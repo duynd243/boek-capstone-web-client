@@ -33,7 +33,6 @@ export default function Home() {
               height={400}
               alt="Student"
               src="https://images.unsplash.com/photo-1621274790572-7c32596bc67f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=654&q=80"
-              //Hold the mouse to enlarge the image
               className="h-40 w-full object-cover sm:h-56 md:h-full rounded shadow-lg hover:shadow-2xl transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
             />
             <Image
