@@ -1,3 +1,120 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+* {
+  font-family: "Inter", sans-serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+::-webkit-scrollbar {
+  width: 0.4em;
+  height: 0.4em;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(0, 0%, 91%);
+  border-radius: 100vw;
+  margin-block: 0.2em;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(0, 0%, 71%);
+  border-radius: 100vw;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(0, 0%, 60%);
+}
+
+/* SweetAlert 2 re-customized */
+
+.swal2-popup {
+  @apply rounded-xl px-6 pt-6 pb-8 shadow-sm #{!important};
+}
+
+.swal2-close {
+  @apply h-[1.1rem]
+  w-[1.1rem]
+  focus:shadow-none #{!important};
+}
+
+.swal2-icon {
+  @apply scale-[0.92] #{!important};
+}
+
+.swal2-actions {
+  @apply mt-10
+  block
+  w-full
+  sm:flex
+  sm:gap-1 #{!important};
+}
+
+.swal2-actions button {
+  @apply w-full
+  rounded-lg
+  border-2
+  py-2.5
+  text-base
+  font-medium
+  outline-none
+  ring-blue-500
+  ring-offset-2
+  focus:shadow-sm
+  sm:flex-1 #{!important};
+}
+
+.swal2-styled.swal2-confirm {
+  @apply border-blue-500
+  bg-blue-500
+  text-white
+  hover:bg-blue-600 #{!important};
+}
+
+.swal2-styled {
+  .swal2-cancel {
+    @apply border-solid
+    border-[#EDEDED]
+    bg-white
+    text-[#6D6D6D] #{!important};
+  }
+}
+
+.m-btn,
+.m-btn-lg,
+.m-btn-sm,
+.m-btn-xs {
+  @apply inline-flex items-center justify-center rounded border border-transparent text-sm font-medium leading-5 shadow-sm transition duration-150 ease-in-out;
+}
+
+.m-btn {
+  @apply px-3 py-2;
+}
+
+.m-btn-lg {
+  @apply px-4 py-3;
+}
+
+.m-btn-sm {
+  @apply px-2 py-1;
+}
+
+.m-btn-xs {
+  @apply px-2 py-0.5;
+}
+
+.input-error {
+  @apply mt-1 text-sm font-medium text-red-500;
+}

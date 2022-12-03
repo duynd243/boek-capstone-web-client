@@ -5,7 +5,16 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        "progress-loading": {
+          "50%": { left: "107%" },
+        },
+      },
+      animation: {
+        "progress-loading": "progress-loading 4s linear infinite",
+      },
+    },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/line-clamp"), require("@tailwindcss/forms")],
 };
