@@ -3,6 +3,8 @@ import Image from "next/image";
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/router";
+import { findRole } from "../constants/Roles";
+import Link from "next/link";
 
 const Index = () => {
   const router = useRouter();
@@ -31,6 +33,14 @@ const Index = () => {
                   {loginUser ? "Logout" : "Login"}
                 </div>
               </div>
+              {loginUser && (
+                <Link
+                  href={findRole(loginUser?.role)?.defaultRoute || "/"}
+                  className="mt-4 block text-white underline"
+                >
+                  Go to {findRole(loginUser?.role)?.name} page
+                </Link>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-1 lg:grid-cols-2">
