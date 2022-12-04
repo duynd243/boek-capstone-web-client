@@ -19,6 +19,8 @@ import LoadingProgress from "../components/LoadingProgress";
 import { toast } from "react-hot-toast";
 import { ILoginUser } from "../types/ILoginUser";
 import { UserService } from "../services/UserService";
+import TransitionModal from "../components/Modal/TransitionModal";
+import LogoutModal from "../components/Modal/LogoutModal";
 
 export interface IAuthContext {
   user: any;
@@ -39,6 +41,9 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loginUser, setLoginUser] = useState<ILoginUser | null>(null);
   const [authLoading, setAuthLoading] = useState<boolean>(true);
+
+  const [showLogOutModal, setShowLogOutModal] = useState<boolean>(false);
+
   const userService = new UserService();
   const googleProvider = new GoogleAuthProvider();
   const auth = getAuth();
@@ -64,24 +69,36 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
         toast.success("Đăng nhập thành công");
       })
       .catch((err) => {
-        toast.error(err);
+        console.log("Google Sign In Error: ", err);
       });
   };
   const logOut = () => {
-    Swal.fire({
-      title: "Bạn có chắc chắn?",
-      text: "Tài khoản của bạn sẽ bị đăng xuất!",
-      icon: "warning",
-      confirmButtonText: "Đăng xuất",
-      showCancelButton: true,
-      cancelButtonText: "Hủy",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await signOut(auth);
-        toast.success("Đăng xuất thành công");
-        await router.push("/");
-      }
+    // Swal.fire({
+    //     title: "Bạn có chắc chắn?",
+    //     text: "Tài khoản của bạn sẽ bị đăng xuất!",
+    //     icon: "warning",
+    //     confirmButtonText: "Đăng xuất",
+    //     showCancelButton: true,
+    //     cancelButtonText: "Hủy",
+    // }).then(async (result) => {
+    //     if (result.isConfirmed) {
+    //         await signOut(auth);
+    //         toast.success("Đăng xuất thành công");
+    //         await router.push("/");
+    //     }
+    // });
+
+    setShowLogOutModal(true);
+  };
+
+  const doLogOut = async () => {
+    await toast.promise(signOut(auth), {
+      loading: "Đang đăng xuất...",
+      success: "Đăng xuất thành công",
+      error: "Xảy ra lỗi khi đăng xuất",
     });
+    await router.push("/");
+    setShowLogOutModal(false);
   };
 
   const handleServerAuthentication = async (firebaseUser: any) => {
@@ -127,6 +144,13 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
       }}
     >
       {authLoading ? <LoadingProgress /> : children}
+      {loginUser && (
+        <LogoutModal
+          doLogout={doLogOut}
+          isOpen={showLogOutModal}
+          onClose={() => setShowLogOutModal(false)}
+        />
+      )}
     </AuthContext.Provider>
   );
 };

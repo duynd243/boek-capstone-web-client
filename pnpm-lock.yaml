@@ -6,8 +6,8 @@ specifiers:
   "@radix-ui/react-primitive": ^1.0.1
   "@tailwindcss/forms": ^0.5.3
   "@tailwindcss/line-clamp": ^0.4.2
-  "@tanstack/react-query": ^4.19.0
-  "@tanstack/react-query-devtools": ^4.19.0
+  "@tanstack/react-query": ^4.19.1
+  "@tanstack/react-query-devtools": ^4.19.1
   "@types/node": 18.11.9
   "@types/react": 18.0.25
   "@types/react-dom": 18.0.9
@@ -36,8 +36,8 @@ specifiers:
 dependencies:
   "@headlessui/react": 1.7.4_biqbaboplfbrettd7655fr4n2y
   "@radix-ui/react-primitive": 1.0.1_biqbaboplfbrettd7655fr4n2y
-  "@tanstack/react-query": 4.19.0_biqbaboplfbrettd7655fr4n2y
-  "@tanstack/react-query-devtools": 4.19.0_budcsmmktl2xfbndofa5sinodm
+  "@tanstack/react-query": 4.19.1_biqbaboplfbrettd7655fr4n2y
+  "@tanstack/react-query-devtools": 4.19.1_xnkyuugmv5unvdsxvtkktqsuae
   axios: 1.2.0
   date-fns: 2.29.3
   firebase: 9.14.0
@@ -1174,35 +1174,35 @@ packages:
       remove-accents: 0.4.2
     dev: false
 
-  /@tanstack/query-core/4.19.0:
+  /@tanstack/query-core/4.19.1:
     resolution:
       {
-        integrity: sha512-q+4GvS05nG2UXDE4ng0NU5SQNhT+VqhRTLNVtgVw1tIKJfG3CyYQpP/JwAdzMB7NEqC8L5oo9NAaORxEQN53dg==,
+        integrity: sha512-Zp0aIose5C8skBzqbVFGk9HJsPtUhRVDVNWIqVzFbGQQgYSeLZMd3Sdb4+EnA5wl1J7X+bre2PJGnQg9x/zHOA==,
       }
     dev: false
 
-  /@tanstack/react-query-devtools/4.19.0_budcsmmktl2xfbndofa5sinodm:
+  /@tanstack/react-query-devtools/4.19.1_xnkyuugmv5unvdsxvtkktqsuae:
     resolution:
       {
-        integrity: sha512-j9Md4xaWRRt/mKZe+sv+M41LfymtzdFcYNPIttGdBV4IQKnCSfuFMztBlIxTPbPGjMz2vTzx4QbYKeIyJxDysg==,
+        integrity: sha512-U63A+ly9JLPJj7ryR9omdXT3n+gS7jlExrHty4klsd/6xdUhC38CKZyZ0Gi3vctaVYRGTU8/vI+uKzBYdFqLaA==,
       }
     peerDependencies:
-      "@tanstack/react-query": 4.19.0
+      "@tanstack/react-query": 4.19.1
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       "@tanstack/match-sorter-utils": 8.7.0
-      "@tanstack/react-query": 4.19.0_biqbaboplfbrettd7655fr4n2y
+      "@tanstack/react-query": 4.19.1_biqbaboplfbrettd7655fr4n2y
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       superjson: 1.11.0
       use-sync-external-store: 1.2.0_react@18.2.0
     dev: false
 
-  /@tanstack/react-query/4.19.0_biqbaboplfbrettd7655fr4n2y:
+  /@tanstack/react-query/4.19.1_biqbaboplfbrettd7655fr4n2y:
     resolution:
       {
-        integrity: sha512-gP4kmfQ3BvCYxTxA/3Xf0P24iNgW539Thk89KzP7X+i+EvFiWhEUMl1NtuI87bFrVEBHs+1ColFNimDidBh/Ww==,
+        integrity: sha512-5dvHvmc0vrWI03AJugzvKfirxCyCLe+qawrWFCXdu8t7dklIhJ7D5ZhgTypv7mMtIpdHPcECtCiT/+V74wCn2A==,
       }
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -1214,7 +1214,7 @@ packages:
       react-native:
         optional: true
     dependencies:
-      "@tanstack/query-core": 4.19.0
+      "@tanstack/query-core": 4.19.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0
@@ -1555,7 +1555,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.4
-      caniuse-lite: 1.0.30001435
+      caniuse-lite: 1.0.30001436
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -1630,7 +1630,7 @@ packages:
     engines: { node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7 }
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001435
+      caniuse-lite: 1.0.30001436
       electron-to-chromium: 1.4.284
       node-releases: 2.0.6
       update-browserslist-db: 1.0.10_browserslist@4.21.4
@@ -1662,10 +1662,10 @@ packages:
     engines: { node: ">= 6" }
     dev: true
 
-  /caniuse-lite/1.0.30001435:
+  /caniuse-lite/1.0.30001436:
     resolution:
       {
-        integrity: sha512-kdCkUTjR+v4YAJelyiDTqiu82BDr4W4CP5sgTA0ZBmqn30XfS2ZghPLMowik9TPhS+psWJiUNxsqLyurDbmutA==,
+        integrity: sha512-ZmWkKsnC2ifEPoWUvSAIGyOYwT+keAaaWPHiQ9DfMqS1t6tfuyFYoWR78TeZtznkEQ64+vGXH9cZrElwR2Mrxg==,
       }
 
   /chalk/4.1.2:
@@ -3457,7 +3457,7 @@ packages:
     dependencies:
       "@next/env": 13.0.4
       "@swc/helpers": 0.4.11
-      caniuse-lite: 1.0.30001435
+      caniuse-lite: 1.0.30001436
       postcss: 8.4.14
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0

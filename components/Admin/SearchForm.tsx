@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FormEvent, useState } from "react";
 import { useRouter } from "next/router";
 
 type Props = {
@@ -10,9 +10,9 @@ const SearchForm: React.FC<Props> = ({
   defaultValue,
   placeholder = "Tìm kiếm...",
 }) => {
-  const [inputSearch, setInputSearch] = React.useState(defaultValue || "");
+  const [inputSearch, setInputSearch] = useState(defaultValue || "");
   const router = useRouter();
-  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await router.push({
       pathname: router.pathname,
