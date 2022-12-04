@@ -6,8 +6,8 @@ specifiers:
   '@radix-ui/react-primitive': ^1.0.1
   '@tailwindcss/forms': ^0.5.3
   '@tailwindcss/line-clamp': ^0.4.2
-  '@tanstack/react-query': ^4.19.0
-  '@tanstack/react-query-devtools': ^4.19.0
+  '@tanstack/react-query': ^4.19.1
+  '@tanstack/react-query-devtools': ^4.19.1
   '@types/node': 18.11.9
   '@types/react': 18.0.25
   '@types/react-dom': 18.0.9
