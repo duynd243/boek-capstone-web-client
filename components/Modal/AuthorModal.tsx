@@ -140,7 +140,7 @@ const AuthorModal: React.FC<Props> = ({ action, isOpen, onClose, author }) => {
               type="text"
             />
             {form.errors.authorName && form.touched.authorName && (
-              <div className="mt-1 text-sm text-rose-500">
+              <div className="mt-1 text-sm font-medium text-rose-500">
                 {form.errors.authorName}
               </div>
             )}
