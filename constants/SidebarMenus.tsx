@@ -8,8 +8,12 @@ import {
   BsFillPieChartFill,
   BsFillTagsFill,
   BsPersonBadgeFill,
+  BsFillBarChartFill,
+  BsFillCalendarWeekFill,
+  BsBookFill
 } from "react-icons/bs";
 import { GiShop } from "react-icons/gi";
+import { ImBook } from 'react-icons/im';
 
 export interface ISidebarMenu {
   name: string;
@@ -61,6 +65,7 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
         path: "/admin/genres",
         icon: <BsFillTagsFill />,
       },
+
     ],
   },
   {
@@ -75,4 +80,26 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
   },
 ];
 
-export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [];
+export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
+  {
+    groupName: "Chung",
+    menus: [
+      {
+        name: "Dashboard",
+        path: "/issuer",
+        icon: <BsFillBarChartFill />,
+      },
+
+      {
+        name: "Sự kiện",
+        path: "/issuer/campaigns",
+        icon: <BsFillCalendarWeekFill />,
+      },
+      {
+        name: "Kho sách",
+        path: "/issuer/books",
+        icon: <ImBook />,
+      },
+    ],
+  },
+];
