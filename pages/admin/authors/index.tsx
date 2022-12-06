@@ -28,11 +28,6 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
     }>(); // Author to be updated (passed to AuthorModal)
     const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
     const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
-
-    useEffect(() => {
-        setSearch(router.query.search as string);
-    }, [router.query.search]);
-
     const {data: authorData, isLoading} = useQuery(
         ["authors", page, size, search],
         () =>
@@ -45,6 +40,12 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
             keepPreviousData: true,
         }
     );
+    useEffect(() => {
+        const search = router.query.search as string;
+        setSearch(search ? search : "");
+        setPage(1); // Reset page to 1 when search changes
+    }, [router.query.search]);
+
 
     if (isLoading) return <LoadingSpinnerWithOverlay/>;
 
@@ -116,7 +117,7 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
                                                  setSize={setSize}
                                                  page={page}
                                                  setPage={setPage}
-                                                 total={authorData?.metadata?.total || 0}
+                                                 metadata={authorData?.metadata}
                                                  pageSizeOptions={pageSizeOptions}/>
                                 </table>
                             </div>

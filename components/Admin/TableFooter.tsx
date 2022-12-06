@@ -1,12 +1,13 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {MdNavigateBefore, MdNavigateNext} from "react-icons/md";
+import {IPaginationMetaData} from "../../types/IBaseListResponse";
 
 type Props = {
     size: number,
     setSize: React.Dispatch<React.SetStateAction<number>>,
     page: number,
     setPage: React.Dispatch<React.SetStateAction<number>>,
-    total: number,
+    metadata: IPaginationMetaData,
     pageSizeOptions: number[],
 }
 
@@ -16,31 +17,27 @@ const TableFooter: React.FC<Props> = (
         setSize,
         page,
         setPage,
-        total,
+        metadata,
         pageSizeOptions
     }
 ) => {
-    const [lastPage, setLastPage] = React.useState<number>(0);
+
+    const total = metadata?.total;
+    const [lastPage, setLastPage] = useState<number>(0);
+
+    const handleSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSize(parseInt(e.target.value));
+        setPage(1);
+    }
+    useEffect(() => {
+        setLastPage(Math.ceil(total ? (total / size) : 0));
+    }, [size, total]);
+
     const fromItem = (page - 1) * size + 1;
     const toItem =
         total && page * size > total
             ? total
             : page * size;
-    console.log(Math.ceil(
-            total ? (total / size) : 0
-        ));
-
-    console.log(total, size, page);
-    useEffect(() => {
-        setLastPage(Math.ceil(
-            total ? (total / size) : 0
-        ));
-    }, [size, total]);
-
-
-    useEffect(() => {
-        if (page > lastPage) setPage(1);
-    }, [page, lastPage, setPage]);
 
     return (
         <tfoot>
@@ -55,9 +52,7 @@ const TableFooter: React.FC<Props> = (
                         <select
                             className="form-select rounded-md border-gray-300 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                             value={size}
-                            onChange={(e) =>
-                                setSize(parseInt(e.target.value))
-                            }
+                            onChange={handleSizeChange}
                         >
                             {pageSizeOptions.map((pageSize) => (
                                 <option key={pageSize} value={pageSize}>
