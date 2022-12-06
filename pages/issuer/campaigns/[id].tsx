@@ -7,9 +7,9 @@ import { useRouter } from 'next/router';
 import { useQuery } from '@tanstack/react-query';
 import LoadingProgress from '../../../components/Commons/LoadingProgress';
 import { IssuerCampaignService } from '../../../services/Issuer/Issuer_CampaignService';
-// import MainContent from '../../../components/CampaignDetails/MainContent';
+import MainContent from '../../../components/CampaignDetails/MainContent';
 import {NextPageWithLayout} from "../../_app";
-// import Sidebar from '../../../components/CampaignDetails/Sidebar';
+import Sidebar from '../../../components/CampaignDetails/Sidebar';
 import { IUser } from '../../../types/user/IUser';
 
 const IssuerCampaignDetailsPage: NextPageWithLayout = () => {
@@ -28,23 +28,23 @@ const IssuerCampaignDetailsPage: NextPageWithLayout = () => {
         return <LoadingProgress />;
     }
 
-    // const issuers = campaign?.participations
-    //     ?.filter((p) => p.issuer)
-    //     .map((p) => p.issuer) as IUser[];
+    const issuers = campaign?.participations
+        ?.filter((p) => p.issuer)
+        .map((p) => p.issuer) as IUser[];
     return (
-        <AdminLayout>
+        <Fragment>
             <div className="mx-auto flex max-w-5xl flex-col lg:flex-row lg:space-x-8 xl:space-x-16">
                 {campaign && (
                     <>
                         {/* Content */}
-                        {/* <MainContent campaign={campaign} /> */}
+                        <MainContent campaign={campaign} />
 
                         {/* Sidebar */}
-                        {/* <Sidebar campaign={campaign} issuers={issuers} /> */}
+                        <Sidebar campaign={campaign} issuers={issuers} />
                     </>
                 )}
             </div>
-        </AdminLayout>
+        </Fragment>
     );
 };
 IssuerCampaignDetailsPage.getLayout = function getLayout(page: ReactElement) {
