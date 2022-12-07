@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {MdNavigateBefore, MdNavigateNext} from "react-icons/md";
-import {IPaginationMetaData} from "../../types/IBaseListResponse";
+import {IPaginationMetaData} from "../../../types/IBaseListResponse";
 
 type Props = {
     size: number,

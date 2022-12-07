@@ -12,14 +12,20 @@ import DefaultAvatar from "../../../assets/images/default-avatar.png";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import {useRouter} from "next/router";
 import AuthorModal, {AuthorModalMode,} from "../../../components/Modal/AuthorModal";
-import TableFooter from "../../../components/Admin/TableFooter";
+import TableFooter from "../../../components/Admin/Table/TableFooter";
+import EmptyState, {EMPTY_STATE_TYPE} from "../../../components/EmptyState";
+import TableData from "../../../components/Admin/Table/TableData";
+import TableBody from "../../../components/Admin/Table/TableBody";
+import TableWrapper from "../../../components/Admin/Table/TableWrapper";
+import TableHeader from "../../../components/Admin/Table/TableHeader";
+import TableHeading from "../../../components/Admin/Table/TableHeading";
 
 const AdminAuthorsPage: NextPageWithLayout = () => {
     const {loginUser} = useAuth();
     const authorService = new AuthorService(loginUser?.accessToken);
     const pageSizeOptions = [5, 10, 20, 50];
-    const [size, setSize] = useState(pageSizeOptions[0]);
-    const [page, setPage] = useState(1);
+    const [size, setSize] = useState<number>(pageSizeOptions[0]);
+    const [page, setPage] = useState<number>(1);
     const [search, setSearch] = useState<string>("");
     const router = useRouter();
     const [selectedAuthor, setSelectedAuthor] = useState<{
@@ -42,10 +48,9 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
     );
     useEffect(() => {
         const search = router.query.search as string;
-        setSearch(search ? search : "");
+        setSearch(search);
         setPage(1); // Reset page to 1 when search changes
     }, [router.query.search]);
-
 
     if (isLoading) return <LoadingSpinnerWithOverlay/>;
 
@@ -58,74 +63,66 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
                     label="Thêm tác giả"
                 />
             </PageHeading>
-            {authorData?.data && authorData?.data?.length > 0 ? (
-                <div className="flex flex-col">
-                    <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                            <div className="overflow-hidden border border-slate-200 shadow sm:rounded-lg">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-slate-100 text-xs">
-                                    <tr>
-                                        <th
-                                            scope="col"
-                                            className="px-6 py-6 text-left font-medium uppercase tracking-wider text-gray-500"
-                                        >
-                                            Tên tác giả
-                                        </th>
-                                        <th scope="col" className="relative px-6 py-3">
-                                            <span className="sr-only">Edit</span>
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200 bg-white">
-                                    {authorData?.data?.map((author) => (
-                                        <tr key={author?.id}>
-                                            <td className="whitespace-nowrap px-6 py-4">
-                                                <div className="flex items-center">
-                                                    <div className="h-10 w-10 flex-shrink-0">
-                                                        <Image
-                                                            width={100}
-                                                            height={100}
-                                                            className="h-10 w-10 rounded-full"
-                                                            src={DefaultAvatar.src}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="ml-4">
-                                                        <div className="text-sm font-medium text-gray-900">
-                                                            {author?.name}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedAuthor(author);
-                                                        setShowUpdateModal(true);
-                                                    }}
-                                                    className="text-indigo-600 hover:text-indigo-900"
-                                                >
-                                                    Chỉnh sửa
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    </tbody>
 
-                                    <TableFooter size={size}
-                                                 setSize={setSize}
-                                                 page={page}
-                                                 setPage={setPage}
-                                                 metadata={authorData?.metadata}
-                                                 pageSizeOptions={pageSizeOptions}/>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {authorData?.data && authorData?.data?.length > 0 ? (
+                <TableWrapper>
+                    <TableHeading>
+                        <TableHeader>
+                            Tên tác giả
+                        </TableHeader>
+                        <TableHeader>
+                            <span className="sr-only">Edit</span>
+                        </TableHeader>
+                    </TableHeading>
+                    <TableBody>
+                        {authorData?.data?.map((author) => (
+                            <tr key={author?.id}>
+                                <TableData>
+                                    <div className="flex items-center">
+                                        <div className="h-10 w-10 flex-shrink-0">
+                                            <Image
+                                                width={100}
+                                                height={100}
+                                                className="h-10 w-10 rounded-full"
+                                                src={DefaultAvatar.src}
+                                                alt=""
+                                            />
+                                        </div>
+                                        <div className="ml-4">
+                                            <div className="text-sm font-medium text-gray-900">
+                                                {author?.name}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </TableData>
+                                <TableData className="text-right text-sm font-medium">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedAuthor(author);
+                                            setShowUpdateModal(true);
+                                        }}
+                                        className="text-indigo-600 hover:text-indigo-900"
+                                    >
+                                        Chỉnh sửa
+                                    </button>
+                                </TableData>
+                            </tr>
+                        ))}
+                    </TableBody>
+                    <TableFooter size={size}
+                                 setSize={setSize}
+                                 page={page}
+                                 setPage={setPage}
+                                 metadata={authorData?.metadata}
+                                 pageSizeOptions={pageSizeOptions}/>
+                </TableWrapper>
             ) : (
-                <div>Ko có</div>
+                <div className='pt-8'>
+                    {search ? <EmptyState
+                            keyword={search}
+                            status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}/>
+                        : <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}/>}
+                </div>
             )}
 
             <AuthorModal
