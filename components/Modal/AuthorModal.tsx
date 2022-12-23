@@ -1,4 +1,4 @@
-import React from "react";
+import React, {memo} from "react";
 import TransitionModal from "./TransitionModal";
 import {useFormik} from "formik";
 import * as Yup from "yup";
@@ -141,9 +141,7 @@ const AuthorModal: React.FC<Props> = ({action, isOpen, onClose, author}) => {
                             type="text"
                         />
                         {form.errors.authorName && form.touched.authorName && (
-                            <ErrorMessage>
-                                {form.errors.authorName}
-                            </ErrorMessage>
+                            <ErrorMessage>{form.errors.authorName}</ErrorMessage>
                         )}
                     </div>
                 </div>
@@ -157,25 +155,17 @@ const AuthorModal: React.FC<Props> = ({action, isOpen, onClose, author}) => {
                         >
                             Huỷ
                         </button>
-                        {action === AuthorModalMode.CREATE ? (
-                            <button
-                                disabled={createAuthorMutation.isLoading}
-                                type="submit"
-                                className="m-btn bg-indigo-500 text-white hover:bg-indigo-600 disabled:bg-indigo-500"
-                            >
-                                {createAuthorMutation.isLoading ? "Đang thêm..." : "Thêm"}
-                            </button>
-                        ) : (
-                            <button
-                                disabled={updateAuthorMutation.isLoading}
-                                type="submit"
-                                className="m-btn bg-indigo-500 text-white hover:bg-indigo-600 disabled:bg-indigo-500"
-                            >
-                                {updateAuthorMutation.isLoading
-                                    ? "Đang cập nhật..."
-                                    : "Cập nhật"}
-                            </button>
-                        )}
+
+                        <button
+                            disabled={action === AuthorModalMode.CREATE ? createAuthorMutation.isLoading : updateAuthorMutation.isLoading}
+                            type="submit"
+                            className="m-btn bg-indigo-500 text-white hover:bg-indigo-600 disabled:bg-indigo-500"
+                        >
+                            {action === AuthorModalMode.CREATE ?
+                                (createAuthorMutation.isLoading ? "Đang thêm..." : "Thêm") :
+                                (updateAuthorMutation.isLoading ? "Đang cập nhật..." : "Cập nhật")
+                            }
+                        </button>
                     </div>
                 </Modal.Footer>
             </form>
@@ -183,4 +173,4 @@ const AuthorModal: React.FC<Props> = ({action, isOpen, onClose, author}) => {
     );
 };
 
-export default AuthorModal;
+export default memo(AuthorModal);

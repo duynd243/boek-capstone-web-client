@@ -1,61 +1,57 @@
-import React, { Fragment,ReactElement, useEffect, useState } from 'react';
+import React, { Fragment, ReactElement, useEffect, useState } from "react";
 
-import { NextPage } from 'next';
+import { NextPage } from "next";
 import AdminLayout from "../../../components/Layout/AdminLayout";
-import { useAuth } from '../../../context/AuthContext';
-import { useRouter } from 'next/router';
-import { useQuery } from '@tanstack/react-query';
-import LoadingProgress from '../../../components/Commons/LoadingProgress';
-import { IssuerCampaignService } from '../../../services/Issuer/Issuer_CampaignService';
+import { useAuth } from "../../../context/AuthContext";
+import { useRouter } from "next/router";
+import { useQuery } from "@tanstack/react-query";
+import LoadingProgress from "../../../components/Commons/LoadingProgress";
+import { IssuerCampaignService } from "../../../services/Issuer/Issuer_CampaignService";
 
-import MainContent from '../../../components/CampaignDetails/MainContent';
-import {NextPageWithLayout} from "../../_app";
-import Sidebar from '../../../components/CampaignDetails/Sidebar';
+import MainContent from "../../../components/CampaignDetails/MainContent";
+import { NextPageWithLayout } from "../../_app";
+import Sidebar from "../../../components/CampaignDetails/Sidebar";
 
-
-import { IUser } from '../../../types/user/IUser';
+import { IUser } from "../../../types/user/IUser";
 
 const IssuerCampaignDetailsPage: NextPageWithLayout = () => {
-    const { loginUser } = useAuth();
-    const router = useRouter();
-    const issuerCampaignService = new IssuerCampaignService(
-        loginUser?.accessToken
-    );
-    const { id: campaignId } = router.query;
+  const { loginUser } = useAuth();
+  const router = useRouter();
+  const issuerCampaignService = new IssuerCampaignService(
+    loginUser?.accessToken
+  );
+  const { id: campaignId } = router.query;
 
-    const { data: campaign, isLoading } = useQuery(
-        ['issuer_campaign', campaignId],
-        () => issuerCampaignService.getCampaignById$Issuer(campaignId)
-    );
-    if (isLoading) {
-        return <LoadingProgress />;
-    }
+  const { data: campaign, isLoading } = useQuery(
+    ["issuer_campaign", campaignId],
+    () => issuerCampaignService.getCampaignById$Issuer(campaignId)
+  );
+  if (isLoading) {
+    return <LoadingProgress />;
+  }
 
+  const issuers = campaign?.participations
+    ?.filter((p) => p.issuer)
+    .map((p) => p.issuer) as IUser[];
+  return (
+    <Fragment>
+      <div className="mx-auto flex max-w-5xl flex-col lg:flex-row lg:space-x-8 xl:space-x-16">
+        {campaign && (
+          <>
+            {/* Content */}
 
-    const issuers = campaign?.participations
-        ?.filter((p) => p.issuer)
-        .map((p) => p.issuer) as IUser[];
-    return (
-        <Fragment>
+            <MainContent campaign={campaign} />
 
-            <div className="mx-auto flex max-w-5xl flex-col lg:flex-row lg:space-x-8 xl:space-x-16">
-                {campaign && (
-                    <>
-                        {/* Content */}
-
-                        <MainContent campaign={campaign} />
-
-                        {/* Sidebar */}
-                        <Sidebar campaign={campaign} issuers={issuers} />
-                    </>
-                )}
-            </div>
-        </Fragment>
-
-    );
+            {/* Sidebar */}
+            <Sidebar campaign={campaign} issuers={issuers} />
+          </>
+        )}
+      </div>
+    </Fragment>
+  );
 };
 IssuerCampaignDetailsPage.getLayout = function getLayout(page: ReactElement) {
-    return <AdminLayout>{page}</AdminLayout>;
+  return <AdminLayout>{page}</AdminLayout>;
 };
 
 export default IssuerCampaignDetailsPage;

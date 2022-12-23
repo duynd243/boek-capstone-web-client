@@ -10,10 +10,10 @@ import {
   BsPersonBadgeFill,
   BsFillBarChartFill,
   BsFillCalendarWeekFill,
-  BsBookFill
+  BsBookFill,
 } from "react-icons/bs";
 import { GiShop } from "react-icons/gi";
-import { ImBook } from 'react-icons/im';
+import { ImBook } from "react-icons/im";
 
 export interface ISidebarMenu {
   name: string;
@@ -65,7 +65,6 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
         path: "/admin/genres",
         icon: <BsFillTagsFill />,
       },
-
     ],
   },
   {

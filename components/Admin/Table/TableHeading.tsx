@@ -1,17 +1,15 @@
-import React from 'react'
+import React from "react";
 
 type Props = {
-    children: React.ReactNode,
-}
+  children: React.ReactNode;
+};
 
-const TableHeading: React.FC<Props> = ({children}) => {
-    return (
-        <thead className="text-xs">
-        <tr>
-            {children}
-        </tr>
-        </thead>
-    )
-}
+const TableHeading: React.FC<Props> = ({ children }) => {
+  return (
+    <thead className="text-xs">
+      <tr>{children}</tr>
+    </thead>
+  );
+};
 
-export default TableHeading
+export default TableHeading;

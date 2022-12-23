@@ -118,3 +118,7 @@
 .input-error {
   @apply mt-1 text-sm font-medium text-red-500;
 }
+
+.custom-toast {
+  @apply bg-gray-800 text-white rounded-md px-4 py-3 #{!important};
+}

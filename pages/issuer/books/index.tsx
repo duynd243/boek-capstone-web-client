@@ -1,55 +1,52 @@
-import React, { useState,Fragment,ReactElement} from 'react';
-import { NextPage } from 'next';
-import { useAuth } from '../../../context/AuthContext';
-import { IssuerBookService } from '../../../services/Issuer/Issuer_BookService';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, Fragment, ReactElement } from "react";
+import { NextPage } from "next";
+import { useAuth } from "../../../context/AuthContext";
+import { IssuerBookService } from "../../../services/Issuer/Issuer_BookService";
+import { useQuery } from "@tanstack/react-query";
 import AdminLayout from "../../../components/Layout/AdminLayout";
-import {NextPageWithLayout} from "../../_app";
-import SearchForm from '../../../components/Admin/SearchForm';
-import CreateButton from '../../../components/Admin/CreateButton';
-import BookTable from '../../../components/Admin/BookTable';
+import { NextPageWithLayout } from "../../_app";
+import SearchForm from "../../../components/Admin/SearchForm";
+import CreateButton from "../../../components/Admin/CreateButton";
+import BookTable from "../../../components/Admin/BookTable";
 
 const IssuerBooksPage: NextPageWithLayout = () => {
-    const { loginUser } = useAuth();
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(20);
-    const issuerBookService = new IssuerBookService(loginUser?.accessToken);
+  const { loginUser } = useAuth();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const issuerBookService = new IssuerBookService(loginUser?.accessToken);
 
-    const { data: issuerBooks } = useQuery(['issuer_books', page], () =>
-        issuerBookService.getBooks$Issuer({
-            page: page,
-            size: pageSize,
-            sort: 'id desc',
-        })
-    );
-    return (
-        <Fragment>
-            <div className="mb-8 sm:flex sm:items-center sm:justify-between">
-                {/* Left: Title */}
-                <div className="mb-4 sm:mb-0">
-                    <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
-                        Kho sách ✨
-                    </h1>
-                </div>
+  const { data: issuerBooks } = useQuery(["issuer_books", page], () =>
+    issuerBookService.getBooks$Issuer({
+      page: page,
+      size: pageSize,
+      sort: "id desc",
+    })
+  );
+  return (
+    <Fragment>
+      <div className="mb-8 sm:flex sm:items-center sm:justify-between">
+        {/* Left: Title */}
+        <div className="mb-4 sm:mb-0">
+          <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
+            Kho sách ✨
+          </h1>
+        </div>
 
-                {/* Right: Actions */}
-                <div className="grid grid-flow-col justify-start gap-2 sm:auto-cols-max sm:justify-end">
-                    {/* Search form */}
-                    <SearchForm />
-                    {/*/!* Filter button *!/*/}
-                    {/*<FilterButton align="right" />*/}
-                    {/* Create campaign button */}
-                    <CreateButton
-                        href={'/issuer/books/create'}
-                        label={'Thêm sách'}
-                    />
-                </div>
-            </div>
-            {issuerBooks && <BookTable data={issuerBooks} />}
-        </Fragment>
-    );
+        {/* Right: Actions */}
+        <div className="grid grid-flow-col justify-start gap-2 sm:auto-cols-max sm:justify-end">
+          {/* Search form */}
+          <SearchForm />
+          {/*/!* Filter button *!/*/}
+          {/*<FilterButton align="right" />*/}
+          {/* Create campaign button */}
+          <CreateButton href={"/issuer/books/create"} label={"Thêm sách"} />
+        </div>
+      </div>
+      {issuerBooks && <BookTable data={issuerBooks} />}
+    </Fragment>
+  );
 };
 IssuerBooksPage.getLayout = function getLayout(page: ReactElement) {
-    return <AdminLayout>{page}</AdminLayout>;
+  return <AdminLayout>{page}</AdminLayout>;
 };
 export default IssuerBooksPage;

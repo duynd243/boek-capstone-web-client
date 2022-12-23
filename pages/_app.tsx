@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { AppProps } from "next/app";
 import "../styles/global.scss";
-import { Toaster } from "react-hot-toast";
+import { Toaster, ToasterProps } from "react-hot-toast";
 import { initFirebaseApp } from "../services/initFirebase";
 import { Fragment, ReactElement, ReactNode, useEffect, useState } from "react";
 import { NextPage } from "next";
@@ -20,6 +20,14 @@ export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 
 type CustomAppProps = AppProps & {
   Component: NextPageWithLayout;
+};
+
+const toasterConfig: ToasterProps = {
+  position: "top-right",
+  toastOptions: {
+    className: "custom-toast",
+  },
+  gutter: 12,
 };
 
 export default function App({ Component, pageProps }: CustomAppProps) {
@@ -47,7 +55,7 @@ export default function App({ Component, pageProps }: CustomAppProps) {
           <Fragment>{component}</Fragment>
         )}
       </AuthContextProvider>
-      <Toaster position="bottom-right" />
+      <Toaster {...toasterConfig} />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

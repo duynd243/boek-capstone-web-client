@@ -8,10 +8,11 @@ import Image from "next/image";
 import {useAuth} from "../../../context/AuthContext";
 import {AuthorService} from "../../../services/AuthorService";
 import {useQuery} from "@tanstack/react-query";
-import DefaultAvatar from "../../../assets/images/default-avatar.png";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import {useRouter} from "next/router";
-import AuthorModal, {AuthorModalMode,} from "../../../components/Modal/AuthorModal";
+import AuthorModal, {
+    AuthorModalMode,
+} from "../../../components/Modal/AuthorModal";
 import TableFooter from "../../../components/Admin/Table/TableFooter";
 import EmptyState, {EMPTY_STATE_TYPE} from "../../../components/EmptyState";
 import TableData from "../../../components/Admin/Table/TableData";
@@ -19,6 +20,7 @@ import TableBody from "../../../components/Admin/Table/TableBody";
 import TableWrapper from "../../../components/Admin/Table/TableWrapper";
 import TableHeader from "../../../components/Admin/Table/TableHeader";
 import TableHeading from "../../../components/Admin/Table/TableHeading";
+import {getAvatarFromName} from "../../../utils/helper";
 
 const AdminAuthorsPage: NextPageWithLayout = () => {
     const {loginUser} = useAuth();
@@ -67,9 +69,7 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
             {authorData?.data && authorData?.data?.length > 0 ? (
                 <TableWrapper>
                     <TableHeading>
-                        <TableHeader>
-                            Tên tác giả
-                        </TableHeader>
+                        <TableHeader>Tên tác giả</TableHeader>
                         <TableHeader>
                             <span className="sr-only">Edit</span>
                         </TableHeader>
@@ -84,7 +84,7 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
                                                 width={100}
                                                 height={100}
                                                 className="h-10 w-10 rounded-full"
-                                                src={DefaultAvatar.src}
+                                                src={getAvatarFromName(author?.name)}
                                                 alt=""
                                             />
                                         </div>
@@ -109,19 +109,26 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
                             </tr>
                         ))}
                     </TableBody>
-                    <TableFooter size={size}
-                                 setSize={setSize}
-                                 page={page}
-                                 setPage={setPage}
-                                 metadata={authorData?.metadata}
-                                 pageSizeOptions={pageSizeOptions}/>
+                    <TableFooter
+                        colSpan={2}
+                        size={size}
+                        setSize={setSize}
+                        page={page}
+                        setPage={setPage}
+                        metadata={authorData?.metadata}
+                        pageSizeOptions={pageSizeOptions}
+                    />
                 </TableWrapper>
             ) : (
-                <div className='pt-8'>
-                    {search ? <EmptyState
+                <div className="pt-8">
+                    {search ? (
+                        <EmptyState
                             keyword={search}
-                            status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}/>
-                        : <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}/>}
+                            status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
+                        />
+                    ) : (
+                        <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}/>
+                    )}
                 </div>
             )}
 

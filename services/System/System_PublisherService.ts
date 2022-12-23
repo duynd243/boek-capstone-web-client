@@ -1,21 +1,22 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance } from "axios";
 import getAxiosClient from "../axiosClient";
-import { IBaseListResponse } from '../../types/response/IBaseListResponse';
-import { IPublisher } from './../../types/user/IPublisher';
+import { IPublisher } from "./../../types/user/IPublisher";
+import { IBaseListResponse } from "../../types/IBaseListResponse";
 
-export class PublisherService {
-    private readonly axiosClient: AxiosInstance;
+export class SystemPublisherService {
+  private readonly axiosClient: AxiosInstance;
 
-    constructor(accessToken?: string) {
-        this.axiosClient = getAxiosClient(accessToken);
-    }
+  constructor(accessToken?: string) {
+    this.axiosClient = getAxiosClient(accessToken);
+  }
 
-    getPublishers = async (params?: any) => {
-        const response = await this.axiosClient.get<
-            IBaseListResponse<IPublisher>
-        >('/publishers', {
-            params,
-        });
-        return response.data;
-    };
+  getPublishers = async (params?: any) => {
+    const response = await this.axiosClient.get<IBaseListResponse<IPublisher>>(
+      "/publishers",
+      {
+        params,
+      }
+    );
+    return response.data;
+  };
 }
