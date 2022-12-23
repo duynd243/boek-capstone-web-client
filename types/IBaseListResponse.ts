@@ -1,8 +1,10 @@
+export interface IPaginationMetaData {
+  page: number;
+  size: number;
+  total: number;
+}
+
 export interface IBaseListResponse<T> {
-  metadata: {
-    page: number;
-    size: number;
-    total: number;
-  };
+  metadata: IPaginationMetaData;
   data: T[];
 }

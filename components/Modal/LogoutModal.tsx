@@ -18,7 +18,7 @@ const LogoutModal: React.FC<Props> = (props) => {
           <div className="rounded-full bg-rose-100 p-1.5">
             <HiExclamationCircle className="text-3xl text-rose-500" />
           </div>
-          <p className="text-base text-slate-700">
+          <p className="text-base font-medium text-slate-800">
             Bạn có chắc chắn muốn đăng xuất?
           </p>
         </div>
