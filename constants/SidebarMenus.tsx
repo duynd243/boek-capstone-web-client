@@ -84,13 +84,13 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
     groupName: "Chung",
     menus: [
       {
-        name: "Dashboard",
+        name: "Tổng quan",
         path: "/issuer",
-        icon: <BsFillBarChartFill />,
+        icon: <BsFillPieChartFill />,
       },
 
       {
-        name: "Sự kiện",
+        name: "Hội sách",
         path: "/issuer/campaigns",
         icon: <BsFillCalendarWeekFill />,
       },
@@ -98,6 +98,26 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
         name: "Kho sách",
         path: "/issuer/books",
         icon: <ImBook />,
+      },
+      {
+        name: "Đơn hàng",
+        path: "/issuer/orders",
+        icon: <BsFillFileEarmarkMedicalFill />,
+      },
+      {
+        name: "Khách hàng",
+        path: "/issuer/customers",
+        icon: <BsFillPeopleFill />,
+      },
+    ],
+  },
+  {
+    groupName: "Cài đặt",
+    menus: [
+      {
+        name: "Cài đặt",
+        path: "/admin/settings",
+        icon: <BsFillGearFill />,
       },
     ],
   },

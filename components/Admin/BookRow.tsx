@@ -1,15 +1,23 @@
-import React from "react";
+import React, { Fragment, ReactElement, useEffect, useState } from "react";
 import { IBookResponse } from "../../types/response/IBookResponse";
 import Image from "next/image";
 import DefaultAvatar from "./../../assets/images/default-avatar.png";
 import TableData, { noDataLabel } from "./TableData";
 import { getFormattedPrice } from "../../utils/helper";
+import BookModal, {
+  BookModalMode,
+} from "./../../components/Modal/BookModal";
+
 
 type Props = {
   book: IBookResponse;
 };
-
 const BookRow: React.FC<Props> = ({ book }) => {
+  const [selectedBook, setSelectedBook] = useState<{
+    id?: number;
+    name?: string;
+  }>();
+  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
   return (
     <tr>
       <td className="whitespace-nowrap px-2 py-3 first:pl-5 last:pr-5">
@@ -18,15 +26,25 @@ const BookRow: React.FC<Props> = ({ book }) => {
       <td className="whitespace-nowrap px-2 py-3 first:pl-5 last:pr-5">
         <div className="flex items-center">
           <div className="mr-2 h-[100px] w-[64px] shrink-0 sm:mr-3">
+            {/* Khi bấm vào tên sách sẽ hiện Modal bao gồm tên chi tiết của sách và hình sách */}
             <Image
-              className="rounded"
+              onClick={() => {
+
+                setSelectedBook({
+                  id: book?.id,
+                  name: book?.name,
+                });
+                setShowUpdateModal(true);
+              }
+              }
+              className="rounded cursor-pointer"
               src={book?.imageUrl || DefaultAvatar.src}
               width="80"
               height="100"
               alt={book?.name || ""}
             />
           </div>
-          <div className="font-medium text-slate-800">{book.name}</div>
+          <div className="font-medium w-[100px] text-slate-500 text-ellipsis overflow-hidden">{book.name}</div>
         </div>
       </td>
 
@@ -51,15 +69,21 @@ const BookRow: React.FC<Props> = ({ book }) => {
       <TableData>{book?.language || noDataLabel}</TableData>
       <td className="w-px whitespace-nowrap px-2 py-3 first:pl-5 last:pr-5">
         {/* Menu button */}
-        <button className="rounded-full text-slate-400 hover:text-slate-500">
+        {/* <button className="rounded-full text-slate-400 hover:text-slate-500">
           <span className="sr-only">Menu</span>
           <svg className="h-8 w-8 fill-current" viewBox="0 0 32 32">
             <circle cx="16" cy="16" r="2" />
             <circle cx="10" cy="16" r="2" />
             <circle cx="22" cy="16" r="2" />
           </svg>
-        </button>
+        </button> */}
       </td>
+      <BookModal
+        action={BookModalMode.UPDATE}
+        book={selectedBook as { id?: number; name?: string }}
+        onClose={() => setShowUpdateModal(false)}
+        isOpen={showUpdateModal}
+      />
     </tr>
   );
 };

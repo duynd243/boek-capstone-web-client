@@ -10,7 +10,13 @@ export class IssuerBookService {
   constructor(accessToken?: string) {
     this.axiosClient = getAxiosClient(accessToken);
   }
-
+  updateBook = async (params?: any) => {
+    const response = await this.axiosClient.put<{
+      id?: number;
+      name?: string;
+    }>("/issuer/books", params);
+    return response.data;
+  };
   getBooks$Issuer = async (params?: any) => {
     const response = await this.axiosClient.get<
       IBaseListResponse<IBookResponse>

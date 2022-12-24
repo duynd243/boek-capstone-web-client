@@ -140,7 +140,7 @@ const MainContent: React.FC<Props> = ({ campaign }) => {
       {/* Posts */}
       <div>
         <ContentHeader
-          text={`Bài đăng (${posts?.pages[0]?.metadata.total || 0})`}
+          text={`Sản phẩm (${posts?.pages[0]?.metadata.total || 0})`}
         />
         {isInitialLoading ? (
           <div className={"my-6"}>Đang tải...</div>

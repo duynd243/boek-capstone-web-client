@@ -19,7 +19,10 @@ const IssuerCampaignsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
   const [page, setPage] = React.useState(1);
+  const [size, setSize] = useState<number>(10);
+  const [search, setSearch] = useState<string>("");
   const [otherPage, setOtherPage] = React.useState(1);
+  const [endedPage, setEndedPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(200);
   const [selectedStatus, setSelectedStatus] = useState<undefined | number>(
     undefined
@@ -28,20 +31,28 @@ const IssuerCampaignsPage: NextPageWithLayout = () => {
   const CampaignTabs = [
     {
       id: 0,
-      name: "Sự kiện của tôi",
+      name: "Hội sách của tôi",
     },
     {
       id: 1,
-      name: "Các sự kiện khác",
+      name: "Các hội sách khác",
+      statusColor: "bg-green-500",
     },
+    {
+      id: 2,
+      name: "Hội sách đã kết thúc",
+      statusColor: "bg-red-500",
+
+    }
   ];
 
   const { data: campaigns, isLoading } = useQuery(
-    ["issuer_campaigns", page],
+    ["issuer_campaigns", page, size, search, selectedStatus],
     () =>
       issuerCampaignService.getCampaigns$Issuer({
         page: page,
         size: pageSize,
+        name: search,
         sort: "id desc",
       })
   );
@@ -55,13 +66,22 @@ const IssuerCampaignsPage: NextPageWithLayout = () => {
         sort: "id desc",
       })
   );
+  const { data: endedCampaigns, isLoading: isEndedLoading } = useQuery(
+    ["issuer_ended_campaigns", endedPage],
+    () =>
+      issuerCampaignService.getEndedCampaigns$Issuer({
+        page: endedPage,
+        size: pageSize,
+        sort: "id desc",
+      })
+  );
   return (
     <Fragment>
       <div className="mb-8 sm:flex sm:items-center sm:justify-between">
         {/* Left: Title */}
         <div className="mb-4 sm:mb-0">
           <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
-            Sự kiện ✨
+            Hội sách ✨
           </h1>
         </div>
 
@@ -82,7 +102,12 @@ const IssuerCampaignsPage: NextPageWithLayout = () => {
               <Tab as={"div"} className={"focus:outline-none"} key={tab.name}>
                 {({ selected }) => {
                   if (selected) setSelectedStatus(tab.id);
-                  return <Chip active={selected}>{tab.name}</Chip>;
+                  return <Chip active={selected}>{tab?.statusColor && (
+                    <span
+                      className={`mr-2 inline-block h-2 w-2 rounded-full ${tab.statusColor}`}
+                    />
+                  )}
+                    {tab.name}</Chip>;
                 }}
               </Tab>
             ))}
@@ -111,6 +136,22 @@ const IssuerCampaignsPage: NextPageWithLayout = () => {
               <div>Đang tải...</div>
             ) : (
               otherCampaigns?.data?.map((campaign) => (
+                <div
+                  key={campaign.id}
+                  className={"col-span-full sm:col-span-6 xl:col-span-4"}
+                >
+                  <AdminCampaignCard campaign={campaign} />
+                </div>
+              ))
+            )}
+          </div>
+        </Tab.Panel>
+        <Tab.Panel as={Fragment}>
+          <div className="grid grid-cols-12 gap-6">
+            {isEndedLoading ? (
+              <div>Đang tải...</div>
+            ) : (
+              endedCampaigns?.data?.map((campaign) => (
                 <div
                   key={campaign.id}
                   className={"col-span-full sm:col-span-6 xl:col-span-4"}

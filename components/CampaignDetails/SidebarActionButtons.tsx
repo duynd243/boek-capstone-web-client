@@ -115,7 +115,7 @@ const IssuerActionButtons: React.FC<Props> = ({ campaign, issuers }) => {
         className="flex w-full items-center justify-center gap-2 rounded bg-indigo-500 py-2 text-white hover:bg-indigo-600"
       >
         <IoAddCircle size={14} />
-        <span>Tạo bài đăng</span>
+        <span>Thêm Sách</span>
       </Link>
     );
   }
@@ -134,7 +134,7 @@ const IssuerActionButtons: React.FC<Props> = ({ campaign, issuers }) => {
         className="flex w-full items-center justify-center gap-2 rounded bg-slate-500 py-2 text-white hover:bg-slate-600"
       >
         <IoAddCircle size={14} />
-        <span>Tạo bài đăng</span>
+        <span>Thêm Sách</span>
       </Link>
     );
   }
