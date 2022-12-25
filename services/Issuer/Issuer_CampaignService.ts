@@ -36,4 +36,14 @@ export class IssuerCampaignService {
     );
     return response.data;
   };
+  
+  getEndedCampaigns$Issuer = async (params?: any) => {
+    const response = await this.axiosClient.get<IBaseListResponse<ICampaign>>(
+      "/issuer/campaigns/ended",
+      {
+        params,
+      }
+    );
+    return response.data;
+  };
 }
