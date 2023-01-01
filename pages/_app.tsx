@@ -10,6 +10,7 @@ import { AuthContextProvider } from "../context/AuthContext";
 import ProtectedRouteWrapper from "../components/ProtectedRouteWrapper";
 import { useRouter } from "next/router";
 import { IProtectedRoute, ProtectedRoutes } from "../constants/ProtectedRoutes";
+import PostContextProvider from "../context/PostContext";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ export default function App({ Component, pageProps }: CustomAppProps) {
     IProtectedRoute | undefined
   >(undefined);
   const getLayout = Component.getLayout ?? ((page) => page);
+
   const router = useRouter();
 
   useEffect(() => {

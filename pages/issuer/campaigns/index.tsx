@@ -42,8 +42,7 @@ const IssuerCampaignsPage: NextPageWithLayout = () => {
       id: 2,
       name: "Hội sách đã kết thúc",
       statusColor: "bg-red-500",
-
-    }
+    },
   ];
 
   const { data: campaigns, isLoading } = useQuery(
@@ -102,12 +101,16 @@ const IssuerCampaignsPage: NextPageWithLayout = () => {
               <Tab as={"div"} className={"focus:outline-none"} key={tab.name}>
                 {({ selected }) => {
                   if (selected) setSelectedStatus(tab.id);
-                  return <Chip active={selected}>{tab?.statusColor && (
-                    <span
-                      className={`mr-2 inline-block h-2 w-2 rounded-full ${tab.statusColor}`}
-                    />
-                  )}
-                    {tab.name}</Chip>;
+                  return (
+                    <Chip active={selected}>
+                      {tab?.statusColor && (
+                        <span
+                          className={`mr-2 inline-block h-2 w-2 rounded-full ${tab.statusColor}`}
+                        />
+                      )}
+                      {tab.name}
+                    </Chip>
+                  );
                 }}
               </Tab>
             ))}

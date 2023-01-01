@@ -11,6 +11,11 @@ import {
   BsFillBarChartFill,
   BsFillCalendarWeekFill,
   BsBookFill,
+  BsPrinterFill,
+  BsStack,
+  BsCollectionFill,
+  BsFillDiagram3Fill,
+  BsFillBriefcaseFill,
 } from "react-icons/bs";
 import { GiShop } from "react-icons/gi";
 import { ImBook } from "react-icons/im";
@@ -43,12 +48,22 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
       {
         name: "Nhà xuất bản",
         path: "/admin/publishers",
-        icon: <BsPersonBadgeFill />,
+        icon: <BsPrinterFill />,
       },
       {
         name: "Khách hàng",
         path: "/admin/customers",
         icon: <BsFillPeopleFill />,
+      },
+      {
+        name: "Nhà phát hành",
+        path: "/admin/issuers",
+        icon: <BsStack />,
+      },
+      {
+        name: "Nhân sự",
+        path: "/admin/personnels",
+        icon: <BsFillBriefcaseFill />,
       },
       {
         name: "Đơn hàng",
@@ -61,9 +76,19 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
         icon: <BsFillPenFill />,
       },
       {
-        name: "Thể loại + Chiết khấu",
-        path: "/admin/genres",
+        name: "Thể loại sách",
+        path: "/admin/categories",
         icon: <BsFillTagsFill />,
+      },
+      {
+        name: "Tổ chức",
+        path: "/admin/organizations",
+        icon: <BsFillDiagram3Fill />,
+      },
+      {
+        name: "Nhóm",
+        path: "/admin/groups",
+        icon: <BsCollectionFill />,
       },
     ],
   },

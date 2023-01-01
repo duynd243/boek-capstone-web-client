@@ -143,9 +143,9 @@ const AdminSidebar: React.FC<Props> = ({ isSidebarOpen, setIsSidebarOpen }) => {
           {sidebarMenuGroups.map((group) => {
             return (
               <div className="mt-3.5 first:mt-0" key={group.groupName}>
-                <span className="mb-2 px-3.5 text-xs font-medium uppercase text-slate-400">
+                <div className="mb-2 px-3.5 text-xs font-medium uppercase text-slate-400">
                   {group.groupName}
-                </span>
+                </div>
                 <ul>
                   {group.menus.map((menu) => (
                     <AdminSidebarMenu

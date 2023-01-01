@@ -27,7 +27,6 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
   //   null
   // );
 
- 
   // const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const file = e.target.files?.[0];
   //   if (file) {

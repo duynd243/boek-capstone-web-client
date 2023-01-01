@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
 type Props = {
+  maxWidth?: string;
   children: React.ReactElement;
   isOpen: boolean;
   onClose: () => void;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 const TransitionModal: React.FC<Props> = ({
+  maxWidth = "max-w-lg",
   children,
   isOpen,
   onClose,
@@ -53,7 +55,9 @@ const TransitionModal: React.FC<Props> = ({
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-4"
             >
-              <Dialog.Panel className="max-h-full w-full max-w-lg overflow-auto rounded bg-white shadow-lg">
+              <Dialog.Panel
+                className={`${maxWidth} max-h-full w-full overflow-auto rounded bg-white shadow-lg`}
+              >
                 {children}
               </Dialog.Panel>
             </Transition.Child>

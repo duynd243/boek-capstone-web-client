@@ -1,92 +1,84 @@
 import React, { Fragment, ReactElement, useState } from "react";
-import { NextPageWithLayout } from "../../_app";
 import AdminLayout from "../../../components/Layout/AdminLayout";
+import { NextPageWithLayout } from "../../_app";
 import PageHeading from "../../../components/Admin/PageHeading";
-import Image from "next/image";
-import { faker } from "@faker-js/faker/locale/vi";
 import SearchForm from "../../../components/Admin/SearchForm";
-import TableData from "../../../components/Admin/Table/TableData";
+import CreateButton from "../../../components/Admin/CreateButton";
 import TableWrapper from "../../../components/Admin/Table/TableWrapper";
 import TableHeading from "../../../components/Admin/Table/TableHeading";
 import TableHeader from "../../../components/Admin/Table/TableHeader";
-import Medal, { MedalTypes } from "../../../components/Medal";
-import CustomerModal, {
-  CustomerModalMode,
-} from "../../../components/Modal/CustomerModal";
+import { faker } from "@faker-js/faker/locale/vi";
+import TableData from "../../../components/Admin/Table/TableData";
+import Image from "next/image";
+import TableBody from "../../../components/Admin/Table/TableBody";
+import IssuerModal, {
+  IssuerModalMode,
+} from "../../../components/Modal/IssuerModal";
 
-const customerLevels = [
-  {
-    id: 1,
-    name: "Đồng",
-    medal: MedalTypes.BRONZE,
-  },
-  {
-    id: 2,
-    name: "Bạc",
-    medal: MedalTypes.SILVER,
-  },
-  {
-    id: 3,
-    name: "Vàng",
-    medal: MedalTypes.GOLD,
-  },
-  {
-    id: 4,
-    name: "Kim cương",
-    medal: MedalTypes.DIAMOND,
-  },
-];
-
-export interface IFakeCustomer {
+export interface IFakeIssuer {
   id?: number;
   code?: string;
   name?: string;
   email?: string;
-  address?: string;
-  phone?: string;
-  status?: boolean;
   imageUrl?: string;
+  phone?: string;
+  address?: string;
+  status?: boolean;
+  taxCode?: string;
 }
 
-const AdminCustomersPage: NextPageWithLayout = () => {
-  const [selectedCustomer, setSelectedCustomer] = useState<IFakeCustomer>();
+const AdminIssuersPage: NextPageWithLayout = () => {
+  const [selectedIssuer, setSelectedIssuer] = useState<IFakeIssuer>();
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
+
   return (
     <Fragment>
-      <PageHeading label="Khách hàng">
+      <PageHeading label="Nhà phát hành">
         <SearchForm />
+        <CreateButton
+          onClick={() => setShowCreateModal(true)}
+          label="Thêm nhà phát hành"
+        />
       </PageHeading>
+
       <TableWrapper>
         <TableHeading>
           <TableHeader>Mã số</TableHeader>
-          <TableHeader>Tên khách hàng</TableHeader>
+          <TableHeader>Tên nhà phát hành</TableHeader>
           <TableHeader>Địa chỉ & Điện thoại</TableHeader>
-          <TableHeader textAlignment="text-center">Cấp độ</TableHeader>
+          <TableHeader>Mã số thuế</TableHeader>
           <TableHeader textAlignment="text-center">Trạng thái</TableHeader>
           <TableHeader>
             <span className="sr-only">Edit</span>
           </TableHeader>
         </TableHeading>
-        <tbody className="divide-y divide-gray-200 bg-white">
+        <TableBody>
           {new Array(8).fill(1).map((_, index) => {
-            const randomLevelIndex = faker.datatype.number({
-              min: 0,
-              max: customerLevels.length - 1,
-            });
-            const randomLevel = customerLevels[randomLevelIndex];
-            const fakeCustomer: IFakeCustomer = {
+            const randomBool = faker.datatype.boolean();
+            const fakeIssuer: IFakeIssuer = {
               id: index,
-              code: `C${faker.datatype.number()}`,
+              code: `I${faker.datatype.number({
+                min: 10000,
+                max: 99999,
+              })}`,
               imageUrl: faker.image.avatar(),
               name: faker.name.fullName(),
               email: faker.internet.email(),
               address: faker.address.cityName(),
               phone: faker.phone.number(),
-              status: faker.datatype.boolean(),
+              taxCode: faker.datatype
+                .number({
+                  min: 1000000000,
+                  max: 9999999999,
+                })
+                .toString(),
+              status: randomBool,
             };
             return (
               <tr key={index}>
                 <TableData className="text-sm font-medium uppercase text-gray-500">
-                  {fakeCustomer.code}
+                  {fakeIssuer.code}
                 </TableData>
                 <TableData>
                   <div className="flex items-center">
@@ -95,36 +87,36 @@ const AdminCustomersPage: NextPageWithLayout = () => {
                         width={100}
                         height={100}
                         className="h-10 w-10 rounded-full"
-                        src={fakeCustomer.imageUrl || ""}
+                        src={fakeIssuer?.imageUrl || ""}
                         alt=""
                       />
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {fakeCustomer.name}
+                        {fakeIssuer.name}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {fakeCustomer.email}
+                        {fakeIssuer.email}
                       </div>
                     </div>
                   </div>
                 </TableData>
                 <TableData>
                   <div className="text-sm text-gray-900">
-                    {fakeCustomer.address}
+                    {fakeIssuer.address}
                   </div>
                   <div className="text-sm text-gray-500">
-                    {fakeCustomer.phone}
+                    {fakeIssuer.phone}
                   </div>
                 </TableData>
-                <TableData textAlignment="text-center">
-                  <Medal medalType={randomLevel.medal} />
-                  <div className="text-sm font-medium capitalize text-gray-900">
-                    {randomLevel.name}
-                  </div>
+
+                <TableData>
+                  <span className="text-sm font-medium uppercase text-gray-500">
+                    {fakeIssuer.taxCode}
+                  </span>
                 </TableData>
                 <TableData textAlignment="text-center">
-                  {fakeCustomer.status ? (
+                  {fakeIssuer.status ? (
                     <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold uppercase leading-5 text-green-800">
                       Hoạt động
                     </span>
@@ -135,25 +127,40 @@ const AdminCustomersPage: NextPageWithLayout = () => {
                   )}
                 </TableData>
                 <TableData className="text-right text-sm font-medium">
-                  <button className="text-indigo-600 hover:text-indigo-900">
+                  <button
+                    onClick={() => {
+                      setSelectedIssuer(fakeIssuer);
+                      setShowUpdateModal(true);
+                    }}
+                    className="text-indigo-600 hover:text-indigo-900"
+                  >
                     Chỉnh sửa
                   </button>
                 </TableData>
               </tr>
             );
           })}
-        </tbody>
+        </TableBody>
       </TableWrapper>
-      {/*<CustomerModal*/}
-      {/*    maxWidth='max-w-2xl'*/}
-      {/*    action={CustomerModalMode.UPDATE}*/}
-      {/*    customer={s}*/}
-      {/*    onClose={() => setShowUpdateModal(false)}*/}
-      {/*    isOpen={showUpdateModal}/>*/}
+
+      <IssuerModal
+        maxWidth="max-w-2xl"
+        action={IssuerModalMode.CREATE}
+        onClose={() => setShowCreateModal(false)}
+        isOpen={showCreateModal}
+      />
+
+      <IssuerModal
+        maxWidth="max-w-2xl"
+        action={IssuerModalMode.UPDATE}
+        issuer={selectedIssuer}
+        onClose={() => setShowUpdateModal(false)}
+        isOpen={showUpdateModal}
+      />
     </Fragment>
   );
 };
-AdminCustomersPage.getLayout = function getLayout(page: ReactElement) {
+AdminIssuersPage.getLayout = function getLayout(page: ReactElement) {
   return <AdminLayout>{page}</AdminLayout>;
 };
-export default AdminCustomersPage;
+export default AdminIssuersPage;

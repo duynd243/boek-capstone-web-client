@@ -31,7 +31,7 @@ const SearchForm: React.FC<Props> = ({
         onChange={(e) => setInputSearch(e.target.value)}
         value={inputSearch}
         name="search"
-        className="form-input rounded border border-slate-200 bg-white py-2 px-3 pl-9 text-sm leading-5 text-slate-800 placeholder-slate-400 shadow-sm hover:border-slate-300 focus:border-slate-500 focus:border-slate-300 focus:ring-0"
+        className="form-input rounded border border-slate-200 bg-white py-2 px-3 pl-9 text-sm leading-5 text-slate-800 placeholder-slate-400 shadow-sm hover:border-slate-300 focus:border-blue-500 focus:ring-1"
         placeholder={placeholder}
       />
       <button
