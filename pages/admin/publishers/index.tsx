@@ -1,24 +1,28 @@
-import React, {Fragment, ReactElement, useEffect, useState} from "react";
-import {NextPageWithLayout} from "../../_app";
+import React, { Fragment, ReactElement, useEffect, useState } from "react";
+import { NextPageWithLayout } from "../../_app";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import PageHeading from "../../../components/Admin/PageHeading";
 import SearchForm from "../../../components/Admin/SearchForm";
 import Image from "next/image";
 import CreateButton from "../../../components/Admin/CreateButton";
-import {useAuth} from "../../../context/AuthContext";
-import {useRouter} from "next/router";
-import {useQuery} from "@tanstack/react-query";
+import { useAuth } from "../../../context/AuthContext";
+import { useRouter } from "next/router";
+import { useQuery } from "@tanstack/react-query";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
-import {SystemPublisherService} from "../../../services/System/System_PublisherService";
-import {IPublisher} from "../../../types/user/IPublisher";
+import { SystemPublisherService } from "../../../services/System/System_PublisherService";
+import { IPublisher } from "../../../types/user/IPublisher";
 import TableWrapper from "../../../components/Admin/Table/TableWrapper";
 import TableHeading from "../../../components/Admin/Table/TableHeading";
 import TableHeader from "../../../components/Admin/Table/TableHeader";
 import TableBody from "../../../components/Admin/Table/TableBody";
-import {getAvatarFromName} from "../../../utils/helper";
+import { getAvatarFromName } from "../../../utils/helper";
 import TableData from "../../../components/Admin/Table/TableData";
 import TableFooter from "../../../components/Admin/Table/TableFooter";
-import EmptyState, {EMPTY_STATE_TYPE} from "../../../components/EmptyState";
+import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
+import PublisherModal, {
+  PublisherModalMode,
+} from "../../../components/Modal/PublisherModal";
+import LoadingTopPage from "../../../components/LoadingTopPage";
 
 const AdminPublishersPage: NextPageWithLayout = () => {
   const { loginUser } = useAuth();
@@ -32,7 +36,11 @@ const AdminPublishersPage: NextPageWithLayout = () => {
   const [selectedPublisher, setSelectedPublisher] = useState<IPublisher>(); // Author to be updated (passed to AuthorModal)
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
-  const { data: publisherData, isLoading } = useQuery(
+  const {
+    data: publisherData,
+    isLoading,
+    isFetching,
+  } = useQuery(
     ["publishers", page, size, search],
     () =>
       publisherService.getPublishers({
@@ -54,6 +62,7 @@ const AdminPublishersPage: NextPageWithLayout = () => {
 
   return (
     <Fragment>
+      {isFetching && <LoadingTopPage />}
       <PageHeading label="Nhà xuất bản">
         <SearchForm defaultValue={search} />
         <CreateButton
@@ -107,7 +116,13 @@ const AdminPublishersPage: NextPageWithLayout = () => {
                   </div>
                 </TableData>
                 <TableData className="text-right text-sm font-medium">
-                  <button className="text-indigo-600 hover:text-indigo-900">
+                  <button
+                    onClick={() => {
+                      setSelectedPublisher(publisher);
+                      setShowUpdateModal(true);
+                    }}
+                    className="text-indigo-600 hover:text-indigo-900"
+                  >
                     Chỉnh sửa
                   </button>
                 </TableData>
@@ -135,6 +150,20 @@ const AdminPublishersPage: NextPageWithLayout = () => {
             <EmptyState status={EMPTY_STATE_TYPE.NO_DATA} />
           )}
         </div>
+      )}
+
+      <PublisherModal
+        action={PublisherModalMode.CREATE}
+        onClose={() => setShowCreateModal(false)}
+        isOpen={showCreateModal}
+      />
+      {selectedPublisher && (
+        <PublisherModal
+          action={PublisherModalMode.UPDATE}
+          publisher={selectedPublisher}
+          onClose={() => setShowUpdateModal(false)}
+          isOpen={showUpdateModal}
+        />
       )}
     </Fragment>
   );

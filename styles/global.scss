@@ -120,5 +120,5 @@
 }
 
 .custom-toast {
-  @apply bg-gray-800 text-white rounded-md px-4 py-3 #{!important};
+  @apply rounded-md bg-gray-800 px-4 py-3 text-white #{!important};
 }

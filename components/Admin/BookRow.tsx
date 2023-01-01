@@ -4,10 +4,7 @@ import Image from "next/image";
 import DefaultAvatar from "./../../assets/images/default-avatar.png";
 import TableData, { noDataLabel } from "./TableData";
 import { getFormattedPrice } from "../../utils/helper";
-import BookModal, {
-  BookModalMode,
-} from "./../../components/Modal/BookModal";
-
+import BookModal, { BookModalMode } from "./../../components/Modal/BookModal";
 
 type Props = {
   book: IBookResponse;
@@ -29,22 +26,22 @@ const BookRow: React.FC<Props> = ({ book }) => {
             {/* Khi bấm vào tên sách sẽ hiện Modal bao gồm tên chi tiết của sách và hình sách */}
             <Image
               onClick={() => {
-
                 setSelectedBook({
                   id: book?.id,
                   name: book?.name,
                 });
                 setShowUpdateModal(true);
-              }
-              }
-              className="rounded cursor-pointer"
+              }}
+              className="cursor-pointer rounded"
               src={book?.imageUrl || DefaultAvatar.src}
               width="80"
               height="100"
               alt={book?.name || ""}
             />
           </div>
-          <div className="font-medium w-[100px] text-slate-500 text-ellipsis overflow-hidden">{book.name}</div>
+          <div className="w-[100px] overflow-hidden text-ellipsis font-medium text-slate-500">
+            {book.name}
+          </div>
         </div>
       </td>
 
