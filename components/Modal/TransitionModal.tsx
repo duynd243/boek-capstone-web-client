@@ -18,7 +18,7 @@ const TransitionModal: React.FC<Props> = ({
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
         as="div"
-        className="relative z-10"
+        className="relative z-10 w-full h-full overflow-y-auto"
         onClose={() => {
           closeOnOverlayClick && onClose();
         }}

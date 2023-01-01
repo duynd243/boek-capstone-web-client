@@ -17,21 +17,47 @@ import { PublisherService } from './../../../services/System/PublisherService';
 import Multiselect from 'multiselect-react-dropdown';
 import DynamicForm from './../../../components/DynamicForm';
 import CreateButton from "../../../components/Admin/CreateButton";
+import { IBaseListResponse } from "../../../types/response/IBaseListResponse";
+import { IBookResponse } from "../../../types/response/IBookResponse";
 import AuthorModal, {
   AuthorModalMode,
 } from "../../../components/Modal/AuthorModal";
+import BookModal, {
+  BookModalMode,
+} from "../../../components/Modal/BookModal";
+import CreateBookModal from "../../../components/Modal/CreateBookModal";
+import { BsFillEyeFill } from "react-icons/bs";
 import Link from "next/link";
 import {
   IoChevronBack
 } from "react-icons/io5";
 
 
+type Props = {
+  data: IBaseListResponse<IBookResponse>;
+};
 
-
-
-const IssuerCreateBookPage: NextPageWithLayout = () => {
+const IssuerCreateBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
+  const metadata = data?.metadata;
   const { loginUser } = useAuth();
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
+  const [selectedBook, setSelectedBook] = useState<{
+    id?: number;
+    name?: string;
+    // code?: string;
+    imageUrl?: string;
+    // isbn10?: string;
+    // isbn13?: string;
+    // price?: number;
+    // publisher?: { name?: string };
+    // releasedYear?: number;
+    // unitInStock?: number;
+    // size?: string;
+    // authorBooks?: { author?: { name?: string } }[];
+    // category?: { name?: string };
+    // language?: string;
+  }>();
+  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
 
   const [selectedPublisherId, setSelectedPublisherId] = useState<string | null>(
     null
@@ -74,11 +100,11 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
   const [selectedAuthor, setSelectedAuthor] = useState<{
     id?: number;
     name?: string;
-  }>(); 
+  }>();
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   // const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
+  const [showCreateBookModal, setShowCreateBookModal] = useState<boolean>(false);
   const router = useRouter();
-
   const createBookMutation = useMutation(
     (values: any) => bookService.createBook$Issuer(values),
     {
@@ -225,6 +251,13 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
         });
     },
   });
+  // bấm nút thêm sách sẽ chuyển sang trang thêm sách combo
+  const handleAddBookCombo = () => {
+    router.push("/issuer/books/createcombo/choosebookcombo");
+  };
+  const handleAddBook = () => {
+    router.push("/issuer/books/create");
+  };
 
   return (
     <Fragment>
@@ -243,7 +276,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
       >
         <div className="mb-4 sm:mb-0">
         <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
-          Thêm sách lẻ ✨
+          Thêm sách Series ✨
         </h1>
       </div>
         <div className="space-y-8 divide-y divide-gray-200">
@@ -497,7 +530,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </div>
               </div>
 
-              <div className="sm:col-span-3">
+              {/* <div className="sm:col-span-3">
                 <label
                   htmlFor="unitInStock"
                   className="block text-sm font-medium text-gray-700"
@@ -517,7 +550,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 {form.errors.unitInStock && form.touched.unitInStock && (
                   <div className={"input-error"}>{form.errors.unitInStock}</div>
                 )}
-              </div>
+              </div> */}
 
               <div className="sm:col-span-3">
                 <label
@@ -674,15 +707,17 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                       key: author?.name,
                     }))}
                     placeholder="Chọn tác giả"
+                    //thêm 1 nút chọn tất cả
+                    showCheckbox={true}
                   />
                 </div>
               </div>
               <div className="sm:col-span-6">
-              <CreateButton
-                    onClick={() => setShowCreateModal(true)}
-                    label="Thêm tác giả"
-                    // align="right"
-                  />
+                <CreateButton
+                  onClick={() => setShowCreateModal(true)}
+                  label="Thêm tác giả"
+                // align="right"
+                />
               </div>
             </div>
           </div>
@@ -691,7 +726,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
               Định dạng
             </h3>
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-            <div className="sm:col-span-6">
+              <div className="sm:col-span-6">
                 <label
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
@@ -707,11 +742,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                     onSearch={function noRefCheck() { }}
                     onSelect={function noRefCheck() { }}
                     placeholder="Chọn định dạng"
-                    options={[ 
+                    options={[
                       { cat: 'Group 1', key: 'Sách giấy' },
                       { cat: 'Group 1', key: 'Sách điện tử' },
                       { cat: 'Group 1', key: 'Bộ sưu tập' },
                     ]}
+                    singleSelect={true}
                   />
                 </div>
               </div>
@@ -728,31 +764,222 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
               </div>
             </div>
           </div>
-        </div>
+          <div className="pt-8">
+            <h3 className="text-lg font-bold leading-6 text-gray-900">
+              Chọn sách cho Series
+            </h3>
+            <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+              <div className="sm:col-span-6">
+                <label
+                  htmlFor="author"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Tìm kiếm sách
+                </label>
+                <div className="mt-1">
+                  <Multiselect
+                    displayValue="key"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    onKeyPressFn={function noRefCheck() { }}
+                    onRemove={function noRefCheck() { }}
+                    onSearch={function noRefCheck() { }}
+                    onSelect={function noRefCheck() { }}
+                    options={books?.data?.map((book) => ({
+                      cat: 'Group 1',
+                      //thêm VND vào giá sách
+                      key: book?.name + ' - ' + book?.publisher?.name + ' - ' + book?.category?.name + ' - ' + book?.price + ' VND',
+                    }))}
+                    placeholder="Tìm và chọn sách"
+                    showCheckbox
+                  />
+                </div>
+              </div>
+              <div className="sm:col-span-6">
+                <button
+                  onClick={() => setShowCreateBookModal(true)}
+                  type="submit"
+                  className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  Tạo sách lẻ mới
+                </button>
+              </div>
+              <div className="sm:col-span-6">
+                <h3 className="text-lg font-bold leading-6 text-gray-900">
+                  Bảng sách được chọn cho Series
+                </h3>
+                <header className="px-5 py-4">
+                  <h2 className="font-semibold text-slate-800">
+                    Tổng số sách{" "}
+                    <span className="font-medium text-slate-400">{metadata?.total}</span>
+                  </h2>
+                </header>
+                {/* Tạo bảng hiển thị tên sách khi nhấn chọn sách Multiselect */}
+                <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Tên sách
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Hình ảnh
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Định dạng
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Chi tiết
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {books?.data?.map((book) => (
+                        <tr
+                          key={book?.id}
+                          onSelect={function noRefCheck() { }}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="ml-4">
+                                <div className="font-medium w-[400px] text-ellipsis overflow-hidden">
+                                  {book?.name}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="ml-4">
 
+                                <div className="mr-2 h-[100px] w-[64px] shrink-0 sm:mr-3">
+                                  <Image
+                                    className="rounded cursor-pointer"
+                                    src={book?.imageUrl || ""}
+                                    width="80"
+                                    height="100"
+                                    alt={book?.name || ""}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="mt-1">
+                                <Multiselect
+                                  displayValue="key"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  onKeyPressFn={function noRefCheck() { }}
+                                  onRemove={function noRefCheck() { }}
+                                  onSearch={function noRefCheck() { }}
+                                  onSelect={function noRefCheck() { }}
+                                  placeholder="Chọn định dạng"
+                                  options={[
+                                    { cat: 'Group 1', key: 'Sách giấy' },
+                                    { cat: 'Group 1', key: 'Sách điện tử' },
+                                    { cat: 'Group 1', key: 'Bộ sưu tập' },
+                                  ]}
+                                  // singleSelect={true}
+                                />
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="ml-4">
+                                <div className="font-medium w-[400px] text-ellipsis overflow-hidden">
+                                  <button
+                                    onClick={() => {
+
+                                      setSelectedBook({
+                                        id: book?.id,
+                                        name: book?.name,
+                                        // code: book?.code,
+                                        imageUrl: book?.imageUrl,
+                                        // isbn10: book?.isbn10,
+                                        // isbn13: book?.isbn13,
+                                        // price: book?.price,
+                                        // publisher: book?.publisher,
+                                        // releasedYear: book?.releasedYear,
+                                        // unitInStock: book?.unitInStock,
+                                        // size: book?.size,
+                                        // authorBooks: book?.authorBooks,
+                                        // category: book?.category,
+                                        // language: book?.language
+                                      });
+                                      setShowUpdateModal(true);
+                                    }
+                                    }
+
+                                    className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                  >
+                                    <BsFillEyeFill />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <BookModal
+          action={BookModalMode.UPDATE}
+          book={selectedBook as {
+            id?: number; name?: string; code?: string; imageUrl?: string;
+            isbn10?: string; isbn13?: string; price?: number; publisher?: { id?: number; name?: string };
+            releasedYear?: number; unitInStock?: number; size?: string; authors?: { id?: number; name?: string }[];
+            categories?: { id?: number; name?: string }[]; languages?: { id?: number; name?: string }[];
+          }}
+          onClose={() => setShowUpdateModal(false)}
+          isOpen={showUpdateModal}
+        />
         <div className="pt-5">
           <div className="flex justify-end">
             <button
-            onClick={() => {
-              // setSelectedAuthor(author);
-              // setShowUpdateModal(true);
-          }}
+              onClick={() => {
+                // setSelectedAuthor(author);
+                // setShowUpdateModal(true);
+                handleAddBookCombo();
+              }}
               type="submit"
               className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
-              Tạo sách
+              Tạo Sách series
             </button>
           </div>
         </div>
       </form>
       <AuthorModal
-                action={AuthorModalMode.CREATE}
-                onClose={() => setShowCreateModal(false)}
-                isOpen={showCreateModal}
-                author={selectedAuthor as { id?: number; name?: string }}
-            />
+        action={AuthorModalMode.CREATE}
+        onClose={() => setShowCreateModal(false)}
+        isOpen={showCreateModal}
+        author={selectedAuthor as { id?: number; name?: string }}
+      />
+      <CreateBookModal
+        onClose={() => setShowCreateBookModal(false)}
+        isOpen={showCreateBookModal}
+      />
 
-            {/* <AuthorModal
+      {/* <AuthorModal
                 action={AuthorModalMode.UPDATE}
                 author={selectedAuthor as { id?: number; name?: string }}
                 onClose={() => setShowUpdateModal(false)}
@@ -761,7 +988,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
     </Fragment>
   );
 };
-IssuerCreateBookPage.getLayout = function getLayout(page: ReactElement) {
+IssuerCreateBookSeriesPage.getLayout = function getLayout(page: ReactElement) {
   return <AdminLayout>{page}</AdminLayout>;
 };
-export default IssuerCreateBookPage;
+export default IssuerCreateBookSeriesPage;

@@ -104,11 +104,6 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
         path: "/issuer/orders",
         icon: <BsFillFileEarmarkMedicalFill />,
       },
-      {
-        name: "Khách hàng",
-        path: "/issuer/customers",
-        icon: <BsFillPeopleFill />,
-      },
     ],
   },
   {

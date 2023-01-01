@@ -6,6 +6,7 @@ type Props = {
   href?: string;
   onClick?: () => void;
   label: string;
+  // align: "left" | "right";
 };
 
 const CreateButton: React.FC<Props> = ({ label, onClick, href }) => {

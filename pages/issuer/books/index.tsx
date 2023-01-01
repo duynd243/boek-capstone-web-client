@@ -8,6 +8,8 @@ import { NextPageWithLayout } from "../../_app";
 import SearchForm from "../../../components/Admin/SearchForm";
 import CreateButton from "../../../components/Admin/CreateButton";
 import BookTable from "../../../components/Admin/BookTable";
+import CreateBookDropdown from './../../../components/CreateBookDropdown';
+
 
 const IssuerBooksPage: NextPageWithLayout = () => {
   const { loginUser } = useAuth();
@@ -39,7 +41,7 @@ const IssuerBooksPage: NextPageWithLayout = () => {
           {/*/!* Filter button *!/*/}
           {/*<FilterButton align="right" />*/}
           {/* Create campaign button */}
-          <CreateButton href={"/issuer/books/create"} label={"Thêm sách"} />
+         <CreateBookDropdown align="right" />
         </div>
       </div>
       {issuerBooks && <BookTable data={issuerBooks} />}

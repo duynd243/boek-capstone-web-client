@@ -27,18 +27,18 @@ const BookTable: React.FC<Props> = ({ data }) => {
             <thead className="border-t border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase text-slate-500">
               <tr>
                 <TableHeader label={"Mã sách"} />
+                <TableHeader label={"ISBN10"} />
+                <TableHeader label={"ISBN13"} />
                 <TableHeader label={"Tên sách"} />
                 <TableHeader label={"Giá"} />
                 <TableHeader label={"Nhà phát hành"} />
                 <TableHeader label={"Năm phát hành"} />
-                <TableHeader label={"Số trang"} />
-                <TableHeader label={"ISBN10"} />
-                <TableHeader label={"ISBN13"} />
-                <TableHeader label={"Kích cỡ"} />
+                {/* <TableHeader label={"Lượng Tồn Kho"} /> */}
+                {/* <TableHeader label={"Kích cỡ"} /> */}
                 <TableHeader label={"Tác giả"} />
                 <TableHeader label={"Thể loại"} />
                 <TableHeader label={"Ngôn ngữ"} />
-                <TableHeader label={""} />
+                <TableHeader label={"Chi tiết & Chỉnh sửa"} />
               </tr>
             </thead>
             {/* Table body */}
