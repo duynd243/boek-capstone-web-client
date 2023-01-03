@@ -188,13 +188,14 @@ const BookRow: React.FC<Props> = ({ book }) => {
         </td>
       </tr>
       <BookModal
+      maxWidth="max-w-5xl"
         action={BookModalMode.UPDATE}
         book={selectedBook as {
           id?: number; name?: string; code?: string; imageUrl?: string;
           isbn10?: string; isbn13?: string; price?: number; publisher?: { id?: number; name?: string };
           releasedYear?: number; unitInStock?: number; size?: string; authors?: { id?: number; name?: string }[];
           categories?: { id?: number; name?: string }[]; languages?: { id?: number; name?: string }[];
-          page?: number; pageSize?: number; description?: string;
+          page?: number; pageSize?: number; description?: string
         }}
         onClose={() => setShowUpdateModal(false)}
         isOpen={showUpdateModal}

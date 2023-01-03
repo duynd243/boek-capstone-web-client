@@ -127,36 +127,36 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
       },
     }
   );
-  const firebaseUploadPromise = (file: File) => {
-    return new Promise((resolve, reject) => {
-      const fileName =
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15);
-      // get file extension
-      const fileExtension = file.name.split('.').pop();
-      const storageRef = ref(
-        storage,
-        `images/${fileName}.${fileExtension}`
-      );
-      const task = uploadBytesResumable(storageRef, file);
-      task.on(
-        'state_changed',
-        (snapshot) => { },
-        (error) => {
-          reject(error);
-        },
-        () => {
-          getDownloadURL(task.snapshot.ref)
-            .then((url) => {
-              resolve(url);
-            })
-            .catch((err) => {
-              reject(err);
-            });
-        }
-      );
-    });
-  };
+  // const firebaseUploadPromise = (file: File) => {
+  //   return new Promise((resolve, reject) => {
+  //     const fileName =
+  //       Math.random().toString(36).substring(2, 15) +
+  //       Math.random().toString(36).substring(2, 15);
+  //     // get file extension
+  //     const fileExtension = file.name.split('.').pop();
+  //     const storageRef = ref(
+  //       storage,
+  //       `images/${fileName}.${fileExtension}`
+  //     );
+  //     const task = uploadBytesResumable(storageRef, file);
+  //     task.on(
+  //       'state_changed',
+  //       (snapshot) => { },
+  //       (error) => {
+  //         reject(error);
+  //       },
+  //       () => {
+  //         getDownloadURL(task.snapshot.ref)
+  //           .then((url) => {
+  //             resolve(url);
+  //           })
+  //           .catch((err) => {
+  //             reject(err);
+  //           });
+  //       }
+  //     );
+  //   });
+  // };
   const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -251,14 +251,14 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
       };
       // // upload cover photo to firebase
       //
-      firebaseUploadPromise(coverPhoto)
-        .then(async (url) => {
-          payload.imageUrl = url as string;
-          createBookMutation.mutate(payload);
-        })
-        .catch((err) => {
-          toast.error("Có lỗi xảy ra khi tải ảnh lên. Vui lòng thử lại");
-        });
+      // firebaseUploadPromise(coverPhoto)
+      //   .then(async (url) => {
+      //     payload.imageUrl = url as string;
+      //     createBookMutation.mutate(payload);
+      //   })
+      //   .catch((err) => {
+      //     toast.error("Có lỗi xảy ra khi tải ảnh lên. Vui lòng thử lại");
+      //   });
     },
   });
   // bấm nút thêm sách sẽ chuyển sang trang thêm sách combo

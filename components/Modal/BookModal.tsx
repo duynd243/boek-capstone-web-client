@@ -11,6 +11,8 @@ import Modal from "./Modal";
 import ErrorMessage from "../Form/ErrorMessage";
 import Image from "next/image";
 import { PublisherService } from './../../services/System/PublisherService';
+import { IBaseListResponse } from "../../types/response/IBaseListResponse";
+import { IBookResponse } from "../../types/response/IBookResponse";
 import ToggleButton from "../ToggleButton";
 import {
     BsEmojiFrownFill,
@@ -180,7 +182,7 @@ const BookModal: React.FC<Props> = ({ action, maxWidth, isOpen, onClose, book })
             }
         },
     });
-    
+
     const handleOnClose = () => {
         form.resetForm();
         onClose();
@@ -301,14 +303,17 @@ const BookModal: React.FC<Props> = ({ action, maxWidth, isOpen, onClose, book })
                             >
                                 Mô tả
                             </label>
-                            <input
+                            {/* <input
                                 disabled={true}
                                 name="bookName"
                                 value={book?.description}
                                 onChange={form.handleChange}
                                 className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
                                 type="text"
-                            />
+                            /> */}
+                            <span>
+                            {book?.description}
+                            </span>
                         </div>
                     </div>
                     <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
@@ -656,6 +661,80 @@ const BookModal: React.FC<Props> = ({ action, maxWidth, isOpen, onClose, book })
                             />
                         </div>
                     </div>
+                    <Modal.Header
+                        title={
+                            action === BookModalMode.CREATE
+                                ? "Thêm sách"
+                                // : `Thông Tin Sách: "${book?.name}"`
+                                : `Bảng sách có trong : "${book?.name}" (Chỉ dành cho Sách combo hoặc Sách series)`
+                        }
+                        onClose={handleOnClose}
+                    />
+
+                    <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >
+                                        Tên sách
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >
+                                        Hình ảnh
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >
+                                        Định dạng
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="flex items-center">
+                                            <div className="ml-4">
+                                                <div className="font-medium w-[180px] text-ellipsis overflow-hidden">
+                                                    {book?.name}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="flex items-center">
+                                            <div className="ml-4">
+                                                <div className="font-medium w-[180px] text-ellipsis overflow-hidden">
+                                                    <Image
+                                                        className="rounded cursor-pointer"
+                                                        src={book?.imageUrl || ""}
+                                                        width="80"
+                                                        height="100"
+                                                        alt={book?.name || ""}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="flex items-center">
+                                            <div className="ml-4">
+                                                <div className="font-medium w-[180px] text-ellipsis overflow-hidden">
+                                                    Sách giấy
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">
