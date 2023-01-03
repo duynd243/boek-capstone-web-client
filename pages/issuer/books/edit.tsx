@@ -320,7 +320,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Trạng thái
+                  Trạng thái<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                   <div className="sm:col-span-6">
@@ -394,7 +394,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="code"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Mã sách
+                  Mã sách<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -416,7 +416,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="description"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Mô tả
+                  Mô tả<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <textarea
@@ -438,7 +438,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="cover-photo"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Ảnh bìa
+                  Ảnh bìa<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
                   <div className="space-y-1 text-center">
@@ -501,7 +501,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="isbn10"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  ISBN10
+                  ISBN10<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -523,7 +523,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="isbn13"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  ISBN13
+                  ISBN13<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -544,7 +544,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="price"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Giá bìa
+                  Giá bìa<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -566,7 +566,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="size"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Kích thước
+                  Kích thước<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -587,7 +587,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="category"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Ngôn ngữ
+                  Ngôn ngữ<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <select
@@ -611,7 +611,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="unitInStock"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Số lượng
+                  Số lượng<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -633,7 +633,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="releasedYear"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Năm xuất bản
+                  Năm xuất bản<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -657,7 +657,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="page"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Số trang
+                  Số trang<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -679,7 +679,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="publisher"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Nhà xuất bản
+                  Nhà xuất bản<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <select
@@ -702,7 +702,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="category"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Thể loại
+                  Thể loại<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <select
@@ -732,7 +732,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="translator"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Dịch giả
+                  Dịch giả<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -755,7 +755,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Tác giả
+                  Tác giả<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   {/* <select
@@ -805,7 +805,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Định dạng chung
+                  Định dạng chung<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <Multiselect
@@ -829,7 +829,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Đường link URL dành cho sách điện tử
+                  Đường link URL dành cho sách điện tử<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <DynamicForm align="right" />

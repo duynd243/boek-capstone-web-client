@@ -328,7 +328,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="code"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Mã sách
+                  Mã sách<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -350,7 +350,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="description"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Mô tả
+                  Mô tả<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <textarea
@@ -372,7 +372,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="cover-photo"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Ảnh bìa
+                  Ảnh bìa<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
                   <div className="space-y-1 text-center">
@@ -435,7 +435,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="isbn10"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  ISBN10
+                  ISBN10<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -457,7 +457,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="isbn13"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  ISBN13
+                  ISBN13<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -478,7 +478,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="price"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Giá bìa
+                  Giá bìa<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -500,7 +500,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="size"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Kích thước
+                  Kích thước<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -521,7 +521,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="category"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Ngôn ngữ
+                  Ngôn ngữ<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <select
@@ -567,7 +567,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="releasedYear"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Năm xuất bản
+                  Năm xuất bản<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -591,7 +591,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="page"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Số trang
+                  Số trang<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -613,7 +613,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="publisher"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Nhà xuất bản
+                  Nhà xuất bản<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <select
@@ -636,7 +636,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="category"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Thể loại
+                  Thể loại<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <select
@@ -666,7 +666,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="translator"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Dịch giả
+                  Dịch giả<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -689,7 +689,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Tác giả
+                  Tác giả<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   {/* <select
@@ -741,7 +741,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Định dạng chung
+                  Định dạng chung<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <Multiselect
@@ -766,7 +766,7 @@ const IssuerEditBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Đường link URL dành cho sách điện tử
+                  Đường link URL dành cho sách điện tử<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <DynamicForm align="right" />
