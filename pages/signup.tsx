@@ -2,13 +2,10 @@ import React from "react";
 import { NextPage } from "next";
 import LoginSignUpLayout from "../components/Layout/LoginSignUpLayout";
 import SignUpForm from "../components/AuthForm/SignUpForm";
+import { NextPageWithLayout } from "./_app";
 
-const Signup: NextPage = () => {
-  return (
-    <LoginSignUpLayout>
-      <SignUpForm />
-    </LoginSignUpLayout>
-  );
+const Signup: NextPageWithLayout = () => {
+  return <SignUpForm />;
 };
-
+Signup.getLayout = (page) => <LoginSignUpLayout>{page}</LoginSignUpLayout>;
 export default Signup;

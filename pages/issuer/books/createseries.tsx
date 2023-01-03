@@ -97,6 +97,16 @@ const IssuerCreateBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
     })
   );
 
+
+  const handleBookSelectChange = (selectedList: any, selectedItem: any) => {
+    const ids = selectedList.map((item: any) => item?.cat);
+    const matchedBooks = books?.data?.filter(b => ids.some((id : any) => id === b?.id));
+    
+    if(matchedBooks) setSelectedBooks(matchedBooks);
+  }
+
+  const [selectedBooks, setSelectedBooks] = useState<(IBookResponse | undefined)[]>([]);
+
   const [selectedAuthor, setSelectedAuthor] = useState<{
     id?: number;
     name?: string;
@@ -276,7 +286,7 @@ const IssuerCreateBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
       >
         <div className="mb-4 sm:mb-0">
         <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
-          Thêm sách Series ✨
+          Chỉnh sửa sách Series ✨
         </h1>
       </div>
         <div className="space-y-8 divide-y divide-gray-200">
@@ -701,7 +711,7 @@ const IssuerCreateBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                     onKeyPressFn={function noRefCheck() { }}
                     onRemove={function noRefCheck() { }}
                     onSearch={function noRefCheck() { }}
-                    onSelect={function noRefCheck() { }}
+                    onSelect={function noRefCheck() {}}
                     options={authors?.data?.map((author) => ({
                       cat: 'Group 1',
                       key: author?.name,
@@ -781,11 +791,11 @@ const IssuerCreateBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                     displayValue="key"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     onKeyPressFn={function noRefCheck() { }}
-                    onRemove={function noRefCheck() { }}
+                    onRemove={handleBookSelectChange}
                     onSearch={function noRefCheck() { }}
-                    onSelect={function noRefCheck() { }}
-                    options={books?.data?.map((book) => ({
-                      cat: 'Group 1',
+                    onSelect={handleBookSelectChange}
+                    options={books?.data?.map((book: IBookResponse) => ({
+                      cat: book?.id,
                       //thêm VND vào giá sách
                       key: book?.name + ' - ' + book?.publisher?.name + ' - ' + book?.category?.name + ' - ' + book?.price + ' VND',
                     }))}
@@ -845,7 +855,7 @@ const IssuerCreateBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {books?.data?.map((book) => (
+                      {selectedBooks?.map((book) => (
                         <tr
                           key={book?.id}
                           onSelect={function noRefCheck() { }}
@@ -853,7 +863,7 @@ const IssuerCreateBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="ml-4">
-                                <div className="font-medium w-[400px] text-ellipsis overflow-hidden">
+                                <div className="font-medium w-[180px] text-ellipsis overflow-hidden">
                                   {book?.name}
                                 </div>
                               </div>

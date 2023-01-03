@@ -38,6 +38,7 @@ specifiers:
   typescript: 4.9.3
   uuid: ^9.0.0
   yup: ^0.32.11
+  zustand: ^4.2.0
 
 dependencies:
   '@headlessui/react': 1.7.7_biqbaboplfbrettd7655fr4n2y
@@ -62,6 +63,7 @@ dependencies:
   tippy.js: 6.3.7
   uuid: 9.0.0
   yup: 0.32.11
+  zustand: 4.2.0_react@18.2.0
 
 devDependencies:
   '@faker-js/faker': 7.6.0
@@ -3489,4 +3491,20 @@ packages:
       nanoclone: 0.2.1
       property-expr: 2.0.5
       toposort: 2.0.2
+    dev: false
+
+  /zustand/4.2.0_react@18.2.0:
+    resolution: {integrity: sha512-eNwaDoD2FYVnMgtNxiMUhTJO780wonZUzJrPQTLYI0erSIMZF8cniWFW22kGQUECd8rdHRJ/ZJL2XO54c9Ttuw==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      immer: '>=9.0'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      immer:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      use-sync-external-store: 1.2.0_react@18.2.0
     dev: false

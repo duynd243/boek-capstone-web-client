@@ -24,6 +24,7 @@ import Link from "next/link";
 import {
   IoChevronBack
 } from "react-icons/io5";
+import { getFormattedPrice } from "../../../utils/helper";
 
 
 
@@ -91,36 +92,36 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
       },
     }
   );
-  const firebaseUploadPromise = (file: File) => {
-    return new Promise((resolve, reject) => {
-      const fileName =
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15);
-      // get file extension
-      const fileExtension = file.name.split('.').pop();
-      const storageRef = ref(
-        storage,
-        `images/${fileName}.${fileExtension}`
-      );
-      const task = uploadBytesResumable(storageRef, file);
-      task.on(
-        'state_changed',
-        (snapshot) => { },
-        (error) => {
-          reject(error);
-        },
-        () => {
-          getDownloadURL(task.snapshot.ref)
-            .then((url) => {
-              resolve(url);
-            })
-            .catch((err) => {
-              reject(err);
-            });
-        }
-      );
-    });
-  };
+  // const firebaseUploadPromise = (file: File) => {
+  //   return new Promise((resolve, reject) => {
+  //     const fileName =
+  //       Math.random().toString(36).substring(2, 15) +
+  //       Math.random().toString(36).substring(2, 15);
+  //     // get file extension
+  //     const fileExtension = file.name.split('.').pop();
+  //     const storageRef = ref(
+  //       storage,
+  //       `images/${fileName}.${fileExtension}`
+  //     );
+  //     const task = uploadBytesResumable(storageRef, file);
+  //     task.on(
+  //       'state_changed',
+  //       (snapshot) => { },
+  //       (error) => {
+  //         reject(error);
+  //       },
+  //       () => {
+  //         getDownloadURL(task.snapshot.ref)
+  //           .then((url) => {
+  //             resolve(url);
+  //           })
+  //           .catch((err) => {
+  //             reject(err);
+  //           });
+  //       }
+  //     );
+  //   });
+  // };
   const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -215,14 +216,14 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
       };
       // // upload cover photo to firebase
       //
-      firebaseUploadPromise(coverPhoto)
-        .then(async (url) => {
-          payload.imageUrl = url as string;
-          createBookMutation.mutate(payload);
-        })
-        .catch((err) => {
-          toast.error("Có lỗi xảy ra khi tải ảnh lên. Vui lòng thử lại");
-        });
+      // firebaseUploadPromise(coverPhoto)
+      //   .then(async (url) => {
+      //     payload.imageUrl = url as string;
+      //     createBookMutation.mutate(payload);
+      //   })
+      //   .catch((err) => {
+      //     toast.error("Có lỗi xảy ra khi tải ảnh lên. Vui lòng thử lại");
+      //   });
     },
   });
 
@@ -285,7 +286,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="code"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Mã sách
+                  Mã sách<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -307,7 +308,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="description"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Mô tả
+                  Mô tả<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <textarea
@@ -329,7 +330,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="cover-photo"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Ảnh bìa
+                  Ảnh bìa<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
                   <div className="space-y-1 text-center">
@@ -392,7 +393,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="isbn10"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  ISBN10
+                  ISBN10<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -414,7 +415,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="isbn13"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  ISBN13
+                  ISBN13<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -435,13 +436,17 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="price"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Giá bìa
+                  Giá bìa<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
-                    value={form.values.price}
+                    // value={form.values.price && getFormattedPrice(form.values.price)}
+                    value={new Intl.NumberFormat("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                }).format(form.values.price)}
                     onChange={form.handleChange}
-                    type="number"
+                    type="text"
                     name="price"
                     id="price"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -457,7 +462,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="size"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Kích thước
+                  Kích thước<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -478,7 +483,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="category"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Ngôn ngữ
+                  Ngôn ngữ<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <select
@@ -502,7 +507,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="unitInStock"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Số lượng
+                  Số lượng<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -524,7 +529,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="releasedYear"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Năm xuất bản
+                  Năm xuất bản<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -548,7 +553,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="page"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Số trang
+                  Số trang<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -570,7 +575,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="publisher"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Nhà xuất bản
+                  Nhà xuất bản<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <select
@@ -593,7 +598,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="category"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Thể loại
+                  Thể loại<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <select
@@ -623,7 +628,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="translator"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Dịch giả
+                  Dịch giả<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -646,7 +651,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Tác giả
+                  Tác giả<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   {/* <select
@@ -696,7 +701,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Định dạng chung
+                  Định dạng chung<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <Multiselect
@@ -720,7 +725,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Đường link URL dành cho sách điện tử
+                  Đường link URL dành cho sách điện tử<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <DynamicForm align="right" />

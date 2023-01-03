@@ -111,7 +111,7 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
     menus: [
       {
         name: "Cài đặt",
-        path: "/admin/settings",
+        path: "/issuer/settings",
         icon: <BsFillGearFill />,
       },
     ],

@@ -27,4 +27,6 @@ export interface IBookResponse {
   category?: ICategory;
   issuer?: IUser;
   publisher?: IUser;
+  isCombo?: boolean;
+    isSeries?: boolean;
 }

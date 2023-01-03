@@ -1,15 +1,23 @@
-import React, { memo,useState } from "react";
+import React, { memo, useState } from "react";
 import TransitionModal from "./TransitionModal";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useMutation, useQueryClient,useQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { IssuerBookService } from "../../services/Issuer/Issuer_BookService";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
+import { format } from "date-fns";
 import Modal from "./Modal";
 import ErrorMessage from "../Form/ErrorMessage";
 import Image from "next/image";
 import { PublisherService } from './../../services/System/PublisherService';
+import ToggleButton from "../ToggleButton";
+import {
+    BsEmojiFrownFill,
+    BsEmojiSmileFill,
+} from "react-icons/bs";
+import { getFormattedPrice } from "../../utils/helper";
+
 
 
 export enum BookModalMode {
@@ -20,10 +28,12 @@ export enum BookModalMode {
 type Props = {
     action: BookModalMode;
     isOpen: boolean;
+    maxWidth?: string;
     onClose: () => void;
     book?: {
         id?: number;
         name?: string;
+        description?: string;
         code?: string;
         imageUrl?: string;
         isbn10?: string;
@@ -32,26 +42,28 @@ type Props = {
         publisher?: { name?: string };
         releasedYear?: number;
         unitInStock?: number;
+        page?: number;
         size?: string;
         authorBooks?: { author?: { name?: string } }[];
         category?: { name?: string };
         language?: string;
+        status?: boolean;
     };
 };
 
-const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
+const BookModal: React.FC<Props> = ({ action, maxWidth, isOpen, onClose, book }) => {
     const [selectedPublisherId, setSelectedPublisherId] = useState<string | null>(
         null
-      );
+    );
     const { loginUser } = useAuth();
     const queryClient = useQueryClient();
     const issuerBookService = new IssuerBookService(loginUser?.accessToken);
-  const publisherService = new PublisherService(loginUser?.accessToken);
+    const publisherService = new PublisherService(loginUser?.accessToken);
     const { data: publishers } = useQuery(['publisher'], () =>
-    publisherService.getPublishers({
-        size: 1000,
-    })
-);
+        publisherService.getPublishers({
+            size: 1000,
+        })
+    );
     const updateBookMutation = useMutation(
         (payload: {
             id?: number; name?: string; code?: string; imageUrl?: string; isbn10?: string;
@@ -64,6 +76,8 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
             authorBooks?: { author?: { name?: string } }[];
             category?: { name?: string };
             language?: string;
+            page?: number;
+            description?: string;
         }) =>
             issuerBookService.updateBook(payload),
         {
@@ -86,6 +100,8 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
             authorBooks?: { author?: { name?: string } }[];
             category?: { name?: string };
             language?: string;
+            page?: number;
+            description?: string;
         }) => issuerBookService.createBook$Issuer(payload),
         {
             onSuccess: async () => {
@@ -122,6 +138,7 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
         enableReinitialize: true,
         initialValues: {
             bookName: action === BookModalMode.UPDATE ? book?.name : "",
+            bookStatus: action === BookModalMode.UPDATE ? book?.status : true,
         },
         validationSchema:
             action === BookModalMode.UPDATE ? updateSchema : createSchema,
@@ -140,7 +157,9 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                 size: book?.size,
                 authorBooks: book?.authorBooks,
                 category: book?.category,
-                language: book?.language
+                language: book?.language,
+                page: book?.page,
+                description: book?.description,
             };
 
             switch (action) {
@@ -161,6 +180,7 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
             }
         },
     });
+    
     const handleOnClose = () => {
         form.resetForm();
         onClose();
@@ -168,14 +188,12 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
 
     return (
         <TransitionModal
+            maxWidth={maxWidth}
             isOpen={isOpen}
             onClose={handleOnClose}
             closeOnOverlayClick={false}
         >
-            <form onSubmit={form.handleSubmit}
-                // kéo dài chiều ngang của modal
-                className="w-full max-w-2xl mx-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4  "
-            >
+            <form onSubmit={form.handleSubmit}>
                 <Modal.Header
                     title={
                         action === BookModalMode.CREATE
@@ -186,35 +204,112 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                     onClose={handleOnClose}
                     showCloseButton={true}
                 />
-                <Image
-                    // cho hình sách nằm ra giữa
-                    className="rounded cursor-pointer mx-auto object-cover border-2 border-gray-300 "
-                    src={book?.imageUrl || "/images/book.png"}
-                    width="100"
-                    height="120"
-                    alt="book"
-                />
-                <div className="pt-8">
+                <div className="space-y-10 py-4 px-5">
+                    <Image
+                        // cho hình sách nằm ra giữa
+                        className="rounded cursor-pointer mx-auto object-cover border-2 border-gray-300 "
+                        src={book?.imageUrl || "/images/book.png"}
+                        width="100"
+                        height="120"
+                        alt="book"
+                    />
+                    <Modal.Header
+                        title={
+                            action === BookModalMode.CREATE
+                                ? "Thêm sách"
+                                // : `Thông Tin Sách: "${book?.name}"`
+                                : `Thông tin chung`
+                        }
+                        onClose={handleOnClose}
+                    />
+                    <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div className="sm:col-span-6">
+                            {/* <label
+                                className="mb-1 block text-sm font-medium"
+                                htmlFor="bookName"
+                            >
+                                Trạng thái
+                            </label> */}
+                            {action === BookModalMode.UPDATE && (
+                                <>
+                                    <Modal.FormLabel
+                                        fieldName="personnelStatus"
+                                        label="Trạng thái"
+                                    // required={true}
+                                    />
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div
+                                                className={`${form.values.bookStatus
+                                                    ? "bg-rose-500"
+                                                    : "bg-green-500"
+                                                    } flex w-fit items-center gap-2 rounded px-2.5 py-1 text-sm text-white transition`}
+                                            >
+                                                {form.values.bookStatus ? (
+                                                    <>
+                                                        Ngừng Phát Hành <BsEmojiFrownFill />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        Phát Hành <BsEmojiSmileFill />
+                                                    </>
+                                                )}
+                                            </div>
+                                            <div className="mt-2 text-sm text-gray-700">
+                                                {form.values.bookStatus
+                                                    ? "Sách sẽ bị vô hiệu hóa"
+                                                    : "Sách đang phát hành"}
+                                            </div>
+                                        </div>
+                                        {/* <ToggleButton
+                                    isCheck={form.values.bookStatus || false}
+                                    onChange={(value) => {
+                                        form.setFieldValue("bookStatus", value);
+                                    }}
+                                /> */}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
                     <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                         <div className="sm:col-span-6">
                             <label
                                 className="mb-1 block text-sm font-medium"
                                 htmlFor="bookName"
                             >
-                                Tên sách <span className="text-rose-500">*</span>
+                                Tên sách
                             </label>
                             <input
+                                disabled={true}
                                 name="bookName"
                                 value={form.values.bookName}
                                 onChange={form.handleChange}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
                                 type="text"
                             />
                             {form.errors.bookName && form.touched.bookName && (
                                 <ErrorMessage>{form.errors.bookName}</ErrorMessage>
                             )}
                         </div>
-
+                    </div>
+                    <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div className="sm:col-span-6">
+                            <label
+                                className="mb-1 block text-sm font-medium"
+                                htmlFor="bookName"
+                            >
+                                Mô tả
+                            </label>
+                            <input
+                                disabled={true}
+                                name="bookName"
+                                value={book?.description}
+                                onChange={form.handleChange}
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                type="text"
+                            />
+                        </div>
                     </div>
                     <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                         <div className="sm:col-span-3">
@@ -222,14 +317,16 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                                 className="mb-1 block text-sm font-medium"
                                 htmlFor="bookName"
                             >
-                                Mã sách <span className="text-rose-500">*</span>
+                                Mã sách
                             </label>
                             <div className="item-center ">
                                 <input
+                                    disabled={true}
                                     name="bookName"
                                     value={book?.code}
                                     onChange={form.handleChange}
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                    // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     type="text"
                                 />
                                 {form.errors.bookName && form.touched.bookName && (
@@ -242,13 +339,15 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                                 className="mb-1 block text-sm font-medium margin-top-20"
                                 htmlFor="bookCode"
                             >
-                                ISBN10<span className="text-rose-500">*</span>
+                                ISBN10
                             </label>
                             <input
+                                disabled={true}
                                 name="bookName"
                                 value={book?.isbn10}
                                 onChange={form.handleChange}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 type="text"
                             />
                         </div>
@@ -259,14 +358,16 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                                 className="mb-1 block text-sm font-medium"
                                 htmlFor="bookName"
                             >
-                                ISBN13 <span className="text-rose-500">*</span>
+                                ISBN13
                             </label>
                             <div className="item-center ">
                                 <input
+                                    disabled={true}
                                     name="bookName"
                                     value={book?.isbn13}
                                     onChange={form.handleChange}
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                    // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     type="text"
                                 />
                             </div>
@@ -276,13 +377,58 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                                 className="mb-1 block text-sm font-medium margin-top-20"
                                 htmlFor="bookName"
                             >
-                                Giá<span className="text-rose-500">*</span>
+                                Giá bìa
                             </label>
                             <input
+                                disabled={true}
                                 name="bookName"
-                                value={book?.price}
+                                // value={book?.price}
                                 onChange={form.handleChange}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                type="text"
+                                // value={new Intl.NumberFormat("vi-VN", {
+                                //     style: "currency",
+                                //     currency: "VND",
+                                // }).getFormattedPrice(book?.price)}
+                                value={book?.price && getFormattedPrice(book?.price)}
+                            />
+                        </div>
+                    </div>
+                    <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div className="sm:col-span-3">
+                            <label
+                                className="mb-1 block text-sm font-medium"
+                                htmlFor="bookName"
+                            >
+                                Kích thước
+                            </label>
+                            <div className="item-center ">
+                                <input
+                                    disabled={true}
+                                    name="bookName"
+                                    value={book?.size}
+                                    onChange={form.handleChange}
+                                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                    // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    type="text"
+                                />
+                            </div>
+                        </div>
+                        <div className="sm:col-span-3">
+                            <label
+                                className="mb-1 block text-sm font-medium margin-top-20"
+                                htmlFor="bookName"
+                            >
+                                Số trang
+                            </label>
+                            <input
+                                disabled={true}
+                                name="bookName"
+                                value={book?.page}
+                                onChange={form.handleChange}
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 type="text"
                             />
                         </div>
@@ -312,9 +458,10 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                             >
                                 Nhà phát hành
                             </label>
-                            <div className="mt-1">
+                            {/* <div className="mt-1">
                                 <select
-                                    onChange={(e) => setSelectedPublisherId(e.target.value)}
+                                disabled={true}
+                                onChange={(e) => setSelectedPublisherId(e.target.value)}
                                     value={selectedPublisherId!}
                                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     name="publisher"
@@ -326,20 +473,31 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                                         </option>
                                     ))}
                                 </select>
-                            </div>
+                            </div> */}
+                            <input
+                                disabled={true}
+                                name="bookName"
+                                value={book?.publisher?.name}
+                                onChange={form.handleChange}
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                type="text"
+                            />
                         </div>
                         <div className="sm:col-span-3">
                             <label
                                 className="mb-1 block text-sm font-medium margin-top-20"
                                 htmlFor="bookName"
                             >
-                                Năm Phát Hành<span className="text-rose-500">*</span>
+                                Năm Phát Hành
                             </label>
                             <input
+                                disabled={true}
                                 name="bookName"
                                 value={book?.releasedYear}
                                 onChange={form.handleChange}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 type="text"
                             />
                         </div>
@@ -350,14 +508,16 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                                 className="mb-1 block text-sm font-medium"
                                 htmlFor="bookName"
                             >
-                                Lượng Tồn Kho <span className="text-rose-500">*</span>
+                                Số Lượng
                             </label>
                             <div className="item-center ">
                                 <input
+                                    disabled={true}
                                     name="bookName"
                                     value={book?.unitInStock}
                                     onChange={form.handleChange}
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                    // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     type="text"
                                 />
                             </div>
@@ -367,13 +527,16 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                                 className="mb-1 block text-sm font-medium margin-top-20"
                                 htmlFor="bookName"
                             >
-                                Tác Giả<span className="text-rose-500">*</span>
+                                Ngôn ngữ
                             </label>
                             <input
+                                disabled={true}
                                 name="bookName"
-                                value={book?.authorBooks?.map((a) => a.author?.name).join(", ")}
+                                // value={book?.authorBooks?.map((a) => a.author?.name).join(", ")}
+                                value={book?.language}
                                 onChange={form.handleChange}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 type="text"
                             />
                         </div>
@@ -384,14 +547,46 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                                 className="mb-1 block text-sm font-medium"
                                 htmlFor="bookName"
                             >
-                                Thể Loại<span className="text-rose-500">*</span>
+                                Thể Loại
                             </label>
                             <div className="item-center ">
                                 <input
+                                    disabled={true}
                                     name="bookName"
                                     value={book?.category?.name}
                                     onChange={form.handleChange}
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                    // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    type="text"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <Modal.Header
+                        title={
+                            action === BookModalMode.CREATE
+                                ? "Thêm sách"
+                                // : `Thông Tin Sách: "${book?.name}"`
+                                : `Tác giả và Dịch giả`
+                        }
+                        onClose={handleOnClose}
+                    />
+                    <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div className="sm:col-span-3">
+                            <label
+                                className="mb-1 block text-sm font-medium"
+                                htmlFor="bookName"
+                            >
+                                Tác giả
+                            </label>
+                            <div className="item-center ">
+                                <input
+                                    disabled={true}
+                                    name="bookName"
+                                    value={book?.authorBooks?.map((a) => a.author?.name).join(", ")}
+                                    onChange={form.handleChange}
+                                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                    // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     type="text"
                                 />
                             </div>
@@ -401,13 +596,62 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                                 className="mb-1 block text-sm font-medium margin-top-20"
                                 htmlFor="bookName"
                             >
-                                Ngôn Ngữ<span className="text-rose-500">*</span>
+                                Dịch giả
                             </label>
                             <input
+                                disabled={true}
                                 name="bookName"
-                                value={book?.language}
+                                // value={book?.authorBooks?.map((a) => a.author?.name).join(", ")}
                                 onChange={form.handleChange}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                type="text"
+                            />
+                        </div>
+                    </div>
+                    <Modal.Header
+                        title={
+                            action === BookModalMode.CREATE
+                                ? "Thêm sách"
+                                // : `Thông Tin Sách: "${book?.name}"`
+                                : `Định dạng`
+                        }
+                        onClose={handleOnClose}
+                    />
+                    <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div className="sm:col-span-6">
+                            <label
+                                className="mb-1 block text-sm font-medium"
+                                htmlFor="bookName"
+                            >
+                                Định dạng
+                            </label>
+                            <div className="item-center ">
+                                <input
+                                    disabled={true}
+                                    name="bookName"
+                                    value={"Sách điện tử"}
+                                    onChange={form.handleChange}
+                                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                    // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    type="text"
+                                />
+                            </div>
+                        </div>
+                        <div className="sm:col-span-6">
+                            <label
+                                className="mb-1 block text-sm font-medium margin-top-20"
+                                htmlFor="bookName"
+                            >
+                                Đường link cho sách điện tử
+                            </label>
+                            <input
+                                disabled={true}
+                                name="bookName"
+                                value={"https://multiselect-react-dropdown.vercel.app/?path=/story/multiselect-dropdown--grouping"}
+                                onChange={form.handleChange}
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
+                                // className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 type="text"
                             />
                         </div>
@@ -431,7 +675,7 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
                         >
                             {action === BookModalMode.CREATE ?
                                 (createBookMutation.isLoading ? "Đang thêm..." : "Thêm") :
-                                (updateBookMutation.isLoading ? "Đang cập nhật..." : "Cập nhật")
+                                (updateBookMutation.isLoading ? "Đang cập nhật..." : "Cập nhật trạng thái")
                             }
                         </button> */}
                     </div>
@@ -441,4 +685,4 @@ const BookModal: React.FC<Props> = ({ action, isOpen, onClose, book }) => {
     );
 };
 
-export default memo(BookModal);
+export default memo(BookModal)

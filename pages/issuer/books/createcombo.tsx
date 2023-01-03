@@ -97,6 +97,16 @@ const IssuerCreateBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
     })
   );
 
+
+  const handleBookSelectChange = (selectedList: any, selectedItem: any) => {
+    const ids = selectedList.map((item: any) => item?.cat);
+    const matchedBooks = books?.data?.filter(b => ids.some((id : any) => id === b?.id));
+    
+    if(matchedBooks) setSelectedBooks(matchedBooks);
+  }
+
+  const [selectedBooks, setSelectedBooks] = useState<(IBookResponse | undefined)[]>([]);
+
   const [selectedAuthor, setSelectedAuthor] = useState<{
     id?: number;
     name?: string;
@@ -701,7 +711,7 @@ const IssuerCreateBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                     onKeyPressFn={function noRefCheck() { }}
                     onRemove={function noRefCheck() { }}
                     onSearch={function noRefCheck() { }}
-                    onSelect={function noRefCheck() { }}
+                    onSelect={function noRefCheck() {}}
                     options={authors?.data?.map((author) => ({
                       cat: 'Group 1',
                       key: author?.name,
@@ -781,16 +791,17 @@ const IssuerCreateBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                     displayValue="key"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     onKeyPressFn={function noRefCheck() { }}
-                    onRemove={function noRefCheck() { }}
+                    onRemove={handleBookSelectChange}
                     onSearch={function noRefCheck() { }}
-                    onSelect={function noRefCheck() { }}
-                    options={books?.data?.map((book) => ({
-                      cat: 'Group 1',
+                    onSelect={handleBookSelectChange}
+                    options={books?.data?.map((book: IBookResponse) => ({
+                      cat: book?.id,
                       //thêm VND vào giá sách
                       key: book?.name + ' - ' + book?.publisher?.name + ' - ' + book?.category?.name + ' - ' + book?.price + ' VND',
                     }))}
                     placeholder="Tìm và chọn sách"
                     showCheckbox
+                    // singleSelect
                   />
                 </div>
               </div>
@@ -845,7 +856,7 @@ const IssuerCreateBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {books?.data?.map((book) => (
+                      {selectedBooks?.map((book) => (
                         <tr
                           key={book?.id}
                           onSelect={function noRefCheck() { }}
@@ -892,7 +903,7 @@ const IssuerCreateBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                                     { cat: 'Group 1', key: 'Sách điện tử' },
                                     { cat: 'Group 1', key: 'Bộ sưu tập' },
                                   ]}
-                                  // singleSelect={true}
+                                  singleSelect={true}
                                 />
                               </div>
                             </div>

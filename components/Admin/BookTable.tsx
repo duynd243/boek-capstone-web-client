@@ -37,7 +37,7 @@ const BookTable: React.FC<Props> = ({ data }) => {
                 {/* <TableHeader label={"Kích cỡ"} /> */}
                 <TableHeader label={"Tác giả"} />
                 <TableHeader label={"Thể loại"} />
-                <TableHeader label={"Ngôn ngữ"} />
+                <TableHeader label={"Trạng thái"} />
                 <TableHeader label={"Chi tiết & Chỉnh sửa"} />
               </tr>
             </thead>
