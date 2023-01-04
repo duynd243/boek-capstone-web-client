@@ -31,7 +31,7 @@ const AdminGroupsPage: NextPageWithLayout = () => {
                 <SearchForm defaultValue={""}/>
                 <CreateButton
                     onClick={() => setShowCreateModal(true)}
-                    label="Thêm tổ chức"
+                    label="Thêm nhóm"
                 />
             </PageHeading>
             <TableWrapper>

@@ -16,6 +16,7 @@ import {
 } from "react-icons/bs";
 import {GiShop} from "react-icons/gi";
 import {ImBook} from "react-icons/im";
+import {IoMedalSharp} from "react-icons/io5";
 
 export interface ISidebarMenu {
   name: string;
@@ -73,7 +74,7 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
       },{
         name: "Cấp độ khách hàng",
         path: "/admin/levels",
-        icon: <BsFillFileEarmarkMedicalFill />,
+        icon: <IoMedalSharp />,
       },
       {
         name: "Tác giả",
