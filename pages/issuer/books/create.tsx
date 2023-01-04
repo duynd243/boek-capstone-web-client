@@ -290,6 +290,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <input
+                  placeholder= "VD: TB001"
                     value={form.values.code}
                     onChange={form.handleChange}
                     type="text"
@@ -397,6 +398,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <input
+                  placeholder="VD: 0545010225​"
                     value={form.values.isbn10}
                     onChange={form.handleChange}
                     type="text"
@@ -419,6 +421,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <input
+                  placeholder="VD: 9781260013870​"
                     value={form.values.isbn13}
                     onChange={form.handleChange}
                     type="text"
@@ -440,6 +443,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <input
+                  placeholder="10,000​"
                     // value={form.values.price && getFormattedPrice(form.values.price)}
                     value={new Intl.NumberFormat("vi-VN", {
                                     style: "currency",

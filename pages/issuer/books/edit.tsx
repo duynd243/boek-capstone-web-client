@@ -326,11 +326,6 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   <div className="sm:col-span-6">
                     {action === editMode.UPDATE && (
                       <>
-                      <Modal.FormLabel
-                                        fieldName="personnelStatus"
-                                        label="Trạng thái"
-                                    // required={true}
-                                    />
                         <div className="flex items-center justify-between">
                           <div>
                             <div
