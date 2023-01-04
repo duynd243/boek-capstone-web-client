@@ -306,7 +306,7 @@ const IssuerEditBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Tên sách<span className="text-rose-500">*</span>
+                  Tên Combo<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -328,10 +328,11 @@ const IssuerEditBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                   htmlFor="code"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Mã sách<span className="text-rose-500">*</span>
+                  Mã Combo<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
+                  placeholder= "VD: TB001"
                     value={form.values.code}
                     onChange={form.handleChange}
                     type="text"
@@ -439,6 +440,7 @@ const IssuerEditBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                 </label>
                 <div className="mt-1">
                   <input
+                  placeholder="VD: 0545010225​"
                     value={form.values.isbn10}
                     onChange={form.handleChange}
                     type="text"
@@ -461,6 +463,7 @@ const IssuerEditBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                 </label>
                 <div className="mt-1">
                   <input
+                  placeholder="VD: 9781260013870​"
                     value={form.values.isbn13}
                     onChange={form.handleChange}
                     type="text"
@@ -482,9 +485,13 @@ const IssuerEditBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                 </label>
                 <div className="mt-1">
                   <input
-                    value={form.values.price}
+                    // value={form.values.price && getFormattedPrice(form.values.price)}
+                    value={new Intl.NumberFormat("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                }).format(form.values.price)}
                     onChange={form.handleChange}
-                    type="number"
+                    type="text"
                     name="price"
                     id="price"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -494,73 +501,6 @@ const IssuerEditBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                   <div className={"input-error"}>{form.errors.price}</div>
                 )}
               </div>
-
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="size"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Kích thước<span className="text-rose-500">*</span>
-                </label>
-                <div className="mt-1">
-                  <input
-                    value={form.values.size}
-                    onChange={form.handleChange}
-                    type="text"
-                    name="size"
-                    id="size"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                </div>
-                {form.errors.size && form.touched.size && (
-                  <div className={"input-error"}>{form.errors.size}</div>
-                )}
-              </div>
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="category"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Ngôn ngữ<span className="text-rose-500">*</span>
-                </label>
-                <div className="mt-1">
-                  <select
-                    onChange={(e) => setSelectedBookId(e.target.value)}
-                    value={selectedBookId!}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    name="category"
-                    id="category"
-                  >
-                    {books?.data?.map((book) => (
-                      <option value={book?.id} key={book?.id}>
-                        {book?.language}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* <div className="sm:col-span-3">
-                <label
-                  htmlFor="unitInStock"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Số lượng
-                </label>
-                <div className="mt-1">
-                  <input
-                    value={form.values.unitInStock}
-                    onChange={form.handleChange}
-                    type="number"
-                    name="unitInStock"
-                    id="unitInStock"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                </div>
-                {form.errors.unitInStock && form.touched.unitInStock && (
-                  <div className={"input-error"}>{form.errors.unitInStock}</div>
-                )}
-              </div> */}
 
               <div className="sm:col-span-3">
                 <label
@@ -585,29 +525,6 @@ const IssuerEditBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                   </div>
                 )}
               </div>
-
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="page"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Số trang<span className="text-rose-500">*</span>
-                </label>
-                <div className="mt-1">
-                  <input
-                    value={form.values.page}
-                    onChange={form.handleChange}
-                    type="number"
-                    name="page"
-                    id="page"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                </div>
-                {form.errors.page && form.touched.page && (
-                  <div className={"input-error"}>{form.errors.page}</div>
-                )}
-              </div>
-
               <div className="sm:col-span-3">
                 <label
                   htmlFor="publisher"
@@ -626,29 +543,6 @@ const IssuerEditBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
                     {publishers?.data?.map((publisher) => (
                       <option value={publisher?.id} key={publisher?.id}>
                         {publisher?.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="category"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Thể loại<span className="text-rose-500">*</span>
-                </label>
-                <div className="mt-1">
-                  <select
-                    onChange={(e) => setSelectedCategoryId(e.target.value)}
-                    value={selectedCategoryId!}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    name="category"
-                    id="category"
-                  >
-                    {categories?.data?.map((category) => (
-                      <option value={category?.id} key={category?.id}>
-                        {category?.name}
                       </option>
                     ))}
                   </select>
@@ -974,7 +868,7 @@ const IssuerEditBookComboPage: NextPageWithLayout<Props> = ({ data }) => {
               type="submit"
               className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
-              Tạo Sách combo
+              Cập nhập
             </button>
           </div>
         </div>

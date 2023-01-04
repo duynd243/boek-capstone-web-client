@@ -286,7 +286,7 @@ const IssuerCreateBookSeriesPage: NextPageWithLayout<Props> = ({ data }) => {
       >
         <div className="mb-4 sm:mb-0">
         <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
-          Chỉnh sửa sách Series ✨
+          Thêm sách Series ✨
         </h1>
       </div>
         <div className="space-y-8 divide-y divide-gray-200">

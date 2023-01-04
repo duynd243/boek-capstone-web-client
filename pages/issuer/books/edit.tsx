@@ -24,49 +24,13 @@ import Link from "next/link";
 import {
   IoChevronBack
 } from "react-icons/io5";
-import {
-  BsEmojiFrownFill,
-  BsEmojiSmileFill,
-} from "react-icons/bs";
-import ToggleButton from "../../../components/ToggleButton";
-import Modal from './../../../components/Modal/Modal';
-
-
-export enum editMode {
-  CREATE,
-  UPDATE,
-}
-type Props = {
-  action: editMode;
-  isOpen: boolean;
-  maxWidth?: string;
-  onClose: () => void;
-  book?: {
-    id?: number;
-    name?: string;
-    description?: string;
-    code?: string;
-    imageUrl?: string;
-    isbn10?: string;
-    isbn13?: string;
-    price?: number;
-    publisher?: { name?: string };
-    releasedYear?: number;
-    unitInStock?: number;
-    page?: number;
-    size?: string;
-    authorBooks?: { author?: { name?: string } }[];
-    category?: { name?: string };
-    language?: string;
-    status?: boolean;
-    translator?: string;
-  };
-};
+import { getFormattedPrice } from "../../../utils/helper";
 
 
 
 
-const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpen, onClose, book }) => {
+
+const IssuerEditBookPage: NextPageWithLayout = () => {
   const { loginUser } = useAuth();
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
 
@@ -111,7 +75,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
   const [selectedAuthor, setSelectedAuthor] = useState<{
     id?: number;
     name?: string;
-  }>();
+  }>(); 
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   // const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
   const router = useRouter();
@@ -176,23 +140,20 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
   };
 
   const form = useFormik({
-    enableReinitialize: true,
     initialValues: {
-      // code: "",
-      // isbn10: "",
-      // isbn13: "",
-      // name: "",
-      // translator: "",
-      // price: 0,
-      // description: "",
-      // language: "",
-      // size: "",
-      // unitInStock: 0,
-      // releasedYear: new Date().getFullYear(),
-      // page: 1,
-      // bookInCombo: true,
-      bookName: action === editMode.UPDATE ? book?.name : "",
-      bookStatus: action === editMode.UPDATE ? book?.status : true,
+      code: "",
+      isbn10: "",
+      isbn13: "",
+      name: "",
+      translator: "",
+      price: 0,
+      description: "",
+      language: "",
+      size: "",
+      unitInStock: 0,
+      releasedYear: new Date().getFullYear(),
+      page: 1,
+      bookInCombo: true,
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required("Mã sách không được để trống"),
@@ -251,24 +212,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
         authors: [Number(selectedAuthorId)],
         categoryId: Number(selectedCategoryId),
         publisherId: Number(selectedPublisherId),
-        // imageUrl: "",
-        id: book?.id,
-        name: values.bookName,
-        code: book?.code,
-        imageUrl: book?.imageUrl,
-        isbn10: book?.isbn10,
-        isbn13: book?.isbn13,
-        price: book?.price,
-        publisher: book?.publisher,
-        releasedYear: book?.releasedYear,
-        unitInStock: book?.unitInStock,
-        size: book?.size,
-        authorBooks: book?.authorBooks,
-        category: book?.category,
-        language: book?.language,
-        page: book?.page,
-        description: book?.description,
-        translator: book?.translator,
+        imageUrl: "",
       };
       // // upload cover photo to firebase
       //
@@ -299,10 +243,10 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
         className="mx-auto max-w-6xl space-y-8 divide-y divide-gray-200 bg-white p-10"
       >
         <div className="mb-4 sm:mb-0">
-          <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
-            Chỉnh sửa sách lẻ ✨
-          </h1>
-        </div>
+        <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
+          Chỉnh sửa sách lẻ ✨
+        </h1>
+      </div>
         <div className="space-y-8 divide-y divide-gray-200">
           <div>
             <div>
@@ -320,58 +264,11 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Trạng thái<span className="text-rose-500">*</span>
-                </label>
-                <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                  <div className="sm:col-span-6">
-                    {action === editMode.UPDATE && (
-                      <>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div
-                              className={`${form.values.bookStatus
-                                ? "bg-rose-500"
-                                : "bg-green-500"
-                                } flex w-fit items-center gap-2 rounded px-2.5 py-1 text-sm text-white transition`}
-                            >
-                              {form.values.bookStatus ? (
-                                <>
-                                  Ngừng Phát Hành <BsEmojiFrownFill />
-                                </>
-                              ) : (
-                                <>
-                                  Phát Hành <BsEmojiSmileFill />
-                                </>
-                              )}
-                            </div>
-                            <div className="mt-2 text-sm text-gray-700">
-                              {form.values.bookStatus
-                                ? "Sách sẽ bị vô hiệu hóa"
-                                : "Sách đang phát hành"}
-                            </div>
-                          </div>
-                          <ToggleButton
-                            isCheck={form.values.bookStatus || false}
-                            onChange={(value) => {
-                              form.setFieldValue("bookStatus", value);
-                            }}
-                          />
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="sm:col-span-6">
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
                   Tên sách<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <input
-                    value={form.values.bookName}
+                    value={form.values.name}
                     onChange={form.handleChange}
                     type="text"
                     name="name"
@@ -379,8 +276,8 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {form.errors.bookName && form.touched.bookName && (
-                  <div className={"input-error"}>{form.errors.bookName}</div>
+                {form.errors.name && form.touched.name && (
+                  <div className={"input-error"}>{form.errors.name}</div>
                 )}
               </div>
 
@@ -393,7 +290,8 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </label>
                 <div className="mt-1">
                   <input
-                    value={book?.code}
+                  placeholder= "VD: TB001"
+                    value={form.values.code}
                     onChange={form.handleChange}
                     type="text"
                     name="code"
@@ -401,9 +299,9 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {/* {form.errors.code && form.touched.code && (
+                {form.errors.code && form.touched.code && (
                   <div className={"input-error"}>{form.errors.code}</div>
-                )} */}
+                )}
               </div>
 
               <div className="sm:col-span-6">
@@ -415,7 +313,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </label>
                 <div className="mt-1">
                   <textarea
-                    value={book?.description}
+                    value={form.values.description}
                     onChange={form.handleChange}
                     id="description"
                     name="description"
@@ -423,9 +321,9 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {/* {form.errors.description && form.touched.description && (
+                {form.errors.description && form.touched.description && (
                   <div className={"input-error"}>{form.errors.description}</div>
-                )} */}
+                )}
               </div>
 
               <div className="sm:col-span-6">
@@ -500,7 +398,8 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </label>
                 <div className="mt-1">
                   <input
-                    value={book?.isbn10}
+                  placeholder="VD: 0545010225​"
+                    value={form.values.isbn10}
                     onChange={form.handleChange}
                     type="text"
                     name="isbn10"
@@ -508,9 +407,9 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {/* {form.errors.isbn10 && form.touched.isbn10 && (
+                {form.errors.isbn10 && form.touched.isbn10 && (
                   <div className={"input-error"}>{form.errors.isbn10}</div>
-                )} */}
+                )}
               </div>
 
               <div className="sm:col-span-3">
@@ -522,7 +421,8 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </label>
                 <div className="mt-1">
                   <input
-                    value={book?.isbn13}
+                  placeholder="VD: 9781260013870​"
+                    value={form.values.isbn13}
                     onChange={form.handleChange}
                     type="text"
                     name="isbn13"
@@ -530,9 +430,9 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {/* {form.errors.isbn13 && form.touched.isbn13 && (
+                {form.errors.isbn13 && form.touched.isbn13 && (
                   <div className={"input-error"}>{form.errors.isbn13}</div>
-                )} */}
+                )}
               </div>
               <div className="sm:col-span-3">
                 <label
@@ -543,17 +443,22 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </label>
                 <div className="mt-1">
                   <input
-                    value={book?.price}
+                  placeholder="10,000​"
+                    // value={form.values.price && getFormattedPrice(form.values.price)}
+                    value={new Intl.NumberFormat("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                }).format(form.values.price)}
                     onChange={form.handleChange}
-                    type="number"
+                    type="text"
                     name="price"
                     id="price"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {/* {form.errors.price && form.touched.price && (
+                {form.errors.price && form.touched.price && (
                   <div className={"input-error"}>{form.errors.price}</div>
-                )} */}
+                )}
               </div>
 
               <div className="sm:col-span-3">
@@ -565,7 +470,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </label>
                 <div className="mt-1">
                   <input
-                    value={book?.size}
+                    value={form.values.size}
                     onChange={form.handleChange}
                     type="text"
                     name="size"
@@ -573,9 +478,9 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {/* {form.errors.size && form.touched.size && (
+                {form.errors.size && form.touched.size && (
                   <div className={"input-error"}>{form.errors.size}</div>
-                )} */}
+                )}
               </div>
               <div className="sm:col-span-3">
                 <label
@@ -610,7 +515,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </label>
                 <div className="mt-1">
                   <input
-                    value={book?.unitInStock}
+                    value={form.values.unitInStock}
                     onChange={form.handleChange}
                     type="number"
                     name="unitInStock"
@@ -618,9 +523,9 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {/* {form.errors.unitInStock && form.touched.unitInStock && (
+                {form.errors.unitInStock && form.touched.unitInStock && (
                   <div className={"input-error"}>{form.errors.unitInStock}</div>
-                )} */}
+                )}
               </div>
 
               <div className="sm:col-span-3">
@@ -632,7 +537,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </label>
                 <div className="mt-1">
                   <input
-                    value={book?.releasedYear}
+                    value={form.values.releasedYear}
                     onChange={form.handleChange}
                     type="number"
                     name="releasedYear"
@@ -640,11 +545,11 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {/* {form.errors.releasedYear && form.touched.releasedYear && (
+                {form.errors.releasedYear && form.touched.releasedYear && (
                   <div className={"input-error"}>
                     {form.errors.releasedYear}
                   </div>
-                )} */}
+                )}
               </div>
 
               <div className="sm:col-span-3">
@@ -656,7 +561,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </label>
                 <div className="mt-1">
                   <input
-                    value={book?.page}
+                    value={form.values.page}
                     onChange={form.handleChange}
                     type="number"
                     name="page"
@@ -664,9 +569,9 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {/* {form.errors.page && form.touched.page && (
+                {form.errors.page && form.touched.page && (
                   <div className={"input-error"}>{form.errors.page}</div>
-                )} */}
+                )}
               </div>
 
               <div className="sm:col-span-3">
@@ -731,7 +636,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </label>
                 <div className="mt-1">
                   <input
-                    value={book?.translator}
+                    value={form.values.translator}
                     onChange={form.handleChange}
                     type="text"
                     name="translator"
@@ -739,9 +644,9 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {/* {form.errors.translator && form.touched.translator && (
+                {form.errors.translator && form.touched.translator && (
                   <div className={"input-error"}>{form.errors.translator}</div>
-                )} */}
+                )}
               </div>
             </div>
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
@@ -782,11 +687,11 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                 </div>
               </div>
               <div className="sm:col-span-6">
-                <CreateButton
-                  onClick={() => setShowCreateModal(true)}
-                  label="Thêm tác giả"
-                // align="right"
-                />
+              <CreateButton
+                    onClick={() => setShowCreateModal(true)}
+                    label="Thêm tác giả"
+                    // align="right"
+                  />
               </div>
             </div>
           </div>
@@ -795,7 +700,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
               Định dạng
             </h3>
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-              <div className="sm:col-span-6">
+            <div className="sm:col-span-6">
                 <label
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
@@ -811,7 +716,7 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
                     onSearch={function noRefCheck() { }}
                     onSelect={function noRefCheck() { }}
                     placeholder="Chọn định dạng"
-                    options={[
+                    options={[ 
                       { cat: 'Group 1', key: 'Sách giấy' },
                       { cat: 'Group 1', key: 'Sách điện tử' },
                       { cat: 'Group 1', key: 'Bộ sưu tập' },
@@ -837,26 +742,26 @@ const IssuerEditBookPage: NextPageWithLayout<Props> = ({ action, maxWidth, isOpe
         <div className="pt-5">
           <div className="flex justify-end">
             <button
-              onClick={() => {
-                // setSelectedAuthor(author);
-                // setShowUpdateModal(true);
-              }}
+            onClick={() => {
+              // setSelectedAuthor(author);
+              // setShowUpdateModal(true);
+          }}
               type="submit"
               className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
-              Tạo sách
+              Cập nhập
             </button>
           </div>
         </div>
       </form>
       <AuthorModal
-        action={AuthorModalMode.CREATE}
-        onClose={() => setShowCreateModal(false)}
-        isOpen={showCreateModal}
-        author={selectedAuthor as { id?: number; name?: string }}
-      />
+                action={AuthorModalMode.CREATE}
+                onClose={() => setShowCreateModal(false)}
+                isOpen={showCreateModal}
+                author={selectedAuthor as { id?: number; name?: string }}
+            />
 
-      {/* <AuthorModal
+            {/* <AuthorModal
                 action={AuthorModalMode.UPDATE}
                 author={selectedAuthor as { id?: number; name?: string }}
                 onClose={() => setShowUpdateModal(false)}
