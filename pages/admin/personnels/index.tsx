@@ -230,7 +230,10 @@ const AdminPersonnelsPage: NextPageWithLayout = () => {
         maxWidth="max-w-2xl"
         action={PersonnelModalMode.UPDATE}
         personnel={selectedPersonnel}
-        onClose={() => setShowUpdateModal(false)}
+        onClose={() => {
+            setShowUpdateModal(false);
+            setSelectedPersonnel(undefined);
+        }}
         isOpen={showUpdateModal}
       />
     </Fragment>

@@ -1,16 +1,15 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import type { AppProps } from "next/app";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
+import type {AppProps} from "next/app";
 import "../styles/global.scss";
-import { Toaster, ToasterProps } from "react-hot-toast";
-import { initFirebaseApp } from "../services/initFirebase";
-import { Fragment, ReactElement, ReactNode, useEffect, useState } from "react";
-import { NextPage } from "next";
-import { AuthContextProvider } from "../context/AuthContext";
+import {Toaster, ToasterProps} from "react-hot-toast";
+import {initFirebaseApp} from "../services/initFirebase";
+import {Fragment, ReactElement, ReactNode, useEffect, useState} from "react";
+import {NextPage} from "next";
+import {AuthContextProvider} from "../context/AuthContext";
 import ProtectedRouteWrapper from "../components/ProtectedRouteWrapper";
-import { useRouter } from "next/router";
-import { IProtectedRoute, ProtectedRoutes } from "../constants/ProtectedRoutes";
-import PostContextProvider from "../context/PostContext";
+import {useRouter} from "next/router";
+import {IProtectedRoute, ProtectedRoutes} from "../constants/ProtectedRoutes";
 
 const queryClient = new QueryClient();
 

@@ -50,7 +50,6 @@ const IssuerModal: React.FC<Props> = ({
       .max(250, "Địa chỉ không được vượt quá 50 ký tự"),
     issuerTaxCode: Yup.string()
       .trim()
-      .required("Mã số thuế không được để trống")
       .min(2, "Mã số thuế phải có ít nhất 2 ký tự")
       .max(10, "Mã số thuế không được vượt quá 10 ký tự"),
   });
@@ -118,7 +117,7 @@ const IssuerModal: React.FC<Props> = ({
           />
           <Modal.FormInput
             placeholder="Nhập mã số thuế"
-            required={true}
+            required={false}
             formikForm={form}
             fieldName="issuerTaxCode"
             label="Mã số thuế"
