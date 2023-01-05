@@ -33,7 +33,6 @@ export const randomBooks = [
 ]
 
 const AdminBooksPage: NextPageWithLayout = () => {
-        const [selectedIssuer, setSelectedIssuer] = useState<IBookResponse>();
         const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
         const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
 
@@ -157,20 +156,6 @@ const AdminBooksPage: NextPageWithLayout = () => {
                     </TableBody>
                 </TableWrapper>
 
-                <IssuerModal
-                    maxWidth="max-w-2xl"
-                    action={IssuerModalMode.CREATE}
-                    onClose={() => setShowCreateModal(false)}
-                    isOpen={showCreateModal}
-                />
-
-                <IssuerModal
-                    maxWidth="max-w-2xl"
-                    action={IssuerModalMode.UPDATE}
-                    issuer={selectedIssuer}
-                    onClose={() => setShowUpdateModal(false)}
-                    isOpen={showUpdateModal}
-                />
             </Fragment>
         );
     }
