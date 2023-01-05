@@ -187,6 +187,7 @@ const BookModal: React.FC<Props> = ({ action, maxWidth, isOpen, onClose, book })
         form.resetForm();
         onClose();
     };
+    const [showMore, setShowMore] = useState (false);
 
     return (
         <TransitionModal
@@ -304,7 +305,10 @@ const BookModal: React.FC<Props> = ({ action, maxWidth, isOpen, onClose, book })
                                 Mô tả
                             </label>
                             <span>
-                            {book?.description}
+                                {showMore ? book?.description : `${book?.description?.substring(0, 250)}`}
+                                <button className="btn" onClick={() => setShowMore(!showMore)}>
+                                    {showMore ? "Show less" : "Show more"}
+                                </button>
                             </span>
                         </div>
                     </div>
