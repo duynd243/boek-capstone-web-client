@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 
 import { IProtectedRoute } from "../constants/ProtectedRoutes";
-import { v4 as uuidv4 } from "uuid"
 import { BsFillCircleFill } from "react-icons/bs";
 import { IoAdd } from "react-icons/io5";
 
@@ -11,10 +10,13 @@ type Props = {
 };
 
 const DynamicForm: React.FC<Props> = ({ align }) => {
+	const generateRandomId = () => {
+		return Math.random().toString(36).substr(2, 9);
+	}
 	const [inviteMembers, setInviteMembers] = React.useState([
 		{
 			name: "",
-			id: uuidv4(),
+			id: generateRandomId(),
 		},
 	])
 
@@ -25,7 +27,7 @@ const DynamicForm: React.FC<Props> = ({ align }) => {
 		let _inviteMembers = [...inviteMembers]
 		_inviteMembers.push({
 			name: "",
-			id: uuidv4(),
+			id: generateRandomId(),
 		})
 		setInviteMembers(_inviteMembers)
 	}
