@@ -28,6 +28,8 @@ type InputProps = {
 } & React.InputHTMLAttributes<HTMLInputElement> &
     React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
+export const defaultInputClass = "block w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500";
+
 const Input: React.FC<InputProps> = ({
                                          uppercase = false,
                                          inputType = "text",
@@ -48,7 +50,7 @@ const Input: React.FC<InputProps> = ({
         },
         placeholder: placeholder,
         className:
-            "block w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500",
+        defaultInputClass,
         ...rest,
     };
     return (
@@ -61,9 +63,7 @@ const Input: React.FC<InputProps> = ({
             )}
             {formikForm.errors[fieldName] && formikForm.touched[fieldName] && (
                 <ErrorMessage>
-                    <span className='text-base'>
-                        {formikForm.errors[fieldName]}
-                    </span>
+                   {formikForm.errors[fieldName]}
                 </ErrorMessage>
             )}
         </div>
@@ -76,8 +76,8 @@ type GroupLabelProps = {
 const GroupLabel: React.FC<GroupLabelProps> = ({label, description}) => {
     return (
         <div>
-            <h3 className="text-xl font-medium leading-6 text-gray-900">{label}</h3>
-            {description && (<p className="mt-1 text text-gray-500">{description}</p>)}
+            <h3 className="text-lg font-medium leading-6 text-gray-900">{label}</h3>
+            {description && (<p className="mt-1 text-sm text-gray-500">{description}</p>)}
         </div>
     )
 }

@@ -15,6 +15,7 @@ import IssuerModal, {
     IssuerModalMode,
 } from "../../../components/Modal/IssuerModal";
 import {IBookResponse} from "../../../types/response/IBookResponse";
+import {getAvatarFromName} from "../../../utils/helper";
 
 export const randomBooks = [
     {
@@ -29,6 +30,18 @@ export const randomBooks = [
         id: 3,
         name: "Cây Cam Ngọt Của Tôi",
         imageUrl: "https://salt.tikicdn.com/cache/w1200/ts/product/5e/18/24/2a6154ba08df6ce6161c13f4303fa19e.jpg",
+    }, {
+        id: 4,
+        name: "Rừng Nauy (Tái Bản)",
+        imageUrl: "https://salt.tikicdn.com/ts/product/9a/84/8f/8c3eda2d15fa1ae7a0e13762a0cfa74e.jpg",
+    }, {
+        id: 5,
+        name: "THÀNH NGỮ TỤC NGỮ VIỆT NAM",
+        imageUrl: "http://static.nhanam.com.vn/thumb/0x320/crop/Books/Images/2022/11/15/LBC828K4.jpg",
+    }, {
+        id: 6,
+        name: "Những Tù Nhân Của Địa Lý",
+        imageUrl: "https://salt.tikicdn.com/cache/w1200/ts/product/8d/96/9e/c0c1f23db756d50b1944dff9c3988753.jpg",
     }
 ]
 
@@ -47,25 +60,27 @@ const AdminBooksPage: NextPageWithLayout = () => {
                         <TableHeader>Mã sách</TableHeader>
                         <TableHeader>Tên sách</TableHeader>
                         <TableHeader>Giá sách</TableHeader>
-                        <TableHeader>Nhà phát hành</TableHeader>
+                        <TableHeader>Nhà xuất bản</TableHeader>
                         <TableHeader>ISBN10</TableHeader>
                         <TableHeader>ISBN13</TableHeader>
+                        <TableHeader>Tác giả</TableHeader>
                         <TableHeader>Năm phát hành</TableHeader>
                         <TableHeader textAlignment="text-center">Trạng thái</TableHeader>
                     </TableHeading>
                     <TableBody>
-                        {new Array(8).fill(1).map((_, index) => {
+                        {randomBooks.map((book, index) => {
                             const randomBool = faker.datatype.boolean();
                             const randomBook = faker.datatype.number({min: 0, max: randomBooks.length - 1});
                             const fakeBook: IBookResponse = {
-
                                 id: index,
                                 code: `B${faker.datatype.number({
                                     min: 10000,
                                     max: 99999,
                                 })}`,
-                                imageUrl: faker.image.avatar(),
-                                name: faker.name.fullName(),
+
+                                publisher: {
+                                    name: faker.company.name(),
+                                },
                                 isbn10: faker.datatype.number({
                                     min: 1000000000,
                                     max: 9999999999,
@@ -85,21 +100,18 @@ const AdminBooksPage: NextPageWithLayout = () => {
                                     <TableData className="text-sm font-medium uppercase text-gray-500">
                                         {fakeBook.code}
                                     </TableData>
-                                    <TableData>
-                                        <div className="flex items-center">
-                                            <div className="h-10 w-10 flex-shrink-0">
-                                                <Image
-                                                    width={120}
-                                                    height={160}
-                                                    className=" rounded"
-                                                    src={randomBooks[randomBook].imageUrl}
-                                                    alt=""
-                                                />
-                                            </div>
-                                            <div className="ml-4">
-                                                <div className="text-sm font-medium text-gray-900">
-                                                    {randomBooks[randomBook].name}
-                                                </div>
+                                    <TableData className='max-w-72'>
+                                        <div className="flex gap-4 items-center">
+                                            <Image
+                                                width={500}
+                                                height={500}
+                                                className="h-20 w-16 object-cover"
+                                                src={book.imageUrl || ''}
+                                                alt=""
+                                            />
+                                            <div
+                                                className="text-sm max-w-56 text-ellipsis overflow-hidden font-medium text-gray-900">
+                                                {book.name}
                                             </div>
                                         </div>
                                     </TableData>
@@ -116,13 +128,13 @@ const AdminBooksPage: NextPageWithLayout = () => {
                                                     width={100}
                                                     height={100}
                                                     className="h-10 w-10 rounded-full"
-                                                    src={fakeBook?.imageUrl || ""}
+                                                    src={getAvatarFromName(fakeBook.publisher?.name)}
                                                     alt=""
                                                 />
                                             </div>
                                             <div className="ml-4">
-                                                <div className="text-sm font-medium text-gray-900">
-                                                    {fakeBook.name}
+                                                <div className="text-sm text-gray-900">
+                                                    {fakeBook.publisher?.name}
                                                 </div>
                                             </div>
                                         </div>
@@ -133,6 +145,9 @@ const AdminBooksPage: NextPageWithLayout = () => {
 
                                     <TableData className="text-sm text-gray-500">
                                         {fakeBook.isbn13}
+                                    </TableData>
+                                    <TableData className="text-sm text-gray-500">
+                                        {faker.name.fullName()}
                                     </TableData>
                                     <TableData textAlignment="text-center" className="text-sm text-gray-500">
                                         {fakeBook.releasedYear}
