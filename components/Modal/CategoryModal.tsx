@@ -17,7 +17,7 @@ type Props = {
   action: CategoryModalMode;
   isOpen: boolean;
   onClose: () => void;
-  category?: typeof bookCategories[0];
+  category?: (typeof bookCategories)[0];
 };
 
 const CategoryModal: React.FC<Props> = ({

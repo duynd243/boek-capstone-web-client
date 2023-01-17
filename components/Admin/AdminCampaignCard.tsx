@@ -1,8 +1,8 @@
 import React from "react";
-import { ICampaign } from "../../types/campaign/ICampaign";
+import { ICampaign } from "../../old-types/campaign/ICampaign";
 import AvatarGroup from "../Commons/AvatarGroup/AvatarGroup";
 import DefaultAvatar from "./../../assets/images/default-avatar.png";
-import { IUser } from "../../types/user/IUser";
+import { IUser } from "../../old-types/user/IUser";
 import StatusLabel from "../CampaignDetails/StatusLabel";
 import { getFormattedDate } from "../../utils/helper";
 import {
@@ -20,7 +20,7 @@ import {
 } from "../../constants/Statuses";
 import { useAuth } from "../../context/AuthContext";
 import { findRole, Roles } from "../../constants/Roles";
-import { IParticipation } from "../../types/participation/IParticipation";
+import { IParticipation } from "../../old-types/participation/IParticipation";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -127,10 +127,10 @@ const AdminCampaignCard: React.FC<Props> = ({ campaign }) => {
   const issuers = campaign.participations
     ?.filter((p) => p.issuer)
     .map((p) => p.issuer) as IUser[];
-  const participationOfIssuer =
-    loginUser?.role === Roles.ISSUER.id
-      ? campaign.participations?.find((p) => p.issuerId === loginUser?.userId)
-      : undefined;
+  // const participationOfIssuer =
+  //   loginUser?.role === Roles.ISSUER.id
+  //     ? campaign.participations?.find((p) => p.issuerId === loginUser?.userId)
+  //     : undefined;
   return (
     //make the card float pointer when hover
     <div className="flex h-full cursor-pointer  flex-col  rounded border bg-white p-5 shadow-sm transition duration-500 ease-in-out hover:shadow-md">

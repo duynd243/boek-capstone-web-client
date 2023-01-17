@@ -1,19 +1,12 @@
-import { AxiosInstance } from "axios";
-import getAxiosClient from "./axiosClient";
-import { IBaseStatusResponse } from "../types/IBaseStatusResponse";
-import { ILoginUser } from "../types/ILoginUser";
+import { ILoginData } from "../types/User/ILoginData";
+import { IBaseStatusResponse } from "../types/Commons/IBaseStatusResponse";
+import { BaseService } from "./BaseService";
 
-export class UserService {
-  private readonly axiosClient: AxiosInstance;
-
-  constructor(accessToken?: string) {
-    this.axiosClient = getAxiosClient(accessToken);
-  }
-
+export class UserService extends BaseService {
   loginWithFirebaseIdToken = async (idToken: string) => {
     const response = await this.axiosClient.post<{
       status: IBaseStatusResponse;
-      data: ILoginUser;
+      data: ILoginData;
     }>("/login", {
       idToken,
     });

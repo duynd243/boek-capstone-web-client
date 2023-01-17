@@ -1,9 +1,16 @@
 import { AxiosInstance } from "axios";
 import getAxiosClient from "../axiosClient";
-import { IPublisher } from "./../../types/user/IPublisher";
-import { IBaseListResponse } from "../../types/IBaseListResponse";
+import { IBaseListResponse } from "../../old-types/response/IBaseListResponse";
 
-export class SystemPublisherService {
+export interface IPublisher {
+  id?: number;
+  code?: string;
+  name?: string;
+  email?: string;
+  address?: string;
+  phoneNumber?: string;
+}
+export class PublisherService {
   private readonly axiosClient: AxiosInstance;
 
   constructor(accessToken?: string) {

@@ -1,5 +1,5 @@
 import React from "react";
-import { IUser } from "../../types/user/IUser";
+import { IUser } from "../../old-types/user/IUser";
 import SidebarBlockWrapper from "./SidebarBlockWrapper";
 import Image from "next/image";
 import DefaultAvatar from "./../../assets/images/default-avatar.png";

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import {
-  IoAdd,
   IoArrowForward,
   IoChevronBack,
   IoLocationSharp,
@@ -10,15 +9,14 @@ import { getFormattedDate } from "../../utils/helper";
 import Image from "next/image";
 import ContentHeader from "./ContentHeader";
 import Separator from "./Seperator";
-import { ICampaign } from "../../types/campaign/ICampaign";
+import { ICampaign } from "../../old-types/campaign/ICampaign";
 import StatusLabel from "./StatusLabel";
 import OrganizationCard from "./OrganizationCard";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
-import { PostService } from "../../services/PostService";
-import { IPostResponse } from "../../types/response/IPostResponse";
+import { PostService } from "../../old-services/PostService";
+import { IPostResponse } from "../../old-types/response/IPostResponse";
 import PostCard from "./PostCard";
-import { Roles } from "../../constants/Roles";
 // import ParticipationTable from '../Admin/ParticipationTable';
 import EmptySection from "./EmptySection";
 // import ParticipationSection from '../Admin/ParticipationSection';

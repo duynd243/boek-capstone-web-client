@@ -1,8 +1,8 @@
 import React from "react";
 import { AxiosInstance } from "axios";
 import getAxiosClient from "../axiosClient";
-import { IBaseListResponse } from "../../types/response/IBaseListResponse";
-import { IBookResponse } from "../../types/response/IBookResponse";
+import { IBaseListResponse } from "../../old-types/response/IBaseListResponse";
+import { IBookResponse } from "../../old-types/response/IBookResponse";
 
 export class IssuerBookService {
   private readonly axiosClient: AxiosInstance;

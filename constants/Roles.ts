@@ -14,9 +14,9 @@ export interface IRole {
 
 export class Roles {
   static readonly SYSTEM: IRole = {
-    id: 0,
-    name: "system",
-    displayName: "Hệ thống",
+    id: 1,
+    name: "admin",
+    displayName: "Quản trị viên",
     defaultRoute: "/admin",
     sidebarMenuGroups: ADMIN_SIDEBAR_MENUS,
   };
@@ -27,8 +27,14 @@ export class Roles {
     defaultRoute: "/issuer",
     sidebarMenuGroups: ISSUER_SIDEBAR_MENUS,
   };
-  static readonly CUSTOMER: IRole = {
+  static readonly STAFF: IRole = {
     id: 3,
+    name: "staff",
+    displayName: "Nhân viên",
+    defaultRoute: "/",
+  };
+  static readonly CUSTOMER: IRole = {
+    id: 4,
     name: "customer",
     displayName: "Khách hàng",
     defaultRoute: "/",

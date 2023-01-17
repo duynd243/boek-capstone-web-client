@@ -1,8 +1,8 @@
 import React from "react";
 import SidebarIssuersTable from "./SidebarIssuersTable";
-import { IUser } from "../../types/user/IUser";
+import { IUser } from "../../old-types/user/IUser";
 import SidebarActionButtons from "./SidebarActionButtons";
-import { ICampaign } from "../../types/campaign/ICampaign";
+import { ICampaign } from "../../old-types/campaign/ICampaign";
 import { useAuth } from "../../context/AuthContext";
 import { Roles } from "../../constants/Roles";
 

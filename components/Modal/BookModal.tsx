@@ -3,7 +3,7 @@ import TransitionModal from "./TransitionModal";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { IssuerBookService } from "../../services/Issuer/Issuer_BookService";
+import { IssuerBookService } from "../../old-services/Issuer/Issuer_BookService";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
 import Modal from "./Modal";

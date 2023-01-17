@@ -1,8 +1,6 @@
-import React, { Fragment, ReactElement, useState } from "react";
+import React, { ReactElement, useState } from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { NextPageWithLayout } from "../../_app";
-import { Disclosure, Menu, Switch, Transition } from "@headlessui/react";
-import { BsSearch } from "react-icons/bs";
 import { getAvatarFromName } from "../../../utils/helper";
 
 const user = {

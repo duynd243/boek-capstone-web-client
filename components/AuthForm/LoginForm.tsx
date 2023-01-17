@@ -7,8 +7,6 @@ import SocialLoginButton, {
   AuthProviders,
 } from "./SocialLoginButton";
 import Link from "next/link";
-import TransitionModal from "../Modal/TransitionModal";
-import Swal from "sweetalert2";
 import { useAuth } from "../../context/AuthContext";
 
 type Props = {};

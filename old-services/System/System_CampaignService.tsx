@@ -1,7 +1,7 @@
 import { AxiosInstance } from "axios";
 import getAxiosClient from "../axiosClient";
-import { IBaseListResponse } from "../../types/IBaseListResponse";
-import { ICampaign } from "../../types/ICampaign";
+import { IBaseListResponse } from "../../old-types/IBaseListResponse";
+import { ICampaign } from "../../old-types/ICampaign";
 
 export class SystemCampaignService {
   private readonly axiosClient: AxiosInstance;

@@ -1,5 +1,5 @@
-import React, { Fragment, ReactElement, useEffect, useState } from "react";
-import { IBookResponse } from "../../types/response/IBookResponse";
+import React, { useState } from "react";
+import { IBookResponse } from "../../old-types/response/IBookResponse";
 import Image from "next/image";
 import DefaultAvatar from "./../../assets/images/default-avatar.png";
 import TableData, { noDataLabel } from "./TableData";

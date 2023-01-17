@@ -1,4 +1,3 @@
-import { NextPage } from "next";
 import AdminLayout from "../../components/Layout/AdminLayout";
 import React, { ReactElement } from "react";
 

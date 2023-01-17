@@ -1,5 +1,4 @@
 import React, { Fragment, ReactElement, useMemo } from "react";
-import { NextPage } from "next";
 import { NextPageWithLayout } from "../../../../_app";
 import AdminLayout from "../../../../../components/Layout/AdminLayout";
 import { bookCategories } from "../../index";
@@ -8,7 +7,6 @@ import PageHeading from "../../../../../components/Admin/PageHeading";
 import SearchForm from "../../../../../components/Admin/SearchForm";
 import CreateButton from "../../../../../components/Admin/CreateButton";
 import { faker } from "@faker-js/faker/locale/vi";
-import Link from "next/link";
 
 const AdminGenresPage: NextPageWithLayout = () => {
   const router = useRouter();

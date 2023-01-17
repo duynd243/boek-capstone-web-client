@@ -1,7 +1,6 @@
 import { AxiosInstance } from "axios";
 import getAxiosClient from "../axiosClient";
-import { IBaseListResponse } from "../../types/response/IBaseListResponse";
-import { IParticipation } from "../../types/participation/IParticipation";
+import { IParticipation } from "../../old-types/participation/IParticipation";
 
 export class IssuerParticipationService {
   private readonly axiosClient: AxiosInstance;

@@ -1,5 +1,5 @@
 import React from "react";
-import { IOrganizationCampaign } from "../../types/joins/IOrganizationCampaign";
+import { IOrganizationCampaign } from "../../old-types/joins/IOrganizationCampaign";
 import { FaBuilding } from "react-icons/fa";
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
 };
 const OrganizationCard: React.FC<Props> = ({ organization }) => {
   return (
-    <div className="flex w-full items-center space-x-4 rounded-lg border bg-white p-4 shadow-sm transition duration-300 hover:shadow-md">
+    <div className="flex w-full  items-center space-x-4 rounded-lg border bg-white p-4 shadow-sm transition duration-300 hover:shadow-md">
       <div className="flex items-center justify-center rounded-full bg-blue-50 p-3.5">
         <FaBuilding size={32} className={"fill-blue-500"} />
       </div>

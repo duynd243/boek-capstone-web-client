@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
 import { NextPage } from "next";
-import create from "zustand";
+import { create } from "zustand";
 
 interface IPostStore {
   data: {

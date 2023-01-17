@@ -1,12 +1,11 @@
 import React from "react";
-import { IPostResponse } from "../../types/response/IPostResponse";
+import { IPostResponse } from "../../old-types/response/IPostResponse";
 import Image from "next/image";
 import { formatDistance } from "date-fns";
 import { vi } from "date-fns/locale";
 import DefaultAvatar from "./../../assets/images/default-avatar.png";
 import { BsDot } from "react-icons/bs";
 import {
-  IoBagCheck,
   IoCalendar,
   IoDocumentText,
   IoFileTray,
@@ -16,9 +15,6 @@ import {
 } from "react-icons/io5";
 import Link from "next/link";
 import { getFormattedPrice, getSlug } from "../../utils/helper";
-import { useAuth } from "../../context/AuthContext";
-import Swal from "sweetalert2";
-import { ICartItem } from "../../types/cart/ICartItem";
 import { useRouter } from "next/router";
 // import { PROTECTED_ROUTES } from '../../constants/ProtectedRoutes';
 import { ProtectedRoutes } from "../../constants/ProtectedRoutes";

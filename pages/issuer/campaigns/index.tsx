@@ -1,9 +1,8 @@
-import React, { Fragment, useState, ReactElement } from "react";
-import { NextPage } from "next";
+import React, { Fragment, ReactElement, useState } from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { useAuth } from "../../../context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { IssuerCampaignService } from "../../../services/Issuer/Issuer_CampaignService";
+import { IssuerCampaignService } from "../../../old-services/Issuer/Issuer_CampaignService";
 import SearchForm from "../../../components/Admin/SearchForm";
 import AdminCampaignCard from "../../../components/Admin/AdminCampaignCard";
 import { NextPageWithLayout } from "../../_app";

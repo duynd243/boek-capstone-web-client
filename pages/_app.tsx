@@ -1,15 +1,16 @@
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
-import type {AppProps} from "next/app";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import type { AppProps } from "next/app";
 import "../styles/global.scss";
-import {Toaster, ToasterProps} from "react-hot-toast";
-import {initFirebaseApp} from "../services/initFirebase";
-import {Fragment, ReactElement, ReactNode, useEffect, useState} from "react";
-import {NextPage} from "next";
-import {AuthContextProvider} from "../context/AuthContext";
+import { Toaster, ToasterProps } from "react-hot-toast";
+import { initFirebaseApp } from "../old-services/initFirebase";
+import { Fragment, ReactElement, ReactNode, useMemo } from "react";
+import { NextPage } from "next";
+import { AuthContextProvider } from "../context/AuthContext";
 import ProtectedRouteWrapper from "../components/ProtectedRouteWrapper";
-import {useRouter} from "next/router";
-import {IProtectedRoute, ProtectedRoutes} from "../constants/ProtectedRoutes";
+import { useRouter } from "next/router";
+import { ProtectedRoutes } from "../constants/ProtectedRoutes";
+import "react-day-picker/dist/style.css";
 
 const queryClient = new QueryClient();
 
@@ -31,18 +32,15 @@ const toasterConfig: ToasterProps = {
 };
 
 export default function App({ Component, pageProps }: CustomAppProps) {
-  const [isProtectedRoute, setIsProtectedRoute] = useState<
-    IProtectedRoute | undefined
-  >(undefined);
   const getLayout = Component.getLayout ?? ((page) => page);
 
   const router = useRouter();
 
-  useEffect(() => {
-    setIsProtectedRoute(
-      ProtectedRoutes.find((route) => router.pathname.startsWith(route.path))
-    );
-  }, [router.pathname]);
+  const isProtectedRoute = useMemo(
+    () =>
+      ProtectedRoutes.find((route) => router.pathname.startsWith(route.path)),
+    [router.pathname]
+  );
 
   const component = getLayout(<Component {...pageProps} />);
   return (

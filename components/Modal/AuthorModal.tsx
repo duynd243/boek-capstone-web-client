@@ -3,7 +3,7 @@ import TransitionModal from "./TransitionModal";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { SystemAuthorService } from "../../services/System/System_AuthorService";
+import { SystemAuthorService } from "../../old-services/System/System_AuthorService";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
 import Modal from "./Modal";
@@ -56,7 +56,7 @@ const AuthorModal: React.FC<Props> = ({
     }
   );
 
-  const createSchema = Yup.object({
+  const authorSchema = Yup.object({
     authorName: Yup.string()
       .trim()
       .required("Tên tác giả không được để trống")
@@ -64,29 +64,18 @@ const AuthorModal: React.FC<Props> = ({
       .max(50, "Tên tác giả không được vượt quá 50 ký tự"),
   });
 
-  const updateSchema = createSchema.concat(
-    Yup.object({
-      authorName: Yup.string().test(
-        "authorName",
-        "Tên tác giả chưa có thay đổi",
-        async (value) => {
-          if (value) {
-            return value !== author?.name;
-          }
-          return true;
-        }
-      ),
-    })
-  );
-
   const form = useFormik({
     enableReinitialize: true,
     initialValues: {
       authorName: action === AuthorModalMode.UPDATE ? author?.name : "",
     },
-    validationSchema:
-      action === AuthorModalMode.UPDATE ? updateSchema : createSchema,
+    validationSchema: authorSchema,
     onSubmit: async (values) => {
+      if (action === AuthorModalMode.UPDATE && !form.dirty) {
+        form.setFieldError("authorName", "Không có gì thay đổi");
+        return;
+      }
+
       const payload = {
         id: author?.id,
         name: values.authorName,

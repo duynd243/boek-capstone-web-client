@@ -6,7 +6,7 @@ import SearchForm from "../../../components/Admin/SearchForm";
 import CreateButton from "../../../components/Admin/CreateButton";
 import Image from "next/image";
 import { useAuth } from "../../../context/AuthContext";
-import { AuthorService } from "../../../services/AuthorService";
+import { AuthorService } from "../../../old-services/AuthorService";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import { useRouter } from "next/router";
