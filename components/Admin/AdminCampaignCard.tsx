@@ -127,10 +127,10 @@ const AdminCampaignCard: React.FC<Props> = ({ campaign }) => {
   const issuers = campaign.participations
     ?.filter((p) => p.issuer)
     .map((p) => p.issuer) as IUser[];
-  const participationOfIssuer =
-    loginUser?.role === Roles.ISSUER.id
-      ? campaign.participations?.find((p) => p.issuerId === loginUser?.userId)
-      : undefined;
+  // const participationOfIssuer =
+  //   loginUser?.role === Roles.ISSUER.id
+  //     ? campaign.participations?.find((p) => p.issuerId === loginUser?.userId)
+  //     : undefined;
   return (
     //make the card float pointer when hover
     <div className="flex h-full cursor-pointer  flex-col  rounded border bg-white p-5 shadow-sm transition duration-500 ease-in-out hover:shadow-md">
