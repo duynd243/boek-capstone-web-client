@@ -5,7 +5,7 @@ import {
   MdNavigateBefore,
   MdNavigateNext,
 } from "react-icons/md";
-import { IPaginationMetaData } from "../../../types/IBaseListResponse";
+import { IPaginationMetaData } from "../../../old-types/IBaseListResponse";
 
 type Props = {
   colSpan: number;

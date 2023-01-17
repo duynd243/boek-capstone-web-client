@@ -1,5 +1,4 @@
 import React from "react";
-import { NextPage } from "next";
 import LoginSignUpLayout from "../components/Layout/LoginSignUpLayout";
 import SignUpForm from "../components/AuthForm/SignUpForm";
 import { NextPageWithLayout } from "./_app";

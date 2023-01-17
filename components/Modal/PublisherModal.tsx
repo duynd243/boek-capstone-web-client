@@ -1,5 +1,5 @@
 import React, { memo, useCallback } from "react";
-import { IPublisher } from "../../types/user/IPublisher";
+import { IPublisher } from "../../old-types/user/IPublisher";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
 import * as Yup from "yup";

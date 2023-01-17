@@ -1,8 +1,8 @@
 import React from "react";
-import { ICampaign } from "../../types/campaign/ICampaign";
+import { ICampaign } from "../../old-types/campaign/ICampaign";
 import AvatarGroup from "../Commons/AvatarGroup/AvatarGroup";
 import DefaultAvatar from "./../../assets/images/default-avatar.png";
-import { IUser } from "../../types/user/IUser";
+import { IUser } from "../../old-types/user/IUser";
 import StatusLabel from "../CampaignDetails/StatusLabel";
 import { getFormattedDate } from "../../utils/helper";
 import {
@@ -20,7 +20,7 @@ import {
 } from "../../constants/Statuses";
 import { useAuth } from "../../context/AuthContext";
 import { findRole, Roles } from "../../constants/Roles";
-import { IParticipation } from "../../types/participation/IParticipation";
+import { IParticipation } from "../../old-types/participation/IParticipation";
 import Link from "next/link";
 import { useRouter } from "next/router";
 

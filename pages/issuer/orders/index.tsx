@@ -1,4 +1,4 @@
-import React, {Fragment, ReactElement, useState} from "react";
+import React, { Fragment, ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import PageHeading from "../../../components/Admin/PageHeading";
@@ -12,8 +12,8 @@ import TableHeading from "../../../components/Admin/Table/TableHeading";
 import TableHeader from "../../../components/Admin/Table/TableHeader";
 import TableBody from "../../../components/Admin/Table/TableBody";
 import TableData from "../../../components/Admin/Table/TableData";
-import {Dialog, Transition} from "@headlessui/react";
-import {HiXMark} from "react-icons/hi2";
+import { Dialog, Transition } from "@headlessui/react";
+import { HiXMark } from "react-icons/hi2";
 
 const IssuerOrdersPage: NextPageWithLayout = () => {
   const [showDetails, setShowDetails] = useState(false);
@@ -374,7 +374,7 @@ const IssuerOrdersPage: NextPageWithLayout = () => {
         </Dialog>
       </Transition.Root>
     </Fragment>
-  )
+  );
 };
 
 IssuerOrdersPage.getLayout = function getLayout(page: ReactElement) {

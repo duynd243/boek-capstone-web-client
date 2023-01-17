@@ -4,7 +4,6 @@ import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
 import * as Yup from "yup";
 import { useFormik } from "formik";
-import { Switch } from "@headlessui/react";
 import ToggleButton from "../ToggleButton";
 import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
 import { ProfilePicture } from "../../pages/admin/settings";

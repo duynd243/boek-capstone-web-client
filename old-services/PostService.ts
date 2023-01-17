@@ -1,7 +1,7 @@
 import { AxiosInstance } from "axios";
 import getAxiosClient from "./axiosClient";
-import { IPostResponse } from "../types/response/IPostResponse";
-import { IBaseListResponse } from "../types/response/IBaseListResponse";
+import { IPostResponse } from "../old-types/response/IPostResponse";
+import { IBaseListResponse } from "../old-types/response/IBaseListResponse";
 
 export class PostService {
   private readonly axiosClient: AxiosInstance;

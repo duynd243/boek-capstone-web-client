@@ -16,13 +16,13 @@ import React, {
 } from "react";
 import LoadingProgress from "../components/LoadingProgress";
 import { toast } from "react-hot-toast";
-import { ILoginUser } from "../types/ILoginUser";
-import { UserService } from "../services/UserService";
 import LogoutModal from "../components/Modal/LogoutModal";
+import { ILoginData } from "../types/User/ILoginData";
+import { UserService } from "../services/UserService";
 
 export interface IAuthContext {
   user: any;
-  loginUser: ILoginUser | null;
+  loginUser: ILoginData | null;
   authLoading: boolean;
   handleGoogleSignIn: () => void;
   logOut: () => void;
@@ -37,7 +37,7 @@ type Props = {
 
 export const AuthContextProvider: React.FC<Props> = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loginUser, setLoginUser] = useState<ILoginUser | null>(null);
+  const [loginUser, setLoginUser] = useState<ILoginData | null>(null);
   const [authLoading, setAuthLoading] = useState<boolean>(true);
 
   const [showLogOutModal, setShowLogOutModal] = useState<boolean>(false);
@@ -45,19 +45,6 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
   const googleProvider = new GoogleAuthProvider();
   const auth = getAuth();
   const router = useRouter();
-
-  // const navigateToDefaultRoute = async () => {
-  //     if (loginUser) {
-  //         const role = findRole(loginUser?.role);
-  //         if (role) {
-  //             await router.push(role.defaultRoute);
-  //         } else {
-  //             await router.push('/');
-  //         }
-  //     } else {
-  //         await router.push('/');
-  //     }
-  // }
 
   const handleGoogleSignIn = () => {
     signInWithPopup(auth, googleProvider)
@@ -70,21 +57,6 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
       });
   };
   const logOut = () => {
-    // Swal.fire({
-    //     title: "Bạn có chắc chắn?",
-    //     text: "Tài khoản của bạn sẽ bị đăng xuất!",
-    //     icon: "warning",
-    //     confirmButtonText: "Đăng xuất",
-    //     showCancelButton: true,
-    //     cancelButtonText: "Hủy",
-    // }).then(async (result) => {
-    //     if (result.isConfirmed) {
-    //         await signOut(auth);
-    //         toast.success("Đăng xuất thành công");
-    //         await router.push("/");
-    //     }
-    // });
-
     setShowLogOutModal(true);
   };
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import TransitionModal from "./TransitionModal";
@@ -10,8 +10,6 @@ import {
   BsShieldFillCheck,
 } from "react-icons/bs";
 import ToggleButton from "../ToggleButton";
-import { RadioGroup } from "@headlessui/react";
-import ErrorMessage from "../Form/ErrorMessage";
 import { ProfilePicture } from "../../pages/admin/settings";
 import { IFakeCustomer } from "../../pages/admin/customers";
 

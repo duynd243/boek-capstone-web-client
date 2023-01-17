@@ -4,9 +4,6 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import TransitionModal from "./TransitionModal";
 import Modal from "./Modal";
-import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
-import ToggleButton from "../ToggleButton";
-import { PersonnelModalMode } from "./PersonnelModal";
 import { ProfilePicture } from "../../pages/admin/settings";
 
 export enum OrganizationModalMode {

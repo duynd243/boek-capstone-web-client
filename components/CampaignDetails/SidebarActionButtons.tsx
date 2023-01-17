@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
-import { IUser } from "../../types/user/IUser";
+import React from "react";
+import { IUser } from "../../old-types/user/IUser";
 import SidebarBlockWrapper from "./SidebarBlockWrapper";
 import {
-  IoAdd,
   IoAddCircle,
   IoBan,
   IoCheckmarkDone,
@@ -10,12 +9,12 @@ import {
 } from "react-icons/io5";
 import { useAuth } from "../../context/AuthContext";
 import { Roles } from "../../constants/Roles";
-import { ICampaign } from "../../types/campaign/ICampaign";
+import { ICampaign } from "../../old-types/campaign/ICampaign";
 import {
   CampaignStatuses,
   ParticipationStatuses,
 } from "../../constants/Statuses";
-import { IssuerParticipationService } from "../../services/Issuer/Issuer_ParticipationService";
+import { IssuerParticipationService } from "../../old-services/Issuer/Issuer_ParticipationService";
 import { QueryClient, useMutation } from "@tanstack/react-query";
 // import { toast } from 'react-toastify';
 import { toast } from "react-hot-toast";

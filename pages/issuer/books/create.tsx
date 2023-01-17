@@ -1,34 +1,25 @@
-import React, { useState, Fragment, ReactElement } from "react";
-import { NextPage } from "next";
+import React, { Fragment, ReactElement, useState } from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import Image from "next/image";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useRouter } from "next/router";
 import { NextPageWithLayout } from "../../_app";
 import { useAuth } from "../../../context/AuthContext";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { AuthorService } from "../../../services/AuthorService";
-import { CategoryService } from "../../../services/System/CategoryService";
-import { IssuerBookService } from "../../../services/Issuer/Issuer_BookService";
-import { PublisherService } from '../../../services/System/PublisherService';
-import Multiselect from 'multiselect-react-dropdown';
-import DynamicForm from './../../../components/DynamicForm';
+import { AuthorService } from "../../../old-services/AuthorService";
+import { CategoryService } from "../../../old-services/System/CategoryService";
+import { IssuerBookService } from "../../../old-services/Issuer/Issuer_BookService";
+import { PublisherService } from "../../../old-services/System/PublisherService";
+import Multiselect from "multiselect-react-dropdown";
+import DynamicForm from "./../../../components/DynamicForm";
 import CreateButton from "../../../components/Admin/CreateButton";
 import AuthorModal, {
   AuthorModalMode,
 } from "../../../components/Modal/AuthorModal";
 import Link from "next/link";
-import {
-  IoChevronBack
-} from "react-icons/io5";
-import { getFormattedPrice } from "../../../utils/helper";
-
-
-
-
+import { IoChevronBack } from "react-icons/io5";
 
 const IssuerCreateBookPage: NextPageWithLayout = () => {
   const { loginUser } = useAuth();
@@ -42,31 +33,29 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null
   );
-  const [selectedBookId, setSelectedBookId] = useState<string | null>(
-    null
-  );
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
   const publisherService = new PublisherService(loginUser?.accessToken);
   const authorService = new AuthorService(loginUser?.accessToken);
   const categoryService = new CategoryService(loginUser?.accessToken);
   const bookService = new IssuerBookService(loginUser?.accessToken);
 
-  const { data: books } = useQuery(['books'], () =>
+  const { data: books } = useQuery(["books"], () =>
     bookService.getBooks$Issuer({
       size: 1000,
     })
   );
-  const { data: publishers } = useQuery(['publisher'], () =>
+  const { data: publishers } = useQuery(["publisher"], () =>
     publisherService.getPublishers({
       size: 1000,
     })
   );
-  const { data: authors } = useQuery(['authors'], () =>
+  const { data: authors } = useQuery(["authors"], () =>
     authorService.getAuthors({
       size: 1000,
     })
   );
 
-  const { data: categories } = useQuery(['categories'], () =>
+  const { data: categories } = useQuery(["categories"], () =>
     categoryService.getCategories({
       size: 1000,
     })
@@ -75,7 +64,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
   const [selectedAuthor, setSelectedAuthor] = useState<{
     id?: number;
     name?: string;
-  }>(); 
+  }>();
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   // const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
   const router = useRouter();
@@ -84,8 +73,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
     (values: any) => bookService.createBook$Issuer(values),
     {
       onSuccess: () => {
-        toast.success('Tạo sách thành công');
-        router.push('/issuer/books');
+        toast.success("Tạo sách thành công");
+        router.push("/issuer/books");
       },
       onError: (error: any) => {
         toast.error(error?.message);
@@ -243,10 +232,10 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
         className="mx-auto max-w-6xl space-y-8 divide-y divide-gray-200 bg-white p-10"
       >
         <div className="mb-4 sm:mb-0">
-        <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
-          Thêm sách lẻ ✨
-        </h1>
-      </div>
+          <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
+            Thêm sách lẻ ✨
+          </h1>
+        </div>
         <div className="space-y-8 divide-y divide-gray-200">
           <div>
             <div>
@@ -290,7 +279,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <input
-                  placeholder= "VD: TB001"
+                    placeholder="VD: TB001"
                     value={form.values.code}
                     onChange={form.handleChange}
                     type="text"
@@ -398,7 +387,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <input
-                  placeholder="VD: 0545010225​"
+                    placeholder="VD: 0545010225​"
                     value={form.values.isbn10}
                     onChange={form.handleChange}
                     type="text"
@@ -421,7 +410,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <input
-                  placeholder="VD: 9781260013870​"
+                    placeholder="VD: 9781260013870​"
                     value={form.values.isbn13}
                     onChange={form.handleChange}
                     type="text"
@@ -443,12 +432,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <input
-                  placeholder="10,000​"
+                    placeholder="10,000​"
                     // value={form.values.price && getFormattedPrice(form.values.price)}
                     value={new Intl.NumberFormat("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                }).format(form.values.price)}
+                      style: "currency",
+                      currency: "VND",
+                    }).format(form.values.price)}
                     onChange={form.handleChange}
                     type="text"
                     name="price"
@@ -674,12 +663,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   <Multiselect
                     displayValue="key"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    onKeyPressFn={function noRefCheck() { }}
-                    onRemove={function noRefCheck() { }}
-                    onSearch={function noRefCheck() { }}
-                    onSelect={function noRefCheck() { }}
+                    onKeyPressFn={function noRefCheck() {}}
+                    onRemove={function noRefCheck() {}}
+                    onSearch={function noRefCheck() {}}
+                    onSelect={function noRefCheck() {}}
                     options={authors?.data?.map((author) => ({
-                      cat: 'Group 1',
+                      cat: "Group 1",
                       key: author?.name,
                     }))}
                     placeholder="Chọn tác giả"
@@ -687,11 +676,11 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </div>
               </div>
               <div className="sm:col-span-6">
-              <CreateButton
-                    onClick={() => setShowCreateModal(true)}
-                    label="Thêm tác giả"
-                    // align="right"
-                  />
+                <CreateButton
+                  onClick={() => setShowCreateModal(true)}
+                  label="Thêm tác giả"
+                  // align="right"
+                />
               </div>
             </div>
           </div>
@@ -700,7 +689,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
               Định dạng
             </h3>
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-            <div className="sm:col-span-6">
+              <div className="sm:col-span-6">
                 <label
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
@@ -711,15 +700,15 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   <Multiselect
                     displayValue="key"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    onKeyPressFn={function noRefCheck() { }}
-                    onRemove={function noRefCheck() { }}
-                    onSearch={function noRefCheck() { }}
-                    onSelect={function noRefCheck() { }}
+                    onKeyPressFn={function noRefCheck() {}}
+                    onRemove={function noRefCheck() {}}
+                    onSearch={function noRefCheck() {}}
+                    onSelect={function noRefCheck() {}}
                     placeholder="Chọn định dạng"
-                    options={[ 
-                      { cat: 'Group 1', key: 'Sách giấy' },
-                      { cat: 'Group 1', key: 'Sách điện tử' },
-                      { cat: 'Group 1', key: 'Bộ sưu tập' },
+                    options={[
+                      { cat: "Group 1", key: "Sách giấy" },
+                      { cat: "Group 1", key: "Sách điện tử" },
+                      { cat: "Group 1", key: "Bộ sưu tập" },
                     ]}
                   />
                 </div>
@@ -729,7 +718,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Đường link URL dành cho sách điện tử<span className="text-rose-500">*</span>
+                  Đường link URL dành cho sách điện tử
+                  <span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <DynamicForm align="right" />
@@ -742,10 +732,10 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
         <div className="pt-5">
           <div className="flex justify-end">
             <button
-            onClick={() => {
-              // setSelectedAuthor(author);
-              // setShowUpdateModal(true);
-          }}
+              onClick={() => {
+                // setSelectedAuthor(author);
+                // setShowUpdateModal(true);
+              }}
               type="submit"
               className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
@@ -755,13 +745,13 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
         </div>
       </form>
       <AuthorModal
-                action={AuthorModalMode.CREATE}
-                onClose={() => setShowCreateModal(false)}
-                isOpen={showCreateModal}
-                author={selectedAuthor as { id?: number; name?: string }}
-            />
+        action={AuthorModalMode.CREATE}
+        onClose={() => setShowCreateModal(false)}
+        isOpen={showCreateModal}
+        author={selectedAuthor as { id?: number; name?: string }}
+      />
 
-            {/* <AuthorModal
+      {/* <AuthorModal
                 action={AuthorModalMode.UPDATE}
                 author={selectedAuthor as { id?: number; name?: string }}
                 onClose={() => setShowUpdateModal(false)}

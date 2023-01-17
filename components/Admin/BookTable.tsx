@@ -1,6 +1,6 @@
-import { IBaseListResponse } from "../../types/response/IBaseListResponse";
+import { IBaseListResponse } from "../../old-types/response/IBaseListResponse";
 import React from "react";
-import { IBookResponse } from "../../types/response/IBookResponse";
+import { IBookResponse } from "../../old-types/response/IBookResponse";
 import BookRow from "./BookRow";
 import TableHeader from "./TableHeader";
 

@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios";
 import getAxiosClient from "./axiosClient";
-import { IBaseListResponse } from "../types/IBaseListResponse";
+import { IBaseListResponse } from "../old-types/IBaseListResponse";
 
 export class AuthorService {
   private readonly axiosClient: AxiosInstance;

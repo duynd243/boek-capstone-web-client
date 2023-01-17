@@ -1,4 +1,5 @@
 import React from "react";
+
 export const noDataLabel = "Chưa có dữ liệu";
 const TableData = ({
   alignClass = "text-left",

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import DefaultAvatar from "../../../assets/images/default-avatar.png";
+
 type Props = {
   avatars: {
     src: string;

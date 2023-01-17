@@ -122,3 +122,16 @@
 .custom-toast {
   @apply rounded-md bg-gray-800 px-4 py-3 text-white #{!important};
 }
+
+.rdp-caption {
+  @apply flex-col items-start #{!important};
+}
+.rdp-nav {
+  svg {
+    @apply h-3 w-3 #{!important};
+  }
+}
+
+.rdp {
+  --rdp-background-color: #e2e2e2 !important;
+}

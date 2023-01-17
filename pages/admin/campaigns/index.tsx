@@ -3,7 +3,7 @@ import { NextPageWithLayout } from "../../_app";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { useRouter } from "next/router";
 import { useAuth } from "../../../context/AuthContext";
-import { SystemCampaignService } from "../../../services/System/System_CampaignService";
+import { SystemCampaignService } from "../../../old-services/System/System_CampaignService";
 import { useQuery } from "@tanstack/react-query";
 import { CampaignStatuses } from "../../../constants/Statuses";
 import PageHeading from "../../../components/Admin/PageHeading";

@@ -1,7 +1,7 @@
 import { AxiosInstance } from "axios";
 import getAxiosClient from "../axiosClient";
-import { IBaseListResponse } from "../../types/response/IBaseListResponse";
-import { ICategory } from "./../../types/category/ICategory";
+import { IBaseListResponse } from "../../old-types/response/IBaseListResponse";
+import { ICategory } from "../../old-types/category/ICategory";
 
 export class CategoryService {
   private readonly axiosClient: AxiosInstance;
