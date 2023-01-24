@@ -86,7 +86,7 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
 
   const searchBooks = useMemo(() => {
     return randomBooks.filter((book) =>
-      book.name.toLowerCase().includes(searchBookQuery.toLowerCase())
+      book?.name?.toLowerCase().includes(searchBookQuery.toLowerCase())
     );
   }, [searchBookQuery]);
 

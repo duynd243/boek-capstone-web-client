@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {fakeBook} from "../../pages/admin/books";
+import {fakeBookSeries} from "../../pages/admin/books";
 import {BsSearch} from "react-icons/bs";
 import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
 import Modal from "../Modal/Modal";
@@ -11,7 +11,7 @@ import Link from "next/link";
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    onItemSelect: (organization: typeof fakeBook[number]) => void;
+    onItemSelect: (organization: typeof fakeBookSeries[number]) => void;
 };
 const SelectSellingBookModal: React.FC<Props> = ({
                                                            isOpen,
@@ -21,7 +21,7 @@ const SelectSellingBookModal: React.FC<Props> = ({
 
     const [search, setSearch] = useState<string>("");
 
-    const searchedBookSeries = fakeBook.filter(bookSeries => bookSeries.name.toLowerCase().includes(search.toLowerCase()));
+    const searchedBookSeries = fakeBookSeries.filter(bookSeries => bookSeries.name.toLowerCase().includes(search.toLowerCase()));
 
     return (
         <TransitionModal
