@@ -28,12 +28,12 @@ const CREATE_BOOK_BUTTONS = [
     href: "/issuer/books/create",
     icon: GiBookCover,
   },
-  {
-    label: "Sách Combo",
-    description: "Thêm sách combo vào kho sách",
-    href: "/issuer/books/create-combo",
-    icon: GiBookPile,
-  },
+  // {
+  //   label: "Sách Combo",
+  //   description: "Thêm sách combo vào kho sách",
+  //   href: "/issuer/books/reate-combo",
+  //   icon: GiBookPile,
+  // },
   {
     label: "Sách Series",
     description: "Thêm sách series vào kho sách",
