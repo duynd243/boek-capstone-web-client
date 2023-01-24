@@ -1,16 +1,16 @@
 import React, { Fragment, ReactElement } from "react";
-import AdminLayout from "../../../components/Layout/AdminLayout";
-import { useAuth } from "../../../context/AuthContext";
+import AdminLayout from "../../../../components/Layout/AdminLayout";
+import { useAuth } from "../../../../context/AuthContext";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
-import LoadingProgress from "../../../components/Commons/LoadingProgress";
-import { IssuerCampaignService } from "../../../old-services/Issuer/Issuer_CampaignService";
+import LoadingProgress from "../../../../components/Commons/LoadingProgress";
+import { IssuerCampaignService } from "../../../../old-services/Issuer/Issuer_CampaignService";
 
-import MainContent from "../../../components/CampaignDetails/MainContent";
-import { NextPageWithLayout } from "../../_app";
-import Sidebar from "../../../components/CampaignDetails/Sidebar";
+import MainContent from "../../../../components/CampaignDetails/MainContent";
+import { NextPageWithLayout } from "../../../_app";
+import Sidebar from "../../../../components/CampaignDetails/Sidebar";
 
-import { IUser } from "../../../old-types/user/IUser";
+import { IUser } from "../../../../old-types/user/IUser";
 
 const IssuerCampaignDetailsPage: NextPageWithLayout = () => {
   const { loginUser } = useAuth();

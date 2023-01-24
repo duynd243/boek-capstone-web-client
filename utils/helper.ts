@@ -1,77 +1,82 @@
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
+import {format} from "date-fns";
+import {vi} from "date-fns/locale";
 import slugify from "slugify";
-import { hexColors } from "../constants/Colors";
+import {hexColors} from "../constants/Colors";
+
+
+export function getRequestDateTime(date: Date) {
+    return format(date, "yyyy-MM-dd'T'HH:mm:ss");
+}
 
 function randomColor(name?: string | undefined): string {
-  return hexColors[name ? name?.length % hexColors.length : 0];
+    return hexColors[name ? name?.length % hexColors.length : 0];
 }
 
 export function getAvatarFromName(name?: string | undefined): string {
-  const backgroundColor = randomColor(name);
-  return `https://ui-avatars.com/api/?name=${name}&color=FFFFFF&background=${backgroundColor}`;
+    const backgroundColor = randomColor(name);
+    return `https://ui-avatars.com/api/?name=${name}&color=FFFFFF&background=${backgroundColor}`;
 }
 
 export function isInViewPort(element: Element): boolean {
-  const rect = element.getBoundingClientRect();
-  const html = document.documentElement;
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || html.clientHeight) &&
-    rect.right <= (window.innerWidth || html.clientWidth)
-  );
+    const rect = element.getBoundingClientRect();
+    const html = document.documentElement;
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || html.clientHeight) &&
+        rect.right <= (window.innerWidth || html.clientWidth)
+    );
 }
 
-const defaultLocaleFormat = { locale: vi };
+const defaultLocaleFormat = {locale: vi};
 
 export function getFormattedDate(
-  dateStr: string | undefined,
-  localeFormat: {
-    locale: Locale;
-  } = defaultLocaleFormat
+    dateStr: string | undefined,
+    localeFormat: {
+        locale: Locale;
+    } = defaultLocaleFormat
 ) {
-  const date = dateStr ? new Date(dateStr) : undefined;
-  return {
-    dayOfWeek: date ? format(date, "eeee", localeFormat) : "N/A",
-    day: date ? format(date, "dd", localeFormat) : "N/A",
-    month: date ? format(date, "MM", localeFormat) : "N/A",
-    year: date ? format(date, "yyyy", localeFormat) : "N/A",
-    withoutDayOfWeek: date ? format(date, "dd/MM/yyyy", localeFormat) : "N/A",
-    fullDate: date ? format(date, "eeee, dd/MM/yyyy", localeFormat) : "N/A",
-  };
+    const date = dateStr ? new Date(dateStr) : undefined;
+    return {
+        dayOfWeek: date ? format(date, "eeee", localeFormat) : "N/A",
+        day: date ? format(date, "dd", localeFormat) : "N/A",
+        month: date ? format(date, "MM", localeFormat) : "N/A",
+        year: date ? format(date, "yyyy", localeFormat) : "N/A",
+        withoutDayOfWeek: date ? format(date, "dd/MM/yyyy", localeFormat) : "N/A",
+        fullDate: date ? format(date, "eeee, dd/MM/yyyy", localeFormat) : "N/A",
+    };
 }
 
 const slugifyOptions = {
-  replacement: "-",
-  remove: /[*+~.()'"!:@]/g,
-  lower: true,
-  strict: true,
-  locale: "vi",
-  trim: true,
+    replacement: "-",
+    remove: /[*+~.()'"!:@]/g,
+    lower: true,
+    strict: true,
+    locale: "vi",
+    trim: true,
 };
 
 export function getSlug(str?: string) {
-  return slugify(str || "", slugifyOptions);
+    return slugify(str || "", slugifyOptions);
 }
 
 export function getSlugUrl(
-  rootPath?: string,
-  title?: string,
-  id?: number | string
+    rootPath?: string,
+    title?: string,
+    id?: number | string
 ) {
-  return `${rootPath}/${getSlug(title)}/${id}`;
+    return `${rootPath}/${getSlug(title)}/${id}`;
 }
 
 export function getFormattedPrice(number: number) {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(number);
+    return new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+    }).format(number);
 }
 
 export function isValidPhoneNumber(phoneNumber: string) {
-  return /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(
-    phoneNumber
-  );
+    return /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(
+        phoneNumber
+    );
 }

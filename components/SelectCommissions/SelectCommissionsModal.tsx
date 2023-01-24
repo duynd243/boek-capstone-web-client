@@ -1,43 +1,52 @@
 import React, {useState} from "react";
 import {BsCheckCircle, BsSearch} from "react-icons/bs";
-import Image from "next/image";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
 import Modal from "../Modal/Modal";
 import TransitionModal from "../Modal/TransitionModal";
 import useDebounce from "../../hooks/useDebounce";
 import {useQuery} from "@tanstack/react-query";
-import {IOrganization} from "../../types/Organization/IOrganization";
-import {OrganizationService} from "../../services/OrganizationService";
+import {GenreService} from "../../services/GenreService";
+import {IGenre} from "../../types/Genre/IGenre";
+import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
+import Image from "next/image";
+import {getAvatarFromName} from "../../utils/helper";
+import {IRequestCommission} from "../../pages/admin/campaigns/create";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    selectedOrganizations: IOrganization[];
-    onItemSelect: (organization: IOrganization) => void;
+    selectedCommissions: IRequestCommission[];
+    onItemSelect: (genre: IGenre) => void;
 };
 
-const SelectOrganizationsModal: React.FC<Props> = ({
-                                                       isOpen,
-                                                       onClose,
-                                                       selectedOrganizations,
-                                                       onItemSelect,
-                                                   }) => {
+const SelectCommissionsModal: React.FC<Props> = ({
+                                                     isOpen,
+                                                     onClose,
+                                                     selectedCommissions,
+                                                     onItemSelect,
+                                                 }) => {
+
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounce(search, 500);
-    const organizationService = new OrganizationService();
+    const genreService = new GenreService();
 
     const onModalClose = () => {
         setSearch("");
         onClose();
     };
 
-    const {data: organizations, isLoading} = useQuery(
-        ["organizations", debouncedSearch],
+    const {data: genres, isLoading} = useQuery(
+        ["genres", debouncedSearch],
         () =>
-            organizationService.getOrganizations({
+            genreService.getGenres({
                 name: debouncedSearch,
-            }),{
-            select: (data) => data.data
+                withBooks: false,
+                size: 1000,
+                status: true,
+            }),
+        {
+            keepPreviousData: true,
+            enabled: isOpen,
+            select: (data) => data?.data?.filter((genre) => genre?.parentId === null),
         }
     );
 
@@ -53,46 +62,43 @@ const SelectOrganizationsModal: React.FC<Props> = ({
                     <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
                     <input
                         type="text"
-                        placeholder="Tìm kiếm tổ chức"
+                        placeholder="Tìm kiếm nhóm"
                         className="h-12 w-full border-0 pl-11 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:ring-0"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
                 <div className="h-96 overflow-y-auto">
-                    {!isLoading && organizations && organizations?.length > 0 ? (
-                        organizations?.map((org) => {
-                            const isSelected = selectedOrganizations?.find(
-                                (o) => o?.id === org?.id
+                    {!isLoading && genres && genres?.length > 0 ? (
+                        genres?.map((genre) => {
+                            const isSelected = selectedCommissions?.find(
+                                (g) => g?.genreId === genre?.id
                             );
                             return (
                                 <div
                                     onClick={() => {
                                         if (!isSelected) {
-                                            onItemSelect(org);
+                                            onItemSelect(genre);
                                         }
                                     }}
-                                    key={org?.id}
+                                    key={genre?.id}
                                     className={`relative flex justify-between border-b border-gray-300 p-4 pr-12 ${
                                         isSelected
                                             ? "cursor-not-allowed bg-slate-100"
                                             : "cursor-pointer"
                                     }`}
                                 >
-                                    <div className="flex gap-4">
+                                    <div className="flex items-center gap-4">
                                         <Image
                                             width={500}
                                             height={500}
-                                            className="h-16 w-16 object-cover"
-                                            src={org?.imageUrl || ""}
+                                            className="h-12 w-12 rounded object-cover"
+                                            src={getAvatarFromName(genre?.name)}
                                             alt=""
                                         />
                                         <div>
                                             <div className="mb-1 text-sm font-medium text-gray-900">
-                                                {org?.name}
-                                            </div>
-                                            <div className="text-sm font-medium text-gray-500">
-                                                {org?.address}
+                                                {genre?.name}
                                             </div>
                                         </div>
                                     </div>
@@ -128,4 +134,4 @@ const SelectOrganizationsModal: React.FC<Props> = ({
     );
 };
 
-export default SelectOrganizationsModal;
+export default SelectCommissionsModal;
