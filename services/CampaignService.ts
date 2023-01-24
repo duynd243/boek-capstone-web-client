@@ -1,6 +1,4 @@
 import {BaseService} from "./BaseService";
-import {CampaignPrivacies} from "../constants/CampaignPrivacies";
-import {CampaignFormats} from "../constants/CampaignFormats";
 
 export class CampaignService extends BaseService {
     createCampaign = async (payload: any) => {

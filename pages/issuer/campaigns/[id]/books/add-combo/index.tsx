@@ -24,6 +24,7 @@ import EmptyState, {EMPTY_STATE_TYPE} from "../../../../../../components/EmptySt
 import Modal from "../../../../../../components/Modal/Modal";
 import Link from "next/link";
 import TransitionModal from "../../../../../../components/Modal/TransitionModal";
+import {toast} from "react-hot-toast";
 
 const fullFormats = [{
     id: 1,
@@ -35,6 +36,7 @@ const fullFormats = [{
     id: 3,
     name: 'Audio'
 }];
+const MAX_FILE_SIZE_IN_MB = 1;
 
 function getFormatOptions(book: typeof fakeBookSeries[number] | undefined) {
     if (!book) {
@@ -60,7 +62,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
     const [selectedBooks, setSelectedBooks] = useState<typeof randomBooks>([]);
     const [showAddBookModal, setShowAddBookModal] = useState(false);
     const [searchBookQuery, setSearchBookQuery] = useState('');
-    const searchBooks = randomBooks.filter(b => b.name.toLowerCase().includes(searchBookQuery.toLowerCase()));
+    const searchBooks = randomBooks.filter(b => b?.name?.toLowerCase().includes(searchBookQuery.toLowerCase()));
 
     const handleAddBook = (book: typeof randomBooks[number]) => {
         if (selectedBooks.find(b => b.id === book.id)) {
@@ -99,18 +101,24 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                 name: '',
                 price: '',
                 saleQuantity: '',
+                description: '',
+                previewImage: null,
                 format: '',
                 bookProductItems: []
             },
             validationSchema: Yup.object({
                 name: Yup.string().required('Tên combo không được để trống'),
+                description: Yup.string().trim().required("Mô tả không được để trống"),
                 price: Yup.number()
                     .required('Giá bán không được để trống')
-                    .integer('Giá bán phải là số nguyên'),
+                    .integer('Giá bán phải là số nguyên')
+                    .min(0, ({min}) => `Giá bán tối thiểu là ${min}`)
+                ,
                 saleQuantity: Yup.number()
                     .required('Số lượng bán không được để trống')
                     .min(1, ({min}) => `Số lượng bán tối thiểu là ${min}`)
                     .integer('Số lượng bán phải là số nguyên'),
+                previewImage: Yup.mixed().required("Ảnh sản phẩm là bắt buộc"),
                 format: Yup.number()
                     .required('Định dạng không được để trống'),
                 bookProductItems: Yup.array().min(1, 'Bạn phải chọn ít nhất 1 sản phẩm')
@@ -120,6 +128,26 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
             }
         }
     )
+
+
+    const onImageChange = (file: File): boolean => {
+        // check file type
+        if (!file.type.startsWith("image/")) {
+            toast.error("Vui lòng tải lên tệp hình ảnh");
+            return false;
+        }
+        // check file size
+        if (file.size > 1024 * 1024 * MAX_FILE_SIZE_IN_MB) {
+            toast.error(`Vui lòng tải lên tệp nhỏ hơn ${MAX_FILE_SIZE_IN_MB}MB`);
+            return false;
+        }
+        form.setFieldValue("previewImage", file);
+        return true;
+    };
+
+    const onImageRemove = () => {
+        form.setFieldValue("previewImage", null);
+    };
 
 
     return (
@@ -164,7 +192,14 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                 />
                             </div>
                             <Form.Label label={"Ảnh sản phẩm"} required={true}/>
-                            <Form.ImageUploadPanel/>
+                            <Form.ImageUploadPanel
+                                label={`PNG, JPG, GIF tối đa ${MAX_FILE_SIZE_IN_MB}MB`}
+                                onChange={onImageChange}
+                                onRemove={onImageRemove}
+                            />
+                            {form.errors.previewImage && form.touched.previewImage && (
+                                <ErrorMessage>{form.errors.previewImage}</ErrorMessage>
+                            )}
                             <Form.Input
                                 isTextArea={true}
                                 placeholder={"Nhập mô tả cho combo sách"}
@@ -194,6 +229,9 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                     dataSource={availableFormats}
                                     displayKey={"name"}
                                 />
+                                {form.values.bookProductItems.length === 0 &&
+                                    <div className="mt-1 text-gray-500 text-sm">Danh sách định dạng chỉ khả dụng khi bạn
+                                        thêm ít nhất 01 sách vào combo.</div>}
                                 {form.errors.format && form.touched.format && (
                                     <ErrorMessage>{form.errors.format}</ErrorMessage>
                                 )}
@@ -365,7 +403,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                 Hủy
                             </button>
                             <button type="submit" className="m-btn text-white bg-indigo-600 hover:bg-indigo-700">
-                                Thêm sách
+                                Thêm vào hội sách
                             </button>
                         </div>
                     </form>
