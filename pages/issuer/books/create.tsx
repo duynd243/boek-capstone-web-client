@@ -33,29 +33,31 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null
   );
-  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(
+    null
+  );
   const publisherService = new PublisherService(loginUser?.accessToken);
   const authorService = new AuthorService(loginUser?.accessToken);
   const categoryService = new CategoryService(loginUser?.accessToken);
   const bookService = new IssuerBookService(loginUser?.accessToken);
 
-  const { data: books } = useQuery(["books"], () =>
+  const { data: books } = useQuery(['books'], () =>
     bookService.getBooks$Issuer({
       size: 1000,
     })
   );
-  const { data: publishers } = useQuery(["publisher"], () =>
+  const { data: publishers } = useQuery(['publisher'], () =>
     publisherService.getPublishers({
       size: 1000,
     })
   );
-  const { data: authors } = useQuery(["authors"], () =>
+  const { data: authors } = useQuery(['authors'], () =>
     authorService.getAuthors({
       size: 1000,
     })
   );
 
-  const { data: categories } = useQuery(["categories"], () =>
+  const { data: categories } = useQuery(['categories'], () =>
     categoryService.getCategories({
       size: 1000,
     })
@@ -73,8 +75,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
     (values: any) => bookService.createBook$Issuer(values),
     {
       onSuccess: () => {
-        toast.success("Tạo sách thành công");
-        router.push("/issuer/books");
+        toast.success('Tạo sách thành công');
+        router.push('/issuer/books');
       },
       onError: (error: any) => {
         toast.error(error?.message);
@@ -459,6 +461,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <input
+                    placeholder="VD: 25cm x 25cm"
                     value={form.values.size}
                     onChange={form.handleChange}
                     type="text"
@@ -625,6 +628,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <input
+                    placeholder="VD: Nguyễn Văn A, Nguyễn Văn B"
                     value={form.values.translator}
                     onChange={form.handleChange}
                     type="text"
@@ -646,6 +650,14 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 >
                   Tác giả<span className="text-rose-500">*</span>
                 </label>
+                <div className="flex justify-end mb-4 gap-4">
+                <CreateButton
+                  className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  onClick={() => setShowCreateModal(true)}
+                  label="Thêm tác giả"
+                // align="right"
+                />
+              </div>
                 <div className="mt-1">
                   {/* <select
                     onChange={(e) => setSelectedAuthorId(e.target.value)}
@@ -663,24 +675,17 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   <Multiselect
                     displayValue="key"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    onKeyPressFn={function noRefCheck() {}}
-                    onRemove={function noRefCheck() {}}
-                    onSearch={function noRefCheck() {}}
-                    onSelect={function noRefCheck() {}}
+                    onKeyPressFn={function noRefCheck() { }}
+                    onRemove={function noRefCheck() { }}
+                    onSearch={function noRefCheck() { }}
+                    onSelect={function noRefCheck() { }}
                     options={authors?.data?.map((author) => ({
-                      cat: "Group 1",
+                      cat: 'Group 1',
                       key: author?.name,
                     }))}
                     placeholder="Chọn tác giả"
                   />
                 </div>
-              </div>
-              <div className="sm:col-span-6">
-                <CreateButton
-                  onClick={() => setShowCreateModal(true)}
-                  label="Thêm tác giả"
-                  // align="right"
-                />
               </div>
             </div>
           </div>
@@ -689,7 +694,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
               Định dạng
             </h3>
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-              <div className="sm:col-span-6">
+              {/* <div className="sm:col-span-6">
                 <label
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
@@ -700,15 +705,15 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   <Multiselect
                     displayValue="key"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    onKeyPressFn={function noRefCheck() {}}
-                    onRemove={function noRefCheck() {}}
-                    onSearch={function noRefCheck() {}}
-                    onSelect={function noRefCheck() {}}
+                    onKeyPressFn={function noRefCheck() { }}
+                    onRemove={function noRefCheck() { }}
+                    onSearch={function noRefCheck() { }}
+                    onSelect={function noRefCheck() { }}
                     placeholder="Chọn định dạng"
                     options={[
-                      { cat: "Group 1", key: "Sách giấy" },
-                      { cat: "Group 1", key: "Sách điện tử" },
-                      { cat: "Group 1", key: "Bộ sưu tập" },
+                      { cat: 'Group 1', key: 'Sách giấy' },
+                      { cat: 'Group 1', key: 'Sách điện tử' },
+                      { cat: 'Group 1', key: 'Bộ sưu tập' },
                     ]}
                   />
                 </div>
@@ -718,30 +723,125 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   htmlFor="author"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Đường link URL dành cho sách điện tử
-                  <span className="text-rose-500">*</span>
+                  Đường link URL dành cho sách điện tử<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <DynamicForm align="right" />
                 </div>
+              </div> */}
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="size"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Link PDF Trial
+                </label>
+                <div className="mt-1">
+                  <input
+                    placeholder="VD: https://tiki.vn/tu-sach-nghe-thuat-lanh-dao"
+                    value={form.values.size}
+                    onChange={form.handleChange}
+                    type="text"
+                    name="size"
+                    id="size"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+                {/* {form.errors.size && form.touched.size && (
+                  <div className={"input-error"}>{form.errors.size}</div>
+                )} */}
+              </div>
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="price"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Giá kèm PDF
+                </label>
+                <div className="mt-1">
+                  <input
+                    placeholder="10,000​"
+                    // value={form.values.price && getFormattedPrice(form.values.price)}
+                    value={new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(form.values.price)}
+                    onChange={form.handleChange}
+                    type="text"
+                    name="price"
+                    id="price"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+                {form.errors.price && form.touched.price && (
+                  <div className={"input-error"}>{form.errors.price}</div>
+                )}
+              </div>
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="size"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Link Audio Trial
+                </label>
+                <div className="mt-1">
+                  <input
+                    placeholder="VD: https://tiki.vn/tu-sach-nghe-thuat-lanh-dao"
+                    value={form.values.size}
+                    onChange={form.handleChange}
+                    type="text"
+                    name="size"
+                    id="size"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+                {/* {form.errors.size && form.touched.size && (
+                  <div className={"input-error"}>{form.errors.size}</div>
+                )} */}
+              </div>
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="price"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Giá kèm Audio
+                </label>
+                <div className="mt-1">
+                  <input
+                    placeholder="10,000​"
+                    // value={form.values.price && getFormattedPrice(form.values.price)}
+                    value={new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(form.values.price)}
+                    onChange={form.handleChange}
+                    type="text"
+                    name="price"
+                    id="price"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+                {form.errors.price && form.touched.price && (
+                  <div className={"input-error"}>{form.errors.price}</div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         <div className="pt-5">
-          <div className="flex justify-end">
+          {/* <div className="flex justify-end"> */}
             <button
               onClick={() => {
                 // setSelectedAuthor(author);
                 // setShowUpdateModal(true);
               }}
               type="submit"
-              className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            >
+              className='bg-slate-200 hover:bg-slate-300 text-gray-800 text-sm font-medium py-2 px-4 rounded inline-flex gap-2 items-center mt-5'>
+            
               Tạo sách
             </button>
-          </div>
+          {/* </div> */}
         </div>
       </form>
       <AuthorModal
