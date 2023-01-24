@@ -40,7 +40,10 @@ const SelectOrganizationsModal: React.FC<Props> = ({
             groupService.getGroups({
                 name: debouncedSearch,
                 status: true,
-            })
+            }), {
+            keepPreviousData: true,
+            select: (data) => data?.data
+        }
     );
 
     return (
@@ -62,8 +65,8 @@ const SelectOrganizationsModal: React.FC<Props> = ({
                     />
                 </div>
                 <div className="h-96 overflow-y-auto">
-                    {!isLoading && groups && groups?.data?.length > 0 ? (
-                        groups?.data?.map((group) => {
+                    {!isLoading && groups ? (
+                        groups?.map((group) => {
                             const isSelected = selectedGroups?.find(
                                 (o) => o?.id === group?.id
                             );

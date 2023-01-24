@@ -45,7 +45,6 @@ const SelectCommissionsModal: React.FC<Props> = ({
             }),
         {
             keepPreviousData: true,
-            enabled: isOpen,
             select: (data) => data?.data?.filter((genre) => genre?.parentId === null),
         }
     );
@@ -69,7 +68,7 @@ const SelectCommissionsModal: React.FC<Props> = ({
                     />
                 </div>
                 <div className="h-96 overflow-y-auto">
-                    {!isLoading && genres && genres?.length > 0 ? (
+                    {!isLoading && genres ? (
                         genres?.map((genre) => {
                             const isSelected = selectedCommissions?.find(
                                 (g) => g?.genreId === genre?.id

@@ -37,6 +37,7 @@ const SelectOrganizationsModal: React.FC<Props> = ({
             organizationService.getOrganizations({
                 name: debouncedSearch,
             }),{
+            keepPreviousData: true,
             select: (data) => data.data
         }
     );
@@ -60,7 +61,7 @@ const SelectOrganizationsModal: React.FC<Props> = ({
                     />
                 </div>
                 <div className="h-96 overflow-y-auto">
-                    {!isLoading && organizations && organizations?.length > 0 ? (
+                    {!isLoading && organizations ? (
                         organizations?.map((org) => {
                             const isSelected = selectedOrganizations?.find(
                                 (o) => o?.id === org?.id

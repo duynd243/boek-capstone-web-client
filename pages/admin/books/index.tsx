@@ -12,14 +12,18 @@ import Image from "next/image";
 import TableBody from "../../../components/Admin/Table/TableBody";
 import {IBookResponse} from "../../../old-types/response/IBookResponse";
 import {getAvatarFromName} from "../../../utils/helper";
+import {IBook} from "../../../types/Book/IBook";
 
-export const randomBooks = [
+export const randomBooks: IBook[] = [
     {
         code: 'B0001',
         id: 1,
         name: "Có Hai Con Mèo Ngồi Bên Cửa Sổ",
         imageUrl:
             "https://salt.tikicdn.com/cache/w1200/ts/product/8a/c3/a9/733444596bdb38042ee6c28634624ee5.jpg",
+        fullPdfAndAudio: true,
+        onlyPdf: false,
+        onlyAudio: false,
 
     },
     {
@@ -28,6 +32,9 @@ export const randomBooks = [
         name: "Thao Túng Tâm Lý",
         imageUrl:
             "https://salt.tikicdn.com/cache/w1200/ts/product/90/49/97/ec88ab408c1997378344486c94dbac40.jpg",
+        fullPdfAndAudio: false,
+        onlyPdf: true,
+        onlyAudio: false,
     },
     {
         code: 'B0003',
@@ -35,6 +42,9 @@ export const randomBooks = [
         name: "Cây Cam Ngọt Của Tôi",
         imageUrl:
             "https://salt.tikicdn.com/cache/w1200/ts/product/5e/18/24/2a6154ba08df6ce6161c13f4303fa19e.jpg",
+        fullPdfAndAudio: false,
+        onlyPdf: false,
+        onlyAudio: true,
     },
     {
         code: 'B0004',
@@ -42,6 +52,9 @@ export const randomBooks = [
         name: "Rừng Nauy (Tái Bản)",
         imageUrl:
             "https://salt.tikicdn.com/ts/product/9a/84/8f/8c3eda2d15fa1ae7a0e13762a0cfa74e.jpg",
+        fullPdfAndAudio: true,
+        onlyPdf: false,
+        onlyAudio: false,
     },
     {
         code: 'B0005',
@@ -49,6 +62,9 @@ export const randomBooks = [
         name: "THÀNH NGỮ TỤC NGỮ VIỆT NAM",
         imageUrl:
             "http://static.nhanam.com.vn/thumb/0x320/crop/Books/Images/2022/11/15/LBC828K4.jpg",
+        fullPdfAndAudio: false,
+        onlyPdf: false,
+        onlyAudio: true,
     },
     {
         code: 'B0006',
@@ -56,6 +72,9 @@ export const randomBooks = [
         name: "Những Tù Nhân Của Địa Lý",
         imageUrl:
             "https://salt.tikicdn.com/cache/w1200/ts/product/8d/96/9e/c0c1f23db756d50b1944dff9c3988753.jpg",
+        fullPdfAndAudio: false,
+        onlyPdf: true,
+        onlyAudio: false,
     },
 ];
 
@@ -91,49 +110,6 @@ export const fakeBookSeries = [
         fullPdfAndAudio: false,
         onlyPdf: false,
         onlyAudio: false,
-    }
-];
-export const fakeBook = [
-    {
-        id: 1,
-        name: "Có Hai Con Mèo Ngồi Bên Cửa Sổ",
-        books: randomBooks,
-        publisher: "Nhã Nam",
-        imageUrl: 'https://salt.tikicdn.com/cache/w1200/ts/product/8a/c3/a9/733444596bdb38042ee6c28634624ee5.jpg',
-        description: 'Cuốn truyện có độ dầy vừa phải, 67 hình vẽ của họa sĩ Đỗ Hoàng Tường sinh động đến từng nét nũng nịu hay kiêu căng của nàng mèo người yêu mèo Gấu, câu chuyện thì hấp dẫn duyên dáng điểm những bài thơ tình lãng mạn nao lòng song đọc to lên thì khiến cười hinh hích…',
-        fullPdfAndAudio: true,
-        onlyPdf: false,
-        onlyAudio: false,
-    }, {
-        id: 2,
-        name: "Cây Cam Ngọt Của Tôi",
-        books: randomBooks,
-        publisher: "Kim Đồng",
-        imageUrl: 'https://salt.tikicdn.com/cache/w1200/ts/product/5e/18/24/2a6154ba08df6ce6161c13f4303fa19e.jpg',
-        description: ' Cuốn sách được đưa vào chương trình tiểu học của Brazil, được bán bản quyền cho hai mươi quốc gia và chuyển thể thành phim điện ảnh. Ngoài ra, José còn rất thành công trong vai trò diễn viên điện ảnh và biên kịch.',
-        fullPdfAndAudio: false,
-        onlyPdf: true,
-        onlyAudio: false,
-    }, {
-        id: 3,
-        name: "Thao Túng Tâm Lý",
-        books: randomBooks,
-        publisher: "Kim Đồng",
-        imageUrl: 'https://salt.tikicdn.com/cache/w1200/ts/product/90/49/97/ec88ab408c1997378344486c94dbac40.jpg',
-        description: 'Thao Túng Tâm Lý - Nhận Diện, Thức Tỉnh Và Chữa Lành Những Tổn Thương Tiềm Ẩn.',
-        fullPdfAndAudio: false,
-        onlyPdf: false,
-        onlyAudio: false,
-    }, {
-        id: 4,
-        name: "Những Tù Nhân Của Địa Lý",
-        books: randomBooks,
-        publisher: "Kim Đồng",
-        imageUrl: 'https://salt.tikicdn.com/cache/w1200/ts/product/8d/96/9e/c0c1f23db756d50b1944dff9c3988753.jpg',
-        description: 'đây là một trong những cuốn sách hay nhất về địa chính trị bạn có thể tưởng tượng: đọc nó cũng giống như một nguồn ánh sáng rọi vào tâm trí bạn… Marshall có cái đầu mạch lạc, sáng suốt và sở hữu một năng lực gần như thần bí là có thể làm cho bức tranh toàn cảnh trở nên dễ hiểu và mạch lạc…',
-        fullPdfAndAudio: false,
-        onlyPdf: false,
-        onlyAudio: true,
     }
 ];
 

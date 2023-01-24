@@ -2,7 +2,7 @@ import React, { ChangeEventHandler, ReactElement, useState } from 'react'
 import { NextPageWithLayout } from "../../../../../_app";
 import AdminLayout from "../../../../../../components/Layout/AdminLayout";
 import { useRouter } from "next/router";
-import { fakeBook, randomBooks } from "../../../../../admin/books";
+import {fakeBookSeries, randomBooks} from "../../../../../admin/books";
 import FormPageLayout from "../../../../../../components/Layout/FormPageLayout";
 import WelcomeBanner from "../../../../../../components/WelcomBanner";
 import { useFormik } from "formik";
@@ -31,7 +31,7 @@ const fullFormats = [{
     name: 'Audio'
 }];
 
-function getFormatOptions(book: typeof fakeBook[number] | undefined) {
+function getFormatOptions(book: typeof fakeBookSeries[number] | undefined) {
     if (!book) {
         return [];
     }
@@ -50,7 +50,7 @@ function getFormatOptions(book: typeof fakeBook[number] | undefined) {
 const AddSellingBookPage: NextPageWithLayout = () => {
     const router = useRouter();
     const bookId = router.query['book-id'];
-    const bookSeries = fakeBook.find(b => b.id === Number(bookId));
+    const bookSeries = fakeBookSeries.find(b => b.id === Number(bookId));
 
     const [selectedBooks, setSelectedBooks] = useState<typeof randomBooks>(randomBooks);
 

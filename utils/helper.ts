@@ -2,6 +2,9 @@ import {format} from "date-fns";
 import {vi} from "date-fns/locale";
 import slugify from "slugify";
 import {hexColors} from "../constants/Colors";
+import {BookFormats, IBookFormat} from "../constants/BookFormats";
+import {IBook} from "../types/Book/IBook";
+import {IBookProduct} from "../types/Book/IBookProduct";
 
 
 export function getRequestDateTime(date: Date) {
@@ -79,4 +82,20 @@ export function isValidPhoneNumber(phoneNumber: string) {
     return /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(
         phoneNumber
     );
+}
+
+export function getFormatsOfBook(book: IBook | IBookProduct | undefined): IBookFormat[] {
+    if (!book) return [];
+    const formats: IBookFormat[] = [BookFormats.PAPER];
+    if (book.fullPdfAndAudio) {
+        formats.push(BookFormats.PDF);
+        formats.push(BookFormats.AUDIO);
+    }
+    if (book.onlyPdf) {
+        formats.push(BookFormats.PDF);
+    }
+    if (book.onlyAudio) {
+        formats.push(BookFormats.AUDIO);
+    }
+    return formats;
 }
