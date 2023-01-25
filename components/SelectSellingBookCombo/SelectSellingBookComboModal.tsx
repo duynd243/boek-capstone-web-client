@@ -1,31 +1,35 @@
 import React, {useState} from 'react'
-import {fakeBookSeries} from "../../pages/admin/books";
-import {BsSearch} from "react-icons/bs";
+import {fakeBookSeries, randomBooks} from "../../pages/admin/books";
+import {BsCheckCircle, BsSearch} from "react-icons/bs";
 import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
 import Modal from "../Modal/Modal";
 import TransitionModal from "../Modal/TransitionModal";
 import Image from "next/image";
 import {faker} from "@faker-js/faker/locale/vi";
 import Link from "next/link";
+import {IBook} from "../../types/Book/IBook";
+import {IBookProduct} from "../../types/Book/IBookProduct";
+import {getFormatsOfBook} from "../../utils/helper";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    onItemSelect: (organization: typeof fakeBookSeries[number]) => void;
+    selectedBooks: IBook[];
+    onItemSelect: (book: IBook) => void;
 };
-const SelectSellingBookSeriesModal: React.FC<Props> = ({
-                                                           isOpen,
-                                                           onClose,
-                                                           onItemSelect
-                                                       }) => {
+const SelectSellingBookComboModal: React.FC<Props> = ({
+                                                          isOpen,
+                                                          onClose,
+                                                          selectedBooks,
+                                                          onItemSelect
+                                                      }) => {
 
     const [search, setSearch] = useState<string>("");
-
-    const searchedBookSeries = fakeBookSeries.filter(bookSeries => bookSeries.name.toLowerCase().includes(search.toLowerCase()));
+    const searchedBooks = randomBooks.filter((book) => book?.name?.toLowerCase().includes(search.toLowerCase()));
 
     return (
         <TransitionModal
-            maxWidth={"max-w-xl"}
+            maxWidth={"max-w-2xl"}
             isOpen={isOpen}
             closeOnOverlayClick={true}
             onClose={onClose}
@@ -35,22 +39,27 @@ const SelectSellingBookSeriesModal: React.FC<Props> = ({
                     <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
                     <input
                         type="text"
-                        placeholder="Tìm kiếm sách series"
+                        placeholder="Tìm kiếm sách"
                         className="h-12 w-full border-0 pl-11 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:ring-0"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
                 <div className="h-96 overflow-y-auto">
-                    {searchedBookSeries.length > 0 ? (
-                        searchedBookSeries?.map((book) => {
+                    {searchedBooks.length > 0 ? (
+                        searchedBooks.map((book, index) => {
+                            const isSelected = selectedBooks?.find(b => b?.id === book?.id);
                             return (
                                 <div
                                     onClick={() => {
-                                        onItemSelect(book);
+                                        if (!isSelected) onItemSelect(book)
                                     }}
-                                    key={book.id}
-                                    className="flex justify-between border-b border-gray-300 p-4"
+                                    key={book?.id}
+                                    className={`relative flex justify-between border-b border-gray-300 p-4 pr-12 ${
+                                        isSelected
+                                            ? "cursor-not-allowed bg-slate-100"
+                                            : "cursor-pointer"
+                                    }`}
                                 >
                                     <div className="flex gap-4">
                                         <Image
@@ -63,7 +72,7 @@ const SelectSellingBookSeriesModal: React.FC<Props> = ({
                                         <div>
                                             <div
                                                 className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
-                                                {`S${faker.datatype.number({
+                                                {`B${faker.datatype.number({
                                                     min: 10000,
                                                     max: 99999,
                                                 })}`}
@@ -72,10 +81,16 @@ const SelectSellingBookSeriesModal: React.FC<Props> = ({
                                                 {book.name}
                                             </div>
                                             <div className="text-sm font-medium text-gray-500">
-                                                NXB: {book.publisher}
+                                                NXB: {faker.company.name()}
                                             </div>
-                                            <div className="text-sm font-medium text-gray-500">
-                                                Số sách trong series: {book.books.length}
+                                            <div className='flex gap-1.5 flex-wrap mt-3'>
+                                                {getFormatsOfBook(book).map(format => (
+                                                    <div
+                                                        key={format?.id}
+                                                        className="inline-block rounded py-1 px-2 text-xs text-blue-500 bg-white border border-blue-500">{format?.displayName}
+                                                    </div>
+                                                ))}
+
                                             </div>
                                         </div>
                                     </div>
@@ -85,6 +100,12 @@ const SelectSellingBookSeriesModal: React.FC<Props> = ({
                                             currency: "VND",
                                         }).format(faker.datatype.number())}
                                     </div>
+
+                                    {isSelected && (
+                                        <div className="absolute top-1/2 right-4 -translate-y-1/2 transform">
+                                            <BsCheckCircle className="text-green-500"/>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })
@@ -117,4 +138,4 @@ const SelectSellingBookSeriesModal: React.FC<Props> = ({
     )
 }
 
-export default SelectSellingBookSeriesModal
+export default SelectSellingBookComboModal
