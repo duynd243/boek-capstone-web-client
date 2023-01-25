@@ -1,4 +1,4 @@
-import React, {ChangeEventHandler, ReactElement, useState} from 'react'
+import React, {ReactElement, useState} from 'react'
 import {NextPageWithLayout} from "../../../../../_app";
 import AdminLayout from "../../../../../../components/Layout/AdminLayout";
 import {useRouter} from "next/router";
@@ -6,12 +6,11 @@ import {fakeBookSeries, randomBooks} from "../../../../../admin/books";
 import FormPageLayout from "../../../../../../components/Layout/FormPageLayout";
 import WelcomeBanner from "../../../../../../components/WelcomBanner";
 import {useFormik} from "formik";
-import Form, {defaultInputClass} from "../../../../../../components/Form";
+import Form from "../../../../../../components/Form";
 import Image from "next/image";
 import * as Yup from "yup";
 import SelectBox from "../../../../../../components/SelectBox";
 import ErrorMessage from "../../../../../../components/Form/ErrorMessage";
-import CreateButton from "../../../../../../components/Admin/CreateButton";
 import TableWrapper from "../../../../../../components/Admin/Table/TableWrapper";
 import TableHeading from "../../../../../../components/Admin/Table/TableHeading";
 import TableHeader from "../../../../../../components/Admin/Table/TableHeader";

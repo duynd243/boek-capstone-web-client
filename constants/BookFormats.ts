@@ -18,3 +18,23 @@ export class BookFormats {
     }
 }
 
+const a = {
+    hobbies: [{
+        id: 1,
+        name: "Reading",
+    }, {
+        id: 2,
+        name: "Writing",
+    }],
+}
+
+const b = {
+    hobbies: [{
+        id: 1,
+        name: "Reading",
+    },{
+        id: 3,
+        name: "Drawing",
+    }],
+}
+

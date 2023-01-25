@@ -5,6 +5,7 @@ import {hexColors} from "../constants/Colors";
 import {BookFormats, IBookFormat} from "../constants/BookFormats";
 import {IBook} from "../types/Book/IBook";
 import {IBookProduct} from "../types/Book/IBookProduct";
+import {randomBooks} from "../pages/admin/books";
 
 
 export function getRequestDateTime(date: Date) {
@@ -98,4 +99,16 @@ export function getFormatsOfBook(book: IBook | IBookProduct | undefined): IBookF
         formats.push(BookFormats.AUDIO);
     }
     return formats;
+}
+
+export function getIntersectedArray<T>(arr1: T[], arr2: T[]): T[] {
+    return arr1.filter((item) => arr2.includes(item));
+}
+
+export function getIntersectedFormatOfBooks(books: IBook[]): IBookFormat[] {
+    if (!books || books.length === 0) return [];
+    const formatsOfBooks = books.map((book) => getFormatsOfBook(book));
+    return formatsOfBooks.reduce((prev, curr) =>
+        getIntersectedArray(prev, curr)
+    );
 }
