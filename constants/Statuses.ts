@@ -6,20 +6,20 @@ export interface IBaseStatus {
 
 export class CampaignStatuses {
   static readonly NOT_STARTED = {
-    id: 0,
+    id: 1,
     name: "NotStarted",
     displayName: "Chưa bắt đầu",
     statusColor: "bg-amber-500",
   };
   static readonly STARTING = {
-    id: 1,
+    id: 2,
     name: "Starting",
     displayName: "Đang diễn ra",
     statusColor: "bg-green-500",
   };
 
   static readonly FINISHED = {
-    id: 2,
+    id: 3,
     name: "Finished",
     displayName: "Đã kết thúc",
     statusColor: "bg-red-500",

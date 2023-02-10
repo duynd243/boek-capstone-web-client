@@ -7,7 +7,6 @@ import Image from "next/image";
 import {getAvatarFromName} from "../../utils/helper";
 import TableWrapper from "../Admin/Table/TableWrapper";
 import {IGroup} from "../../types/Group/IGroup";
-import {FieldArray} from "formik";
 
 type Props = {
     selectedGroups: IGroup[];
