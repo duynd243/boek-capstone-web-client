@@ -4,7 +4,7 @@ import {
     onAuthStateChanged,
     signInWithPopup,
     signOut,
-    Unsubscribe,
+    Unsubscribe, User,
 } from "firebase/auth";
 import {useRouter} from "next/router";
 import React, {
@@ -22,7 +22,7 @@ import {UserService} from "../services/UserService";
 import {Roles} from "../constants/Roles";
 
 export interface IAuthContext {
-    user: any;
+    user: User | null;
     loginUser: ILoginData | null;
     authLoading: boolean;
     handleGoogleSignIn: () => void;
@@ -37,21 +37,18 @@ type Props = {
 };
 
 export const AuthContextProvider: React.FC<Props> = ({children}) => {
-    const [user, setUser] = useState(null);
-    const [loginUser, setLoginUser] = useState<ILoginData | null>(null);
-    const [authLoading, setAuthLoading] = useState<boolean>(true);
-
-    const [showLogOutModal, setShowLogOutModal] = useState<boolean>(false);
-
     const googleProvider = new GoogleAuthProvider();
     const auth = getAuth();
     const router = useRouter();
+    const user = auth.currentUser;
+    const [loginUser, setLoginUser] = useState<ILoginData | null>(null);
+    const [authLoading, setAuthLoading] = useState<boolean>(true);
+    const [showLogOutModal, setShowLogOutModal] = useState<boolean>(false);
 
     const handleGoogleSignIn = () => {
         signInWithPopup(auth, googleProvider)
             .then(async (result) => {
                 console.log("Google Sign In: ", result);
-
             })
             .catch((err) => {
                 console.log("Google Sign In Error: ", err);
@@ -73,13 +70,10 @@ export const AuthContextProvider: React.FC<Props> = ({children}) => {
 
     useEffect(() => {
         const userService = new UserService();
-        const handleServerAuthentication = async (firebaseUser: any) => {
+        const handleServerAuthentication = async (idToken: string) => {
             try {
-                const {data} = await userService.loginWithFirebaseIdToken(
-                    firebaseUser?.accessToken
-                );
+                const {data} = await userService.loginWithFirebaseIdToken(idToken);
                 if (!data) return;
-
                 switch (data?.role) {
                     case Roles.CUSTOMER.id:
                         await signOut(auth);
@@ -92,6 +86,7 @@ export const AuthContextProvider: React.FC<Props> = ({children}) => {
                     default:
                         break;
                 }
+                console.log("Login User: ", data)
                 setLoginUser(data);
                 toast.success("Đăng nhập thành công");
             } catch (err: any) {
@@ -101,14 +96,12 @@ export const AuthContextProvider: React.FC<Props> = ({children}) => {
         };
         const unsubscribe: Unsubscribe = onAuthStateChanged(
             auth,
-            async (firebaseUser: any) => {
-                if (firebaseUser) {
-                    setUser(firebaseUser);
-                    if (loginUser?.email !== firebaseUser?.email) {
-                        await handleServerAuthentication(firebaseUser);
-                    }
-                } else {
-                    setUser(null);
+            async (firebaseUser) => {
+                console.log("Firebase User: ", firebaseUser)
+                if (firebaseUser && firebaseUser.email !== loginUser?.email) {
+                    const token = await firebaseUser.getIdToken();
+                    await handleServerAuthentication(token);
+                } else if (!firebaseUser) {
                     setLoginUser(null);
                 }
                 setAuthLoading(false);
