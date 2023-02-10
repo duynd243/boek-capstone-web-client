@@ -127,6 +127,7 @@
   @apply flex-col items-start #{!important};
 }
 .rdp-nav {
+  @apply self-end #{!important};
   svg {
     @apply h-3 w-3 #{!important};
   }

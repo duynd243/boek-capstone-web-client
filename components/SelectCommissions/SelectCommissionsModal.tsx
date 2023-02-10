@@ -9,8 +9,11 @@ import {IGenre} from "../../types/Genre/IGenre";
 import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
 import Image from "next/image";
 import {getAvatarFromName} from "../../utils/helper";
-import {IRequestCommission} from "../../pages/admin/campaigns/create";
-
+export interface IRequestCommission {
+    genreId: number,
+    genreName: string,
+    commission: number,
+}
 type Props = {
     isOpen: boolean;
     onClose: () => void;

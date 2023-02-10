@@ -7,7 +7,7 @@ const getAxiosClient = (
   const axiosClient = axios.create({
     baseURL: customURL ?? process.env.NEXT_PUBLIC_API_URL,
   });
-  axiosClient.interceptors.request.use((config: AxiosRequestConfig) => {
+  axiosClient.interceptors.request.use((config) => {
     if (config.headers && accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }

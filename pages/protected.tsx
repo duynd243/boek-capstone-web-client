@@ -10,8 +10,8 @@ const Protected: NextPage = () => {
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center">
       <Image
-        src={user?.photoURL}
-        alt={user?.displayName}
+        src={user?.photoURL || "https://via.placeholder.com/100"}
+        alt={user?.displayName || "Guest"}
         className={"mb-6"}
         width={100}
         height={100}

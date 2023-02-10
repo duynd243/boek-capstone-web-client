@@ -8,8 +8,8 @@ import {getAvatarFromName} from "../../utils/helper";
 import TableWrapper from "../Admin/Table/TableWrapper";
 import {FormikValues} from "formik/dist/types";
 import {FieldArray, getIn} from "formik";
-import {IRequestCommission} from "../../pages/admin/campaigns/create";
 import {defaultInputClass} from "../Form";
+import {IRequestCommission} from "./SelectCommissionsModal";
 
 type Props = {
     formikForm: FormikValues,

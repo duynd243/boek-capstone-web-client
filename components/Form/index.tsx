@@ -1,8 +1,8 @@
-import React, {useMemo, useState} from "react";
-import {FormikValues} from "formik/dist/types";
-import ErrorMessage from "./ErrorMessage";
+import { FormikValues } from "formik/dist/types";
 import Image from "next/image";
-import {BsCalendarWeek} from "react-icons/bs";
+import React, { useMemo, useState } from "react";
+import { BsCalendarWeek } from "react-icons/bs";
+import ErrorMessage from "./ErrorMessage";
 
 type LabelProps = {
     fieldName?: string;
@@ -50,7 +50,7 @@ const Input: React.FC<InputProps> = ({
     const commonProps = {
         id: fieldName,
         name: fieldName,
-        value: formikForm.values[fieldName],
+        value: formikForm.values[fieldName] || "",
         onChange: (
             e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
         ) => {
@@ -93,6 +93,7 @@ const GroupLabel: React.FC<GroupLabelProps> = ({label, description}) => {
 };
 
 type ImageUploadPanelProps = {
+    defaultImageURL?: string;
     onChange?: (file: File) => boolean;
     onRemove?: () => void;
     label?: string;
@@ -102,13 +103,19 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                                                                label,
                                                                onChange,
                                                                onRemove,
+                                                               defaultImageURL
                                                            }) => {
-    const [file, setFile] = useState<File | null>(null);
+    const [file, setFile] = useState<File | null>(defaultImageURL ? new File([], "") : null);
 
     const previewURL = useMemo(() => {
-        if (!file) return null;
-        return URL.createObjectURL(file);
-    }, [file]);
+        if (file && file.name && file.size) {
+            return URL.createObjectURL(file);
+        } else if (defaultImageURL) {
+            return defaultImageURL;
+        } else {
+            return null;
+        }
+    }, [defaultImageURL, file]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -125,7 +132,7 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
     return (
         <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
             <div className="space-y-1 text-center">
-                {file && previewURL ? (
+                {previewURL ? (
                     <Image
                         className={"mx-auto mb-4 rounded-md object-cover object-center"}
                         width={500}
@@ -157,7 +164,7 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                         htmlFor="file-upload"
                         className="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
                     >
-                        <span>{file ? "Chọn ảnh khác" : "Tải ảnh lên"}</span>
+                        <span>{(file || previewURL) ? "Chọn ảnh khác" : "Tải ảnh lên"}</span>
                         <input
                             onChange={handleFileChange}
                             id="file-upload"
@@ -185,8 +192,11 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
 type DateTimeInputFieldProps = {
     value: string;
     onClick?: () => void;
+    id: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 const DateTimeInputField: React.FC<DateTimeInputFieldProps> = ({
+    placeholder,
+                                                                   id,
                                                                    onClick,
                                                                    value,
                                                                    ...rest
@@ -195,14 +205,17 @@ const DateTimeInputField: React.FC<DateTimeInputFieldProps> = ({
         <div className="relative">
             <input
                 {...rest}
+                id={id}
                 readOnly={true}
                 onClick={onClick}
                 value={value}
-                placeholder={"dd/mm/yyyy hh:mm"}
+                placeholder={placeholder || "dd/mm/yyyy hh:mm"}
                 className={defaultInputClass}
                 type="text"
             />
-            <BsCalendarWeek className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400"/>
+            <label htmlFor={id} className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400">
+                <BsCalendarWeek/>
+            </label>
         </div>
     );
 };
@@ -215,4 +228,5 @@ const Form = {
     ImageUploadPanel,
     DateTimeInputField,
 };
+
 export default Form;
