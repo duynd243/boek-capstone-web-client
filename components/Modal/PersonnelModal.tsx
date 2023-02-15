@@ -123,28 +123,28 @@ const PersonnelModal: React.FC<Props> = ({
         <div className="space-y-3 py-4 px-5">
           <Modal.FormLabel label="Ảnh đại diện" />
           <ProfilePicture />
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập tên nhân sự"
             required={true}
             formikForm={form}
             fieldName="personnelName"
             label="Tên nhân sự"
           />
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập email"
             required={true}
             formikForm={form}
             fieldName="personnelEmail"
             label="Địa chỉ email"
           />
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập số điện thoại"
             required={true}
             formikForm={form}
             fieldName="personnelPhone"
             label="Số điện thoại"
           />
-          <Modal.FormInput
+          <Modal.FormInputOld
             isTextArea={true}
             placeholder="Nhập địa chỉ"
             required={true}

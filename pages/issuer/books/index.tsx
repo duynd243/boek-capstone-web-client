@@ -57,7 +57,7 @@ const IssuerBooksPage: NextPageWithLayout = () => {
   return (
     <Fragment>
       <PageHeading label="Kho sách">
-        <SearchForm defaultValue={""} />
+        <SearchForm/>
         <Menu as={"div"} className={"relative"}>
           <Menu.Button
             as={"button"}

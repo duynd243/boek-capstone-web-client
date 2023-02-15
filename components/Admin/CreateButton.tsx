@@ -1,25 +1,34 @@
-import React from "react";
+import React, { memo } from "react";
 import Link from "next/link";
 import { IoAdd } from "react-icons/io5";
 
 type Props = {
-  href?: string;
-  onClick?: () => void;
-  label: string;
-  className?: string;
+    href?: string;
+    onClick?: () => void;
+    label: string;
+    className?: string;
 };
 
 const CreateButton: React.FC<Props> = ({ label, onClick, href, className }) => {
-  return (
-    <Link
-      href={href || ""}
-      onClick={onClick}
-      className={`m-btn gap-1 bg-indigo-500 text-white hover:bg-indigo-600 ${className}`}
-    >
-      <IoAdd size={16} />
-      <span className="hidden sm:block">{label}</span>
-    </Link>
-  );
+    const commonProps = {
+        className: `m-btn gap-1 bg-indigo-500 text-white hover:bg-indigo-600 ${className}`,
+    };
+
+    const children = (
+        <>
+            <IoAdd size={16} />
+            <span className="hidden sm:block">{label}</span>
+        </>
+    );
+    return href ? (
+        <Link href={href} {...commonProps}>
+            {children}
+        </Link>
+    ) : (
+        <button onClick={onClick} {...commonProps}>
+            {children}
+        </button>
+    );
 };
 
-export default CreateButton;
+export default memo(CreateButton);

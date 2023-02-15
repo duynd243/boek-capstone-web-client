@@ -100,35 +100,35 @@ const IssuerModal: React.FC<Props> = ({
         <div className="space-y-3 py-4 px-5">
           <Modal.FormLabel label="Ảnh đại diện" />
           <ProfilePicture />
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập tên nhà phát hành"
             required={true}
             formikForm={form}
             fieldName="issuerName"
             label="Tên nhà phát hành"
           />
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập email"
             required={true}
             formikForm={form}
             fieldName="issuerEmail"
             label="Địa chỉ email"
           />
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập mã số thuế"
             required={false}
             formikForm={form}
             fieldName="issuerTaxCode"
             label="Mã số thuế"
           />
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập số điện thoại"
             required={true}
             formikForm={form}
             fieldName="issuerPhone"
             label="Số điện thoại"
           />
-          <Modal.FormInput
+          <Modal.FormInputOld
             isTextArea={true}
             placeholder="Nhập địa chỉ"
             required={true}

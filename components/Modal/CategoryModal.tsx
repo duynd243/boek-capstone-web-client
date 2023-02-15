@@ -83,7 +83,7 @@ const CategoryModal: React.FC<Props> = ({
           showCloseButton={true}
         />
         <div className="space-y-3 py-4 px-5">
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập tên thể loại"
             required={true}
             formikForm={form}
@@ -91,7 +91,7 @@ const CategoryModal: React.FC<Props> = ({
             label="Tên thể loại"
           />
 
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập mức chiết khấu"
             required={true}
             formikForm={form}

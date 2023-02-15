@@ -59,7 +59,7 @@ const AdminCampaignsPage: NextPageWithLayout = () => {
     return (
         <Fragment>
             <PageHeading label="Hội sách">
-                <SearchForm defaultValue={search}/>
+                <SearchForm/>
                 <CreateButton label="Tạo hội sách" href="/admin/campaigns/create"/>
             </PageHeading>
             <div className='bg-white px-4 rounded'>

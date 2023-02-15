@@ -4,6 +4,7 @@ specifiers:
   '@faker-js/faker': ^7.6.0
   '@headlessui/react': ^1.7.9
   '@headlessui/tailwindcss': ^0.1.2
+  '@hookform/resolvers': ^2.9.11
   '@radix-ui/react-primitive': ^1.0.1
   '@tailwindcss/forms': ^0.5.3
   '@tailwindcss/line-clamp': ^0.4.2
@@ -28,6 +29,7 @@ specifiers:
   react: 18.2.0
   react-day-picker: ^8.5.1
   react-dom: 18.2.0
+  react-hook-form: ^7.43.1
   react-hot-toast: ^2.4.0
   react-icons: ^4.7.1
   sass: ^1.58.0
@@ -37,11 +39,13 @@ specifiers:
   typescript: 4.9.3
   uuid: ^9.0.0
   yup: ^0.32.11
+  zod: ^3.20.6
   zustand: ^4.3.2
 
 dependencies:
   '@headlessui/react': 1.7.9_biqbaboplfbrettd7655fr4n2y
   '@headlessui/tailwindcss': 0.1.2_tailwindcss@3.2.4
+  '@hookform/resolvers': 2.9.11_react-hook-form@7.43.1
   '@radix-ui/react-primitive': 1.0.1_biqbaboplfbrettd7655fr4n2y
   '@tanstack/react-query': 4.24.4_biqbaboplfbrettd7655fr4n2y
   '@tanstack/react-query-devtools': 4.24.4_pkeil6ml7pq7xvil3imldjs2sa
@@ -54,6 +58,7 @@ dependencies:
   react: 18.2.0
   react-day-picker: 8.5.1_r6j3756ioqf5pjc2u22wj25rla
   react-dom: 18.2.0_react@18.2.0
+  react-hook-form: 7.43.1_react@18.2.0
   react-hot-toast: 2.4.0_biqbaboplfbrettd7655fr4n2y
   react-icons: 4.7.1_react@18.2.0
   sass: 1.58.0
@@ -61,6 +66,7 @@ dependencies:
   sweetalert2: 11.7.1
   uuid: 9.0.0
   yup: 0.32.11
+  zod: 3.20.6
   zustand: 4.3.2_react@18.2.0
 
 devDependencies:
@@ -610,6 +616,14 @@ packages:
       tailwindcss: ^3.0
     dependencies:
       tailwindcss: 3.2.4_postcss@8.4.21
+    dev: false
+
+  /@hookform/resolvers/2.9.11_react-hook-form@7.43.1:
+    resolution: {integrity: sha512-bA3aZ79UgcHj7tFV7RlgThzwSSHZgvfbt2wprldRkYBcMopdMvHyO17Wwp/twcJasNFischFfS7oz8Katz8DdQ==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.43.1_react@18.2.0
     dev: false
 
   /@humanwhocodes/config-array/0.11.8:
@@ -2992,6 +3006,15 @@ packages:
     resolution: {integrity: sha512-suNP+J1VU1MWFKcyt7RtjiSWUjvidmQSlqu+eHslq+342xCbGTYmC0mEhPCOHxlW0CywylOC1u2DFAT+bv4dBw==}
     dev: false
 
+  /react-hook-form/7.43.1_react@18.2.0:
+    resolution: {integrity: sha512-+s3+s8LLytRMriwwuSqeLStVjRXFGxgjjx2jED7Z+wz1J/88vpxieRQGvJVvzrzVxshZ0BRuocFERb779m2kNg==}
+    engines: {node: '>=12.22.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /react-hot-toast/2.4.0_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-qnnVbXropKuwUpriVVosgo8QrB+IaPJCpL8oBI6Ov84uvHZ5QQcTp2qg6ku2wNfgJl6rlQXJIQU5q+5lmPOutA==}
     engines: {node: '>=10'}
@@ -3580,6 +3603,10 @@ packages:
       nanoclone: 0.2.1
       property-expr: 2.0.5
       toposort: 2.0.2
+    dev: false
+
+  /zod/3.20.6:
+    resolution: {integrity: sha512-oyu0m54SGCtzh6EClBVqDDlAYRz4jrVtKwQ7ZnsEmMI9HnzuZFj8QFwAY1M5uniIYACdGvv0PBWPF2kO0aNofA==}
     dev: false
 
   /zustand/4.3.2_react@18.2.0:

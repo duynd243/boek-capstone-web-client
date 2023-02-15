@@ -66,7 +66,7 @@ const GroupModal: React.FC<Props> = ({
           showCloseButton={true}
         />
         <div className="space-y-3 py-4 px-5">
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập tên nhóm"
             required={true}
             formikForm={form}
