@@ -20,6 +20,7 @@ import AuthorModal, {
 } from "../../../components/Modal/AuthorModal";
 import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
+import {IAuthor} from "../../../types/Author/IAuthor";
 
 const IssuerCreateBookPage: NextPageWithLayout = () => {
   const { loginUser } = useAuth();
@@ -848,7 +849,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
         action={AuthorModalMode.CREATE}
         onClose={() => setShowCreateModal(false)}
         isOpen={showCreateModal}
-        author={selectedAuthor as { id?: number; name?: string }}
+        author={selectedAuthor as IAuthor}
       />
 
       {/* <AuthorModal

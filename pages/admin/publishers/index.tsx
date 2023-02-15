@@ -134,8 +134,8 @@ const AdminPublishersPage: NextPageWithLayout = () => {
                         size={size}
                         onPageChange={(page) => setPage(page)}
                         page={page}
+                        totalPages={publisherData?.metadata?.total}
                         onSizeChange={(size) => setSize(size)}
-                        metadata={publisherData?.metadata}
                         pageSizeOptions={pageSizeOptions}
                     />
                 </TableWrapper>
