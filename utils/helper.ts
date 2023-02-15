@@ -11,6 +11,13 @@ import {randomBooks} from "../pages/admin/books";
 export function getRequestDateTime(date: Date) {
     return format(date, "yyyy-MM-dd'T'HH:mm:ss");
 }
+export function isImageFile(file: File) {
+    return file.type.startsWith("image");
+}
+
+export function isValidFileSize(file: File, maxSizeInMb: number) {
+    return file.size <= maxSizeInMb * 1024 * 1024;
+}
 
 function randomColor(name?: string | undefined): string {
     return hexColors[name ? name?.length % hexColors.length : 0];
@@ -112,3 +119,5 @@ export function getIntersectedFormatOfBooks(books: IBook[]): IBookFormat[] {
         getIntersectedArray(prev, curr)
     );
 }
+
+export const VIETNAMESE_PHONE_REGEX = /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/;

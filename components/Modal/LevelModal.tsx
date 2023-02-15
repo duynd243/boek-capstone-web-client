@@ -80,7 +80,7 @@ const LevelModal: React.FC<Props> = ({
           showCloseButton={true}
         />
         <div className="space-y-3 py-4 px-5">
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập tên cấp độ"
             required={true}
             formikForm={form}
@@ -88,7 +88,7 @@ const LevelModal: React.FC<Props> = ({
             label="Tên cấp độ"
           />
 
-          <Modal.FormInput
+          <Modal.FormInputOld
             placeholder="Nhập điểm yêu cầu"
             required={true}
             formikForm={form}

@@ -1,6 +1,7 @@
 import { AxiosInstance } from "axios";
 import getAxiosClient from "./axiosClient";
 import { IBaseListResponse } from "../old-types/IBaseListResponse";
+import {IAuthor} from "../types/Author/IAuthor";
 
 export class AuthorService {
   private readonly axiosClient: AxiosInstance;
@@ -11,10 +12,7 @@ export class AuthorService {
 
   getAuthors = async (params?: any) => {
     const response = await this.axiosClient.get<
-      IBaseListResponse<{
-        id?: number;
-        name?: string;
-      }>
+      IBaseListResponse<IAuthor>
     >("/authors", {
       params,
     });

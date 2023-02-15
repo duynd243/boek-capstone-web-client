@@ -28,7 +28,7 @@ const AdminGroupsPage: NextPageWithLayout = () => {
   return (
     <Fragment>
       <PageHeading label="Nhóm">
-        <SearchForm defaultValue={""} />
+        <SearchForm/>
         <CreateButton
           onClick={() => setShowCreateModal(true)}
           label="Thêm nhóm"

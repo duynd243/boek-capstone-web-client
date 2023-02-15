@@ -3,27 +3,34 @@ import {useRouter} from "next/router";
 
 type Props = {
     placeholder?: string;
-    defaultValue?: string;
+    value?: string;
+    onSearchSubmit?: (value: string) => void;
 };
 
 const SearchForm: React.FC<Props> = ({
-                                         defaultValue,
+                                         value,
                                          placeholder = "Tìm kiếm...",
+                                         onSearchSubmit,
                                      }) => {
-    const [inputSearch, setInputSearch] = useState(defaultValue || "");
     const router = useRouter();
-    const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
+
+    const [inputSearch, setInputSearch] = useState(value || "");
+
+    const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        await router.push({
-            pathname: router.pathname,
-            query: {
-                ...router.query,
-                search: inputSearch.trim(),
-            },
-        });
+        if (onSearchSubmit) {
+            onSearchSubmit(inputSearch);
+            // await router.push({
+            //     pathname: router.pathname,
+            //     query: {
+            //         ...router.query,
+            //         search: inputSearch,
+            //     }
+            // });
+        }
     };
     return (
-        <form onSubmit={handleSearch} className="relative">
+        <form onSubmit={onSubmit} className="relative">
             <label htmlFor="action-search" className="sr-only">
                 Search
             </label>
