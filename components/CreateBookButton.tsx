@@ -1,40 +1,40 @@
 import React from "react";
 import Link from "next/link";
-import { IconType } from "react-icons";
+import {IconType} from "react-icons";
 
 type Props = {
-  label: string;
-  description?: string;
-  onClick?: () => void;
-  href?: string;
-  icon: IconType;
+    label: string;
+    description?: string;
+    onClick?: () => void;
+    href?: string;
+    icon: IconType;
 };
 const CreateBookButton: React.FC<Props> = ({
-  icon,
-  label,
-  description,
-  onClick,
-  href,
-}) => {
-  return (
-    <Link
-      href={href || ""}
-      onClick={onClick}
-      className="flex gap-4 rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50
+                                               icon,
+                                               label,
+                                               description,
+                                               onClick,
+                                               href,
+                                           }) => {
+    return (
+        <Link
+            href={href || ""}
+            onClick={onClick}
+            className="flex gap-4 rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50
             focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
-    >
-      <div className="w-30 h-30">
-        {icon({
-          size: 45,
-          className: "p-2 fill-indigo-600 bg-indigo-50 rounded",
-        })}
-      </div>
-      <div>
-        <p className="text-sm font-medium text-slate-800">{label}</p>
-        <p className="text-sm text-slate-500">{description}</p>
-      </div>
-    </Link>
-  );
+        >
+            <div className="w-30 h-30">
+                {icon({
+                    size: 45,
+                    className: "p-2 fill-indigo-600 bg-indigo-50 rounded",
+                })}
+            </div>
+            <div>
+                <p className="text-sm font-medium text-slate-800">{label}</p>
+                <p className="text-sm text-slate-500">{description}</p>
+            </div>
+        </Link>
+    );
 };
 
 export default CreateBookButton;

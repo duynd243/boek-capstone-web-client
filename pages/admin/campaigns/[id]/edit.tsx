@@ -19,8 +19,8 @@ const CampaignEditPage: NextPageWithLayout = () => {
     const campaignService = new CampaignService(loginUser?.accessToken);
 
     const {data: campaign, isLoading} = useQuery(
-        ["campaign", campaignId],
-        () => campaignService.getCampaignById(Number(campaignId)),
+        ["admin_campaign", campaignId],
+        () => campaignService.getCampaignByIdByAdmin(Number(campaignId)),
         {
             staleTime: Infinity,
             cacheTime: Infinity,

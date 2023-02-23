@@ -3,4 +3,5 @@ export interface IProvince {
     name: string;
     slug: string;
     nameWithType: string;
+    disabled: boolean;
 }

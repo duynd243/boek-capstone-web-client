@@ -1,8 +1,11 @@
-import { FormikValues } from "formik/dist/types";
+import {FormikValues} from "formik/dist/types";
 import Image from "next/image";
-import React, { useMemo, useState } from "react";
-import { BsCalendarWeek } from "react-icons/bs";
+import React, {useEffect, useMemo, useState} from "react";
+import {BsCalendarWeek} from "react-icons/bs";
 import ErrorMessage from "./ErrorMessage";
+import {FormState, Path, UseFormRegister} from "react-hook-form";
+import errorMessage from "./ErrorMessage";
+import DefaultAvatar from "../../assets/images/default-avatar.png";
 
 type LabelProps = {
     fieldName?: string;
@@ -21,61 +24,61 @@ const Label = (props: LabelProps) => {
     );
 };
 
-type InputProps = {
+type InputProps<T extends Record<string, any>> = {
+    register: UseFormRegister<T>;
     uppercase?: boolean;
-    formikForm: FormikValues;
-    fieldName: string;
+    fieldName: Path<T>;
     label: string;
     required?: boolean;
     placeholder?: string;
     isTextArea?: boolean;
     inputType?: React.HTMLInputTypeAttribute;
+    errorMessage?: string;
 } & React.InputHTMLAttributes<HTMLInputElement> &
     React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 export const defaultInputClass =
     "block w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:opacity-50";
 
-const Input: React.FC<InputProps> = ({
-                                         uppercase = false,
-                                         inputType = "text",
-                                         formikForm,
-                                         isTextArea,
-                                         label,
-                                         required,
-                                         fieldName,
-                                         placeholder,
-                                         ...rest
-                                     }) => {
+const Input = <T extends Record<string, any>>({
+                                                  register,
+                                                  uppercase = false,
+                                                  inputType = "text",
+                                                  isTextArea,
+                                                  label,
+                                                  required,
+                                                  fieldName,
+                                                  placeholder,
+                                                  errorMessage,
+                                                  ...rest
+                                              }: InputProps<T>) => {
     const commonProps = {
         id: fieldName,
-        name: fieldName,
-        value: formikForm.values[fieldName] || "",
-        onChange: (
-            e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-        ) => {
-            formikForm.setFieldValue(
-                fieldName,
-                uppercase ? e.target.value.toUpperCase() : e.target.value
-            );
-        },
         placeholder: placeholder,
-        className: defaultInputClass,
+        className: `${defaultInputClass}`,
+        ...register(fieldName),
         ...rest,
     };
+
+
     return (
         <div>
-            <Label fieldName={fieldName} label={label} required={required}/>
+            <Label
+                fieldName={fieldName}
+                label={label}
+                required={required}
+            />
             {isTextArea ? (
-                <textarea {...commonProps} />
+                <textarea {...commonProps} rows={3}/>
             ) : (
                 <input {...commonProps} type={inputType}/>
             )}
-            {formikForm.errors[fieldName] && formikForm.touched[fieldName] && (
-                <ErrorMessage>{formikForm.errors[fieldName]}</ErrorMessage>
+            {errorMessage && (
+                <ErrorMessage>{errorMessage}</ErrorMessage>
             )}
         </div>
     );
+
 };
 type GroupLabelProps = {
     label: string;
@@ -105,26 +108,26 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                                                                onRemove,
                                                                defaultImageURL
                                                            }) => {
-    const [file, setFile] = useState<File | null>(defaultImageURL ? new File([], "") : null);
+    const [file, setFile] = useState<File | null>(null);
 
-    const previewURL = useMemo(() => {
-        if (file && file.name && file.size) {
-            return URL.createObjectURL(file);
-        } else if (defaultImageURL) {
-            return defaultImageURL;
-        } else {
-            return null;
-        }
-    }, [defaultImageURL, file]);
-
+    const objectURL = file && URL.createObjectURL(file);
+    const imgSrc = objectURL ? objectURL : defaultImageURL;
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file && onChange?.(file)) {
+        if (!file) return;
+        if (onChange?.(file)) {
             setFile(file);
         }
-    };
+    }
+
+    useEffect(() => {
+        if (objectURL) {
+            return () => {
+                URL.revokeObjectURL(objectURL);
+            };
+        }
+    }, [objectURL, file]);
     const handleRemoveFile = () => {
-        URL.revokeObjectURL(previewURL!);
         setFile(null);
         onRemove?.();
     };
@@ -132,12 +135,12 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
     return (
         <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
             <div className="space-y-1 text-center">
-                {previewURL ? (
+                {(imgSrc) ? (
                     <Image
                         className={"mx-auto mb-4 rounded-md object-cover object-center"}
                         width={500}
                         height={500}
-                        src={previewURL}
+                        src={imgSrc}
                         alt={""}
                     />
                 ) : (
@@ -164,7 +167,7 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                         htmlFor="file-upload"
                         className="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
                     >
-                        <span>{(file || previewURL) ? "Chọn ảnh khác" : "Tải ảnh lên"}</span>
+                        <span>{(imgSrc) ? "Chọn ảnh khác" : "Tải ảnh lên"}</span>
                         <input
                             onChange={handleFileChange}
                             id="file-upload"
@@ -179,9 +182,10 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                             onClick={handleRemoveFile}
                             className="font-medium text-rose-500"
                         >
-                            Xoá
+                            {defaultImageURL ? "Khôi phục ảnh mặc định" : "Xóa ảnh"}
                         </button>
                     )}
+
                 </div>
                 <p className="text-xs text-gray-500">{label}</p>
             </div>
@@ -195,7 +199,7 @@ type DateTimeInputFieldProps = {
     id: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 const DateTimeInputField: React.FC<DateTimeInputFieldProps> = ({
-    placeholder,
+                                                                   placeholder,
                                                                    id,
                                                                    onClick,
                                                                    value,
