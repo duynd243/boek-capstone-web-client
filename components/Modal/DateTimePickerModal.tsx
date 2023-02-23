@@ -44,7 +44,7 @@ const DateTimePickerModal: React.FC<Props> = ({
         <div className="mt-3 flex items-center justify-between border-t border-slate-200 pt-3">
             <div className="font-medium text-slate-800">Chọn giờ</div>
             <input
-                className={`${defaultInputClass} w-fit font-medium`}
+                className={`${defaultInputClass} !w-fit !font-medium`}
                 type={"time"}
                 value={time}
                 onChange={(e) => {

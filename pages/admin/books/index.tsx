@@ -1,4 +1,4 @@
-import React, {Fragment, ReactElement, useState} from "react";
+import React, {Fragment, ReactElement, useCallback, useState} from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import {NextPageWithLayout} from "../../_app";
 import PageHeading from "../../../components/Admin/PageHeading";
@@ -13,6 +13,12 @@ import TableBody from "../../../components/Admin/Table/TableBody";
 import {IBookResponse} from "../../../old-types/response/IBookResponse";
 import {getAvatarFromName} from "../../../utils/helper";
 import {IBook} from "../../../types/Book/IBook";
+import {useAuth} from "../../../context/AuthContext";
+import useSearchQuery from "../../../hooks/useSearchQuery";
+import {LevelService} from "../../../services/LevelService";
+import {ILevel} from "../../../types/Level/ILevel";
+import {useQuery} from "@tanstack/react-query";
+import {BookService} from "../../../services/BookService";
 
 export const randomBooks: IBook[] = [
     {
@@ -115,8 +121,40 @@ export const fakeBookSeries = [
 
 
 const AdminBooksPage: NextPageWithLayout = () => {
+
+
+    const {loginUser} = useAuth();
+    const [page, setPage] = useState<number>(1);
+    const {search, setSearch} = useSearchQuery("search", () => setPage(1));
+    const bookService = new BookService(loginUser?.accessToken);
+    const pageSizeOptions = [5, 10, 20, 50];
+    const [size, setSize] = useState<number>(pageSizeOptions[3]);
+    const [selectedBook, setSelectedBook] = useState<IBook>();
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
     const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
+
+    const onSizeChange = useCallback((newSize: number) => {
+        setSize(newSize);
+        setPage(1);
+    }, []);
+
+    const {
+        data: bookData,
+        isLoading,
+        isFetching,
+    } = useQuery(
+        ["books", {search, page, size}],
+        () =>
+            bookService.getBooks({
+                name: search,
+                page,
+                size,
+            }),
+        {
+            keepPreviousData: true,
+        }
+    );
 
     return (
         <Fragment>
@@ -137,43 +175,12 @@ const AdminBooksPage: NextPageWithLayout = () => {
                     <TableHeader textAlignment="text-center">Trạng thái</TableHeader>
                 </TableHeading>
                 <TableBody>
-                    {randomBooks.map((book, index) => {
-                        const randomBool = faker.datatype.boolean();
-                        const randomBook = faker.datatype.number({
-                            min: 0,
-                            max: randomBooks.length - 1,
-                        });
-                        const fakeBook: IBookResponse = {
-                            id: index,
-                            code: `B${faker.datatype.number({
-                                min: 10000,
-                                max: 99999,
-                            })}`,
+                    {bookData?.data?.map((book, index) => {
 
-                            publisher: {
-                                name: faker.company.name(),
-                            },
-                            isbn10: faker.datatype
-                                .number({
-                                    min: 1000000000,
-                                    max: 9999999999,
-                                })
-                                .toString(),
-                            isbn13: faker.datatype
-                                .number({
-                                    min: 1000000000000,
-                                    max: 9999999999999,
-                                })
-                                .toString(),
-                            releasedYear: faker.datatype.number({
-                                min: 2010,
-                                max: 2022,
-                            }),
-                        };
                         return (
-                            <tr key={index}>
+                            <tr key={book?.id}>
                                 <TableData className="text-sm font-medium uppercase text-gray-500">
-                                    {fakeBook.code}
+                                    {book?.code}
                                 </TableData>
                                 <TableData className="max-w-72">
                                     <div className="flex items-center gap-4">
@@ -181,12 +188,12 @@ const AdminBooksPage: NextPageWithLayout = () => {
                                             width={500}
                                             height={500}
                                             className="h-20 w-16 object-cover"
-                                            src={book.imageUrl || ""}
+                                            src={book?.imageUrl || ""}
                                             alt=""
                                         />
                                         <div
                                             className="max-w-56 overflow-hidden text-ellipsis text-sm font-medium text-gray-900">
-                                            {book.name}
+                                            {book?.name}
                                         </div>
                                     </div>
                                 </TableData>
@@ -194,7 +201,7 @@ const AdminBooksPage: NextPageWithLayout = () => {
                                     {new Intl.NumberFormat("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
-                                    }).format(faker.datatype.number())}
+                                    }).format(book?.coverPrice || 0)}
                                 </TableData>
                                 <TableData>
                                     <div className="flex items-center">
@@ -203,35 +210,35 @@ const AdminBooksPage: NextPageWithLayout = () => {
                                                 width={100}
                                                 height={100}
                                                 className="h-10 w-10 rounded-full"
-                                                src={getAvatarFromName(fakeBook.publisher?.name)}
+                                                src={getAvatarFromName(book?.publisher?.name)}
                                                 alt=""
                                             />
                                         </div>
                                         <div className="ml-4">
                                             <div className="text-sm text-gray-900">
-                                                {fakeBook.publisher?.name}
+                                                {book?.publisher?.name}
                                             </div>
                                         </div>
                                     </div>
                                 </TableData>
                                 <TableData className="text-sm text-gray-500">
-                                    {fakeBook.isbn10}
+                                    {book?.isbn10}
                                 </TableData>
 
                                 <TableData className="text-sm text-gray-500">
-                                    {fakeBook.isbn13}
+                                    {book?.isbn13}
                                 </TableData>
                                 <TableData className="text-sm text-gray-500">
-                                    {faker.name.fullName()}
+                                    {book?.bookAuthors?.map((author) => (author?.author?.name)).join(", ")}
                                 </TableData>
                                 <TableData
                                     textAlignment="text-center"
                                     className="text-sm text-gray-500"
                                 >
-                                    {fakeBook.releasedYear}
+                                    {book?.releasedYear}
                                 </TableData>
                                 <TableData textAlignment="text-center">
-                                    {randomBool ? (
+                                    {book?.status ? (
                                         <span
                                             className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold uppercase leading-5 text-green-800">
                       Hoạt động

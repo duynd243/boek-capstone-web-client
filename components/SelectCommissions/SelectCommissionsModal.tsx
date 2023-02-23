@@ -9,16 +9,17 @@ import {IGenre} from "../../types/Genre/IGenre";
 import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
 import Image from "next/image";
 import {getAvatarFromName} from "../../utils/helper";
-export interface IRequestCommission {
-    genreId: number,
-    genreName: string,
-    commission: number,
-}
+import {z} from "zod";
+import {CampaignCommissionSchema} from "../CampaignForm/hooks";
+
+
+type CampaignCommission = z.infer<typeof CampaignCommissionSchema>;
+
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    selectedCommissions: IRequestCommission[];
-    onItemSelect: (genre: IGenre) => void;
+    selectedCommissions: CampaignCommission[];
+    onItemSelect: (genre: CampaignCommission) => void;
 };
 
 const SelectCommissionsModal: React.FC<Props> = ({
@@ -80,7 +81,11 @@ const SelectCommissionsModal: React.FC<Props> = ({
                                 <div
                                     onClick={() => {
                                         if (!isSelected) {
-                                            onItemSelect(genre);
+                                            onItemSelect({
+                                                genreId: genre?.id,
+                                                genreName: genre?.name,
+                                                minimalCommission: 0,
+                                            });
                                         }
                                     }}
                                     key={genre?.id}

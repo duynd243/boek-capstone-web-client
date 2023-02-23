@@ -18,7 +18,7 @@ type Props = {
     onItemSelect: (organization: IGroup) => void;
 };
 
-const SelectOrganizationsModal: React.FC<Props> = ({
+const SelectGroupsModal: React.FC<Props> = ({
                                                        isOpen,
                                                        onClose,
                                                        selectedGroups,
@@ -133,4 +133,4 @@ const SelectOrganizationsModal: React.FC<Props> = ({
     );
 };
 
-export default SelectOrganizationsModal;
+export default SelectGroupsModal;

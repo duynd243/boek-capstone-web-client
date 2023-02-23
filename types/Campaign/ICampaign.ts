@@ -12,11 +12,9 @@ export interface ICampaign {
     privacy?: number;
     address?: string;
     offlineStatus?: number;
-    startOfflineDate?: string;
-    endOfflineDate?: string;
     onlineStatus?: number;
-    startOnlineDate?: string;
-    endOnlineDate?: string;
+    startDate?: string;
+    endDate?: string;
     createdDate?: string;
     updatedDate?: string;
     statusOfflineName?: string;

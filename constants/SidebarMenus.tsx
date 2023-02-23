@@ -17,6 +17,7 @@ import {
 import {GiShop} from "react-icons/gi";
 import {ImBook} from "react-icons/im";
 import {IoMedalSharp} from "react-icons/io5";
+import {MdContactMail} from "react-icons/md";
 
 export interface ISidebarMenu {
     name: string;
@@ -46,6 +47,11 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                 name: "Hội sách",
                 path: "/admin/campaigns",
                 icon: <GiShop/>,
+            },
+            {
+                name: "Tham gia hội sách",
+                path: "/admin/participants",
+                icon: <MdContactMail/>,
             },
             {
                 name: "Khách hàng",

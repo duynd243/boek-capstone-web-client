@@ -36,7 +36,7 @@ const SelectOrganizationsModal: React.FC<Props> = ({
         () =>
             organizationService.getOrganizations({
                 name: debouncedSearch,
-            }),{
+            }), {
             keepPreviousData: true,
             select: (data) => data.data
         }
