@@ -78,7 +78,7 @@ const AdminGenresPage: NextPageWithLayout = () => {
                       <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                         <a
                           href="#"
-                          className="block text-indigo-600 hover:text-indigo-900"
+                          className="block text-indigo-600 hover:text-indigo-700"
                         >
                           Chỉnh sửa
                         </a>

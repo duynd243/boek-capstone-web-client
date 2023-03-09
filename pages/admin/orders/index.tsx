@@ -197,7 +197,7 @@ const AdminOrdersPage: NextPageWithLayout = () => {
                                             setShowDetails(true);
                                             setSelectedOrder(order);
                                         }}
-                                        className="text-indigo-600 hover:text-indigo-900"
+                                        className="text-indigo-600 hover:text-indigo-700"
                                     >
                                         Chi tiết
                                     </button>

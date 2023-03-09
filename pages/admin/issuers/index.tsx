@@ -1,166 +1,227 @@
-import React, { Fragment, ReactElement, useState } from "react";
-import AdminLayout from "../../../components/Layout/AdminLayout";
-import { NextPageWithLayout } from "../../_app";
+import { faker } from "@faker-js/faker/locale/vi";
+import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
+import { Fragment, ReactElement, useState } from "react";
+import DefaultAvatar from "../../../assets/images/default-avatar.png";
+import CreateButton from "../../../components/Admin/CreateButton";
 import PageHeading from "../../../components/Admin/PageHeading";
 import SearchForm from "../../../components/Admin/SearchForm";
-import CreateButton from "../../../components/Admin/CreateButton";
-import TableWrapper from "../../../components/Admin/Table/TableWrapper";
-import TableHeading from "../../../components/Admin/Table/TableHeading";
-import TableHeader from "../../../components/Admin/Table/TableHeader";
-import { faker } from "@faker-js/faker/locale/vi";
-import TableData from "../../../components/Admin/Table/TableData";
-import Image from "next/image";
 import TableBody from "../../../components/Admin/Table/TableBody";
+import TableData from "../../../components/Admin/Table/TableData";
+import TableFooter from "../../../components/Admin/Table/TableFooter";
+import TableHeader from "../../../components/Admin/Table/TableHeader";
+import TableHeading from "../../../components/Admin/Table/TableHeading";
+import TableWrapper from "../../../components/Admin/Table/TableWrapper";
+import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
+import AdminLayout from "../../../components/Layout/AdminLayout";
+import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
+import LoadingTopPage from "../../../components/LoadingTopPage";
 import IssuerModal, {
-  IssuerModalMode,
+    IssuerModalMode,
 } from "../../../components/Modal/IssuerModal";
-
-export interface IFakeIssuer {
-  id?: number;
-  code?: string;
-  name?: string;
-  email?: string;
-  imageUrl?: string;
-  phone?: string;
-  address?: string;
-  status?: boolean;
-  taxCode?: string;
-}
+import StatusCard from "../../../components/StatusCard";
+import { Roles } from "../../../constants/Roles";
+import { useAuth } from "../../../context/AuthContext";
+import useTableManagementPage from "../../../hooks/useTableManagementPage";
+import { UserService } from "../../../services/UserService";
+import { IUser } from "../../../types/User/IUser";
+import { isValidImageSrc } from "../../../utils/helper";
+import { NextPageWithLayout } from "../../_app";
 
 const AdminIssuersPage: NextPageWithLayout = () => {
-  const [selectedIssuer, setSelectedIssuer] = useState<IFakeIssuer>();
-  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
-  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
+    const { loginUser } = useAuth();
+    const userService = new UserService(loginUser?.accessToken);
+    const [selectedIssuer, setSelectedIssuer] = useState<IUser | undefined>(
+        undefined
+    );
 
-  return (
-    <Fragment>
-      <PageHeading label="Nhà phát hành">
-        <SearchForm />
-        <CreateButton
-          onClick={() => setShowCreateModal(true)}
-          label="Thêm nhà phát hành"
-        />
-      </PageHeading>
+    const {
+        search,
+        setSearch,
+        page,
+        size,
+        onSizeChange,
+        pageSizeOptions,
+        setPage,
+        showCreateModal,
+        setShowCreateModal,
+        setShowUpdateModal,
+        showUpdateModal,
+    } = useTableManagementPage();
 
-      <TableWrapper>
-        <TableHeading>
-          <TableHeader>Mã số</TableHeader>
-          <TableHeader>Tên nhà phát hành</TableHeader>
-          <TableHeader>Địa chỉ & Điện thoại</TableHeader>
-          <TableHeader>Mã số thuế</TableHeader>
-          <TableHeader textAlignment="text-center">Trạng thái</TableHeader>
-          <TableHeader>
-            <span className="sr-only">Edit</span>
-          </TableHeader>
-        </TableHeading>
-        <TableBody>
-          {new Array(8).fill(1).map((_, index) => {
-            const randomBool = faker.datatype.boolean();
-            const fakeIssuer: IFakeIssuer = {
-              id: index,
-              code: `I${faker.datatype.number({
-                min: 10000,
-                max: 99999,
-              })}`,
-              imageUrl: faker.image.avatar(),
-              name: faker.name.fullName(),
-              email: faker.internet.email(),
-              address: faker.address.cityName(),
-              phone: faker.phone.number(),
-              taxCode: faker.datatype
-                .number({
-                  min: 1000000000,
-                  max: 9999999999,
-                })
-                .toString(),
-              status: randomBool,
-            };
-            return (
-              <tr key={index}>
-                <TableData className="text-sm font-medium uppercase text-gray-500">
-                  {fakeIssuer.code}
-                </TableData>
-                <TableData>
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0">
-                      <Image
-                        width={100}
-                        height={100}
-                        className="h-10 w-10 rounded-full"
-                        src={fakeIssuer?.imageUrl || ""}
-                        alt=""
-                      />
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {fakeIssuer.name}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {fakeIssuer.email}
-                      </div>
-                    </div>
-                  </div>
-                </TableData>
-                <TableData>
-                  <div className="text-sm text-gray-900">
-                    {fakeIssuer.address}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {fakeIssuer.phone}
-                  </div>
-                </TableData>
+    const {
+        data: issuerData,
+        isLoading,
+        isFetching,
+    } = useQuery(
+        ["issuers", { search, page, size }],
+        () =>
+            userService.getUsersByAdmin({
+                name: search,
+                page,
+                size,
+                role: Roles.ISSUER.id,
+                withAddressDetail: true,
+            }),
+        {
+            keepPreviousData: true,
+        }
+    );
 
-                <TableData>
-                  <span className="text-sm font-medium uppercase text-gray-500">
-                    {fakeIssuer.taxCode}
-                  </span>
-                </TableData>
-                <TableData textAlignment="text-center">
-                  {fakeIssuer.status ? (
-                    <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold uppercase leading-5 text-green-800">
-                      Hoạt động
-                    </span>
-                  ) : (
-                    <span className="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold uppercase leading-5 text-red-800">
-                      Bị vô hiệu hóa
-                    </span>
-                  )}
-                </TableData>
-                <TableData className="text-right text-sm font-medium">
-                  <button
-                    onClick={() => {
-                      setSelectedIssuer(fakeIssuer);
-                      setShowUpdateModal(true);
-                    }}
-                    className="text-indigo-600 hover:text-indigo-900"
-                  >
-                    Chỉnh sửa
-                  </button>
-                </TableData>
-              </tr>
-            );
-          })}
-        </TableBody>
-      </TableWrapper>
+    if (isLoading) return <LoadingSpinnerWithOverlay />;
 
-      <IssuerModal
-        maxWidth="max-w-2xl"
-        action={IssuerModalMode.CREATE}
-        onClose={() => setShowCreateModal(false)}
-        isOpen={showCreateModal}
-      />
+    return (
+        <Fragment>
+            {isFetching && <LoadingTopPage />}
+            <PageHeading label="Nhà phát hành">
+                <SearchForm
+                    placeholder="Tìm kiếm nhà phát hành"
+                    value={search}
+                    onSearchSubmit={(value) => setSearch(value)}
+                />
+                <CreateButton
+                    onClick={() => setShowCreateModal(true)}
+                    label="Thêm NPH"
+                />
+            </PageHeading>
+            {issuerData?.data && issuerData.data?.length > 0 ? (
+                <TableWrapper>
+                    <TableHeading>
+                        <TableHeader>Mã số</TableHeader>
+                        <TableHeader>Tên nhà phát hành</TableHeader>
+                        <TableHeader>Địa chỉ & Điện thoại</TableHeader>
+                        <TableHeader>Mô tả</TableHeader>
+                        <TableHeader textAlignment="text-center">
+                            Trạng thái
+                        </TableHeader>
+                        <TableHeader>
+                            <span className="sr-only">Edit</span>
+                        </TableHeader>
+                    </TableHeading>
+                    <TableBody>
+                        {issuerData?.data?.map((issuer) => {
+                            return (
+                                <tr key={issuer?.id}>
+                                    <TableData className="text-sm font-medium uppercase text-gray-500">
+                                        {issuer?.code}
+                                    </TableData>
+                                    <TableData>
+                                        <div className="flex items-center">
+                                            <div className="h-10 w-10 flex-shrink-0">
+                                                <Image
+                                                    width={100}
+                                                    height={100}
+                                                    className="h-10 w-10 rounded-full object-cover"
+                                                    src={
+                                                        issuer?.imageUrl &&
+                                                        isValidImageSrc(
+                                                            issuer?.imageUrl
+                                                        )
+                                                            ? issuer?.imageUrl
+                                                            : DefaultAvatar.src
+                                                    }
+                                                    alt=""
+                                                />
+                                            </div>
+                                            <div className="ml-4">
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {issuer?.name}
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {issuer?.email}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </TableData>
+                                    <TableData>
+                                        <div className="text-sm text-gray-900 w-72 truncate">
+                                            {issuer?.addressViewModel &&
+                                            issuer?.address
+                                                ? issuer?.address
+                                                : "Chưa có thông tin địa chỉ"}
+                                        </div>
+                                        <div className="text-sm text-gray-500">
+                                            {issuer?.phone ||
+                                                "Chưa có số điện thoại"}
+                                        </div>
+                                    </TableData>
 
-      <IssuerModal
-        maxWidth="max-w-2xl"
-        action={IssuerModalMode.UPDATE}
-        issuer={selectedIssuer}
-        onClose={() => setShowUpdateModal(false)}
-        isOpen={showUpdateModal}
-      />
-    </Fragment>
-  );
+                                    <TableData>
+                                        <span className="text-sm font-medium uppercase text-gray-500">
+                                            {issuer?.issuer?.description || "-"}
+                                        </span>
+                                    </TableData>
+                                    <TableData textAlignment="text-center">
+                                        {issuer?.status ? (
+                                            <StatusCard
+                                                label="Hoạt động"
+                                                variant="success"
+                                            />
+                                        ) : (
+                                            <StatusCard
+                                                label="Bị vô hiệu hóa"
+                                                variant="error"
+                                            />
+                                        )}
+                                    </TableData>
+                                    <TableData className="text-right text-sm font-medium">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedIssuer(issuer);
+                                                setShowUpdateModal(true);
+                                            }}
+                                            className="text-indigo-600 hover:text-indigo-700"
+                                        >
+                                            Chỉnh sửa
+                                        </button>
+                                    </TableData>
+                                </tr>
+                            );
+                        })}
+                    </TableBody>
+                    <TableFooter
+                        colSpan={6}
+                        size={size}
+                        onSizeChange={onSizeChange}
+                        page={page}
+                        onPageChange={(page) => setPage(page)}
+                        totalPages={issuerData?.metadata?.total || 0}
+                        pageSizeOptions={pageSizeOptions}
+                    />
+                </TableWrapper>
+            ) : (
+                <div className="pt-8">
+                    {search ? (
+                        <EmptyState
+                            keyword={search}
+                            status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
+                        />
+                    ) : (
+                        <EmptyState status={EMPTY_STATE_TYPE.NO_DATA} />
+                    )}
+                </div>
+            )}
+
+            <IssuerModal
+                action={IssuerModalMode.CREATE}
+                onClose={() => setShowCreateModal(false)}
+                isOpen={showCreateModal}
+            />
+
+            {selectedIssuer && (
+                <IssuerModal
+                    maxWidth="max-w-2xl"
+                    action={IssuerModalMode.UPDATE}
+                    issuer={selectedIssuer}
+                    onClose={() => setShowUpdateModal(false)}
+                    afterLeave={() => setSelectedIssuer(undefined)}
+                    isOpen={showUpdateModal}
+                />
+            )}
+        </Fragment>
+    );
 };
 AdminIssuersPage.getLayout = function getLayout(page: ReactElement) {
-  return <AdminLayout>{page}</AdminLayout>;
+    return <AdminLayout>{page}</AdminLayout>;
 };
 export default AdminIssuersPage;

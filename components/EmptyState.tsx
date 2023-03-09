@@ -11,9 +11,10 @@ type Props = {
   status: EMPTY_STATE_TYPE;
   keyword?: string;
   customMessage?: string;
+  searchNotFoundMessage?: string;
 };
 
-const EmptyState: React.FC<Props> = ({ status, keyword, customMessage }) => {
+const EmptyState: React.FC<Props> = ({ status, keyword, customMessage, searchNotFoundMessage }) => {
   return (
     <div className="flex h-full flex-col items-center justify-center">
       <div className="flex h-24 w-24 items-center justify-center rounded-full bg-slate-100">
@@ -34,7 +35,7 @@ const EmptyState: React.FC<Props> = ({ status, keyword, customMessage }) => {
       </div>
       {status === EMPTY_STATE_TYPE.SEARCH_NOT_FOUND && (
         <div className="mt-2 text-base text-slate-500">
-          Hãy thử tìm kiếm với từ khóa khác
+          {searchNotFoundMessage || "Hãy thử tìm kiếm với từ khóa khác"}
         </div>
       )}
     </div>

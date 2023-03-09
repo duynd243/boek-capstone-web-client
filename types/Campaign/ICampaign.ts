@@ -1,6 +1,9 @@
-import {IGroup} from "../Group/IGroup";
-import {IOrganization} from "../Organization/IOrganization";
-import {ICampaignCommission} from "../ICampaignComission";
+import { IParticipant } from "./../Participant/IParticipant";
+import { ICampaignLevel } from "./../Campaign_Level/ICampaignLevel";
+import { ICampaignGroup } from "./../Campaign_Group/ICampaignGroup";
+import { ICampaignOrganization } from "../Campaign_Organization/ICampaignOrganization";
+import { ICampaignCommission } from "../Campaign_Commission/ICampaignCommission";
+import { IAddress } from "./../Address/IAddress";
 
 export interface ICampaign {
     id: number;
@@ -9,29 +12,19 @@ export interface ICampaign {
     description?: string;
     imageUrl?: string;
     format?: number;
-    privacy?: number;
+    formatName?: string;
     address?: string;
-    offlineStatus?: number;
-    onlineStatus?: number;
+    addressViewModel?: IAddress;
     startDate?: string;
     endDate?: string;
+    isRecurring?: boolean;
+    status?: number;
     createdDate?: string;
     updatedDate?: string;
-    statusOfflineName?: string;
-    statusOnlineName?: string;
-    formatName?: string;
-    privacyName?: string;
+    statusName?: string;
     campaignCommissions?: ICampaignCommission[];
-    campaignOrganizations?: {
-        id?: number;
-        campaignId?: number;
-        organizationId?: number;
-        organization?: IOrganization;
-    }[];
-    campaignGroups?: {
-        id?: number;
-        campaignId?: number;
-        groupId?: number;
-        group?: IGroup;
-    }[];
+    campaignOrganizations?: ICampaignOrganization[];
+    campaignGroups?: ICampaignGroup[];
+    participants?: IParticipant[];
+    campaignLevels?: ICampaignLevel[];
 }

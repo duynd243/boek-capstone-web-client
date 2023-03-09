@@ -1,16 +1,18 @@
-import React, {Fragment, ReactElement} from "react";
-import AdminLayout from "../../../../components/Layout/AdminLayout";
-import {NextPageWithLayout} from "../../../_app";
-import {useRouter} from "next/router";
-import {useAuth} from "../../../../context/AuthContext";
-import {CampaignService} from "../../../../services/CampaignService";
 import {useQuery} from "@tanstack/react-query";
+import {useRouter} from "next/router";
+import {Fragment, ReactElement} from "react";
+import OfflineCampaignForm from "../../../../components/CampaignForm/OfflineCampaignForm";
+import OnlineCampaignForm from "../../../../components/CampaignForm/OnlineCampaignForm";
 import EmptyState, {EMPTY_STATE_TYPE} from "../../../../components/EmptyState";
-import LoadingSpinnerWithOverlay from "../../../../components/LoadingSpinnerWithOverlay";
+import AdminLayout from "../../../../components/Layout/AdminLayout";
 import FormPageLayout from "../../../../components/Layout/FormPageLayout";
+import LoadingSpinnerWithOverlay from "../../../../components/LoadingSpinnerWithOverlay";
 import WelcomeBanner from "../../../../components/WelcomBanner";
-import CampaignForm, {CampaignFormAction} from "../../../../components/CampaignForm";
-import {FormikProvider, useFormik} from "formik";
+import {CampaignFormats} from "../../../../constants/CampaignFormats";
+import {useAuth} from "../../../../context/AuthContext";
+import {CampaignContext} from "../../../../context/CampaignContext";
+import {CampaignService} from "../../../../services/CampaignService";
+import {NextPageWithLayout} from "../../../_app";
 
 const CampaignEditPage: NextPageWithLayout = () => {
     const router = useRouter();
@@ -20,53 +22,46 @@ const CampaignEditPage: NextPageWithLayout = () => {
 
     const {data: campaign, isLoading} = useQuery(
         ["admin_campaign", campaignId],
-        () => campaignService.getCampaignByIdByAdmin(Number(campaignId)),
+        () => campaignService.getCampaignByIdByAdmin(Number(campaignId), {
+            withAddressDetail: true,
+        }),
         {
-            staleTime: Infinity,
-            cacheTime: Infinity,
-            retry: false,
+            enabled: !!campaignId,
         }
     );
-    const form = useFormik({
-        enableReinitialize: true,
-        initialValues: {
-            ...campaign,
-            organizations: [...campaign?.campaignOrganizations?.map(co => co?.organization) || []],
-            campaignCommissions: [...campaign?.campaignCommissions?.map(cc => {
-                return {
-                    ...cc,
-                    genreName: cc?.genre?.name,
-                }
-            }) || []],
-            groups: [...campaign?.campaignGroups?.map(cg => cg?.group) || []],
-            startOnlineDate: campaign?.startOnlineDate ? new Date(campaign?.startOnlineDate) : undefined,
-            endOnlineDate: campaign?.endOnlineDate ? new Date(campaign?.endOnlineDate) : undefined,
-            startOfflineDate: campaign?.startOfflineDate ? new Date(campaign?.startOfflineDate) : undefined,
-            endOfflineDate: campaign?.endOfflineDate ? new Date(campaign?.endOfflineDate) : undefined,
-        },
-        onSubmit: async (values) => {
-            console.log(JSON.stringify(values, null, 2));
-        }
-    })
+
     return (
         <Fragment>
-            {isLoading && <LoadingSpinnerWithOverlay label={'Đang tải...'}/>}
-            {!isLoading && !campaign &&
-                <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}
-                            customMessage={`Không tìm thấy hội sách có mã: ${campaignId}`}/>
-            }
+            {isLoading && <LoadingSpinnerWithOverlay label={"Đang tải..."}/>}
+            {!isLoading && !campaign && (
+                <EmptyState
+                    status={EMPTY_STATE_TYPE.NO_DATA}
+                    customMessage={`Không tìm thấy hội sách có mã: ${campaignId}`}
+                />
+            )}
 
             {/*TODO:*/}
             {/*Thêm các case hiển thị khi không thể edit campaign: đã bắt đầu, đã kết thúc, đã xóa, ...*/}
 
-            {campaign &&
+            {campaign && (
                 <FormPageLayout>
-                    <WelcomeBanner label="Chỉnh sửa hội sách 🏪" className="p-6 sm:p-10"/>
-                    <FormikProvider value={form}>
-                        <CampaignForm formikForm={form} action={CampaignFormAction.UPDATE}/>
-                    </FormikProvider>
+                    <WelcomeBanner
+                        label={`Chỉnh sửa hội sách ${
+                            campaign?.format === CampaignFormats.OFFLINE.id
+                                ? "trực tiếp"
+                                : "trực tuyến"
+                        } 🏪`}
+                        className="p-6 sm:p-10"
+                    />
+                    <CampaignContext.Provider value={campaign}>
+                        {campaign?.format === CampaignFormats.OFFLINE.id ? (
+                            <OfflineCampaignForm action={"UPDATE"}/>
+                        ) : (
+                            <OnlineCampaignForm action={"UPDATE"}/>
+                        )}
+                    </CampaignContext.Provider>
                 </FormPageLayout>
-            }
+            )}
         </Fragment>
     );
 };

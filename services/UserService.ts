@@ -1,10 +1,16 @@
-import {ILoginData} from "../types/User/ILoginData";
-import {IBaseStatusResponse} from "../types/Commons/IBaseStatusResponse";
-import {BaseService} from "./BaseService";
-import {IUser} from "../types/User/IUser";
-import {IBaseListResponse} from "../types/Commons/IBaseListResponse";
+import { IBaseRequestParams } from "./../types/Request/IBaseRequestParams";
+import { ILoginData } from "../types/User/ILoginData";
+import { IBaseStatusResponse } from "../types/Commons/IBaseStatusResponse";
+import { BaseService } from "./BaseService";
+import { IUser } from "../types/User/IUser";
+import { IBaseListResponse } from "../types/Commons/IBaseListResponse";
+
+export type UpdateUserParams = Required<Pick<IUser, "id" | "role">> &
+    Partial<IUser>;
+export type CreateUserParams = Omit<UpdateUserParams, "id">;
 
 export class UserService extends BaseService {
+    // common
     loginWithFirebaseIdToken = async (idToken: string) => {
         const response = await this.axiosClient.post<{
             status: IBaseStatusResponse;
@@ -15,10 +21,55 @@ export class UserService extends BaseService {
         return response.data;
     };
 
-    getUsersByAdmin = async (params?: any) => {
-        const response = await this.axiosClient.get<IBaseListResponse<IUser>>("/admin/users", {
-            params,
-        });
+    getLoggedInUser = async () => {
+        const response = await this.axiosClient.get<IUser>("/users/me");
         return response.data;
-    }
+    };
+
+    // admin
+    getUsersByAdmin = async (
+        params?: IBaseRequestParams<IUser> & { withAddressDetail?: boolean }
+    ) => {
+        const response = await this.axiosClient.get<IBaseListResponse<IUser>>(
+            "/admin/users",
+            {
+                params,
+            }
+        );
+        return response.data;
+    };
+
+    updateUserByAdmin = async (user: IUser) => {
+        const response = await this.axiosClient.put<IUser>(
+            `/admin/users`,
+            user
+        );
+        return response.data;
+    };
+
+    createUserByAdmin = async (user: CreateUserParams) => {
+        const response = await this.axiosClient.post<IUser>(
+            `/admin/users`,
+            user
+        );
+        return response.data;
+    };
+
+    updateProfileByIssuer = async (payload: {
+        description?: string;
+        user: UpdateUserParams;
+    }) => {
+        const response = await this.axiosClient.put<any>(
+            `/users/issuer`,
+            payload
+        );
+        return response.data;
+    };
+
+    getUnattendedStaffsByCampaignId = async (campaignId: number) => {
+        const response = await this.axiosClient.get<IUser[]>(
+            `/admin/campaigns/${campaignId}/unattended-staffs`
+        );
+        return response.data;
+    };
 }

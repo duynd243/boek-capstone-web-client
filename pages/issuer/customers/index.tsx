@@ -111,7 +111,7 @@ const IssuerCustomersPage: NextPageWithLayout = () => {
                 )}
               </TableData>
               {/* <TableData className="text-right text-sm font-medium">
-                <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                <a href="#" className="text-indigo-600 hover:text-indigo-700">
                   Chỉnh sửa
                 </a>
               </TableData> */}

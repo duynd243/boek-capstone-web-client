@@ -1,6 +1,14 @@
 import {IGenre} from "../Genre/IGenre";
 import {IPublisher} from "../Publisher/IPublisher";
 import {IBookAuthor} from "../Book_Author/IBookAuthor";
+import {IUser} from "../User/IUser";
+
+export interface IBookItem {
+    id: number;
+    parentBookId?: number;
+    bookId: number;
+    displayIndex: number;
+}
 
 export interface IBook {
     id?: number;
@@ -30,8 +38,12 @@ export interface IBook {
     onlyPdf?: boolean;
     onlyAudio?: boolean;
     genre?: IGenre;
-    //issuer?: Issuer;
+    issuer?: {
+        id: string;
+        description?: string;
+        user?: IUser;
+    };
     publisher?: IPublisher;
     bookAuthors?: IBookAuthor[];
-    //bookItems?: BookItem[];
+    bookItems?: IBookItem[];
 }

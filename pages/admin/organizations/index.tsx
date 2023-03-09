@@ -20,32 +20,32 @@ import OrganizationModal, {
     OrganizationModalMode,
 } from "../../../components/Modal/OrganizationModal";
 import { useAuth } from "../../../context/AuthContext";
-import useSearchQuery from "../../../hooks/useSearchQuery";
+import useTableManagementPage from "../../../hooks/useTableManagementPage";
 import { OrganizationService } from "../../../services/OrganizationService";
 import { IOrganization } from "../../../types/Organization/IOrganization";
 import { getAvatarFromName } from "../../../utils/helper";
 import { NextPageWithLayout } from "../../_app";
 
-export interface IFakeOrganization {
-    id?: number;
-    code?: string;
-    name?: string;
-    address?: string;
-    phone?: string;
-    imageUrl?: string;
-}
-
 const AdminOrganizationsPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
-    const [page, setPage] = useState<number>(1);
-    const { search, setSearch } = useSearchQuery("search", () => setPage(1));
     const orgService = new OrganizationService(loginUser?.accessToken);
-    const pageSizeOptions = [5, 10, 20, 50];
-    const [size, setSize] = useState<number>(pageSizeOptions[0]);
     const [selectedOrg, setSelectedOrg] = useState<IOrganization>();
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [showUpdateModal, setShowUpdateModal] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    const {
+        search,
+        setSearch,
+        page,
+        size,
+        onSizeChange,
+        pageSizeOptions,
+        setPage,
+        showDeleteModal,
+        setShowDeleteModal,
+        setShowCreateModal,
+        setShowUpdateModal,
+        showCreateModal,
+        showUpdateModal,
+    } = useTableManagementPage();
 
     const queryClient = useQueryClient();
     const deleteOrganizationMutation = useMutation(
@@ -59,11 +59,6 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
             },
         }
     );
-
-    const onSizeChange = useCallback((newSize: number) => {
-        setSize(newSize);
-        setPage(1);
-    }, []);
 
     const {
         data: orgData,
@@ -131,7 +126,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                                                 <Image
                                                     width={100}
                                                     height={100}
-                                                    className="h-10 w-10 rounded-full"
+                                                    className="h-10 w-10 rounded-full object-cover"
                                                     src={
                                                         org?.imageUrl ||
                                                         getAvatarFromName(
@@ -145,9 +140,6 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                                                 <div className="text-sm font-medium text-gray-900">
                                                     {org?.name}
                                                 </div>
-                                                {/* <div className="text-sm text-gray-500">
-                          {faker.company.companySuffix()}
-                        </div> */}
                                             </div>
                                         </div>
                                     </TableData>
@@ -189,7 +181,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                         size={size}
                         onSizeChange={onSizeChange}
                         page={page}
-                        onPageChange={(page) => setPage(page)}
+                        onPageChange={setPage}
                         totalPages={orgData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />
@@ -214,14 +206,15 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                 isOpen={showCreateModal}
             />
 
-            <OrganizationModal
-                key={selectedOrg?.id}
-                action={OrganizationModalMode.UPDATE}
-                organization={selectedOrg}
-                onClose={() => setShowUpdateModal(false)}
-                afterLeave={() => setSelectedOrg(undefined)}
-                isOpen={showUpdateModal}
-            />
+            {selectedOrg && (
+                <OrganizationModal
+                    action={OrganizationModalMode.UPDATE}
+                    organization={selectedOrg}
+                    onClose={() => setShowUpdateModal(false)}
+                    afterLeave={() => setSelectedOrg(undefined)}
+                    isOpen={showUpdateModal}
+                />
+            )}
 
             <ConfirmModal
                 isOpen={showDeleteModal}

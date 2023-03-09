@@ -1,5 +1,5 @@
-import {useRouter} from "next/router";
-import {useEffect, useState} from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 function useSearchQuery(queryKey: string, onChange?: () => void) {
     const router = useRouter();
@@ -9,27 +9,28 @@ function useSearchQuery(queryKey: string, onChange?: () => void) {
     useEffect(() => {
         (async () => {
             if (searchFromUrl !== search) {
-                await router.push({
-                    pathname: router.pathname,
-                    query: {
-                        ...router.query,
-                        [queryKey]: search,
+                await router.push(
+                    {
+                        pathname: router.pathname,
+                        query: {
+                            ...router.query,
+                            [queryKey]: search,
+                        },
                     },
-                }, undefined, {shallow: true});
+                    undefined,
+                    { shallow: true }
+                );
                 if (onChange) {
                     onChange();
                 }
             }
-
         })();
-
     }, [onChange, queryKey, router, search, searchFromUrl]);
-
 
     return {
         search,
         setSearch,
-    }
+    };
 }
 
 export default useSearchQuery;

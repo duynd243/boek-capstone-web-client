@@ -1,7 +1,9 @@
-import React, {ReactElement, useState} from "react";
+import React, { ReactElement, useState } from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
-import {NextPageWithLayout} from "../../_app";
-import {getAvatarFromName} from "../../../utils/helper";
+import { NextPageWithLayout } from "../../_app";
+import { getAvatarFromName } from "../../../utils/helper";
+import { useAuth } from "../../../context/AuthContext";
+import { defaultInputClass } from "../../../components/Form";
 
 const user = {
     name: "Debbie Lewis",
@@ -10,19 +12,19 @@ const user = {
     imageUrl: getAvatarFromName("Duy Nguyễn"),
 };
 const navigation = [
-    {name: "Dashboard", href: "#", current: true},
-    {name: "Jobs", href: "#", current: false},
-    {name: "Applicants", href: "#", current: false},
-    {name: "Company", href: "#", current: false},
+    { name: "Dashboard", href: "#", current: true },
+    { name: "Jobs", href: "#", current: false },
+    { name: "Applicants", href: "#", current: false },
+    { name: "Company", href: "#", current: false },
 ];
 const subNavigation = [
-    {name: "Hồ sơ", href: "#", current: true},
-    {name: "Cài đặt khác", href: "#", current: false},
+    { name: "Hồ sơ", href: "#", current: true },
+    { name: "Cài đặt khác", href: "#", current: false },
 ];
 const userNavigation = [
-    {name: "Your Profile", href: "#"},
-    {name: "Settings", href: "#"},
-    {name: "Sign out", href: "#"},
+    { name: "Your Profile", href: "#" },
+    { name: "Settings", href: "#" },
+    { name: "Sign out", href: "#" },
 ];
 
 function classNames(...classes: string[]) {
@@ -43,8 +45,7 @@ export const ProfilePicture = () => {
                 />
             </div>
             <div className="ml-5 rounded-md shadow-sm">
-                <div
-                    className="group relative flex items-center justify-center rounded-md border border-gray-300 py-2 px-3 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:bg-gray-50">
+                <div className="group relative flex items-center justify-center rounded-md border border-gray-300 py-2 px-3 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:bg-gray-50">
                     <label
                         htmlFor="mobile-user-photo"
                         className="pointer-events-none relative text-sm font-medium leading-4 text-gray-700"
@@ -69,6 +70,7 @@ const Settings: NextPageWithLayout = () => {
     const [privateAccount, setPrivateAccount] = useState(false);
     const [allowCommenting, setAllowCommenting] = useState(true);
     const [allowMentions, setAllowMentions] = useState(true);
+    const { loginUser } = useAuth();
 
     return (
         <main className="relative ">
@@ -87,7 +89,9 @@ const Settings: NextPageWithLayout = () => {
                                                 : "border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900",
                                             "group flex items-center border-l-4 px-3 py-2 text-sm font-medium"
                                         )}
-                                        aria-current={item.current ? "page" : undefined}
+                                        // aria-current={
+                                        //     item.current ? "page" : undefined
+                                        // }
                                     >
                                         {/*<item.icon*/}
                                         {/*  className={classNames(*/}
@@ -98,7 +102,9 @@ const Settings: NextPageWithLayout = () => {
                                         {/*  )}*/}
                                         {/*  aria-hidden="true"*/}
                                         {/*/>*/}
-                                        <span className="truncate">{item.name}</span>
+                                        <span className="truncate">
+                                            {item.name}
+                                        </span>
                                     </a>
                                 ))}
                             </nav>
@@ -116,12 +122,13 @@ const Settings: NextPageWithLayout = () => {
                                         Hồ sơ
                                     </h2>
                                     <p className="mt-1 text-sm text-gray-500">
-                                        Thông tin này sẽ được hiển thị công khai vì vậy hãy cẩn thận
-                                        những gì bạn chia sẻ.
+                                        Thông tin này sẽ được hiển thị công khai
+                                        vì vậy hãy cẩn thận những gì bạn chia
+                                        sẻ.
                                     </p>
                                 </div>
 
-                                <div className="mt-6 flex flex-col lg:flex-row">
+                                <div className="mt-6 flex flex-col lg:flex-row flex-col-reverse">
                                     <div className="flex-grow space-y-6">
                                         <div>
                                             <label
@@ -133,7 +140,9 @@ const Settings: NextPageWithLayout = () => {
                                             <div className="mt-1 flex rounded-md shadow-sm">
                                                 <input
                                                     disabled={true}
-                                                    defaultValue="duyndse150396@fpt.edu.vn"
+                                                    defaultValue={
+                                                        loginUser?.email
+                                                    }
                                                     type="text"
                                                     name="email"
                                                     id="email"
@@ -149,11 +158,11 @@ const Settings: NextPageWithLayout = () => {
                                                 Họ và tên
                                             </label>
                                             <input
-                                                defaultValue={"Duy System"}
+                                                defaultValue={loginUser?.name}
                                                 type="text"
                                                 name="fullName"
                                                 id="fullName"
-                                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                                                className={defaultInputClass}
                                             />
                                         </div>
 
@@ -165,18 +174,20 @@ const Settings: NextPageWithLayout = () => {
                                                 Địa chỉ
                                             </label>
                                             <div className="mt-1">
-                        <textarea
-                            id="about"
-                            name="about"
-                            rows={3}
-                            className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            defaultValue={""}
-                        />
+                                                <textarea
+                                                    id="about"
+                                                    name="about"
+                                                    rows={3}
+                                                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                    defaultValue={
+                                                        loginUser?.address
+                                                    }
+                                                />
                                             </div>
-                                            <p className="mt-2 text-sm text-gray-500">
+                                            {/* <p className="mt-2 text-sm text-gray-500">
                                                 Brief description for your profile. URLs are
                                                 hyperlinked.
-                                            </p>
+                                            </p> */}
                                         </div>
                                     </div>
 
@@ -187,7 +198,7 @@ const Settings: NextPageWithLayout = () => {
                                         >
                                             Ảnh đại diện
                                         </p>
-                                        <div className="mt-1 lg:hidden">
+                                        {/* <div className="mt-1 lg:hidden">
                                             <div className="flex items-center">
                                                 <div
                                                     className="inline-block h-12 w-12 flex-shrink-0 overflow-hidden rounded-full"
@@ -195,19 +206,21 @@ const Settings: NextPageWithLayout = () => {
                                                 >
                                                     <img
                                                         className="h-full w-full rounded-full"
-                                                        src={user.imageUrl}
+                                                        src={loginUser.imageUrl}
                                                         alt=""
                                                     />
                                                 </div>
                                                 <div className="ml-5 rounded-md shadow-sm">
-                                                    <div
-                                                        className="group relative flex items-center justify-center rounded-md border border-gray-300 py-2 px-3 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:bg-gray-50">
+                                                    <div className="group relative flex items-center justify-center rounded-md border border-gray-300 py-2 px-3 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:bg-gray-50">
                                                         <label
                                                             htmlFor="mobile-user-photo"
                                                             className="pointer-events-none relative text-sm font-medium leading-4 text-gray-700"
                                                         >
                                                             <span>Change</span>
-                                                            <span className="sr-only"> user photo</span>
+                                                            <span className="sr-only">
+                                                                {" "}
+                                                                user photo
+                                                            </span>
                                                         </label>
                                                         <input
                                                             id="mobile-user-photo"
@@ -218,12 +231,12 @@ const Settings: NextPageWithLayout = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> */}
 
-                                        <div className="relative hidden overflow-hidden rounded-full lg:block">
+                                        <div className="relative overflow-hidden rounded-full w-fit">
                                             <img
-                                                className="relative h-40 w-40 rounded-full"
-                                                src={user.imageUrl}
+                                                className="relative h-40 w-40 rounded-full object-cover"
+                                                src={loginUser.imageUrl}
                                                 alt=""
                                             />
                                             <label
@@ -231,7 +244,10 @@ const Settings: NextPageWithLayout = () => {
                                                 className="absolute inset-0 flex h-full w-full items-center justify-center bg-black bg-opacity-75 text-sm font-medium text-white opacity-0 focus-within:opacity-100 hover:opacity-100"
                                             >
                                                 <span>Change</span>
-                                                <span className="sr-only"> user photo</span>
+                                                <span className="sr-only">
+                                                    {" "}
+                                                    user photo
+                                                </span>
                                                 <input
                                                     type="file"
                                                     id="desktop-user-photo"
@@ -253,7 +269,7 @@ const Settings: NextPageWithLayout = () => {
                                         </label>
                                         <input
                                             disabled={true}
-                                            defaultValue={"A123456"}
+                                            defaultValue={""}
                                             type="text"
                                             name="code"
                                             id="code"
@@ -270,7 +286,7 @@ const Settings: NextPageWithLayout = () => {
                                             Số điện thoại
                                         </label>
                                         <input
-                                            defaultValue={"0123456789"}
+                                            defaultValue={loginUser?.phone}
                                             type="text"
                                             name="phoneNumber"
                                             id="phoneNumber"

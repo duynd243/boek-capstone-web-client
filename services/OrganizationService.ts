@@ -2,8 +2,9 @@ import {BaseService} from "./BaseService";
 import {IBaseListResponse} from "../types/Commons/IBaseListResponse";
 import {IOrganization} from "../types/Organization/IOrganization";
 
-export type CreateOrganizationParams = Required<Omit<IOrganization, 'id'>>;
-export type UpdateOrganizationParams = Required<IOrganization>;
+
+export type UpdateOrganizationParams = Required<Pick<IOrganization, 'id'>> & Partial<IOrganization>;
+export type CreateOrganizationParams = Omit<UpdateOrganizationParams, 'id'>;
 
 export class OrganizationService extends BaseService {
     getOrganizations = async (params?: any) => {
