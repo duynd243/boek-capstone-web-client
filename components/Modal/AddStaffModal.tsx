@@ -174,8 +174,8 @@ const AddStaffModal: React.FC<Props> = ({currentStaffs, isOpen, onClose}) => {
                     )}
 
                     <div className="overflow-y-scroll h-96">
-                        {!isLoading && availableStaffs ? (
-                            availableStaffs.map((staff) => (
+                        {!isLoading && staffs ? (
+                            staffs.map((staff) => (
                                 <div
                                     key={staff.id}
                                     className="flex items-center justify-between p-4 border-b border-gray-200"

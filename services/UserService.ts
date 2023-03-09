@@ -68,7 +68,7 @@ export class UserService extends BaseService {
 
     getUnattendedStaffsByCampaignId = async (campaignId: number) => {
         const response = await this.axiosClient.get<IUser[]>(
-            `/admin/campaigns/${campaignId}/unattended-staffs`
+            `/admin/campaigns/${campaignId}/unattended-staff`
         );
         return response.data;
     };
