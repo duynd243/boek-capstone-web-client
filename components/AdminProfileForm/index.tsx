@@ -318,9 +318,9 @@ const AdminProfileForm = ({ onSubmit }: Props) => {
                 </button>
             </div>
 
-            <pre>
-                <code>{JSON.stringify(watch(), null, 2)}</code>
-            </pre>
+            {/*<pre>*/}
+            {/*    <code>{JSON.stringify(watch(), null, 2)}</code>*/}
+            {/*</pre>*/}
         </form>
     );
 };
