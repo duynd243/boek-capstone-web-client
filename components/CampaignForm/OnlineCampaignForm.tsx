@@ -758,7 +758,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                     : "Tạo hội sách"}
                         </button>
                     </div>
-                    <pre>{JSON.stringify(watch(), null, 2)}</pre>
+                    {/*<pre>{JSON.stringify(watch(), null, 2)}</pre>*/}
                 </form>
             </FormProvider>
         </Fragment>
