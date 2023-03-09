@@ -1,45 +1,34 @@
-export interface AddressViewModel {
-    detail: string;
-    provinceCode: number;
-    districtCode: number;
-    wardCode: number;
-}
+import { ICustomerLevel } from "./../CustomerLevel/ICustomerLevel";
 
-export interface Level {
-    id: number;
-    name: string;
-    conditionalPoint: number;
-    status: boolean;
-    statusName: string;
-}
+import { IAddress } from "./../Address/IAddress";
 
-export interface Customer {
+export interface ICustomer {
     id: string;
-    levelId: number;
-    dob: Date;
-    gender: boolean;
-    point: number;
-    level: Level;
+    levelId?: number;
+    dob?: Date;
+    gender?: boolean;
+    point?: number;
+    level?: ICustomerLevel;
 }
 
-export interface Issuer {
+export interface IIssuer {
     id: string;
-    description: string;
+    description?: string;
 }
 
 export interface IUser {
     id: string;
-    code: string;
-    name: string;
-    email: string;
-    address: string;
-    addressViewModel: AddressViewModel;
-    phone: string;
-    roleName: string;
-    role: number;
-    status: boolean;
-    statusName: string;
-    imageUrl: string;
-    customer: Customer;
-    issuer: Issuer;
+    code?: string;
+    name?: string;
+    email?: string;
+    address?: string;
+    addressViewModel?: IAddress;
+    phone?: string;
+    roleName?: string;
+    role?: number;
+    status?: boolean;
+    statusName?: string;
+    imageUrl?: string;
+    customer?: ICustomer;
+    issuer?: IIssuer;
 }

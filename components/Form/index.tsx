@@ -1,11 +1,8 @@
-import {FormikValues} from "formik/dist/types";
 import Image from "next/image";
-import React, {useEffect, useMemo, useState} from "react";
-import {BsCalendarWeek} from "react-icons/bs";
+import React, { useEffect, useState } from "react";
+import { Path, UseFormRegister } from "react-hook-form";
+import { BsCalendarWeek } from "react-icons/bs";
 import ErrorMessage from "./ErrorMessage";
-import {FormState, Path, UseFormRegister} from "react-hook-form";
-import errorMessage from "./ErrorMessage";
-import DefaultAvatar from "../../assets/images/default-avatar.png";
 
 type LabelProps = {
     fieldName?: string;
@@ -19,7 +16,8 @@ const Label = (props: LabelProps) => {
             className="mb-1 block text-sm font-medium text-gray-600"
             htmlFor={props.fieldName}
         >
-            {props.label} {props.required && <span className="text-rose-500">*</span>}
+            {props.label}
+            {props.required && <span className="text-rose-500"> *</span>}
         </label>
     );
 };
@@ -41,17 +39,17 @@ export const defaultInputClass =
     "block w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:opacity-50";
 
 const Input = <T extends Record<string, any>>({
-                                                  register,
-                                                  uppercase = false,
-                                                  inputType = "text",
-                                                  isTextArea,
-                                                  label,
-                                                  required,
-                                                  fieldName,
-                                                  placeholder,
-                                                  errorMessage,
-                                                  ...rest
-                                              }: InputProps<T>) => {
+    register,
+    uppercase = false,
+    inputType = "text",
+    isTextArea,
+    label,
+    required,
+    fieldName,
+    placeholder,
+    errorMessage,
+    ...rest
+}: InputProps<T>) => {
     const commonProps = {
         id: fieldName,
         placeholder: placeholder,
@@ -60,34 +58,34 @@ const Input = <T extends Record<string, any>>({
         ...rest,
     };
 
-
     return (
         <div>
-            <Label
-                fieldName={fieldName}
-                label={label}
-                required={required}
-            />
+            <Label fieldName={fieldName} label={label} required={required} />
             {isTextArea ? (
-                <textarea {...commonProps} rows={3}/>
+                <textarea rows={3} {...commonProps} />
             ) : (
-                <input {...commonProps} type={inputType}/>
+                <input {...commonProps} type={inputType} />
             )}
-            {errorMessage && (
-                <ErrorMessage>{errorMessage}</ErrorMessage>
-            )}
+            {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
         </div>
     );
-
 };
 type GroupLabelProps = {
     label: string;
     description?: string;
+    required?: boolean;
 };
-const GroupLabel: React.FC<GroupLabelProps> = ({label, description}) => {
+const GroupLabel: React.FC<GroupLabelProps> = ({
+    label,
+    description,
+    required,
+}) => {
     return (
         <div>
-            <h3 className="text-lg font-medium leading-6 text-gray-900">{label}</h3>
+            <h3 className="text-lg font-medium leading-6 text-gray-900">
+                {label}
+                {required && <span className="text-rose-500"> *</span>}
+            </h3>
             {description && (
                 <p className="mt-1 text-sm text-gray-500">{description}</p>
             )}
@@ -103,11 +101,11 @@ type ImageUploadPanelProps = {
 };
 
 const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
-                                                               label,
-                                                               onChange,
-                                                               onRemove,
-                                                               defaultImageURL
-                                                           }) => {
+    label,
+    onChange,
+    onRemove,
+    defaultImageURL,
+}) => {
     const [file, setFile] = useState<File | null>(null);
 
     const objectURL = file && URL.createObjectURL(file);
@@ -118,7 +116,7 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
         if (onChange?.(file)) {
             setFile(file);
         }
-    }
+    };
 
     useEffect(() => {
         if (objectURL) {
@@ -135,9 +133,11 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
     return (
         <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
             <div className="space-y-1 text-center">
-                {(imgSrc) ? (
+                {imgSrc ? (
                     <Image
-                        className={"mx-auto mb-4 rounded-md object-cover object-center"}
+                        className={
+                            "mx-auto mb-4 rounded-md object-cover object-center"
+                        }
                         width={500}
                         height={500}
                         src={imgSrc}
@@ -160,14 +160,16 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                     </svg>
                 )}
                 {file && (
-                    <div className="mb-2 text-sm text-slate-600">{file?.name}</div>
+                    <div className="mb-2 text-sm text-slate-600">
+                        {file?.name}
+                    </div>
                 )}
                 <div className="flex flex-col justify-center gap-1 text-sm text-gray-600">
                     <label
                         htmlFor="file-upload"
                         className="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
                     >
-                        <span>{(imgSrc) ? "Chọn ảnh khác" : "Tải ảnh lên"}</span>
+                        <span>{imgSrc ? "Chọn ảnh khác" : "Tải ảnh lên"}</span>
                         <input
                             onChange={handleFileChange}
                             id="file-upload"
@@ -182,10 +184,11 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                             onClick={handleRemoveFile}
                             className="font-medium text-rose-500"
                         >
-                            {defaultImageURL ? "Khôi phục ảnh mặc định" : "Xóa ảnh"}
+                            {defaultImageURL
+                                ? "Khôi phục ảnh mặc định"
+                                : "Xóa ảnh"}
                         </button>
                     )}
-
                 </div>
                 <p className="text-xs text-gray-500">{label}</p>
             </div>
@@ -199,12 +202,12 @@ type DateTimeInputFieldProps = {
     id: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 const DateTimeInputField: React.FC<DateTimeInputFieldProps> = ({
-                                                                   placeholder,
-                                                                   id,
-                                                                   onClick,
-                                                                   value,
-                                                                   ...rest
-                                                               }) => {
+    placeholder,
+    id,
+    onClick,
+    value,
+    ...rest
+}) => {
     return (
         <div className="relative">
             <input
@@ -217,15 +220,18 @@ const DateTimeInputField: React.FC<DateTimeInputFieldProps> = ({
                 className={defaultInputClass}
                 type="text"
             />
-            <label htmlFor={id} className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400">
-                <BsCalendarWeek/>
+            <label
+                htmlFor={id}
+                className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400"
+            >
+                <BsCalendarWeek />
             </label>
         </div>
     );
 };
 
 const Form = {
-    Divider: () => <hr className="my-8 border-t border-gray-200"/>,
+    Divider: () => <hr className="my-8 border-t border-gray-200" />,
     GroupLabel,
     Label,
     Input,

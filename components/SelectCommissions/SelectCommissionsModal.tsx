@@ -1,34 +1,29 @@
-import React, {useState} from "react";
-import {BsCheckCircle, BsSearch} from "react-icons/bs";
+import React, { useState } from "react";
+import { BsCheckCircle, BsSearch } from "react-icons/bs";
 import Modal from "../Modal/Modal";
 import TransitionModal from "../Modal/TransitionModal";
 import useDebounce from "../../hooks/useDebounce";
-import {useQuery} from "@tanstack/react-query";
-import {GenreService} from "../../services/GenreService";
-import {IGenre} from "../../types/Genre/IGenre";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
+import { useQuery } from "@tanstack/react-query";
+import { GenreService } from "../../services/GenreService";
+import { IGenre } from "../../types/Genre/IGenre";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 import Image from "next/image";
-import {getAvatarFromName} from "../../utils/helper";
-import {z} from "zod";
-import {CampaignCommissionSchema} from "../CampaignForm/hooks";
-
-
-type CampaignCommission = z.infer<typeof CampaignCommissionSchema>;
+import { getAvatarFromName } from "../../utils/helper";
+import { z } from "zod";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    selectedCommissions: CampaignCommission[];
-    onItemSelect: (genre: CampaignCommission) => void;
+    selectedGenres: { id: number; [key: string]: any }[];
+    onItemSelect: (genre: IGenre) => void;
 };
 
 const SelectCommissionsModal: React.FC<Props> = ({
-                                                     isOpen,
-                                                     onClose,
-                                                     selectedCommissions,
-                                                     onItemSelect,
-                                                 }) => {
-
+    isOpen,
+    onClose,
+    selectedGenres,
+    onItemSelect,
+}) => {
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounce(search, 500);
     const genreService = new GenreService();
@@ -38,7 +33,7 @@ const SelectCommissionsModal: React.FC<Props> = ({
         onClose();
     };
 
-    const {data: genres, isLoading} = useQuery(
+    const { data: genres, isLoading } = useQuery(
         ["genres", debouncedSearch],
         () =>
             genreService.getGenres({
@@ -49,7 +44,8 @@ const SelectCommissionsModal: React.FC<Props> = ({
             }),
         {
             keepPreviousData: true,
-            select: (data) => data?.data?.filter((genre) => genre?.parentId === null),
+            select: (data) =>
+                data?.data?.filter((genre) => genre?.parentId === null),
         }
     );
 
@@ -62,7 +58,7 @@ const SelectCommissionsModal: React.FC<Props> = ({
         >
             <div className="overflow-hidden rounded-xl">
                 <div>
-                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Tìm kiếm nhóm"
@@ -74,18 +70,14 @@ const SelectCommissionsModal: React.FC<Props> = ({
                 <div className="h-96 overflow-y-auto">
                     {!isLoading && genres ? (
                         genres?.map((genre) => {
-                            const isSelected = selectedCommissions?.find(
-                                (g) => g?.genreId === genre?.id
+                            const isSelected = selectedGenres?.find(
+                                (g) => g?.id === genre?.id
                             );
                             return (
                                 <div
                                     onClick={() => {
                                         if (!isSelected) {
-                                            onItemSelect({
-                                                genreId: genre?.id,
-                                                genreName: genre?.name,
-                                                minimalCommission: 0,
-                                            });
+                                            onItemSelect(genre);
                                         }
                                     }}
                                     key={genre?.id}
@@ -112,7 +104,7 @@ const SelectCommissionsModal: React.FC<Props> = ({
 
                                     {isSelected && (
                                         <div className="absolute top-1/2 right-4 -translate-y-1/2 transform">
-                                            <BsCheckCircle className="text-green-500"/>
+                                            <BsCheckCircle className="text-green-500" />
                                         </div>
                                     )}
                                 </div>

@@ -216,7 +216,7 @@ const IssuerBooksPage: NextPageWithLayout = () => {
                                     )}
                                 </TableData>
                                 <TableData className="text-right text-sm font-medium">
-                                    <button className="text-indigo-600 hover:text-indigo-900">
+                                    <button className="text-indigo-600 hover:text-indigo-700">
                                         Chi tiết
                                     </button>
                                 </TableData>

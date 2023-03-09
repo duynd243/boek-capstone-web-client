@@ -12,6 +12,7 @@ type Props<T> = {
     displayKey: keyof T;
     searchable?: boolean;
     disableKey?: keyof T;
+    disabled?: boolean;
 };
 
 const SelectBox = <T extends Record<string, any>>({
@@ -21,6 +22,7 @@ const SelectBox = <T extends Record<string, any>>({
                                                       dataSource,
                                                       displayKey,
                                                       searchable = true,
+                                                      disabled = false,
                                                       disableKey
                                                   }: Props<T>) => {
     const [search, setSearch] = useState("");
@@ -30,7 +32,7 @@ const SelectBox = <T extends Record<string, any>>({
     });
 
     return (
-        <Combobox value={value} onChange={onValueChange}>
+        <Combobox value={value} onChange={onValueChange} disabled={disabled}>
             {({open}) => (
                 <div className="relative">
                     <Combobox.Button className='relative w-full'>

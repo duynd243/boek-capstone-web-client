@@ -4,5 +4,6 @@ export interface IPublisher {
   name?: string;
   email?: string;
   address?: string;
-  phoneNumber?: string;
+  phone?: string;
+  imageUrl?: string;
 }

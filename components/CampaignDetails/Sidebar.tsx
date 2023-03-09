@@ -1,75 +1,43 @@
-import React from "react";
-import SidebarIssuersTable from "./SidebarIssuersTable";
-import {IUser} from "../../old-types/user/IUser";
-import SidebarActionButtons from "./SidebarActionButtons";
-import {useAuth} from "../../context/AuthContext";
-import {Roles} from "../../constants/Roles";
-import {faker} from "@faker-js/faker/locale/vi";
-import SidebarStaffsTable from "./SidebarStaffsTable";
-import {ICampaign} from "../../types/Campaign/ICampaign";
+import Link from "next/link";
+import React, {useContext} from "react";
+import {MdEdit} from "react-icons/md";
 import {CampaignFormats} from "../../constants/CampaignFormats";
+import {CampaignStatuses} from "../../constants/CampaignStatuses";
+import {Roles} from "../../constants/Roles";
+import {useAuth} from "../../context/AuthContext";
+import {CampaignContext} from "../../context/CampaignContext";
+import SidebarIssuersTable from "./SidebarIssuersTable";
+import SidebarStaffsTable from "./SidebarStaffsTable";
 
-type Props = {
-    campaign: ICampaign | undefined;
-    issuers: IUser[];
-};
-
-const Sidebar: React.FC<Props> = ({campaign, issuers}) => {
+const Sidebar: React.FC = () => {
     const {loginUser} = useAuth();
+    const campaign = useContext(CampaignContext);
+    console.log(campaign?.format === CampaignFormats?.OFFLINE.id);
+
     return (
         <div>
             <div className="space-y-4 lg:sticky lg:top-20">
-                {/* 1st block */}
+                {loginUser?.role === Roles.SYSTEM.id &&
+                    campaign?.status === CampaignStatuses?.NOT_STARTED.id && (
+                        <Link
+                            href={`${campaign?.id}/edit`}
+                            className="m-btn bg-blue-600 text-white w-full"
+                        >
+                            <MdEdit className="mr-2.5" size={17}/>
+                            Cập nhật thông tin
+                        </Link>
+                    )}
+                {/* 1st block
                 {loginUser && loginUser?.role === Roles.ISSUER.id && (
                     <SidebarActionButtons campaign={campaign} issuers={issuers}/>
-                )}
+                )} */}
                 {/* 2nd block */}
-                <SidebarIssuersTable issuers={[
-                    {
-                        id: '1',
-                        name: faker.name.fullName(),
-                        imageUrl: faker.image.avatar(),
-                    },
-                    {
-                        id: '2',
-                        name: faker.name.fullName(),
-                        imageUrl: faker.image.avatar(),
-                    },
-                    {
-                        id: '3',
-                        name: faker.name.fullName(),
-                        imageUrl: faker.image.avatar(),
-                    }, {
-                        id: '4',
-                        name: faker.name.fullName(),
-                        imageUrl: faker.image.avatar(),
-                    }, {
-                        id: '5',
-                        name: faker.name.fullName(),
-                        imageUrl: faker.image.avatar(),
-                    }, {
-                        id: '6',
-                        name: faker.name.fullName(),
-                        imageUrl: faker.image.avatar(),
-                    }, {
-                        id: '7',
-                        name: faker.name.fullName(),
-                        imageUrl: faker.image.avatar(),
-                    }
-                ]}/>
+                <SidebarIssuersTable/>
 
-                {campaign?.format === CampaignFormats?.OFFLINE.id && <SidebarStaffsTable issuers={[
-                    {
-                        id: '1',
-                        name: faker.name.fullName(),
-                        imageUrl: faker.image.avatar(),
-                    },
-                    {
-                        id: '2',
-                        name: faker.name.fullName(),
-                        imageUrl: faker.image.avatar(),
-                    },
-                ]}/>}
+                {loginUser?.role === Roles.SYSTEM.id &&
+                    campaign?.format === CampaignFormats?.OFFLINE.id && (
+                        <SidebarStaffsTable/>
+                    )}
             </div>
         </div>
     );

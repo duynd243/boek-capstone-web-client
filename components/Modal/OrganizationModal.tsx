@@ -1,17 +1,17 @@
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import {useForm} from "react-hook-form";
-import {toast} from "react-hot-toast";
-import {z} from "zod";
-import {useAuth} from "../../context/AuthContext";
-import {ImageUploadService} from "../../services/ImageUploadService";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { z } from "zod";
+import { useAuth } from "../../context/AuthContext";
+import { ImageUploadService } from "../../services/ImageUploadService";
 import {
     CreateOrganizationParams,
     OrganizationService,
     UpdateOrganizationParams,
 } from "../../services/OrganizationService";
-import {IOrganization} from "../../types/Organization/IOrganization";
+import { IOrganization } from "../../types/Organization/IOrganization";
 import {
     isImageFile,
     isValidFileSize,
@@ -21,7 +21,7 @@ import SelectProfilePicture from "../SelectProfilePicture";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
 
-import {CgSpinnerAlt} from "react-icons/cg";
+import { CgSpinnerAlt } from "react-icons/cg";
 
 export enum OrganizationModalMode {
     CREATE,
@@ -38,14 +38,14 @@ type Props = {
 };
 
 const OrganizationModal: React.FC<Props> = ({
-                                                maxWidth,
-                                                action,
-                                                isOpen,
-                                                onClose,
-                                                organization,
-                                                afterLeave,
-                                            }) => {
-    const {loginUser} = useAuth();
+    maxWidth,
+    action,
+    isOpen,
+    onClose,
+    organization,
+    afterLeave,
+}) => {
+    const { loginUser } = useAuth();
     const queryClient = useQueryClient();
     const orgService = new OrganizationService(loginUser?.accessToken);
     const imageService = new ImageUploadService(loginUser?.accessToken);
@@ -69,7 +69,7 @@ const OrganizationModal: React.FC<Props> = ({
         imageService.uploadImage(file)
     );
 
-    const OrganizationSchema = z.object({
+    const BaseOrganizationSchema = z.object({
         name: z
             .string()
             .min(2, "Tên tổ chức phải có ít nhất 2 ký tự")
@@ -85,19 +85,36 @@ const OrganizationModal: React.FC<Props> = ({
         previewFile: z.instanceof(File).optional(),
     });
 
-    type OrganizationSchemaType = z.infer<typeof OrganizationSchema>;
+    const UpdateOrganizationSchema = BaseOrganizationSchema.extend({
+        id: z.number().int().positive(),
+    });
 
-    const {register, setValue, reset, getValues, handleSubmit, formState} =
-        useForm<OrganizationSchemaType>({
-            resolver: zodResolver(OrganizationSchema),
-            values: {
-                name: organization?.name || "",
-                address: organization?.address || "",
-                phone: organization?.phone || "",
-                imageUrl: organization?.imageUrl,
-            },
-        });
-    const {isSubmitting, isDirty} = formState;
+    type FormType = Partial<z.infer<typeof UpdateOrganizationSchema>>;
+
+    const defaultValues: FormType = {
+        id: organization?.id,
+        name: organization?.name,
+        address: organization?.address,
+        phone: organization?.phone,
+        imageUrl: organization?.imageUrl || undefined,
+        previewFile: undefined,
+    };
+
+    const {
+        register,
+        control,
+        setValue,
+        reset,
+        handleSubmit,
+        formState: { errors, isSubmitting, isDirty },
+    } = useForm<FormType>({
+        resolver: zodResolver(
+            action === OrganizationModalMode.UPDATE
+                ? UpdateOrganizationSchema
+                : BaseOrganizationSchema
+        ),
+        defaultValues,
+    });
 
     const handleOnClose = () => {
         reset();
@@ -119,38 +136,37 @@ const OrganizationModal: React.FC<Props> = ({
         return true;
     };
 
-    const onSubmit = async (data: OrganizationSchemaType) => {
-        if (data?.previewFile) {
-            toast
-                .promise(uploadImageMutation.mutateAsync(data.previewFile), {
-                    loading: "Đang tải ảnh lên",
-                    success: (res) => {
-                        if (res?.url) {
-                            data.imageUrl = res.url;
-                        }
-                        return `Tải ảnh lên thành công`;
-                    },
-                    error: (error) => {
-                        return (
-                            error?.message || "Đã có lỗi xảy ra khi tải ảnh lên"
-                        );
-                    },
-                })
-                .catch((err) => console.log(err));
-        }
-
-        if (!data?.imageUrl) {
-            toast.error("Vui lòng chọn ảnh đại diện");
-            return;
+    const onSubmit = async (data: FormType) => {
+        if (data.previewFile) {
+            try {
+                await toast.promise(
+                    uploadImageMutation.mutateAsync(data.previewFile),
+                    {
+                        loading: "Đang tải ảnh lên",
+                        success: (res) => {
+                            if (res?.url) {
+                                data.imageUrl = res.url;
+                            }
+                            return `Tải ảnh lên thành công`;
+                        },
+                        error: (error) => {
+                            return (
+                                error?.message ||
+                                "Đã có lỗi xảy ra khi tải ảnh lên"
+                            );
+                        },
+                    }
+                );
+            } catch (error) {
+                return;
+            }
         }
         switch (action) {
             case OrganizationModalMode.CREATE:
-                toast
-                    .promise(
-                        createMutation.mutateAsync({
-                            ...data,
-                            imageUrl: data.imageUrl,
-                        }),
+                try {
+                    const createPayload = BaseOrganizationSchema.parse(data);
+                    await toast.promise(
+                        createMutation.mutateAsync(createPayload),
                         {
                             loading: "Đang tạo tổ chức",
                             success: "Tạo tổ chức thành công",
@@ -161,18 +177,16 @@ const OrganizationModal: React.FC<Props> = ({
                                 );
                             },
                         }
-                    )
-                    .catch((err) => console.log(err));
+                    );
+                } catch (error) {
+                    return;
+                }
                 break;
             case OrganizationModalMode.UPDATE:
-                if (!organization?.id) return;
-                toast
-                    .promise(
-                        updateMutation.mutateAsync({
-                            ...data,
-                            id: organization.id,
-                            imageUrl: data.imageUrl,
-                        }),
+                try {
+                    const updatePayload = UpdateOrganizationSchema.parse(data);
+                    await toast.promise(
+                        updateMutation.mutateAsync(updatePayload),
                         {
                             loading: "Đang cập nhật tổ chức",
                             success: "Cập nhật tổ chức thành công",
@@ -183,12 +197,16 @@ const OrganizationModal: React.FC<Props> = ({
                                 );
                             },
                         }
-                    )
-                    .catch((err) => console.log(err));
+                    );
+                } catch (error) {
+                    return;
+                }
 
                 break;
         }
     };
+
+    console.log(errors);
 
     return (
         <TransitionModal
@@ -199,7 +217,7 @@ const OrganizationModal: React.FC<Props> = ({
             closeOnOverlayClick={false}
         >
             <form onSubmit={handleSubmit(onSubmit)}>
-                {isSubmitting && <Modal.Backdrop/>}
+                {isSubmitting && <Modal.Backdrop />}
                 <Modal.Header
                     title={
                         action === OrganizationModalMode.CREATE
@@ -210,80 +228,92 @@ const OrganizationModal: React.FC<Props> = ({
                     showCloseButton={true}
                 />
                 <div className="space-y-3 py-4 px-5">
-                    <Modal.FormLabel label="Ảnh đại diện"/>
-                    <SelectProfilePicture
-                        onChange={onFileChange}
-                        defaultImageURL={organization?.imageUrl}
+                    <Modal.FormLabel label="Ảnh đại diện" />
+                    <Controller
+                        name="previewFile"
+                        control={control}
+                        render={({ field }) => (
+                            <SelectProfilePicture
+                                onChange={(file) => {
+                                    if (!isImageFile(file)) {
+                                        toast.error(
+                                            "Tệp tải lên phải có định dạng ảnh"
+                                        );
+                                        return false;
+                                    }
+                                    if (!isValidFileSize(file, 1)) {
+                                        toast.error(
+                                            "Kích thước ảnh đại diện không được vượt quá 1MB"
+                                        );
+                                        return false;
+                                    }
+                                    field.onChange(file);
+                                    return true;
+                                }}
+                                defaultImageURL={organization?.imageUrl}
+                            />
+                        )}
                     />
-                    <Modal.FormInput<OrganizationSchemaType>
+                    <Modal.FormInput<FormType>
                         required={true}
                         label={"Tên tổ chức"}
-                        formState={formState}
                         placeholder={"Nhập tên tổ chức"}
                         fieldName={"name"}
                         register={register}
+                        errorMessage={errors.name?.message}
                     />
 
-                    <Modal.FormInput<OrganizationSchemaType>
+                    <Modal.FormInput<FormType>
                         required={true}
                         label={"Số điện thoại"}
-                        formState={formState}
                         placeholder={"Nhập số điện thoại"}
                         fieldName={"phone"}
                         register={register}
+                        errorMessage={errors.phone?.message}
                     />
 
-                    <Modal.FormInput<OrganizationSchemaType>
+                    <Modal.FormInput<FormType>
                         required={true}
                         isTextArea={true}
                         label={"Địa chỉ"}
-                        formState={formState}
                         placeholder={"Nhập địa chỉ"}
                         fieldName={"address"}
                         register={register}
+                        errorMessage={errors.address?.message}
                     />
-
-                    <pre>
-                        {JSON.stringify(getValues(), null, 2)}
-                    </pre>
                 </div>
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">
-                        <button
+                        <Modal.SecondaryButton
                             disabled={isSubmitting}
                             onClick={handleOnClose}
                             type="button"
-                            className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200"
                         >
                             Huỷ
-                        </button>
+                        </Modal.SecondaryButton>
 
-                        <button
+                        <Modal.PrimaryButton
                             disabled={
                                 isSubmitting ||
-                                (action === OrganizationModalMode.UPDATE && !isDirty &&
-                                    getValues().previewFile === undefined)
+                                (action === OrganizationModalMode.UPDATE &&
+                                    !isDirty)
                             }
                             type="submit"
-                            className="m-btn bg-indigo-500 text-white hover:bg-indigo-600 disabled:bg-indigo-300"
                         >
-                            {isSubmitting ? (
-                                <>
-                                    {action === OrganizationModalMode.CREATE
-                                        ? "Đang tạo"
-                                        : "Đang cập nhật"}
-
-                                    <CgSpinnerAlt
-                                        className="animate-spin ml-2"
-                                        size={18}
-                                    />
-                                </>
-                            ) : action === OrganizationModalMode.CREATE ? (
-                                "Tạo tổ chức"
-                            ) : (
-                                "Cập nhật tổ chức"
-                            )}
-                        </button>
+                            <Modal.SubmitTextWithLoading
+                                isLoading={isSubmitting}
+                                text={
+                                    action === OrganizationModalMode.CREATE
+                                        ? "Thêm tổ chức"
+                                        : "Cập nhật tổ chức"
+                                }
+                                loadingText={
+                                    action === OrganizationModalMode.CREATE
+                                        ? "Đang thêm"
+                                        : "Đang cập nhật"
+                                }
+                            />
+                        </Modal.PrimaryButton>
                     </div>
                 </Modal.Footer>
             </form>

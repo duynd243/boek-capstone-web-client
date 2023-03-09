@@ -1,204 +1,506 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import React, { memo, useCallback } from "react";
-import { IFakeIssuer } from "../../pages/admin/issuers";
+import { Controller, useForm } from "react-hook-form";
+import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
+import { z } from "zod";
+import useAddress from "../../hooks/useAddress";
+import { IDistrict } from "../../types/Address/IDistrict";
+import { IProvince } from "../../types/Address/IProvince";
+import { IWard } from "../../types/Address/IWard";
+import { IUser } from "../../types/User/IUser";
+import {
+    isImageFile,
+    isValidFileSize,
+    VIETNAMESE_PHONE_REGEX,
+} from "../../utils/helper";
+import ErrorMessage from "../Form/ErrorMessage";
+import SelectBox from "../SelectBox";
+import ToggleButton from "../ToggleButton";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
-import * as Yup from "yup";
-import { useFormik } from "formik";
-import ToggleButton from "../ToggleButton";
-import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
-import { ProfilePicture } from "../../pages/admin/settings";
+import SelectProfilePicture from "../SelectProfilePicture";
+import { toast } from "react-hot-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
+import {
+    CreateUserParams,
+    UpdateUserParams,
+    UserService,
+} from "../../services/UserService";
+import { ImageUploadService } from "../../services/ImageUploadService";
+import { Roles } from "../../constants/Roles";
 
 export enum IssuerModalMode {
-  CREATE,
-  UPDATE,
+    CREATE,
+    UPDATE,
 }
 
 type Props = {
-  maxWidth?: string;
-  action: IssuerModalMode;
-  isOpen: boolean;
-  onClose: () => void;
-  issuer?: IFakeIssuer;
+    maxWidth?: string;
+    afterLeave?: () => void;
+    action: IssuerModalMode;
+    isOpen: boolean;
+    onClose: () => void;
+    issuer?: IUser;
 };
 
 const IssuerModal: React.FC<Props> = ({
-  maxWidth,
-  action,
-  isOpen,
-  onClose,
-  issuer,
+    maxWidth,
+    action,
+    isOpen,
+    onClose,
+    issuer,
+    afterLeave,
 }) => {
-  const createIssuerSchema = Yup.object({
-    issuerName: Yup.string()
-      .trim()
-      .required("Tên nhà phát hành không được để trống")
-      .min(2, "Tên nhà phát hành phải có ít nhất 2 ký tự")
-      .max(50, "Tên nhà phát hành không được vượt quá 50 ký tự"),
-    issuerEmail: Yup.string()
-      .trim()
-      .required("Email không được để trống")
-      .email("Email không hợp lệ"),
-    issuerPhone: Yup.string()
-      .trim()
-      .required("Số điện thoại không được để trống")
-      .matches(/^[0-9]+$/, "Số điện thoại không hợp lệ"),
-    issuerAddress: Yup.string()
-      .trim()
-      .required("Địa chỉ không được để trống")
-      .min(2, "Địa chỉ phải có ít nhất 2 ký tự")
-      .max(250, "Địa chỉ không được vượt quá 50 ký tự"),
-    issuerTaxCode: Yup.string()
-      .trim()
-      .min(2, "Mã số thuế phải có ít nhất 2 ký tự")
-      .max(10, "Mã số thuế không được vượt quá 10 ký tự"),
-  });
+    const { loginUser } = useAuth();
+    const queryClient = useQueryClient();
+    const userService = new UserService(loginUser?.accessToken);
+    const imageService = new ImageUploadService(loginUser?.accessToken);
 
-  const updateIssuerSchema = createIssuerSchema.concat(
-    Yup.object({
-      issuerStatus: Yup.boolean().required("Trạng thái không được để trống"),
-    })
-  );
+    const {
+        provinces,
+        districts,
+        wards,
+        handleProvinceChange,
+        handleDistrictChange,
+        handleWardChange,
+        selectedProvince,
+        selectedDistrict,
+        selectedWard,
+    } = useAddress({
+        defaultProvinceCode: issuer?.addressViewModel?.provinceCode,
+        defaultDistrictCode: issuer?.addressViewModel?.districtCode,
+        defaultWardCode: issuer?.addressViewModel?.wardCode,
+    });
+    const CreateIssuerSchema = z.object({
+        name: z
+            .string()
+            .min(2, "Tên nhà phát hành phải có ít nhất 2 ký tự")
+            .max(50, "Tên nhà phát hành không được vượt quá 50 ký tự"),
+        email: z.string().email("Email không hợp lệ"),
+        role: z.number().int(),
+    });
 
-  const form = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      issuerName: action === IssuerModalMode.UPDATE ? issuer?.name : "",
-      issuerEmail: action === IssuerModalMode.UPDATE ? issuer?.email : "",
-      issuerPhone: action === IssuerModalMode.UPDATE ? issuer?.phone : "",
-      issuerAddress: action === IssuerModalMode.UPDATE ? issuer?.address : "",
-      issuerTaxCode: action === IssuerModalMode.UPDATE ? issuer?.taxCode : "",
-      issuerStatus: action === IssuerModalMode.UPDATE ? issuer?.status : true,
-    },
-    validationSchema:
-      action === IssuerModalMode.CREATE
-        ? createIssuerSchema
-        : updateIssuerSchema,
-    onSubmit: async (values) => {},
-  });
+    const UpdateIssuerSchema = CreateIssuerSchema.extend({
+        id: z.string(),
+        phone: z
+            .string()
+            .regex(VIETNAMESE_PHONE_REGEX, "Số điện thoại không hợp lệ"),
+        imageUrl: z.string(),
+        addressRequest: z.object({
+            detail: z.string().min(1, "Địa chỉ chi tiết không được để trống"),
+            provinceCode: z.number({
+                required_error: "Tỉnh / Thành phố không được để trống",
+            }),
+            districtCode: z.number({
+                required_error: "Quận / Huyện không được để trống",
+            }),
+            wardCode: z.number({
+                required_error: "Phường / Xã không được để trống",
+            }),
+        }),
+        previewFile: z.instanceof(File).optional(),
+        status: z.boolean(),
+    });
 
-  const handleOnClose = useCallback(() => {
-    form.resetForm();
-    onClose();
-  }, [form, onClose]);
-  return (
-    <TransitionModal
-      maxWidth={maxWidth}
-      isOpen={isOpen}
-      onClose={handleOnClose}
-      closeOnOverlayClick={false}
-    >
-      <form onSubmit={form.handleSubmit}>
-        <Modal.Header
-          title={
+    type FormType = Partial<z.infer<typeof UpdateIssuerSchema>>;
+
+    const defaultValues = {
+        id: issuer?.id || "",
+        name: issuer?.name || "",
+        email: issuer?.email || "",
+        phone: issuer?.phone || "",
+        imageUrl: issuer?.imageUrl || "",
+        addressRequest: {
+            detail: issuer?.addressViewModel?.detail,
+            provinceCode: issuer?.addressViewModel?.provinceCode,
+            districtCode: issuer?.addressViewModel?.districtCode,
+            wardCode: issuer?.addressViewModel?.wardCode,
+        },
+        previewFile: undefined,
+        status: issuer?.status,
+        role: Roles.ISSUER.id,
+    };
+
+    const {
+        register,
+        control,
+        watch,
+        reset,
+        setValue,
+        handleSubmit,
+        formState: { errors, isSubmitting, isDirty },
+    } = useForm<FormType>({
+        resolver: zodResolver(
             action === IssuerModalMode.CREATE
-              ? "Thêm nhà phát hành"
-              : `Cập nhật ${issuer?.name} (${issuer?.code})`
-          }
-          onClose={handleOnClose}
-          showCloseButton={true}
-        />
-        <div className="space-y-3 py-4 px-5">
-          <Modal.FormLabel label="Ảnh đại diện" />
-          <ProfilePicture />
-          <Modal.FormInputOld
-            placeholder="Nhập tên nhà phát hành"
-            required={true}
-            formikForm={form}
-            fieldName="issuerName"
-            label="Tên nhà phát hành"
-          />
-          <Modal.FormInputOld
-            placeholder="Nhập email"
-            required={true}
-            formikForm={form}
-            fieldName="issuerEmail"
-            label="Địa chỉ email"
-          />
-          <Modal.FormInputOld
-            placeholder="Nhập mã số thuế"
-            required={false}
-            formikForm={form}
-            fieldName="issuerTaxCode"
-            label="Mã số thuế"
-          />
-          <Modal.FormInputOld
-            placeholder="Nhập số điện thoại"
-            required={true}
-            formikForm={form}
-            fieldName="issuerPhone"
-            label="Số điện thoại"
-          />
-          <Modal.FormInputOld
-            isTextArea={true}
-            placeholder="Nhập địa chỉ"
-            required={true}
-            formikForm={form}
-            fieldName="issuerAddress"
-            label="Địa chỉ"
-          />
-          {action === IssuerModalMode.UPDATE && (
-            <>
-              <Modal.FormLabel
-                fieldName="issuerStatus"
-                label="Trạng thái"
-                required={true}
-              />
-              <div className="flex items-center justify-between">
-                <div>
-                  <div
-                    className={`${
-                      form.values.issuerStatus ? "bg-green-500" : "bg-rose-500"
-                    } flex w-fit items-center gap-2 rounded px-2.5 py-1 text-sm text-white transition`}
-                  >
-                    {form.values.issuerStatus ? (
-                      <>
-                        Hoạt động <BsEmojiSmileFill />
-                      </>
-                    ) : (
-                      <>
-                        Không hoạt động <BsEmojiFrownFill />
-                      </>
-                    )}
-                  </div>
-                  <div className="mt-2 text-sm text-gray-700">
-                    {form.values.issuerStatus
-                      ? "Nhà phát hành đang hoạt động"
-                      : "Nhà phát hành sẽ bị vô hiệu hóa"}
-                  </div>
-                </div>
-                <ToggleButton
-                  isCheck={form.values.issuerStatus || false}
-                  onChange={(value) => {
-                    form.setFieldValue("issuerStatus", value);
-                  }}
-                />
-              </div>
-            </>
-          )}
-        </div>
-        <Modal.Footer>
-          <div className="flex flex-wrap justify-end space-x-2">
-            <button
-              //disabled={updateAuthorMutation.isLoading}
-              onClick={handleOnClose}
-              type="button"
-              className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200"
-            >
-              Huỷ
-            </button>
+                ? CreateIssuerSchema
+                : UpdateIssuerSchema
+        ),
+        defaultValues,
+    });
 
-            <button
-              // disabled={action === IssuerModalMode.CREATE ? createAuthorMutation.isLoading : updateAuthorMutation.isLoading}
-              type="submit"
-              className="m-btn bg-indigo-500 text-white hover:bg-indigo-600 disabled:bg-indigo-500"
-            >
-              {action === IssuerModalMode.CREATE ? "Thêm NPH" : "Cập nhật"}
-            </button>
-          </div>
-        </Modal.Footer>
-      </form>
-    </TransitionModal>
-  );
+    const handleOnClose = useCallback(() => {
+        onClose();
+        if (action === IssuerModalMode.CREATE) {
+            reset();
+        }
+    }, [onClose, action, reset]);
+
+    const commonMutationOptions = {
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(["issuers"]);
+            handleOnClose();
+        },
+    };
+
+    const createIssuerMutation = useMutation((data: CreateUserParams) => {
+        return userService.createUserByAdmin(data);
+    }, commonMutationOptions);
+
+    const updateIssuerMutation = useMutation((data: UpdateUserParams) => {
+        return userService.updateUserByAdmin(data);
+    }, commonMutationOptions);
+
+    const uploadImageMutation = useMutation((file: File) =>
+        imageService.uploadImage(file)
+    );
+
+    const onSubmit = async (data: FormType) => {
+        if (data.previewFile) {
+            try {
+                await toast.promise(
+                    uploadImageMutation.mutateAsync(data.previewFile),
+                    {
+                        loading: "Đang tải ảnh lên",
+                        success: (res) => {
+                            data.imageUrl = res?.url;
+                            return "Tải ảnh lên thành công";
+                        },
+                        error: (error) => {
+                            return "Tải ảnh lên thất bại";
+                        },
+                    }
+                );
+            } catch (error) {
+                return;
+            }
+        }
+
+        switch (action) {
+            case IssuerModalMode.CREATE:
+                
+                try {
+                    const createPayload = CreateIssuerSchema.parse(data);
+                    await toast.promise(
+                        createIssuerMutation.mutateAsync(createPayload),
+                        {
+                            loading: "Đang thêm nhà phát hành",
+                            success: () => {
+                                return "Thêm nhà phát hành thành công";
+                            },
+                            error: (error) => {
+                                return error?.message || "Thêm nhà phát hành thất bại";
+                            },
+                        }
+                    );
+                } catch (error) {
+                    return;
+                }
+                break;
+            case IssuerModalMode.UPDATE:
+                try {
+                    const updatePayload = UpdateIssuerSchema.parse(data);
+                    await toast.promise(
+                        updateIssuerMutation.mutateAsync(updatePayload),
+                        {
+                            loading: "Đang cập nhật nhà phát hành",
+                            success: () => {
+                                return "Cập nhật nhà phát hành thành công";
+                            },
+                            error: (error) => {
+                                return (
+                                    error?.message ||
+                                    "Cập nhật nhà phát hành thất bại"
+                                );
+                            },
+                        }
+                    );
+                } catch (error) {
+                    return;
+                }
+                break;
+        }
+    };
+
+    return (
+        <TransitionModal
+            maxWidth={maxWidth}
+            isOpen={isOpen}
+            onClose={handleOnClose}
+            closeOnOverlayClick={false}
+            afterLeave={afterLeave}
+        >
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {isSubmitting && <Modal.Backdrop />}
+                <Modal.Header
+                    title={
+                        action === IssuerModalMode.CREATE
+                            ? "Thêm nhà phát hành"
+                            : `Cập nhật ${issuer?.name} (${issuer?.code})`
+                    }
+                    onClose={handleOnClose}
+                    showCloseButton={true}
+                />
+                <div className="space-y-3 py-4 px-5">
+                    {action === IssuerModalMode.UPDATE && (
+                        <>
+                            <Modal.FormLabel label="Ảnh đại diện" />
+                            <Controller
+                                name="previewFile"
+                                control={control}
+                                render={({ field }) => (
+                                    <SelectProfilePicture
+                                        onChange={(file) => {
+                                            if (!isImageFile(file)) {
+                                                toast.error(
+                                                    "Tệp tải lên phải có định dạng ảnh"
+                                                );
+                                                return false;
+                                            }
+                                            if (!isValidFileSize(file, 1)) {
+                                                toast.error(
+                                                    "Kích thước ảnh đại diện không được vượt quá 1MB"
+                                                );
+                                                return false;
+                                            }
+                                            field.onChange(file);
+                                            return true;
+                                        }}
+                                        defaultImageURL={issuer?.imageUrl}
+                                    />
+                                )}
+                            />
+                        </>
+                    )}
+                    <Modal.FormInput<FormType>
+                        disabled={action === IssuerModalMode.UPDATE}
+                        readOnly={action === IssuerModalMode.UPDATE}
+                        required={action === IssuerModalMode.CREATE}
+                        placeholder="Nhập email"
+                        register={register}
+                        fieldName="email"
+                        label="Địa chỉ email"
+                        errorMessage={errors.email?.message}
+                    />
+                    <Modal.FormInput<FormType>
+                        placeholder="Nhập tên nhà phát hành"
+                        required={true}
+                        register={register}
+                        fieldName="name"
+                        label="Tên nhà phát hành"
+                        errorMessage={errors.name?.message}
+                    />
+
+                    {action === IssuerModalMode.UPDATE && (
+                        <>
+                            <Modal.FormInput<FormType>
+                                placeholder="Nhập số điện thoại"
+                                required={true}
+                                register={register}
+                                fieldName="phone"
+                                label="Số điện thoại"
+                                errorMessage={errors.phone?.message}
+                            />
+                            <Modal.FormInput<FormType>
+                                isTextArea={true}
+                                placeholder="Nhập địa chỉ"
+                                required={true}
+                                register={register}
+                                fieldName="addressRequest.detail"
+                                label="Địa chỉ chi tiết"
+                                errorMessage={
+                                    errors?.addressRequest?.detail?.message
+                                }
+                            />
+                            <div>
+                                <Modal.FormLabel
+                                    label="Tỉnh / Thành phố"
+                                    required={true}
+                                />
+                                <Controller
+                                    control={control}
+                                    name="addressRequest.provinceCode"
+                                    render={({ field }) => (
+                                        <SelectBox<IProvince>
+                                            value={selectedProvince}
+                                            placeholder="Chọn tỉnh / thành phố"
+                                            onValueChange={(p) => {
+                                                if (
+                                                    p.code ===
+                                                    watch(
+                                                        "addressRequest.provinceCode"
+                                                    )
+                                                )
+                                                    return;
+
+                                                field.onChange(p.code);
+                                                setValue(
+                                                    "addressRequest.districtCode" as any,
+                                                    undefined
+                                                );
+                                                setValue(
+                                                    "addressRequest.wardCode" as any,
+                                                    undefined
+                                                );
+                                                handleProvinceChange(p);
+                                            }}
+                                            displayKey="nameWithType"
+                                            dataSource={provinces}
+                                        />
+                                    )}
+                                />
+                                <ErrorMessage>
+                                    {
+                                        errors?.addressRequest?.provinceCode
+                                            ?.message
+                                    }
+                                </ErrorMessage>
+                            </div>
+                            <div>
+                                <Modal.FormLabel
+                                    label="Quận / Huyện"
+                                    required={true}
+                                />
+                                <Controller
+                                    control={control}
+                                    name="addressRequest.districtCode"
+                                    render={({ field }) => (
+                                        <SelectBox<IDistrict>
+                                            value={selectedDistrict}
+                                            placeholder="Chọn quận / huyện"
+                                            onValueChange={(d) => {
+                                                if (
+                                                    d.code ===
+                                                    watch(
+                                                        "addressRequest.districtCode"
+                                                    )
+                                                )
+                                                    return;
+                                                field.onChange(d.code);
+                                                setValue(
+                                                    "addressRequest.wardCode" as any,
+                                                    undefined
+                                                );
+                                                handleDistrictChange(d);
+                                            }}
+                                            displayKey="nameWithType"
+                                            dataSource={districts}
+                                        />
+                                    )}
+                                />
+
+                                <ErrorMessage>
+                                    {
+                                        errors.addressRequest?.districtCode
+                                            ?.message
+                                    }
+                                </ErrorMessage>
+                            </div>
+                            <div>
+                                <Modal.FormLabel
+                                    label="Phường / Xã"
+                                    required={true}
+                                />
+                                <Controller
+                                    control={control}
+                                    name="addressRequest.wardCode"
+                                    render={({ field }) => (
+                                        <SelectBox<IWard>
+                                            value={selectedWard}
+                                            placeholder="Chọn phường / xã"
+                                            onValueChange={(w) => {
+                                                if (
+                                                    w.code ===
+                                                    watch(
+                                                        "addressRequest.wardCode"
+                                                    )
+                                                )
+                                                    return;
+                                                field.onChange(w.code);
+                                                handleWardChange(w);
+                                            }}
+                                            displayKey="nameWithType"
+                                            dataSource={wards}
+                                        />
+                                    )}
+                                />
+                                <ErrorMessage>
+                                    {errors.addressRequest?.wardCode?.message}
+                                </ErrorMessage>
+                            </div>
+                            <Modal.FormLabel
+                                fieldName="status"
+                                label="Trạng thái"
+                                required={true}
+                            />
+                            <div className="flex items-center justify-between">
+                                <Modal.StatusSwitch
+                                    enabled={watch("status") || false}
+                                    enabledText="Nhà phát hành đang hoạt động"
+                                    disabledText="Nhà phát hành sẽ bị vô hiệu hóa"
+                                />
+                                <Controller
+                                    name="status"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <ToggleButton
+                                            isCheck={watch("status") || false}
+                                            onChange={(value) =>
+                                                field.onChange(value)
+                                            }
+                                        />
+                                    )}
+                                />
+                            </div>
+                        </>
+                    )}
+                </div>
+                <Modal.Footer>
+                    <div className="flex flex-wrap justify-end space-x-2">
+                        <Modal.SecondaryButton
+                            disabled={isSubmitting}
+                            onClick={handleOnClose}
+                            type="button"
+                        >
+                            Huỷ
+                        </Modal.SecondaryButton>
+
+                        <Modal.PrimaryButton
+                            disabled={
+                                isSubmitting ||
+                                (!isDirty && action === IssuerModalMode.UPDATE)
+                            }
+                            type="submit"
+                        >
+                            <Modal.SubmitTextWithLoading
+                                isLoading={isSubmitting}
+                                text={
+                                    action === IssuerModalMode.CREATE
+                                        ? "Thêm nhà phát hành"
+                                        : "Cập nhật NPH"
+                                }
+                                loadingText={
+                                    action === IssuerModalMode.CREATE
+                                        ? "Đang thêm"
+                                        : "Đang cập nhật"
+                                }
+                            />
+                        </Modal.PrimaryButton>
+                    </div>
+                </Modal.Footer>
+            </form>
+        </TransitionModal>
+    );
 };
 
 export default memo(IssuerModal);

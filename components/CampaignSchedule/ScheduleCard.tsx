@@ -2,17 +2,16 @@ import React, {useState} from 'react'
 import Form from "../Form";
 import {RiDeleteBin7Fill} from "react-icons/ri";
 import {z} from "zod";
-import {ScheduleSchema} from "../CampaignForm/hooks";
 import {Controller, useFormContext} from "react-hook-form";
 import useAddress from "../../hooks/useAddress";
 import SelectBox from "../SelectBox";
 import {IProvince} from "../../types/Address/IProvince";
 import {IDistrict} from "../../types/Address/IDistrict";
 import {IWard} from "../../types/Address/IWard";
-import useOfflineCampaignForm from "../CampaignForm/hooks/useOfflineCampaignForm";
 import ErrorMessage from "../Form/ErrorMessage";
 import DateTimePickerModal from "../Modal/DateTimePickerModal";
 import {format} from "date-fns";
+import {RecurringOfflineCampaignSchema, ScheduleSchema} from '../CampaignForm/shared';
 
 type Schedule = z.infer<typeof ScheduleSchema>
 
@@ -32,20 +31,10 @@ const ScheduleCard: React.FC<Props> = ({
 
     const [showStartDatePicker, setShowStartDatePicker] = useState(false);
     const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+
+    type FormType = z.infer<typeof RecurringOfflineCampaignSchema>;
     const {
-        provinces,
-        districts,
-        wards,
-        selectedProvince,
-        selectedDistrict,
-        selectedWard,
-        handleProvinceChange,
-        handleDistrictChange,
-        handleWardChange
-    } = useAddress();
-    const {ContinuousOfflineCampaignSchema} = useOfflineCampaignForm({});
-    type FormType = z.infer<typeof ContinuousOfflineCampaignSchema>;
-    const {
+        watch,
         control,
         getValues,
         register,
@@ -64,6 +53,22 @@ const ScheduleCard: React.FC<Props> = ({
         startDate: `${registerKey}.startDate` as `campaignOrganizations.${number}.schedules.${number}.startDate`,
         endDate: `${registerKey}.endDate` as `campaignOrganizations.${number}.schedules.${number}.endDate`,
     }
+
+    const {
+        provinces,
+        districts,
+        wards,
+        selectedProvince,
+        selectedDistrict,
+        selectedWard,
+        handleProvinceChange,
+        handleDistrictChange,
+        handleWardChange
+    } = useAddress({
+        defaultProvinceCode: getValues(fieldNames.addressRequest.provinceCode),
+        defaultDistrictCode: getValues(fieldNames.addressRequest.districtCode),
+        defaultWardCode: getValues(fieldNames.addressRequest.wardCode)
+    });
 
     const errorsInSchedule = errors?.campaignOrganizations?.[parentIndex]?.schedules?.[index];
 
@@ -201,10 +206,6 @@ const ScheduleCard: React.FC<Props> = ({
                                             //         message: "Thời gian bắt đầu phải sau năm 2025"
                                             //     })
                                             // }
-                                            setError(fieldNames.startDate, {
-                                                type: "manual",
-                                                message: "Thời gian bắt đầu phải sau năm 2025"
-                                            })
                                             field.onChange(date);
                                         }
                                         setShowStartDatePicker(false);

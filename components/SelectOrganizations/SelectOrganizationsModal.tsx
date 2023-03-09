@@ -1,27 +1,27 @@
-import React, {useState} from "react";
-import {BsCheckCircle, BsSearch} from "react-icons/bs";
+import React, { useState } from "react";
+import { BsCheckCircle, BsSearch } from "react-icons/bs";
 import Image from "next/image";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 import Modal from "../Modal/Modal";
 import TransitionModal from "../Modal/TransitionModal";
 import useDebounce from "../../hooks/useDebounce";
-import {useQuery} from "@tanstack/react-query";
-import {IOrganization} from "../../types/Organization/IOrganization";
-import {OrganizationService} from "../../services/OrganizationService";
+import { useQuery } from "@tanstack/react-query";
+import { IOrganization } from "../../types/Organization/IOrganization";
+import { OrganizationService } from "../../services/OrganizationService";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    selectedOrganizations: IOrganization[];
+    selectedOrganizations: { id: number; [key: string]: any }[];
     onItemSelect: (organization: IOrganization) => void;
 };
 
 const SelectOrganizationsModal: React.FC<Props> = ({
-                                                       isOpen,
-                                                       onClose,
-                                                       selectedOrganizations,
-                                                       onItemSelect,
-                                                   }) => {
+    isOpen,
+    onClose,
+    selectedOrganizations,
+    onItemSelect,
+}) => {
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounce(search, 500);
     const organizationService = new OrganizationService();
@@ -31,14 +31,15 @@ const SelectOrganizationsModal: React.FC<Props> = ({
         onClose();
     };
 
-    const {data: organizations, isLoading} = useQuery(
+    const { data: organizations, isLoading } = useQuery(
         ["organizations", debouncedSearch],
         () =>
             organizationService.getOrganizations({
                 name: debouncedSearch,
-            }), {
+            }),
+        {
             keepPreviousData: true,
-            select: (data) => data.data
+            select: (data) => data.data,
         }
     );
 
@@ -51,7 +52,7 @@ const SelectOrganizationsModal: React.FC<Props> = ({
         >
             <div className="overflow-hidden rounded-xl">
                 <div>
-                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Tìm kiếm tổ chức"
@@ -100,7 +101,7 @@ const SelectOrganizationsModal: React.FC<Props> = ({
 
                                     {isSelected && (
                                         <div className="absolute top-1/2 right-4 -translate-y-1/2 transform">
-                                            <BsCheckCircle className="text-green-500"/>
+                                            <BsCheckCircle className="text-green-500" />
                                         </div>
                                     )}
                                 </div>
