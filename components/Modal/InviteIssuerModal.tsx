@@ -1,64 +1,52 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import Image from "next/image";
-import React, { useContext, useState } from "react";
-import { toast } from "react-hot-toast";
-import { AiFillMinusCircle } from "react-icons/ai";
-import { BsSearch } from "react-icons/bs";
-import { Roles } from "../../constants/Roles";
-import { useAuth } from "../../context/AuthContext";
-import { CampaignContext } from "../../context/CampaignContext";
-import useDebounce from "../../hooks/useDebounce";
-import {
-    InviteIssuerParams,
-    ParticipantService,
-} from "../../services/ParticipantService";
-import { UserService } from "../../services/UserService";
-import { IUser } from "../../types/User/IUser";
-import { getAvatarFromName } from "../../utils/helper";
-import Modal from "./Modal";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import React, {useContext, useState} from "react";
+import {toast} from "react-hot-toast";
+import {useAuth} from "../../context/AuthContext";
+import {CampaignContext} from "../../context/CampaignContext";
+import {InviteIssuerParams, ParticipantService,} from "../../services/ParticipantService";
+import {IUser} from "../../types/User/IUser";
 import TransitionModal from "./TransitionModal";
+import {BsSearch} from "react-icons/bs";
+import {AiFillMinusCircle} from "react-icons/ai";
+import {getAvatarFromName} from "../../utils/helper";
+import Image from "next/image";
+import Modal from "./Modal";
+import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
 };
 
-const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
-    const { loginUser } = useAuth();
+const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
+    const {loginUser} = useAuth();
+    const campaign = useContext(CampaignContext);
+    const queryClient = useQueryClient();
     const participantService = new ParticipantService(loginUser?.accessToken);
+    const campaignService = new ParticipantService(loginUser?.accessToken);
     const inviteIssuerMutation = useMutation((data: InviteIssuerParams) =>
-        participantService.inviteIssuerByAdmin(data)
-    );
-    const [search, setSearch] = useState<string>("");
-
-    const [selectedIssuers, setSelectedIssuers] = useState<IUser[]>([]);
-    const debouncedSearch = useDebounce(search, 500);
-
-    const { data: issuers, isLoading } = useQuery(
-        ["issuers", debouncedSearch],
-        () => {
-            return new UserService(loginUser?.accessToken).getUsersByAdmin({
-                name: debouncedSearch,
-                size: 1000,
-                status: true,
-                role: Roles.ISSUER.id,
-            });
-        },
-        {
-            select: (data) => data?.data,
+            participantService.inviteIssuerByAdmin(data), {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries(["admin_campaign", campaign?.id]);
+                await queryClient.invalidateQueries(["unparticipated-issuers", campaign?.id]);
+                onClose();
+            }
         }
     );
+    const [search, setSearch] = useState<string>("");
+    const [selectedIssuers, setSelectedIssuers] = useState<IUser[]>([]);
 
-    const campaign = useContext(CampaignContext);
-    const currentParticipantIssuerIds =
-        campaign?.participants?.map((participant) => participant?.issuerId) ||
-        [];
-    const availableIssuers = issuers?.filter(
-        (issuer) =>
-            !selectedIssuers?.find(
-                (selectedIssuer) => selectedIssuer?.id === issuer?.id
-            ) && !currentParticipantIssuerIds?.find((id) => id === issuer?.id)
+    const {data: issuers, isLoading} = useQuery(
+        ["unparticipated-issuers", campaign?.id],
+        () => {
+            if (campaign?.id === undefined) return [];
+            return campaignService.getUnparticipatedIssuersOfCampaign(campaign?.id);
+        },
     );
+
+    const searchedIssuers = issuers?.filter((issuer) => {
+        return issuer?.name?.toLowerCase().includes(search.toLowerCase());
+    });
 
     const afterModalClose = () => {
         setSelectedIssuers([]);
@@ -127,7 +115,7 @@ const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className={"relative my-3"}>
-                        <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
+                        <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
                         <input
                             type="text"
                             placeholder="Tìm kiếm nhà phát hành"
@@ -142,7 +130,7 @@ const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                 htmlFor="email"
                                 className="text-sm font-medium text-gray-700"
                             >
-                                Nhà phát hành sẽ được mời mời
+                                Nhà phát hành sẽ được mời
                             </label>
                             <div className="mt-1">
                                 <div className="flex overflow-x-scroll gap-2 my-3 pb-3">
@@ -167,7 +155,8 @@ const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                                     type="button"
                                                     className="relative mt-2 mr-2"
                                                 >
-                                                    <AiFillMinusCircle className="h-4 w-4 text-red-500 hover:text-red-700" />
+                                                    <AiFillMinusCircle
+                                                        className="h-4 w-4 text-red-500 hover:text-red-700"/>
                                                 </button>
                                             </div>
                                             <Image
@@ -182,7 +171,7 @@ const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                                 height={200}
                                                 className="h-10 w-10 rounded-full object-cover"
                                             />
-                                            <span className="text-sm text-gray-500 line-clamp-1">
+                                            <span className="text-sm text-gray-500 line-clamp-1 px-2">
                                                 {issuer?.name}
                                             </span>
                                         </div>
@@ -192,19 +181,19 @@ const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
                         </div>
                     )}
 
-                    <div className="overflow-y-scroll h-96">
-                        {!isLoading && availableIssuers ? (
-                            availableIssuers.map((issuer) => (
-                                <div
-                                    key={issuer.id}
-                                    className="flex items-center justify-between p-4 border-b border-gray-200"
-                                >
-                                    <div className="flex items-center">
-                                        <div className="flex-shrink-0">
+                    <div className="overflow-y-auto h-96 max-w-full">
+                        {searchedIssuers && searchedIssuers?.length > 0 ? (
+                                searchedIssuers.map((issuer) => {
+                                    const isSelected = selectedIssuers?.find(i => i?.id === issuer?.id) !== undefined;
+                                    return <div
+                                        key={issuer.id}
+                                        className="flex gap-3 items-center justify-between p-4 border-b border-gray-200"
+                                    >
+                                        <div className='flex gap-4 flex-1 min-w-0'>
                                             <Image
                                                 width={200}
                                                 height={200}
-                                                className="h-10 w-10 rounded-full object-cover"
+                                                className="h-10 w-10 rounded-full object-cover flex-shrink-0"
                                                 src={
                                                     issuer?.imageUrl ||
                                                     getAvatarFromName(
@@ -213,91 +202,43 @@ const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                                 }
                                                 alt=""
                                             />
+                                            <div className='flex-1 min-w-0'>
+                                                <p className="text-sm font-medium text-gray-900 line-clamp-2 break-words">
+                                                    {issuer?.name}
+                                                </p>
+                                                <p className="text-sm text-gray-500 line-clamp-2 break-words">
+                                                    {issuer?.email}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="ml-4">
-                                            <div className="text-sm font-medium text-gray-900">
-                                                {issuer?.name}
-                                            </div>
-                                            <div className="text-sm text-gray-500">
-                                                {issuer?.email}
-                                            </div>
+                                        <div className='flex justify-end items-center'>
+                                            <button
+                                                onClick={() =>
+                                                    handleSelectIssuer(issuer)
+                                                }
+                                                disabled={isSelected}
+                                                type="button"
+                                                className="text-sm font-medium w-max text-indigo-600 hover:text-indigo-500 disabled:opacity-50"
+                                            >
+                                                {isSelected
+                                                    ? "Đã chọn"
+                                                    : "Chọn"}
+                                            </button>
                                         </div>
                                     </div>
-                                    <div className="flex-shrink-0">
-                                        <button
-                                            onClick={() =>
-                                                handleSelectIssuer(issuer)
-                                            }
-                                            type="button"
-                                            className="relative inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        >
-                                            Thêm
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="flex items-center justify-center p-4 border-b border-gray-200">
-                                <div className="flex items-center">
-                                    Chưa có nhà phát hành
-                                </div>
-                            </div>
-                        )}
+                                })
+                            ) :
+                            issuers && issuers?.length > 0 ? (
+                                <EmptyState
+                                    status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
+                                />
+                            ) : (
+                                <EmptyState
+                                    status={EMPTY_STATE_TYPE.NO_DATA}
+                                    customMessage={"Không có nhà phát hành nào để mời"}
+                                />
+                            )}
                     </div>
-
-                    {/*<div className='mt-4'>*/}
-                    {/*    <div className='flex flex-col'>*/}
-                    {/*        <label htmlFor='email' className='text-sm font-medium text-gray-700'>*/}
-                    {/*            Email*/}
-                    {/*        </label>*/}
-                    {/*        <div className='mt-1'>*/}
-                    {/*            <input*/}
-                    {/*                type='text'*/}
-                    {/*                name='email'*/}
-                    {/*                id='email'*/}
-                    {/*                className='shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md'*/}
-                    {/*            />*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*    <div className='flex flex-col mt-4'>*/}
-                    {/*        <label htmlFor='role' className='text-sm font-medium text-gray-700'>*/}
-                    {/*            Vai trò*/}
-                    {/*        </label>*/}
-                    {/*        <div className='mt-1'>*/}
-                    {/*            <select*/}
-                    {/*                id='role'*/}
-                    {/*                name='role'*/}
-                    {/*                className='shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md'*/}
-                    {/*            >*/}
-                    {/*                <option>Chọn vai trò</option>*/}
-                    {/*                <option>Chủ sở hữu</option>*/}
-                    {/*                <option>Quản trị viên</option>*/}
-                    {/*            </select>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*    <div className='flex flex-col mt-4'>*/}
-                    {/*        <label htmlFor='message' className='text-sm font-medium text-gray-700'>*/}
-                    {/*            Tin nhắn*/}
-                    {/*        </label>*/}
-                    {/*        <div className='mt-1'>*/}
-                    {/*            <textarea*/}
-                    {/*                id='message'*/}
-                    {/*                name='message'*/}
-                    {/*                rows={3}*/}
-                    {/*                className='shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md'*/}
-
-                    {/*            />*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*    <div className='mt-4'>*/}
-                    {/*        <button*/}
-                    {/*            type='button'*/}
-                    {/*            className='m-btn bg-indigo-500 text-white w-full'*/}
-                    {/*        >*/}
-                    {/*            Gửi lời mời*/}
-                    {/*        </button>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
                 </div>
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">
@@ -311,9 +252,8 @@ const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                 inviteIssuerMutation.isLoading
                             }
                         >
-                            Gửi lời mời{" "}
-                            {selectedIssuers.length > 0 &&
-                                `(${selectedIssuers.length})`}
+                            {inviteIssuerMutation.isLoading ?
+                                'Đang gửi...' : `Gửi lời mời ${selectedIssuers.length > 0 ? `(${selectedIssuers.length})` : ""}`}
                         </Modal.PrimaryButton>
                     </div>
                 </Modal.Footer>

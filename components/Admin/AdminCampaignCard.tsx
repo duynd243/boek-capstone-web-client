@@ -155,7 +155,7 @@ const AdminCampaignCard: React.FC<Props> = ({ campaign }) => {
         <Link
           href={
             findRole(loginUser?.role)?.defaultRoute +
-            `/campaigns/${campaign?.id}/edit`
+            `/campaigns/${campaign?.id}`
           }
           className="mb-1 inline-flex text-slate-800 hover:text-slate-900"
         >

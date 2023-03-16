@@ -1,4 +1,6 @@
-import { IUser } from "./../User/IUser";
+import {IUser} from "../User/IUser";
+import {ICampaign} from "../Campaign/ICampaign";
+
 export interface IParticipant {
     id: number;
     campaignId?: number;
@@ -13,4 +15,5 @@ export interface IParticipant {
         description?: string;
         user?: IUser;
     };
+    campaign?: ICampaign;
 }

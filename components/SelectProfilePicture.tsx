@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useId, useState} from "react";
 import DefaultAvatar from "../assets/images/default-avatar.png";
 import Image from "next/image";
-import { isValidImageSrc } from "../utils/helper";
+import {isValidImageSrc} from "../utils/helper";
 
 type Props = {
     defaultImageURL?: string;
@@ -9,9 +9,10 @@ type Props = {
 };
 
 const SelectProfilePicture: React.FC<Props> = ({
-    defaultImageURL,
-    onChange,
-}) => {
+                                                   defaultImageURL,
+                                                   onChange,
+                                               }) => {
+    const inputId = useId();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const initialPreviewURL =
@@ -50,9 +51,10 @@ const SelectProfilePicture: React.FC<Props> = ({
                 />
             </div>
             <div className="ml-5 rounded-md shadow-sm">
-                <div className="group relative flex items-center justify-center rounded-md border border-gray-300 py-2 px-3 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:bg-gray-50">
+                <div
+                    className="group relative flex items-center justify-center rounded-md border border-gray-300 py-2 px-3 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:bg-gray-50">
                     <label
-                        htmlFor="profile-picture-input"
+                        htmlFor={inputId}
                         className="pointer-events-none relative text-sm font-medium leading-4 text-gray-700"
                     >
                         <span>
@@ -63,8 +65,9 @@ const SelectProfilePicture: React.FC<Props> = ({
                     </label>
                     <input
                         onChange={handleFileChange}
-                        id="profile-picture-input"
+                        id={inputId}
                         type="file"
+                        accept="image/*"
                         className="absolute h-full w-full cursor-pointer rounded-md border-gray-300 opacity-0"
                     />
                 </div>

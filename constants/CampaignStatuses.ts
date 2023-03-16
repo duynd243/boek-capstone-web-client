@@ -10,12 +10,12 @@ export const CampaignStatuses = {
         statusColor: "green",
     },
     POSTPONED: {
-        id: 3,
+        id: 5,
         displayName: "Đang tạm hoãn",
         statusColor: "slate",
     },
     FINISHED: {
-        id: 4,
+        id: 3,
         displayName: "Đã kết thúc",
         statusColor: "red",
     },

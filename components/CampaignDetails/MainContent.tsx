@@ -1,29 +1,25 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import {useInfiniteQuery} from "@tanstack/react-query";
 import Image from "next/image";
-import React, { useContext, useState } from "react";
-import {
-    IoArrowForward,
-    IoChevronBack,
-    IoLocationSharp,
-} from "react-icons/io5";
-import { useAuth } from "../../context/AuthContext";
-import { PostService } from "../../old-services/PostService";
-import { IPostResponse } from "../../old-types/response/IPostResponse";
-import { getFormattedDate } from "../../utils/helper";
+import React, {useContext, useState} from "react";
+import {IoArrowForward, IoChevronBack, IoLocationSharp,} from "react-icons/io5";
+import {useAuth} from "../../context/AuthContext";
+import {PostService} from "../../old-services/PostService";
+import {IPostResponse} from "../../old-types/response/IPostResponse";
+import {getFormattedDate} from "../../utils/helper";
 import ContentHeader from "./ContentHeader";
 import OrganizationCard from "./OrganizationCard";
 import PostCard from "./PostCard";
 import Separator from "./Seperator";
 import StatusLabel from "./StatusLabel";
 // import ParticipationTable from '../Admin/ParticipationTable';
-import { useRouter } from "next/router";
-import { HiStatusOnline } from "react-icons/hi";
-import { CampaignFormats } from "../../constants/CampaignFormats";
-import { CampaignContext } from "../../context/CampaignContext";
+import {useRouter} from "next/router";
+import {HiStatusOnline} from "react-icons/hi";
+import {CampaignFormats} from "../../constants/CampaignFormats";
+import {CampaignContext} from "../../context/CampaignContext";
 import EmptySection from "./EmptySection";
 
 const MainContent: React.FC = () => {
-    const { loginUser } = useAuth();
+    const {loginUser} = useAuth();
     const postService = new PostService(loginUser?.accessToken);
 
     const router = useRouter();
@@ -42,7 +38,7 @@ const MainContent: React.FC = () => {
         isInitialLoading,
     } = useInfiniteQuery(
         ["posts", campaign?.id],
-        ({ pageParam = 1 }) =>
+        ({pageParam = 1}) =>
             postService.getPosts({
                 page: pageParam,
                 campaignId: campaign?.id,
@@ -66,13 +62,13 @@ const MainContent: React.FC = () => {
                     className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
                     onClick={() => router.back()}
                 >
-                    <IoChevronBack size={"17"} />
+                    <IoChevronBack size={"17"}/>
                     <span>Quay lại</span>
                 </button>
             </div>
             <div className="mb-2 flex flex-wrap items-center gap-1 text-sm font-semibold uppercase text-indigo-500">
                 {getFormattedDate(campaign?.startDate).fullDate}
-                <IoArrowForward className={"fill-indigo-500"} />
+                <IoArrowForward className={"fill-indigo-500"}/>
                 {getFormattedDate(campaign?.endDate).fullDate}
             </div>
             <header className="mb-4">
@@ -116,7 +112,7 @@ const MainContent: React.FC = () => {
                     )}
                 </div>
                 {/* Right side */}
-                <StatusLabel statusId={campaign?.status} />
+                <StatusLabel statusId={campaign?.status}/>
             </div>
 
             {/* Image */}
@@ -135,10 +131,10 @@ const MainContent: React.FC = () => {
 
             {/* Description */}
             <div>
-                <ContentHeader text={"Mô tả hội sách"} />
+                <ContentHeader text={"Mô tả hội sách"}/>
                 <p className="mt-2 mb-6 break-words">{campaign?.description}</p>
             </div>
-            <Separator />
+            <Separator/>
 
             {/*Organizations*/}
             <div>
@@ -164,7 +160,7 @@ const MainContent: React.FC = () => {
                     />
                 )}
             </div>
-            <Separator />
+            <Separator/>
 
             {/*ParticipationTable*/}
             {/* {loginUser?.role === Roles.SYSTEM.id && (
@@ -185,7 +181,7 @@ const MainContent: React.FC = () => {
                         <div className="grid grid-cols-12 gap-6">
                             {posts?.pages?.map((value) =>
                                 value.data.map((post: IPostResponse) => (
-                                    <PostCard data={post} key={post?.id} />
+                                    <PostCard data={post} key={post?.id}/>
                                 ))
                             )}
                         </div>
@@ -202,11 +198,11 @@ const MainContent: React.FC = () => {
                         )}
                     </div>
                 ) : (
-                    <EmptySection text={"Sự kiện này chưa có bài đăng nào"} />
+                    <EmptySection text={"Sự kiện này chưa có bài đăng nào"}/>
                 )}
             </div>
 
-            <Separator />
+            <Separator/>
 
             {/*/!* Comments *!/*/}
             {/*<div>*/}

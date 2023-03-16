@@ -1,22 +1,20 @@
-import React, {Fragment, ReactElement, useState} from "react";
-import AdminLayout from "../../../components/Layout/AdminLayout";
+import React, {Fragment, ReactElement, useState} from 'react'
+import {ParticipantFlowTabs} from "../../../constants/ParticipantStatuses";
 import {NextPageWithLayout} from "../../_app";
+import AdminLayout from "../../../components/Layout/AdminLayout";
 import PageHeading from "../../../components/Admin/PageHeading";
 import {Tab} from "@headlessui/react";
 import Kanban from "../../../components/Kanban";
 import ParticipantColumn from "../../../components/ParticipantColumn";
-import {ParticipantFlowTabs} from "../../../constants/ParticipantStatuses";
 
-
-const AdminParticipantsPage: NextPageWithLayout = () => {
-    const [selectedFlowTab, setSelectedFlowTab] = useState(ParticipantFlowTabs[0]);
-
+const IssuerParticipants: NextPageWithLayout = () => {
+    const [selectedFlowTab, setSelectedFlowTab] = useState(
+        ParticipantFlowTabs[0]
+    );
     return (
         <Fragment>
             <PageHeading label="Yêu cầu và lời mời tham gia hội sách">
             </PageHeading>
-
-
             <div className="rounded shadow bg-gradient-to-r from-gray-700 via-gray-900 to-black
              overflow-hidden">
                 <div className="bg-white px-4 md:px-6 border-b-2">
@@ -51,10 +49,9 @@ const AdminParticipantsPage: NextPageWithLayout = () => {
 
             </div>
         </Fragment>
-    );
-};
-
-AdminParticipantsPage.getLayout = function getLayout(page: ReactElement) {
+    )
+}
+IssuerParticipants.getLayout = function getLayout(page: ReactElement) {
     return <AdminLayout>{page}</AdminLayout>;
 };
-export default AdminParticipantsPage;
+export default IssuerParticipants

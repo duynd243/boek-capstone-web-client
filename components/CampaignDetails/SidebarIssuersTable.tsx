@@ -1,23 +1,27 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { useContext, useState } from "react";
-import { AiOutlineUsergroupAdd } from "react-icons/ai";
-import { CampaignStatuses } from "../../constants/CampaignStatuses";
-import { ParticipantStatuses } from "../../constants/ParticipantStatuses";
-import { Roles } from "../../constants/Roles";
-import { useAuth } from "../../context/AuthContext";
-import { CampaignContext } from "../../context/CampaignContext";
+import React, {useContext, useState} from "react";
+import {AiOutlineUsergroupAdd} from "react-icons/ai";
+import {CampaignStatuses} from "../../constants/CampaignStatuses";
+import {ParticipantStatuses} from "../../constants/ParticipantStatuses";
+import {Roles} from "../../constants/Roles";
+import {useAuth} from "../../context/AuthContext";
+import {CampaignContext} from "../../context/CampaignContext";
 import InviteIssuerModal from "../Modal/InviteIssuerModal";
 import DefaultAvatar from "./../../assets/images/default-avatar.png";
 import SidebarBlockWrapper from "./SidebarBlockWrapper";
+import JoinedIssuerModal from "../Modal/JoinedIssuerModal";
+import * as HoverCard from "@radix-ui/react-hover-card";
+import IssuerHoverCard from "../IssuerHoverCard";
 
 type Props = {
     maxRows?: number;
 };
 
-const SidebarIssuersTable: React.FC<Props> = ({ maxRows = 10 }) => {
+const SidebarIssuersTable: React.FC<Props> = ({maxRows = 10}) => {
     const [showInviteModal, setShowInviteModal] = useState(false);
-    const { loginUser } = useAuth();
+    const [showAllModal, setShowAllModal] = useState(false);
+    const {loginUser} = useAuth();
 
     const campaign = useContext(CampaignContext);
     const joinedIssuers =
@@ -25,8 +29,7 @@ const SidebarIssuersTable: React.FC<Props> = ({ maxRows = 10 }) => {
             ?.filter(
                 (p) =>
                     p?.status === ParticipantStatuses.RequestApproved.id ||
-                    (p?.status === ParticipantStatuses.InvitationAccepted.id &&
-                        p?.issuer)
+                    p?.status === ParticipantStatuses.InvitationAccepted.id
             )
             ?.map((p) => p?.issuer?.user) || [];
 
@@ -42,9 +45,18 @@ const SidebarIssuersTable: React.FC<Props> = ({ maxRows = 10 }) => {
                 </div>
                 {joinedIssuers?.length > 0 &&
                     joinedIssuers?.length > maxRows && (
-                        <button className="text-base font-medium text-indigo-500 hover:text-indigo-600 disabled:text-gray-500">
-                            Xem tất cả
-                        </button>
+                        <>
+                            <button
+                                onClick={() => setShowAllModal(true)}
+                                className="text-base font-medium text-indigo-500 hover:text-indigo-600 disabled:text-gray-500">
+                                Xem tất cả
+                            </button>
+                            <JoinedIssuerModal
+                                isOpen={showAllModal}
+                                onClose={() => setShowAllModal(false)}
+                                joinedIssuers={joinedIssuers}
+                            />
+                        </>
                     )}
             </div>
             {joinedIssuers?.length === 0 ? (
@@ -56,34 +68,48 @@ const SidebarIssuersTable: React.FC<Props> = ({ maxRows = 10 }) => {
                     {joinedIssuers?.slice(0, maxRows).map((issuer) => (
                         <li key={issuer?.id}>
                             <div className="flex justify-between">
-                                <div className="flex grow items-center">
-                                    <div className="relative mr-3">
-                                        <Image
-                                            className="h-8 w-8 rounded-full"
-                                            src={
-                                                issuer?.imageUrl ||
-                                                DefaultAvatar.src
-                                            }
-                                            width="32"
-                                            height="32"
-                                            alt="User 08"
-                                        />
-                                    </div>
-                                    <div className="truncate">
+                                <HoverCard.Root>
+                                    <HoverCard.Trigger asChild>
+                                        <div className="flex grow items-center">
+                                            <div className="relative mr-3">
+                                                <Image
+                                                    className="h-8 w-8 rounded-full"
+                                                    src={
+                                                        issuer?.imageUrl ||
+                                                        DefaultAvatar.src
+                                                    }
+                                                    width={500}
+                                                    height={500}
+                                                    alt=""
+                                                />
+                                            </div>
+                                            <div className="truncate">
                                         <span className="text-sm font-medium text-slate-800">
                                             {issuer?.name}
                                         </span>
-                                    </div>
-                                </div>
+                                            </div>
+                                        </div>
+                                    </HoverCard.Trigger>
+                                    <HoverCard.Portal>
+                                        <HoverCard.Content
+                                            className={'radix-side-top:animate-slide-up radix-side-bottom:animate-slide-down rounded-lg p-4 pt-0 md:w-full animate-fade-in'}
+                                            align="start"
+                                            sideOffset={4}>
+                                            <HoverCard.Arrow className="fill-current text-gray-50"/>
+                                            <IssuerHoverCard issuer={issuer}/>
+                                        </HoverCard.Content>
+                                    </HoverCard.Portal>
+                                </HoverCard.Root>
+
                                 <button className="rounded-full text-slate-400 hover:text-slate-500">
                                     <span className="sr-only">Menu</span>
                                     <svg
                                         className="h-8 w-8 fill-current"
                                         viewBox="0 0 32 32"
                                     >
-                                        <circle cx="16" cy="16" r="2" />
-                                        <circle cx="10" cy="16" r="2" />
-                                        <circle cx="22" cy="16" r="2" />
+                                        <circle cx="16" cy="16" r="2"/>
+                                        <circle cx="10" cy="16" r="2"/>
+                                        <circle cx="22" cy="16" r="2"/>
                                     </svg>
                                 </button>
                             </div>
