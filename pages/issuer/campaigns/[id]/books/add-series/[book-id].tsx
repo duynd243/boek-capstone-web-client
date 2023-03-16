@@ -49,16 +49,16 @@ function getFormatOptions(book: typeof fakeBookSeries[number] | undefined) {
 const AddSellingBookSeriesPage: NextPageWithLayout = () => {
     const router = useRouter();
     const bookId = router.query['book-id'];
-    const bookSeries = fakeBookSeries.find(b => b.id === Number(bookId));
+    // const bookSeries = fakeBookSeries.find(b => b.id === Number(bookId));
 
     const [selectedBooks, setSelectedBooks] = useState<typeof randomBooks>(randomBooks);
 
 
-    const availableFormats = getFormatOptions(bookSeries);
-    const [selectedFormat, setSelectedFormat] = useState<typeof fullFormats[number] | null>(availableFormats?.length === 1 ? availableFormats[0] : null);
+    //const availableFormats = getFormatOptions(bookSeries);
+    //const [selectedFormat, setSelectedFormat] = useState<typeof fullFormats[number] | null>(availableFormats?.length === 1 ? availableFormats[0] : null);
 
-    const availableBonuses = availableFormats.filter((format) => format.id !== selectedFormat?.id && format.name !== 'Sách giấy');
-    console.log(availableFormats);
+    // const availableBonuses = availableFormats.filter((format) => format.id !== selectedFormat?.id && format.name !== 'Sách giấy');
+    // console.log(availableFormats);
 
 
     const [selectedBonus, setSelectedBonus] = useState<number[]>([]);
@@ -118,13 +118,13 @@ const AddSellingBookSeriesPage: NextPageWithLayout = () => {
                             width={1000}
                             height={1000}
                             className={'rounded-md w-64 h-72 object-cover max-w-full shadow-md'}
-                            src={bookSeries?.imageUrl || ''} alt={bookSeries?.name || ''}/>
+                            src={faker.image.imageUrl() || ''} alt={''}/>
                         <div>
                             <div
                                 className='mb-2 bg-blue-500 text-sm font-medium text-white py-2 px-3 w-fit rounded'>S81239
                             </div>
-                            <h1 className="mb-2 text-2xl font-medium text-slate-800">{bookSeries?.name}</h1>
-                            <div className="text-gray-500">NXB: {bookSeries?.publisher}</div>
+                            <h1 className="mb-2 text-2xl font-medium text-slate-800">{'bookSeries?.name'}</h1>
+                            <div className="text-gray-500">NXB: {'ABC'}</div>
 
 
                             {/* Price */}
@@ -137,7 +137,7 @@ const AddSellingBookSeriesPage: NextPageWithLayout = () => {
 
                             {/* Description */}
                             <div className="mt-3 text-sm text-gray-500">
-                                {bookSeries?.description}
+                                {'bookSeries?.description'}
                             </div>
                         </div>
                     </div>
@@ -147,14 +147,14 @@ const AddSellingBookSeriesPage: NextPageWithLayout = () => {
                             <Form.Input
                                 inputType={'number'}
                                 placeholder={"Giảm giá"}
-                                formikForm={form}
+
                                 fieldName={"discount"}
                                 label={"Giảm giá (%)"}
                             />
                             <Form.Input
                                 inputType={'number'}
                                 placeholder={"Nhập số lượng sách sẽ được bán"}
-                                formikForm={form}
+
                                 required={true}
                                 fieldName={"saleQuantity"}
                                 label={"Số lượng"}
@@ -169,18 +169,18 @@ const AddSellingBookSeriesPage: NextPageWithLayout = () => {
                     <div className="mt-3 space-y-4">
                         <div>
                             <Form.Label required={true} label={"Định dạng sách"}/>
-                            <SelectBox
-                                placeholder={"Chọn định dạng"}
-                                value={selectedFormat}
-                                onChange={(value) => {
-                                    if (value) {
-                                        setSelectedFormat(value);
-                                        form.setFieldValue("format", value?.id);
-                                    }
-                                }}
-                                dataSource={availableFormats}
-                                displayKey={"name"}
-                            />
+                            {/*<SelectBox*/}
+                            {/*    placeholder={"Chọn định dạng"}*/}
+                            {/*    value={selectedFormat}*/}
+                            {/*    onChange={(value) => {*/}
+                            {/*        if (value) {*/}
+                            {/*            setSelectedFormat(value);*/}
+                            {/*            form.setFieldValue("format", value?.id);*/}
+                            {/*        }*/}
+                            {/*    }}*/}
+                            {/*    dataSource={availableFormats}*/}
+                            {/*    displayKey={"name"}*/}
+                            {/*/>*/}
                             {form.errors.format && form.touched.format && (
                                 <ErrorMessage>{form.errors.format}</ErrorMessage>
                             )}
@@ -188,38 +188,38 @@ const AddSellingBookSeriesPage: NextPageWithLayout = () => {
                         <div>
                             <Form.Label label={"Tặng kèm"}/>
                             <div className="grid sm:grid-cols-2">
-                                {selectedFormat ? (availableBonuses?.length > 0 ? availableBonuses.map((format) => (
-                                    <div key={format.id} className="relative flex items-start">
-                                        <div className="flex h-5 items-center">
-                                            <input
-                                                id={`bonus-${format.id}`}
-                                                name="bonus"
-                                                type="checkbox"
-                                                value={format.id}
-                                                onChange={(event => {
-                                                    if (event.target.checked) {
-                                                        handleAddBonus(format.id);
-                                                    } else {
-                                                        handleRemoveBonus(format.id);
-                                                    }
-                                                })
-                                                }
-                                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                            />
-                                        </div>
-                                        <div className="ml-3 text-sm">
-                                            <label
-                                                htmlFor={`bonus-${format.id}`}
-                                                className="text-sm font-medium text-gray-600"
-                                            >
-                                                Tất cả sách {format.name} trong series
-                                            </label>
-                                        </div>
-                                    </div>
-                                )) : <div className="text-gray-500 text-sm">Không tìm thấy tặng kèm khả dụng.</div>) : (
-                                    <div className="text-gray-500 text-sm">Bạn cần chọn định dạng để xem được các mục
-                                        tặng kèm khả dụng.</div>
-                                )}
+                                {/*{selectedFormat ? (availableBonuses?.length > 0 ? availableBonuses.map((format) => (*/}
+                                {/*    <div key={format.id} className="relative flex items-start">*/}
+                                {/*        <div className="flex h-5 items-center">*/}
+                                {/*            <input*/}
+                                {/*                id={`bonus-${format.id}`}*/}
+                                {/*                name="bonus"*/}
+                                {/*                type="checkbox"*/}
+                                {/*                value={format.id}*/}
+                                {/*                onChange={(event => {*/}
+                                {/*                    if (event.target.checked) {*/}
+                                {/*                        handleAddBonus(format.id);*/}
+                                {/*                    } else {*/}
+                                {/*                        handleRemoveBonus(format.id);*/}
+                                {/*                    }*/}
+                                {/*                })*/}
+                                {/*                }*/}
+                                {/*                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"*/}
+                                {/*            />*/}
+                                {/*        </div>*/}
+                                {/*        <div className="ml-3 text-sm">*/}
+                                {/*            <label*/}
+                                {/*                htmlFor={`bonus-${format.id}`}*/}
+                                {/*                className="text-sm font-medium text-gray-600"*/}
+                                {/*            >*/}
+                                {/*                Tất cả sách {format.name} trong series*/}
+                                {/*            </label>*/}
+                                {/*        </div>*/}
+                                {/*    </div>*/}
+                                {/*)) : <div className="text-gray-500 text-sm">Không tìm thấy tặng kèm khả dụng.</div>) : (*/}
+                                {/*    <div className="text-gray-500 text-sm">Bạn cần chọn định dạng để xem được các mục*/}
+                                {/*        tặng kèm khả dụng.</div>*/}
+                                {/*)}*/}
                             </div>
                         </div>
                     </div>

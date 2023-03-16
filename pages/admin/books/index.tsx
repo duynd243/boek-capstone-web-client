@@ -36,12 +36,6 @@ const AdminBooksPage: NextPageWithLayout = () => {
         onSizeChange,
         pageSizeOptions,
         setPage,
-        showDeleteModal,
-        setShowDeleteModal,
-        setShowCreateModal,
-        setShowUpdateModal,
-        showCreateModal,
-        showUpdateModal,
     } = useTableManagementPage();
 
     const {

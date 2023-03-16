@@ -1,21 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { memo, useMemo } from "react";
-import { BsCalendarWeek, BsThreeDots } from "react-icons/bs";
-import { IoMdInformation } from "react-icons/io";
-import { IoLocationSharp, IoPeopleSharp } from "react-icons/io5";
+import React, {memo, useMemo} from "react";
+import {BsCalendarWeek, BsThreeDots} from "react-icons/bs";
+import {IoMdInformation} from "react-icons/io";
+import {IoLocationSharp, IoPeopleSharp} from "react-icons/io5";
 import NoImage from "../../assets/images/no-image.png";
-import { ParticipantStatuses } from "../../constants/ParticipantStatuses";
-import { useAuth } from "../../context/AuthContext";
-import { ICampaign } from "../../types/Campaign/ICampaign";
-import { getFormattedTime } from "../../utils/helper";
+import {ParticipantStatuses} from "../../constants/ParticipantStatuses";
+import {ICampaign} from "../../types/Campaign/ICampaign";
+import {getFormattedTime} from "../../utils/helper";
 import AvatarGroup from "../AvatarGroup";
 import FormatCard from "./FormatCard";
+import IssuerHoverCard from "../IssuerHoverCard";
+
 type Props = {
     campaign: ICampaign;
 };
 
-const CampaignCard: React.FC<Props> = ({ campaign }) => {
+const CampaignCard: React.FC<Props> = ({campaign}) => {
 
     const issuerAvatars = useMemo(() => {
         return (
@@ -33,8 +34,16 @@ const CampaignCard: React.FC<Props> = ({ campaign }) => {
                 }) || []
         );
     }, [campaign]);
+    const issuerOfParticipants = useMemo(() => {
+        return campaign?.participants?.map((p) => p?.issuer?.user) || [];
+    }, [campaign]);
+    const issuerHoverCardElements = issuerOfParticipants.map((issuer) => {
+        return (
+            <IssuerHoverCard issuer={issuer} key={issuer?.id}/>
+        )
+    });
 
-    console.log("issuerAvatars", issuerAvatars);                    
+    console.log("issuerAvatars", issuerAvatars);
 
     const metadataItemClassName = {
         container: "flex items-center justify-between gap-3",
@@ -62,7 +71,8 @@ const CampaignCard: React.FC<Props> = ({ campaign }) => {
             <div className="p-4 flex-1 min-w-0 flex flex-col">
                 <div className="flex-1 min-w-0">
                     {/* Time */}
-                    <div className="flex text-blue-600 items-center gap-1.5 text-sm font-medium uppercase tracking-wide ">
+                    <div
+                        className="flex text-blue-600 items-center gap-1.5 text-sm font-medium uppercase tracking-wide ">
                         <div className="bg-blue-50 p-2 rounded">
                             <BsCalendarWeek
                                 className="fill-blue-600 w-3 h-3"
@@ -104,7 +114,7 @@ const CampaignCard: React.FC<Props> = ({ campaign }) => {
                                 Hình thức
                             </span>
                         </div>
-                        <FormatCard formatId={campaign?.format} />
+                        <FormatCard formatId={campaign?.format}/>
                     </div>
                     <div
                         className={`${metadataItemClassName.container} min-w-0`}
@@ -144,6 +154,7 @@ const CampaignCard: React.FC<Props> = ({ campaign }) => {
                                 max={3}
                                 size={26}
                                 restTitle="nhà phát hành khác"
+                                hoverElements={issuerHoverCardElements}
                             />
                         ) : (
                             <span className={metadataItemClassName.value}>
@@ -156,7 +167,7 @@ const CampaignCard: React.FC<Props> = ({ campaign }) => {
 
             {/* Status Card */}
             <button className="border rounded-full absolute bg-white p-1.5 top-3 right-3">
-                <BsThreeDots className="fill-slate-600" />
+                <BsThreeDots className="fill-slate-600"/>
             </button>
         </Link>
     );

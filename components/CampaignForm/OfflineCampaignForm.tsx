@@ -258,6 +258,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
     const selectedCommissions = watch("campaignCommissions") || [];
 
     const onSubmit = async (data: OfflineCampaignFormType) => {
+        console.log('here')
         if (data.previewFile) {
             try {
                 await toast.promise(

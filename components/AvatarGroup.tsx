@@ -1,7 +1,9 @@
-import Image from "next/image";
 import React, {useMemo} from "react";
-import DefaultAvatar from "../assets/images/default-avatar.png";
+import * as HoverCard from '@radix-ui/react-hover-card';
+import Image from "next/image";
 import {isValidImageSrc} from "../utils/helper";
+import DefaultAvatar from "../assets/images/default-avatar.png";
+
 
 type Props = {
     avatars: {
@@ -11,6 +13,7 @@ type Props = {
     max?: number;
     size?: "sm" | "md" | "lg" | number;
     restTitle?: string;
+    hoverElements?: React.ReactNode[];
 };
 
 const AvatarGroup: React.FC<Props> = ({
@@ -18,6 +21,7 @@ const AvatarGroup: React.FC<Props> = ({
                                           max = 3,
                                           size = "sm",
                                           restTitle,
+                                          hoverElements,
                                       }) => {
     let sizeClasses = "";
     let restTextSizeClass = "";
@@ -50,20 +54,35 @@ const AvatarGroup: React.FC<Props> = ({
     return (
         <div className="flex items-center group">
             {avatars.slice(0, max).map((avatar, index) => (
-                <Image
-                    key={index}
-                    title={avatar.title}
-                    width={1000}
-                    height={1000}
-                    className={`${sizeClasses} first:ml-0 -ml-2 group-hover:ml-0 rounded-full border border-slate-50 object-cover shadow-sm drop-shadow-sm transition-all duration-300`}
-                    style={styles}
-                    src={
-                        avatar.src && isValidImageSrc(avatar.src)
-                            ? avatar.src
-                            : DefaultAvatar.src
-                    }
-                    alt={avatar.title || ""}
-                />
+
+                <HoverCard.Root key={index}>
+                    <HoverCard.Trigger asChild>
+                        <Image
+                            title={
+                                hoverElements && hoverElements[index] ? '' : avatar.title || ''
+                            }
+                            width={500}
+                            height={500}
+                            className={`${sizeClasses} first:ml-0 -ml-2 group-hover:ml-0 rounded-full border border-slate-50 object-cover shadow-sm drop-shadow-sm transition-all duration-300`}
+                            style={styles}
+                            src={
+                                avatar.src && isValidImageSrc(avatar.src)
+                                    ? avatar.src
+                                    : DefaultAvatar.src
+                            }
+                            alt={avatar.title || ""}
+                        />
+                    </HoverCard.Trigger>
+                    <HoverCard.Portal>
+                        <HoverCard.Content
+                            className={'radix-side-top:animate-slide-up radix-side-bottom:animate-slide-down rounded-lg p-4 pt-0 md:w-full animate-fade-in'}
+                            align="center"
+                            sideOffset={4}>
+                            <HoverCard.Arrow className="fill-current text-gray-50"/>
+                            {hoverElements && hoverElements[index]}
+                        </HoverCard.Content>
+                    </HoverCard.Portal>
+                </HoverCard.Root>
             ))}
             {rest > 0 && (
                 <div

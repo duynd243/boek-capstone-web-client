@@ -1,10 +1,10 @@
 import React from "react";
 
-import { Dialog } from "@headlessui/react";
+import {Dialog} from "@headlessui/react";
 import Form from "../Form";
 import Link from "next/link";
-import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
-import { CgSpinnerAlt } from "react-icons/cg";
+import {BsEmojiFrownFill, BsEmojiSmileFill} from "react-icons/bs";
+import {CgSpinnerAlt} from "react-icons/cg";
 
 type HeaderProps = {
     title: string;
@@ -16,7 +16,7 @@ type FooterProps = {
     children: React.ReactNode;
 };
 
-const Header: React.FC<HeaderProps> = ({ title, showCloseButton, onClose }) => {
+const Header: React.FC<HeaderProps> = ({title, showCloseButton, onClose}) => {
     return (
         <Dialog.Title className="border-b border-slate-200 px-5 py-3">
             <div className="flex items-center justify-between">
@@ -29,7 +29,8 @@ const Header: React.FC<HeaderProps> = ({ title, showCloseButton, onClose }) => {
                     >
                         <div className="sr-only">Close</div>
                         <svg className="h-4 w-4 fill-current">
-                            <path d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z"></path>
+                            <path
+                                d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z"></path>
                         </svg>
                     </button>
                 )}
@@ -37,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({ title, showCloseButton, onClose }) => {
         </Dialog.Title>
     );
 };
-const Footer: React.FC<FooterProps> = ({ children }) => {
+const Footer: React.FC<FooterProps> = ({children}) => {
     return (
         <div className="border-t border-slate-200 px-5 py-4">{children}</div>
     );
@@ -55,7 +56,7 @@ type ButtonProps = {
 } & React.ButtonHTMLAttributes<HTMLButtonElement> &
     React.AnchorHTMLAttributes<HTMLAnchorElement>;
 
-const PrimaryButton: React.FC<ButtonProps> = ({ children, href, ...rest }) => {
+const PrimaryButton: React.FC<ButtonProps> = ({children, href, ...rest}) => {
     const props = {
         ...rest,
         className:
@@ -74,10 +75,10 @@ const PrimaryButton: React.FC<ButtonProps> = ({ children, href, ...rest }) => {
 };
 
 const SecondaryButton: React.FC<ButtonProps> = ({
-    children,
-    href,
-    ...rest
-}) => {
+                                                    children,
+                                                    href,
+                                                    ...rest
+                                                }) => {
     const props = {
         ...rest,
         className:
@@ -95,10 +96,10 @@ const SecondaryButton: React.FC<ButtonProps> = ({
 };
 
 const StatusSwitch = ({
-    enabled,
-    enabledText,
-    disabledText,
-}: {
+                          enabled,
+                          enabledText,
+                          disabledText,
+                      }: {
     enabled: boolean;
     enabledText: string;
     disabledText: string;
@@ -112,11 +113,11 @@ const StatusSwitch = ({
             >
                 {enabled ? (
                     <>
-                        Hoạt động <BsEmojiSmileFill />
+                        Hoạt động <BsEmojiSmileFill/>
                     </>
                 ) : (
                     <>
-                        Không hoạt động <BsEmojiFrownFill />
+                        Không hoạt động <BsEmojiFrownFill/>
                     </>
                 )}
             </div>
@@ -137,7 +138,7 @@ const SubmitTextWithLoading = (props: {
             {props.isLoading ? (
                 <>
                     {props.loadingText}
-                    <CgSpinnerAlt className="animate-spin ml-2" size={18} />
+                    <CgSpinnerAlt className="animate-spin ml-2" size={18}/>
                 </>
             ) : (
                 props.text
