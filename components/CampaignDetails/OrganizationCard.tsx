@@ -18,7 +18,7 @@ const OrganizationCard: React.FC<Props> = ({ organization }) => {
         </div>
         <div className={"text-sm text-slate-500"}>
           {organization?.organization?.address} -{" "}
-          {organization?.organization?.phoneNumber}
+          {organization?.organization?.phone}
         </div>
       </div>
     </div>

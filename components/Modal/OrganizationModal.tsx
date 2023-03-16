@@ -244,7 +244,7 @@ const OrganizationModal: React.FC<Props> = ({
                     />
 
                     <pre>
-                        {JSON.stringify(getValues(), null, 2)}
+                        {/* {JSON.stringify(getValues(), null, 2)} */}
                     </pre>
                 </div>
                 <Modal.Footer>

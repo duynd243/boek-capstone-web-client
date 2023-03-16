@@ -8,11 +8,18 @@ import {CampaignStatuses} from "../../../constants/Statuses";
 import PageHeading from "../../../components/Admin/PageHeading";
 import SearchForm from "../../../components/Admin/SearchForm";
 import CreateButton from "../../../components/Admin/CreateButton";
-import {Tab} from "@headlessui/react";
+import {Menu, Tab, Transition} from "@headlessui/react";
 import Chip from "../../../components/Admin/Chip";
 import {CampaignFormats} from "../../../constants/CampaignFormats";
 import CampaignCard from "../../../components/CampaignCard";
 import {CampaignService} from "../../../services/CampaignService";
+import useSearchQuery from "../../../hooks/useSearchQuery";
+import {IoAdd} from "react-icons/io5";
+import CreateBookButton from "../../../components/CreateBookButton";
+import {GiBookmarklet} from "react-icons/gi";
+import CreateCampaignButton from "../../../components/CreateCampaignButton";
+import {HiBuildingStorefront} from "react-icons/hi2";
+import {HiStatusOnline} from "react-icons/hi";
 
 const CampaignStatusTabs = [
     {
@@ -30,15 +37,30 @@ const CampaignFormatTabs = [
 
     }, ...Object.values(CampaignFormats)];
 
+const CampaignCreateButtons = [
+    {
+        label: "Trực tiếp",
+        description: "Tạo hội sách trực tiếp",
+        href: "/admin/campaigns/create/offline",
+        icon: HiBuildingStorefront,
+    },
+    {
+        label: "Trực tuyến",
+        description: "Tạo hội sách trực tuyến",
+        href: "/admin/campaigns/create/online",
+        icon: HiStatusOnline,
+    }
+]
+
 
 const AdminCampaignsPage: NextPageWithLayout = () => {
 
-    console.log(CampaignFormatTabs)
     const router = useRouter();
+
+    const {search, setSearch} = useSearchQuery("search", () => setPage(1));
 
     const [size, setSize] = useState<number>(10);
     const [page, setPage] = useState<number>(1);
-    const [search, setSearch] = useState<string>("");
     const [selectedFormat, setSelectedFormat] = useState<undefined | number>(1);
     const [selectedStatus, setSelectedStatus] = useState<undefined | number>(
         undefined
@@ -46,21 +68,53 @@ const AdminCampaignsPage: NextPageWithLayout = () => {
     const {loginUser} = useAuth();
     const campaignService = new CampaignService(loginUser?.accessToken);
     const {data: campaignsResponse, isLoading} = useQuery(
-        ["admin_campaigns"],
-        () => campaignService.getCampaignsByAdmin(),
+        ["admin_campaigns", {search}],
+        () => campaignService.getCampaignsByAdmin({
+            name: search,
+        }),
     );
-
-    useEffect(() => {
-        const search = router.query.search as string;
-        setSearch(search);
-        setPage(1); // Reset page to 1 when search changes
-    }, [router.query.search]);
-
     return (
         <Fragment>
             <PageHeading label="Hội sách">
-                <SearchForm/>
-                <CreateButton label="Tạo hội sách" href="/admin/campaigns/create"/>
+                <SearchForm
+                    placeholder="Tìm kiếm hội sách"
+                    value={search}
+                    onSearchSubmit={(value) => setSearch(value)}
+                />
+
+                <Menu as={"div"} className={"relative"}>
+                    <Menu.Button
+                        as={'div'}
+                    >
+                        <CreateButton label="Tạo hội sách"/>
+
+                    </Menu.Button>
+                    <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                    >
+                        <Menu.Items
+                            className="max-w-screen absolute right-0 z-10 mt-2 w-80 origin-top-right overflow-hidden rounded-lg bg-white p-2.5 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <div className="relative flex flex-col gap-2 bg-white">
+                                {CampaignCreateButtons.map((button, index) => (
+                                    <Menu.Item as={'div'} key={index}>
+                                        <CreateCampaignButton
+                                            icon={button.icon}
+                                            href={button.href}
+                                            label={button.label}
+                                            description={button.description}
+                                        />
+                                    </Menu.Item>
+                                ))}
+                            </div>
+                        </Menu.Items>
+                    </Transition>
+                </Menu>
             </PageHeading>
             <div className='bg-white px-4 rounded'>
                 <Tab.Group>
@@ -94,7 +148,6 @@ const AdminCampaignsPage: NextPageWithLayout = () => {
                                     key={tab.name}
                                 >
                                     {({selected}) => {
-                                        console.log(tab.statusColor)
                                         return (
                                             <Chip active={selected}>
                                                 {tab?.statusColor && (
@@ -112,7 +165,8 @@ const AdminCampaignsPage: NextPageWithLayout = () => {
                     </div>
                 </Tab.Group>
                 <div className='grid gap-6 md:grid-cols-2 '>
-                    {campaignsResponse?.data?.map((campaign) => (<CampaignCard key={campaign?.id} campaign={campaign}/>))}
+                    {campaignsResponse?.data?.map((campaign) => (
+                        <CampaignCard key={campaign?.id} campaign={campaign}/>))}
                 </div>
             </div>
 

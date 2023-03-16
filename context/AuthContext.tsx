@@ -4,9 +4,10 @@ import {
     onAuthStateChanged,
     signInWithPopup,
     signOut,
-    Unsubscribe, User,
+    Unsubscribe,
+    User,
 } from "firebase/auth";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 import React, {
     createContext,
     ReactNode,
@@ -15,11 +16,12 @@ import React, {
     useState,
 } from "react";
 import LoadingProgress from "../components/LoadingProgress";
-import {toast} from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import LogoutModal from "../components/Modal/LogoutModal";
-import {ILoginData} from "../types/User/ILoginData";
-import {UserService} from "../services/UserService";
-import {Roles} from "../constants/Roles";
+import { ILoginData } from "../types/User/ILoginData";
+import { UserService } from "../services/UserService";
+import { Roles } from "../constants/Roles";
+import { IUser } from "../types/User/IUser";
 
 export interface IAuthContext {
     user: User | null;
@@ -27,6 +29,7 @@ export interface IAuthContext {
     authLoading: boolean;
     handleGoogleSignIn: () => void;
     logOut: () => void;
+    updateLoginUser: (user: IUser) => void;
 }
 
 const AuthContext = createContext({} as IAuthContext);
@@ -36,7 +39,7 @@ type Props = {
     children: ReactNode;
 };
 
-export const AuthContextProvider: React.FC<Props> = ({children}) => {
+export const AuthContextProvider: React.FC<Props> = ({ children }) => {
     const googleProvider = new GoogleAuthProvider();
     const auth = getAuth();
     const router = useRouter();
@@ -58,6 +61,17 @@ export const AuthContextProvider: React.FC<Props> = ({children}) => {
         setShowLogOutModal(true);
     };
 
+    const updateLoginUser = (user: IUser) => {
+        setLoginUser((prev) => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                name: user?.name || prev.name,
+                imageUrl: user?.imageUrl || prev.imageUrl,
+            };
+        });
+    };
+
     const doLogOut = async () => {
         await toast.promise(signOut(auth), {
             loading: "Đang đăng xuất...",
@@ -72,21 +86,27 @@ export const AuthContextProvider: React.FC<Props> = ({children}) => {
         const userService = new UserService();
         const handleServerAuthentication = async (idToken: string) => {
             try {
-                const {data} = await userService.loginWithFirebaseIdToken(idToken);
+                const { data } = await userService.loginWithFirebaseIdToken(
+                    idToken
+                );
                 if (!data) return;
                 switch (data?.role) {
                     case Roles.CUSTOMER.id:
                         await signOut(auth);
-                        toast.error("Tài khoản của bạn hiện không hỗ trợ đăng nhập bằng website. Vui lòng đăng nhập lại trên ứng dụng điện thoại.");
+                        toast.error(
+                            "Tài khoản của bạn hiện không hỗ trợ đăng nhập bằng website. Vui lòng đăng nhập lại trên ứng dụng điện thoại."
+                        );
                         return;
                     case Roles.STAFF.id:
                         await signOut(auth);
-                        toast.error("Tài khoản nhân viên không hỗ trợ đăng nhập bằng website. Vui lòng đăng nhập lại trên ứng dụng điện thoại.");
+                        toast.error(
+                            "Tài khoản nhân viên không hỗ trợ đăng nhập bằng website. Vui lòng đăng nhập lại trên ứng dụng điện thoại."
+                        );
                         return;
                     default:
                         break;
                 }
-                console.log("Login User: ", data)
+                console.log("Login User: ", data);
                 setLoginUser(data);
                 toast.success("Đăng nhập thành công");
             } catch (err: any) {
@@ -97,7 +117,7 @@ export const AuthContextProvider: React.FC<Props> = ({children}) => {
         const unsubscribe: Unsubscribe = onAuthStateChanged(
             auth,
             async (firebaseUser) => {
-                console.log("Firebase User: ", firebaseUser)
+                console.log("Firebase User: ", firebaseUser);
                 if (firebaseUser && firebaseUser.email !== loginUser?.email) {
                     const token = await firebaseUser.getIdToken();
                     await handleServerAuthentication(token);
@@ -115,12 +135,13 @@ export const AuthContextProvider: React.FC<Props> = ({children}) => {
             value={{
                 user,
                 loginUser,
+                updateLoginUser,
                 authLoading,
                 handleGoogleSignIn,
                 logOut,
             }}
         >
-            {authLoading ? <LoadingProgress/> : children}
+            {authLoading ? <LoadingProgress /> : children}
             {loginUser && (
                 <LogoutModal
                     doLogout={doLogOut}

@@ -17,6 +17,7 @@ import {
 import {GiShop} from "react-icons/gi";
 import {ImBook} from "react-icons/im";
 import {IoMedalSharp} from "react-icons/io5";
+import {MdContactMail} from "react-icons/md";
 
 export interface ISidebarMenu {
     name: string;
@@ -29,6 +30,27 @@ export interface ISidebarMenuGroup {
     menus: ISidebarMenu[];
 }
 
+export const ADMIN_SETTINGS_MENUS: ISidebarMenu[] = [
+    {
+        name: "Hồ sơ",
+        path: "/admin/settings/profile",
+    },
+    {
+        name: "Cài đặt khác",
+        path: "/admin/settings/other",
+    },
+];
+
+export const ISSUER_SETTINGS_MENUS: ISidebarMenu[] = [
+    {
+        name: "Hồ sơ",
+        path: "/issuer/settings/profile",
+    },
+    {
+        name: "Cài đặt khác",
+        path: "/issuer/settings/other",
+    },
+];
 export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
     {
         groupName: "Thống kê",
@@ -46,6 +68,11 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                 name: "Hội sách",
                 path: "/admin/campaigns",
                 icon: <GiShop/>,
+            },
+            {
+                name: "Tham gia hội sách",
+                path: "/admin/participants",
+                icon: <MdContactMail/>,
             },
             {
                 name: "Khách hàng",
@@ -133,10 +160,10 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
 
 export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
     {
-        groupName: "Chung",
+        groupName: "Hệ Thống",
         menus: [
             {
-                name: "Tổng quan",
+                name: "Thống kê",
                 path: "/issuer",
                 icon: <BsFillPieChartFill/>,
             },
@@ -147,11 +174,6 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                 icon: <BsFillCalendarWeekFill/>,
             },
             {
-                name: "Kho sách",
-                path: "/issuer/books",
-                icon: <ImBook/>,
-            },
-            {
                 name: "Đơn hàng",
                 path: "/issuer/orders",
                 icon: <BsFillFileEarmarkMedicalFill/>,
@@ -159,11 +181,31 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
         ],
     },
     {
-        groupName: "Cài đặt",
+        groupName: "Đối tác",
         menus: [
             {
+                name: "Kho sách",
+                path: "/issuer/books",
+                icon: <ImBook/>,
+            },
+            {
+                name: "Nhà xuất bản",
+                path: "/admin/publishers",
+                icon: <BsPrinterFill/>,
+            },
+            {
+                name: "Tác giả",
+                path: "/admin/authors",
+                icon: <BsFillPenFill/>,
+            },
+            {
+                name: "Thể loại sách",
+                path: "/admin/categories",
+                icon: <BsFillTagsFill/>,
+            },
+            {
                 name: "Cài đặt",
-                path: "/issuer/settings",
+                path: "/issuer/settings/profile",
                 icon: <BsFillGearFill/>,
             },
         ],

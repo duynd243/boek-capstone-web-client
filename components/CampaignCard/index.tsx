@@ -1,18 +1,22 @@
 import React from 'react'
 import Image from "next/image";
-import {faker} from "@faker-js/faker/locale/vi";
 import {ICampaign} from "../../types/Campaign/ICampaign";
+import Link from "next/link";
+import {useAuth} from "../../context/AuthContext";
+import {findRole} from "../../constants/Roles";
 
 type Props = {
     campaign: ICampaign
 }
 
 const CampaignCard: React.FC<Props> = ({campaign}) => {
-    const image = faker.image.image();
+
+    const {loginUser} = useAuth();
+    const defaultRoute = findRole(loginUser?.role)?.defaultRoute;
     return (
-        <div
-            className='border cursor-pointer transition-all duration-300 hover:scale-[1.02] shadow rounded overflow-hidden lg:grid lg:grid-cols-6'>
-            <Image src={campaign?.imageUrl || image}
+        <Link href={`${defaultRoute}/campaigns/${campaign?.id}`}
+              className='border cursor-pointer transition-all duration-300 hover:scale-[1.02] shadow rounded overflow-hidden lg:grid lg:grid-cols-6'>
+            <Image src={campaign?.imageUrl || ''}
                    width={1000}
                    height={1000}
                    className='object-cover w-full h-48 lg:col-span-2 lg:h-full'
@@ -27,7 +31,7 @@ const CampaignCard: React.FC<Props> = ({campaign}) => {
                     {campaign?.description}
                 </p>
             </div>
-        </div>
+        </Link>
     )
 }
 

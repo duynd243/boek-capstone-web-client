@@ -281,6 +281,8 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
         setShowSelectGroupModal(false);
     };
 
+
+
     const handleRemoveGroup = (group: IGroup) => {
         form.setFieldValue(
             "groups",
@@ -296,7 +298,6 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
 
     return (
         <Fragment>
-
             <form className="p-6 sm:p-10" onSubmit={form.handleSubmit}>
                 {/*Thông tin chung*/}
                 <Form.GroupLabel

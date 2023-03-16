@@ -2,6 +2,7 @@ import { AxiosInstance } from "axios";
 import getAxiosClient from "../axiosClient";
 import { IBaseListResponse } from "../../old-types/response/IBaseListResponse";
 import { ICampaign } from "../../old-types/ICampaign";
+// import { ICampaign } from './../../types/Campaign/ICampaign';
 
 export class IssuerCampaignService {
   private readonly axiosClient: AxiosInstance;

@@ -27,7 +27,7 @@ const SelectSellingBookSeriesModal: React.FC<Props> = ({
         <TransitionModal
             maxWidth={"max-w-xl"}
             isOpen={isOpen}
-            closeOnOverlayClick={true}
+            closeOnOverlayClick={false}
             onClose={onClose}
         >
             <div className="overflow-hidden rounded-xl">

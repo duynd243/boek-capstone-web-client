@@ -10,6 +10,8 @@ import {useAuth} from "../../../context/AuthContext";
 import {Roles} from "../../../constants/Roles";
 import ConfirmModal from "../ConfirmModal";
 import CancelOrderModal from "../CancelOrderModal";
+import SectionHeader from "./SectionHeader";
+import OrderGeneralInfo from "./OrderGeneralInfo";
 
 export interface IMockOrderItem {
     id: number;
@@ -104,7 +106,7 @@ const OrderDetailsModal: React.FC<Props> = ({order, afterLeave, isOpen, onClose}
     const nextStatus = getNextUpdateStatus(order?.status, order?.orderType);
 
     const [showConfirmUpdateModal, setShowConfirmUpdateModal] = useState(false);
-     const [showCancelModal, setShowCancelModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
     return (
         <Transition.Root show={isOpen} as={Fragment}>
             <Dialog
@@ -162,21 +164,22 @@ const OrderDetailsModal: React.FC<Props> = ({order, afterLeave, isOpen, onClose}
                                     <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
                                         <div className="py-8 px-4 lg:px-8 2xl:px-12">
                                             <div className="mx-auto max-w-sm lg:max-w-none">
-                                                <h2 className="mb-6 text-2xl font-bold text-slate-800">
+                                                <h1 className="mb-6 text-2xl font-bold text-slate-800">
                                                     Chi tiết đơn hàng
-                                                </h2>
+                                                </h1>
                                                 <div className="space-y-6">
+                                                    {/* Order Info */}
+                                                    <OrderGeneralInfo order={order}/>
+
                                                     {/* Order Details */}
                                                     <div>
-                                                        <div className="mb-2 font-semibold text-slate-800">
-                                                            Danh sách sản phẩm
-                                                        </div>
+                                                        <SectionHeader label={'Danh sách sản phẩm'}/>
                                                         {/* Cart items */}
-                                                        <ul>
+                                                        <div>
                                                             {/* Cart item */}
                                                             {order?.items.map((item) => <OrderItem orderItem={item}
                                                                                                    key={item?.id}/>)}
-                                                        </ul>
+                                                        </div>
                                                         {/* Fees, discount and total */}
                                                         <ul>
                                                             <li className="flex items-center justify-between border-b border-slate-200 py-3">
@@ -332,7 +335,6 @@ const OrderDetailsModal: React.FC<Props> = ({order, afterLeave, isOpen, onClose}
                                                         }
 
                                                     </div>
-
 
                                                     {loginUser?.role === Roles.ISSUER.id &&
                                                         <>

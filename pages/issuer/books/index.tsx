@@ -1,4 +1,4 @@
-import React, { Fragment, ReactElement, useState } from "react";
+import React, { Fragment, ReactElement, useState, useCallback } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { IssuerBookService } from "../../../old-services/Issuer/Issuer_BookService";
 import { useQuery } from "@tanstack/react-query";
@@ -23,6 +23,9 @@ import { randomBooks } from "../../admin/books";
 import { getAvatarFromName } from "../../../utils/helper";
 import useSearchQuery from "../../../hooks/useSearchQuery";
 import { BookService } from './../../../services/BookService';
+import Link from "next/link";
+import TableFooter from "../../../components/Admin/Table/TableFooter";
+
 
 
 
@@ -54,23 +57,29 @@ const IssuerBooksPage: NextPageWithLayout = () => {
   const [size, setSize] = useState<number>(pageSizeOptions[0]);
   const { search, setSearch } = useSearchQuery("search", () => setPage(1));
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(5);
   const issuerBookService = new IssuerBookService(loginUser?.accessToken);
   const bookService = new BookService(loginUser?.accessToken);
 
-
   const { data: issuerData } = useQuery(["issuer_books", { search, page, size }], () =>
-  bookService.getBooks$Issuer({
+    bookService.getBooks$Issuer({
       page: page,
       size: pageSize,
       sort: "id desc",
       name: search || undefined,
     }),
   );
+  const onSizeChange = useCallback((newSize: number) => {
+    setSize(newSize);
+    setPage(1);
+  }, []);
   return (
     <Fragment>
       <PageHeading label="Kho sách">
-        <SearchForm />
+        <SearchForm
+          placeholder="Tìm kiếm sách"
+          value={search}
+          onSearchSubmit={(value) => setSearch(value)} />
         <Menu as={"div"} className={"relative"}>
           <Menu.Button
             as={"button"}
@@ -115,6 +124,7 @@ const IssuerBooksPage: NextPageWithLayout = () => {
             <TableHeader>Nhà xuất bản</TableHeader>
             <TableHeader>ISBN10</TableHeader>
             <TableHeader>ISBN13</TableHeader>
+            {/* <TableHeader>Hội sách</TableHeader> */}
             <TableHeader>Tác giả</TableHeader>
             <TableHeader>Năm phát hành</TableHeader>
             <TableHeader textAlignment="text-center">Trạng thái</TableHeader>
@@ -146,10 +156,10 @@ const IssuerBooksPage: NextPageWithLayout = () => {
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
                     currency: "VND",
-                  }).format(faker.datatype.number())}
+                  }).format(book?.coverPrice || 0)}
                 </TableData>
                 <TableData>
-                  <div className="flex items-center">
+                  {!book?.isSeries ? <div className="flex items-center">
                     <div className="h-10 w-10 flex-shrink-0">
                       <Image
                         width={100}
@@ -164,7 +174,7 @@ const IssuerBooksPage: NextPageWithLayout = () => {
                         {book.publisher?.name}
                       </div>
                     </div>
-                  </div>
+                  </div> : <span>-</span>}
                 </TableData>
                 <TableData className="text-sm text-gray-500">
                   {book.isbn10}
@@ -174,7 +184,9 @@ const IssuerBooksPage: NextPageWithLayout = () => {
                   {book.isbn13}
                 </TableData>
                 <TableData className="text-sm text-gray-500">
-                  {book.name}
+                  {book.bookAuthors?.map((author) => (
+                    <div key={author?.id}>{author?.author?.name}</div>
+                  ))}
                 </TableData>
                 <TableData
                   textAlignment="text-center"
@@ -183,25 +195,35 @@ const IssuerBooksPage: NextPageWithLayout = () => {
                   {book.releasedYear}
                 </TableData>
                 <TableData textAlignment="text-center">
-                  {/* {randomBool ? (
+                  {book.status ? (
                     <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold uppercase leading-5 text-green-800">
-                      Hoạt động
+                      Phát Hành
                     </span>
                   ) : (
                     <span className="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold uppercase leading-5 text-red-800">
-                      Bị vô hiệu hóa
+                      Ngưng Phát Hành
                     </span>
-                  )} */}
-                  {book.statusName}
+                  )}
                 </TableData>
                 <TableData className="text-right text-sm font-medium">
-                  <button className="text-indigo-600 hover:text-indigo-900">
+                  <Link
+                    href={book?.isSeries ? `/issuer/books/series-detail/${book?.id}` : `/issuer/books/book-detail/${book?.id}`}
+                    className="text-indigo-600 hover:text-indigo-900">
                     Chi tiết
-                  </button>
+                  </Link>
                 </TableData>
               </tr>
             ))}
           </TableBody>
+          <TableFooter
+            colSpan={10}
+            size={size}
+            onSizeChange={onSizeChange}
+            page={page}
+            onPageChange={(page) => setPage(page)}
+            totalPages={issuerData?.metadata?.total || 0}
+            pageSizeOptions={pageSizeOptions}
+          />
         </TableWrapper>
       ) : (
         <div className="pt-8">

@@ -11,6 +11,7 @@ type Props<T> = {
     dataSource: T[] | undefined;
     displayKey: keyof T;
     searchable?: boolean;
+    disableKey?: keyof T;
 };
 
 const SelectBox = <T extends Record<string, any>>({
@@ -20,18 +21,19 @@ const SelectBox = <T extends Record<string, any>>({
                                                       dataSource,
                                                       displayKey,
                                                       searchable = true,
+                                                      disableKey
                                                   }: Props<T>) => {
     const [search, setSearch] = useState("");
 
     const searchedOptions = dataSource?.filter((option) => {
-        return option?.[displayKey].toLowerCase().includes(search.toLowerCase());
+        return option?.[displayKey]?.toString().toLowerCase().includes(search.toLowerCase());
     });
 
     return (
         <Combobox value={value} onChange={onValueChange}>
             {({open}) => (
                 <div className="relative">
-                    <Combobox.Button className='relative'>
+                    <Combobox.Button className='relative w-full'>
                         <Combobox.Input
                             readOnly={!searchable}
                             placeholder={open && value ? value?.[displayKey] : placeholder}
@@ -55,11 +57,12 @@ const SelectBox = <T extends Record<string, any>>({
                         afterLeave={() => setSearch("")}
                     >
                         <Combobox.Options
-                            className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            className="absolute z-[100] mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             {searchedOptions && searchedOptions?.length > 0 ? (
                                 searchedOptions.map((option, index) => (
                                     <Combobox.Option
-                                        className="relative cursor-default select-none rounded py-2 px-4 text-gray-700 ui-selected:font-medium ui-selected:text-gray-900 ui-active:bg-indigo-600 ui-active:text-white"
+                                        disabled={disableKey ? option?.[disableKey] : false}
+                                        className="relative cursor-default select-none rounded py-2 px-4 text-gray-700 ui-disabled:text-gray-400 ui-selected:font-medium ui-selected:text-gray-900 ui-active:bg-indigo-600 ui-active:text-white"
                                         key={index}
                                         value={option}
                                     >
@@ -88,3 +91,43 @@ const SelectBox = <T extends Record<string, any>>({
 };
 
 export default SelectBox;
+
+//
+// import {z} from "zod"
+//
+// export const schema = z.object({
+//     name: z.string(),
+//     description: z.string(),
+//     imageUrl: z.string(),
+//     addressRequest: z.object({
+//         detail: z.string(),
+//         provinceCode: z.number(),
+//         districtCode: z.number(),
+//         wardCode: z.number()
+//     }),
+//     startDate: z.date(),
+//     endDate: z.date(),
+//     campaignCommissions: z.array(
+//         z.object({genreId: z.number(), minimalCommission: z.number()})
+//     ),
+//     campaignOrganizations: z.array(
+//         z.object({
+//             organizationId: z.number(),
+//             schedules: z.array(
+//                 z.object({
+//                     addressRequest: z.object({
+//                         detail: z.string(),
+//                         provinceCode: z.number(),
+//                         districtCode: z.number(),
+//                         wardCode: z.number()
+//                     }),
+//                     startDate: z.date()
+//                         .refine((value) => value > , {
+//                             message: "Ngày bắt đầu phải lớn hơn ngày hiện tại"
+//                         }),
+//                     endDate: z.date()
+//                 })
+//             )
+//         })
+//     )
+// })

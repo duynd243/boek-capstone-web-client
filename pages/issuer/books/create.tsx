@@ -32,17 +32,11 @@ import ErrorMessage from './../../../components/Form/ErrorMessage';
 
 
 const IssuerCreateBookPage: NextPageWithLayout = () => {
+  
   const { loginUser } = useAuth();
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
-
-  const [selectedPublisherId, setSelectedPublisherId] = useState<string | null>(
-    null
-  );
   const [selectedAuthorId, setSelectedAuthorId] = useState<string | null>(null);
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
-    null
-  );
   const [selectedBookId, setSelectedBookId] = useState<string | null>(
     null
   );
@@ -141,6 +135,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
   const handleAddAuthor = (author: IAuthor) => {
     const currentAuthors = form.values.authors;
     const newAuthors = [...currentAuthors, author];
+    console.log(newAuthors);
+
     form.setFieldValue("authors", newAuthors);
   }
   const handleRemoveAuthor = (org: IAuthor) => {
@@ -168,7 +164,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
       isbn13: "",
       name: "",
       translator: "",
-      price: 0,
+      coverPrice: 0,
       description: "",
       language: "",
       size: "",
@@ -181,6 +177,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
       page: 1,
       bookInCombo: true,
       authors: [],
+      publisherId: undefined,
+      genreId: undefined,
     },
     validationSchema: Yup.object().shape({
       authors: Yup.array(Yup.object().shape({
@@ -196,7 +194,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
       //   .length(13, "ISBN13 phải có 13 ký tự"),
       name: Yup.string().required("Tên sách không được để trống"),
       translator: Yup.string().required("Tên dịch giả không được để trống"),
-      price: Yup.number()
+      coverPrice: Yup.number()
         .required("Giá không được để trống")
         .min(0, "Giá không được nhỏ hơn 0"),
       description: Yup.string().required("Mô tả không được để trống"),
@@ -214,10 +212,11 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
           new Date().getFullYear(),
           "Năm xuất bản không được lớn hơn năm hiện tại"
         ),
-
       page: Yup.number()
         .required("Số trang không được để trống")
         .min(1, "Số trang không được nhỏ hơn 1"),
+      publisherId: Yup.number().required("Nhà xuất bản không được để trống"),
+      genreId: Yup.number().required("Thể loại không được để trống"),
     }),
     onSubmit: async (values) => {
       // if (coverPhoto === null) {
@@ -238,15 +237,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
       //   return;
       // }
 
-      let payload = {
-        ...values,
-        authors: [Number(selectedAuthorId)],
-        categoryId: Number(selectedCategoryId),
-        publisherId: Number(selectedPublisherId),
-        imageUrl: "",
-      };
-      console.log(payload);
-
+      
       // // upload cover photo to firebase
       //
       // firebaseUploadPromise(coverPhoto)
@@ -269,15 +260,47 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
       //       toast.error(error?.message);
       //     },
       //   }
-      // );
-      alert(JSON.stringify(payload, null, 2));
+      // )
+
+
+      let payload = {
+        ...values,
+        authors: values.authors.map((a: IAuthor) => a.id),
+        audioTrialUrl: values.audioTrialUrl || null,
+        pdfTrialUrl: values.pdfTrialUrl || null,
+        pdfExtraPrice: values.pdfExtraPrice <=0 ? null : values.pdfExtraPrice,
+        audioExtraPrice: values.audioExtraPrice <=0 ? null : values.audioExtraPrice,
+        imageUrl: "",
+      };
+
+
+      if(!coverPhoto) {
+        toast.error("Vui lòng chọn ảnh bìa"); 
+        return;
+      }
+      try {
+          await toast.promise(uploadImageMutation.mutateAsync(coverPhoto), {
+            loading: "Đang tải ảnh lên",
+            success: (data) => {
+              payload.imageUrl = data?.url || "";
+              return "Tải ảnh lên thành công"
+            }
+              ,
+            error: (err) => err?.message || "Tải ảnh lên thất bại",
+          })
+      } catch(err) {
+        console.log(err);
+        return;
+      }
 
       async function createBookWithToast(promise: Promise<any>) {
         await toast.promise(promise, {
           loading: "Đang tạo sách lẻ",
-          success: () => {
-            router.push(`/issuer/books`);
-            
+          success: (data) => {
+            if (data?.id) {
+              router.push(`/issuer/books`);
+
+            }
             return "Tạo sách lẻ thành công"
           },
           error: (error) => {
@@ -285,7 +308,17 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
           },
         })
       }
-      await createBookWithToast(createBookMutation.mutateAsync(payload));
+
+
+
+     
+      console.log(payload);
+
+      try {
+        await createBookWithToast(createBookMutation.mutateAsync(payload));
+      } catch (error) {
+        console.log(error);
+      }
 
 
       // createBookWithToast(createBookMutation.mutateAsync(payload));
@@ -502,28 +535,29 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
               </div>
               <div className="sm:col-span-3">
                 <label
-                  htmlFor="price"
+                  htmlFor="coverPrice"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Giá bìa<span className="text-rose-500">*</span>
+                  Giá bìa (đ)<span className="text-rose-500">*</span>
                 </label>
+
                 <div className="mt-1">
                   <input
                     placeholder="10,000​"
-                    value={form.values.price}
+                    value={form.values.coverPrice}
                     // value={new Intl.NumberFormat("vi-VN", {
                     //   style: "currency",
                     //   currency: "VND",
                     // }).format(form.values.price)}
                     onChange={form.handleChange}
                     type="text"
-                    name="price"
-                    id="price"
+                    name="coverPrice"
+                    id="coverPrice"
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {form.errors.price && form.touched.price && (
-                  <div className={"input-error"}>{form.errors.price}</div>
+                {form.errors.coverPrice && form.touched.coverPrice && (
+                  <div className={"input-error"}>{form.errors.coverPrice}</div>
                 )}
               </div>
 
@@ -650,14 +684,14 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 </label>
                 <div className="mt-1">
                   <select
-                    onChange={(e) => setSelectedPublisherId(e.target.value)}
-                    value={selectedPublisherId!}
+                    onChange={form.handleChange}
+                    value={form.values.publisherId}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    name="publisher"
-                    id="publisher"
+                    name="publisherId"
+                    id="publisherId"
                   >
                     {publishers?.data?.map((publisher) => (
-                      <option value={publisher?.id} key={publisher?.id}>
+                      <option value={Number(publisher?.id)} key={publisher?.id}>
                         {publisher?.name}
                       </option>
                     ))}
@@ -666,18 +700,18 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
               </div>
               <div className="sm:col-span-3">
                 <label
-                  htmlFor="category"
+                  htmlFor="genreId"
                   className="block text-sm font-medium text-gray-700"
                 >
                   Thể loại<span className="text-rose-500">*</span>
                 </label>
                 <div className="mt-1">
                   <select
-                    onChange={(e) => setSelectedCategoryId(e.target.value)}
-                    value={selectedCategoryId!}
+                    onChange={form.handleChange}
+                    value={form.values.genreId}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    name="category"
-                    id="category"
+                    name="genreId"
+                    id="genreId"
                   >
                     {genres?.map((genre) => (
                       <option value={genre?.id} key={genre?.id}>
@@ -794,8 +828,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {form.errors.price && form.touched.price && (
-                  <div className={"input-error"}>{form.errors.price}</div>
+                {form.errors.pdfExtraPrice && form.touched.pdfExtraPrice && (
+                  <div className={"input-error"}>{form.errors.pdfExtraPrice}</div>
                 )}
               </div>
               <div className="sm:col-span-3">
@@ -838,8 +872,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
-                {form.errors.price && form.touched.price && (
-                  <div className={"input-error"}>{form.errors.price}</div>
+                {form.errors.audioExtraPrice && form.touched.audioExtraPrice && (
+                  <div className={"input-error"}>{form.errors.audioExtraPrice}</div>
                 )}
               </div>
             </div>
@@ -874,6 +908,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
         isOpen={showauthorselectModal}
         onClose={() => setShowAuthorSelectModal(false)}
         onItemSelect={(author) => {
+          console.log(author);
+
           handleAddAuthor(author);
           setShowAuthorSelectModal(false);
         }

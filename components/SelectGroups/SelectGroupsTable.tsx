@@ -17,6 +17,8 @@ const SelectGroupsTable: React.FC<Props> = ({
                                                 selectedGroups,
                                                 handleRemoveGroup,
                                             }) => {
+
+
     return (
         <TableWrapper>
             <TableHeading>
