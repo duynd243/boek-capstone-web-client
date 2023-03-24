@@ -9,13 +9,31 @@ import SelectBookSeriesProductModal from "../../../../../../components/SelectBoo
 import { IoChevronBack } from 'react-icons/io5';
 
 
+import { useAuth } from '../../../../../../context/AuthContext';
+import { CampaignService } from '../../../../../../services/CampaignService';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+
+import SelectBookSeriesModal from "../../../../../../components/SelectBookSeries/SelectBookSeriesModal";
 
 const SelectBookSeriesPage: NextPageWithLayout = () => {
     const router = useRouter();
 
+    const {loginUser} = useAuth();
+    const campaignService = new CampaignService(loginUser?.accessToken);
     const [showModal, setShowModal] = useState(false);
 
     const campaignId = router.query.id;
+
+    const { data: campaign, isFetching, isInitialLoading, isError } = useQuery(
+        ["issuer_campaign", campaignId],
+        () => campaignService.getCampaignByIdByIssuer(Number(campaignId)),
+        {
+            enabled: !!campaignId,
+        }
+    );
+
+    const genreIds = useMemo(() => campaign?.campaignCommissions?.map(c => c.genre?.id) || [], [campaign]);
     return (
         <Fragment>
             <div className='mx-auto max-w-6xl overflow-hidden rounded-md bg-white p-3'>
@@ -43,10 +61,15 @@ const SelectBookSeriesPage: NextPageWithLayout = () => {
                 </div>
             </div>
 
-            <SelectBookSeriesProductModal isOpen={showModal} onClose={() => setShowModal(false)}
-                                          onItemSelect={(book) => {
-                                              router.push(`/issuer/campaigns/${campaignId}/books/add-series/${book.id}`);
-                                          }}/>
+            <SelectBookSeriesModal
+                campaignId={Number(campaignId)}
+                isOpen={showModal} 
+                onClose={() => setShowModal(false)}
+                genreIds={genreIds}
+                isSeries={true}
+                onItemSelect={(book) => {
+                    router.push(`/issuer/campaigns/${campaignId}/books/add-series/${book.id}`);
+                }} />
         </Fragment>
     )
 }

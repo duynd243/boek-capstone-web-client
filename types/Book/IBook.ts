@@ -1,18 +1,18 @@
-import { IGenre } from "../Genre/IGenre";
-import { IPublisher } from "../Publisher/IPublisher";
-import { IBookAuthor } from "../Book_Author/IBookAuthor";
-import { ICampaign } from './../Campaign/ICampaign';
+import {IGenre} from "../Genre/IGenre";
+import {IPublisher} from "../Publisher/IPublisher";
+import {IBookAuthor} from "../Book_Author/IBookAuthor";
+import {IUser} from "../User/IUser";
 
 export interface IBookItem {
     id: number;
     parentBookId?: number;
     bookId: number;
     displayIndex: number;
-    book?: IBook;
+    book: IBook;
 }
 
 export interface IBook {
-    id?: number;
+    id: number;
     code?: string;
     genreId?: number;
     publisherId?: number;
@@ -39,13 +39,13 @@ export interface IBook {
     onlyPdf?: boolean;
     onlyAudio?: boolean;
     genre?: IGenre;
-    saleQuantity?: number;
-    discount?: number;
-    // status: boolean;
-    setFieldValue: (fieldName: string, value: any) => void;
-    //issuer?: Issuer;
+    issuer?: {
+        id: string;
+        description?: string;
+        user?: IUser;
+    };
     publisher?: IPublisher;
     bookAuthors?: IBookAuthor[];
     bookItems?: IBookItem[];
-    campaigns?: ICampaign[];
+    allowChangingGenre?: boolean;
 }

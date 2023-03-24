@@ -1,19 +1,14 @@
 import Image from "next/image";
-import React, { useEffect } from "react";
-import { Controller, useFormContext } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import { z } from "zod";
+import React, {useEffect, useId} from "react";
+import {Controller, useFormContext} from "react-hook-form";
+import {toast} from "react-hot-toast";
+import {z} from "zod";
 import DefaultAvatar from "../../assets/images/default-avatar.png";
-import { useAuth } from "../../context/AuthContext";
 import useAddress from "../../hooks/useAddress";
-import { IDistrict } from "../../types/Address/IDistrict";
-import { IProvince } from "../../types/Address/IProvince";
-import { IWard } from "../../types/Address/IWard";
-import {
-    isImageFile,
-    isValidFileSize,
-    VIETNAMESE_PHONE_REGEX,
-} from "../../utils/helper";
+import {IDistrict} from "../../types/Address/IDistrict";
+import {IProvince} from "../../types/Address/IProvince";
+import {IWard} from "../../types/Address/IWard";
+import {isImageFile, isValidFileSize, VIETNAMESE_PHONE_REGEX,} from "../../utils/helper";
 import Form from "../Form";
 import ErrorMessage from "../Form/ErrorMessage";
 import SelectBox from "../SelectBox";
@@ -49,22 +44,22 @@ export const UpdateProfileSchema = z.object({
     role: z.number().int(),
     status: z.boolean().default(true),
     code: z.string().optional(),
-    description: z.string().optional(),
 });
 
 export type UpdateProfileFormType = Partial<
     z.infer<typeof UpdateProfileSchema>
 >;
 
-const AdminProfileForm = ({ onSubmit }: Props) => {
-    const {loginUser} = useAuth();
+const AdminProfileForm = ({onSubmit}: Props) => {
+
+    const inputId = useId();
     const {
         handleSubmit,
         control,
         register,
         setValue,
         watch,
-        formState: { errors, isDirty, isSubmitting },
+        formState: {errors, isDirty, isSubmitting},
     } = useFormContext<UpdateProfileFormType>();
 
     const {
@@ -133,9 +128,12 @@ const AdminProfileForm = ({ onSubmit }: Props) => {
                     />
                 </div>
 
-                <div className="flex-grow mt-0 lg:flex-shrink-0 lg:flex-grow-0">
-                    <Form.Label label="Ảnh đại diện" />
-
+                <div className="flex-grow mt-0  lg:flex-shrink-0 lg:flex-grow-0">
+                    <label
+            className="mb-1 block text-sm text-center font-medium text-gray-600">
+            Ảnh đại diện
+        </label>
+                    
                     <div className="relative overflow-hidden rounded-full w-fit">
                         <Image
                             width={512}
@@ -147,9 +145,9 @@ const AdminProfileForm = ({ onSubmit }: Props) => {
                         <Controller
                             name="previewFile"
                             control={control}
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <label
-                                    htmlFor="user-photo"
+                                    htmlFor={inputId}
                                     className="absolute inset-0 flex h-full w-full items-center justify-center bg-black bg-opacity-75 text-sm font-medium text-white opacity-0 focus-within:opacity-100 hover:opacity-100"
                                 >
                                     <span>
@@ -183,8 +181,9 @@ const AdminProfileForm = ({ onSubmit }: Props) => {
                                                 );
                                             }
                                         }}
+                                        accept="image/*"
                                         type="file"
-                                        id="user-photo"
+                                        id={inputId}
                                         className="absolute inset-0 h-full w-full cursor-pointer rounded-md border-gray-300 opacity-0"
                                     />
                                 </label>
@@ -196,11 +195,11 @@ const AdminProfileForm = ({ onSubmit }: Props) => {
 
             <div className="mt-6 grid sm:grid-cols-2 gap-6">
                 <div>
-                    <Form.Label label="Tỉnh / Thành phố" />
+                    <Form.Label label="Tỉnh / Thành phố"/>
                     <Controller
                         control={control}
                         name="addressRequest.provinceCode"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <SelectBox<IProvince>
                                 value={selectedProvince}
                                 placeholder="Chọn tỉnh / thành phố"
@@ -232,11 +231,11 @@ const AdminProfileForm = ({ onSubmit }: Props) => {
                     </ErrorMessage>
                 </div>
                 <div>
-                    <Form.Label label="Quận / Huyện" />
+                    <Form.Label label="Quận / Huyện"/>
                     <Controller
                         control={control}
                         name="addressRequest.districtCode"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <SelectBox<IDistrict>
                                 value={selectedDistrict}
                                 placeholder="Chọn quận / huyện"
@@ -264,11 +263,11 @@ const AdminProfileForm = ({ onSubmit }: Props) => {
                     </ErrorMessage>
                 </div>
                 <div>
-                    <Form.Label label="Phường / Xã" />
+                    <Form.Label label="Phường / Xã"/>
                     <Controller
                         control={control}
                         name="addressRequest.wardCode"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <SelectBox<IWard>
                                 value={selectedWard}
                                 placeholder="Chọn phường / xã"
@@ -291,15 +290,7 @@ const AdminProfileForm = ({ onSubmit }: Props) => {
                     </ErrorMessage>
                 </div>
             </div>
-            <div className="mt-6">
-                <Form.Input<UpdateProfileFormType>
-                    fieldName="description"
-                    label="Mô tả"
-                    register={register}
-                    isTextArea={true}
-                />
-            </div>
-            <Form.Divider />
+
             <div className="mt-6 grid sm:grid-cols-2 gap-6">
                 <Form.Input<UpdateProfileFormType>
                     fieldName="code"
@@ -316,7 +307,7 @@ const AdminProfileForm = ({ onSubmit }: Props) => {
                     errorMessage={errors.phone?.message}
                 />
             </div>
-            <Form.Divider />
+            <Form.Divider/>
             <div className="flex justify-end">
                 <button
                     disabled={isSubmitting}
@@ -329,9 +320,9 @@ const AdminProfileForm = ({ onSubmit }: Props) => {
                 </button>
             </div>
 
-            <pre>
-                {/* <code>{JSON.stringify(watch(), null, 2)}</code> */}
-            </pre>
+            {/*<pre>*/}
+            {/*    <code>{JSON.stringify(watch(), null, 2)}</code>*/}
+            {/*</pre>*/}
         </form>
     );
 };

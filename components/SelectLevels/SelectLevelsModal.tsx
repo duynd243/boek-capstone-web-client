@@ -1,16 +1,15 @@
-import React, {useState} from "react";
-import {BsCheckCircle, BsSearch} from "react-icons/bs";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
+import React, { useState } from "react";
+import { BsCheckCircle, BsSearch } from "react-icons/bs";
+import { useAuth } from "../../context/AuthContext";
+import useDebounce from "../../hooks/useDebounce";
+import { LevelService } from "../../services/LevelService";
+import { ILevel } from "../../types/Level/ILevel";
+import { getAvatarFromName } from "../../utils/helper";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 import Modal from "../Modal/Modal";
 import TransitionModal from "../Modal/TransitionModal";
-import useDebounce from "../../hooks/useDebounce";
-import {useQuery} from "@tanstack/react-query";
-import {IGroup} from "../../types/Group/IGroup";
-import {useAuth} from "../../context/AuthContext";
-import {getAvatarFromName} from "../../utils/helper";
-import {LevelService} from "../../services/LevelService";
-import {ILevel} from "../../types/Level/ILevel";
 
 type Props = {
     isOpen: boolean;
@@ -20,12 +19,12 @@ type Props = {
 };
 
 const SelectLevelsModal: React.FC<Props> = ({
-                                                isOpen,
-                                                onClose,
-                                                selectedLevels,
-                                                onItemSelect,
-                                            }) => {
-    const {loginUser} = useAuth();
+    isOpen,
+    onClose,
+    selectedLevels,
+    onItemSelect,
+}) => {
+    const { loginUser } = useAuth();
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounce(search, 500);
     const levelService = new LevelService(loginUser?.accessToken);
@@ -35,15 +34,16 @@ const SelectLevelsModal: React.FC<Props> = ({
         onClose();
     };
 
-    const {data: levels, isLoading} = useQuery(
+    const { data: levels, isLoading } = useQuery(
         ["levels", debouncedSearch],
         () =>
             levelService.getLevels({
                 name: debouncedSearch,
                 status: true,
-            }), {
+            }),
+        {
             keepPreviousData: true,
-            select: (data) => data?.data
+            select: (data) => data?.data,
         }
     );
 
@@ -56,7 +56,7 @@ const SelectLevelsModal: React.FC<Props> = ({
         >
             <div className="overflow-hidden rounded-xl">
                 <div>
-                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Tìm kiếm nhóm"
@@ -90,7 +90,10 @@ const SelectLevelsModal: React.FC<Props> = ({
                                             width={500}
                                             height={500}
                                             className="h-16 w-16 object-cover"
-                                            src={getAvatarFromName(level?.name)}
+                                            src={getAvatarFromName(
+                                                level?.name,
+                                                1
+                                            )}
                                             alt=""
                                         />
                                         <div>
@@ -105,7 +108,7 @@ const SelectLevelsModal: React.FC<Props> = ({
 
                                     {isSelected && (
                                         <div className="absolute top-1/2 right-4 -translate-y-1/2 transform">
-                                            <BsCheckCircle className="text-green-500"/>
+                                            <BsCheckCircle className="text-green-500" />
                                         </div>
                                     )}
                                 </div>

@@ -37,7 +37,7 @@ const BookDetails: NextPageWithLayout = () => {
     const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
     const { data: book, isLoading } = useQuery(
         ["issuer_book", bookId],
-        () => bookService.getBookById$Issuer(Number(bookId), {withCampaigns: true}),
+        () => bookService.getBookById$Issuer(Number(bookId), {withCampaigns: true, withAllowChangingGenre: true}),
         {
             staleTime: Infinity,
             cacheTime: Infinity,

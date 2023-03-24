@@ -1,14 +1,21 @@
-import React, {memo} from "react";
+import React, { memo } from "react";
 import TransitionModal from "./TransitionModal";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {SystemAuthorService} from "../../old-services/System/System_AuthorService";
-import {useAuth} from "../../context/AuthContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
 import Modal from "./Modal";
-import {z} from "zod";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {IAuthor} from "../../types/Author/IAuthor";
-import {toast} from "react-hot-toast";
+import { z } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { IAuthor } from "../../types/Author/IAuthor";
+import { toast } from "react-hot-toast";
+import {
+    AuthorService,
+    CreateAuthorParams,
+    UpdateAuthorParams,
+} from "../../services/AuthorService";
+import SelectProfilePicture from "../SelectProfilePicture";
+import { isImageFile, isValidFileSize } from "../../utils/helper";
+import { ImageUploadService } from "../../services/ImageUploadService";
 
 export enum AuthorModalMode {
     CREATE,
@@ -20,146 +27,248 @@ type Props = {
     action: AuthorModalMode;
     isOpen: boolean;
     onClose: () => void;
+    afterLeave?: () => void;
     author?: IAuthor;
 };
 
 const AuthorModal: React.FC<Props> = ({
-                                          maxWidth,
-                                          action,
-                                          isOpen,
-                                          onClose,
-                                          author,
-                                      }) => {
-        const {loginUser} = useAuth();
-        const queryClient = useQueryClient();
-        const systemAuthorService = new SystemAuthorService(loginUser?.accessToken);
+    maxWidth,
+    action,
+    isOpen,
+    onClose,
+    afterLeave,
+    author,
+}) => {
+    const { loginUser } = useAuth();
+    const queryClient = useQueryClient();
+    const authorService = new AuthorService(loginUser?.accessToken);
+    const imageService = new ImageUploadService(loginUser?.accessToken);
+    const uploadImageMutation = useMutation((file: File) =>
+        imageService.uploadImage(file)
+    );
 
+    const commonMutationOptions = {
+        onSuccess: async () => {
+            handleOnClose();
+            await queryClient.invalidateQueries(["authors"]);
+        },
+    };
 
-        const updateAuthorMutation = useMutation(
-            (payload: { id?: number; name?: string }) =>
-                systemAuthorService.updateAuthor(payload),
-            {
-                onSuccess: async () => {
-                    handleOnClose();
-                    await queryClient.invalidateQueries(["authors"]);
-                },
-            }
-        );
+    const updateAuthorMutation = useMutation(
+        (payload: UpdateAuthorParams) => authorService.updateAuthor(payload),
+        commonMutationOptions
+    );
 
-        const createAuthorMutation = useMutation(
-            (payload: { name?: string }) => systemAuthorService.createAuthor(payload),
-            {
-                onSuccess: async () => {
-                    handleOnClose();
-                    await queryClient.invalidateQueries(["authors"]);
-                },
-            }
-        );
+    const createAuthorMutation = useMutation(
+        (payload: CreateAuthorParams) => authorService.createAuthor(payload),
+        commonMutationOptions
+    );
 
-        const AuthorSchema = z.object({
-            authorName: z.string({required_error: "Tên tác giả không được để trống"})
-                .min(2, {message: "Tên tác giả phải có ít nhất 2 ký tự"})
-                .max(50, {message: "Tên tác giả không được vượt quá 50 ký tự"}),
-        });
+    const BaseAuthorSchema = z.object({
+        name: z
+            .string()
+            .min(2, { message: "Tên tác giả phải có ít nhất 2 ký tự" })
+            .max(50, { message: "Tên tác giả không được vượt quá 50 ký tự" }),
+        description: z
+            .string()
+            .max(500, "Mô tả không được vượt quá 500 ký tự")
+            .optional(),
+        imageUrl: z.string().optional(),
+        previewFile: z.instanceof(File).optional(),
+    });
 
-        type AuthorSchemaType = z.infer<typeof AuthorSchema>;
+    const UpdateAuthorSchema = BaseAuthorSchema.extend({
+        id: z.number().int().positive(),
+    });
 
-        const {register, setError, handleSubmit, reset, formState} = useForm<AuthorSchemaType>(
-            {
-                values: {
-                    authorName: action === AuthorModalMode.UPDATE && author?.name ? author.name : "",
-                },
-                resolver: zodResolver(AuthorSchema),
-            }
-        )
-        const onSubmit = async (data: AuthorSchemaType) => {
-            if (action === AuthorModalMode.UPDATE && !formState.isDirty) {
-                setError("authorName", {message: "Chưa có thay đổi"})
+    type FormType = Partial<z.infer<typeof UpdateAuthorSchema>>;
+
+    const defaultValues: FormType = {
+        id: author?.id,
+        name: author?.name,
+        description: author?.description,
+        imageUrl: author?.imageUrl || undefined,
+        previewFile: undefined,
+    };
+
+    const {
+        register,
+        control,
+        watch,
+        setError,
+        handleSubmit,
+        reset,
+        formState: { errors, isDirty, isSubmitting },
+    } = useForm<FormType>({
+        resolver: zodResolver(
+            action === AuthorModalMode.UPDATE
+                ? UpdateAuthorSchema
+                : BaseAuthorSchema
+        ),
+        defaultValues,
+    });
+    const onSubmit = async (data: FormType) => {
+        if (data.previewFile) {
+            try {
+                await toast.promise(
+                    uploadImageMutation.mutateAsync(data.previewFile),
+                    {
+                        loading: "Đang tải ảnh lên",
+                        success: (res) => {
+                            data.imageUrl = res?.url;
+                            return "Tải ảnh lên thành công";
+                        },
+                        error: (error) => {
+                            return "Tải ảnh lên thất bại";
+                        },
+                    }
+                );
+            } catch (error) {
                 return;
             }
-            const payload = {
-                id: author?.id,
-                name: data.authorName,
-            };
+        }
 
-            switch (action) {
-                case AuthorModalMode.CREATE:
-                    await toast.promise(createAuthorMutation.mutateAsync(payload), {
-                        loading: "Đang thêm tác giả",
-                        success: () => "Thêm tác giả thành công",
-                        error: (error) => error?.message,
-                    });
-                    break;
-                case AuthorModalMode.UPDATE:
-                    await toast.promise(updateAuthorMutation.mutateAsync(payload), {
-                        loading: "Đang cập nhật tác giả",
-                        success: () => "Cập nhật tác giả thành công",
-                        error: (error) => error?.message,
-                    });
-                    break;
-            }
-        };
-        const handleOnClose = () => {
-            reset();
-            onClose();
-        };
-
-
-        return (
-            <TransitionModal
-                maxWidth={maxWidth}
-                isOpen={isOpen}
-                onClose={handleOnClose}
-                closeOnOverlayClick={false}
-            >
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <Modal.Header
-                        title={
-                            action === AuthorModalMode.CREATE
-                                ? "Thêm tác giả"
-                                : `Cập nhật tác giả ${author?.name}`
+        switch (action) {
+            case AuthorModalMode.CREATE:
+                try {
+                    const payload = BaseAuthorSchema.parse(data);
+                    await toast.promise(
+                        createAuthorMutation.mutateAsync(payload),
+                        {
+                            loading: "Đang thêm tác giả",
+                            success: () => "Thêm tác giả thành công",
+                            error: (error) =>
+                                error?.message || "Thêm tác giả thất bại",
                         }
-                        onClose={handleOnClose}
-                        showCloseButton={true}
+                    );
+                } catch (error) {
+                    return;
+                }
+                break;
+            case AuthorModalMode.UPDATE:
+                try {
+                    const payload = UpdateAuthorSchema.parse(data);
+                    await toast.promise(
+                        updateAuthorMutation.mutateAsync(payload),
+                        {
+                            loading: "Đang cập nhật tác giả",
+                            success: () => "Cập nhật tác giả thành công",
+                            error: (error) => error?.message,
+                        }
+                    );
+                } catch (error) {
+                    return;
+                }
+                break;
+        }
+    };
+    const handleOnClose = () => {
+        reset();
+        onClose();
+    };
+
+    console.log(errors);
+
+    return (
+        <TransitionModal
+            maxWidth={maxWidth}
+            isOpen={isOpen}
+            onClose={handleOnClose}
+            closeOnOverlayClick={false}
+            afterLeave={afterLeave}
+        >
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {isSubmitting && <Modal.Backdrop />}
+                <Modal.Header
+                    title={
+                        action === AuthorModalMode.CREATE
+                            ? "Thêm tác giả"
+                            : `Cập nhật tác giả ${author?.name}`
+                    }
+                    onClose={handleOnClose}
+                    showCloseButton={true}
+                />
+                <div className="space-y-3 py-4 px-5">
+                    <Modal.FormLabel label="Ảnh đại diện" />
+                    <Controller
+                        name="previewFile"
+                        control={control}
+                        render={({ field }) => (
+                            <SelectProfilePicture
+                                onChange={(file) => {
+                                    if (!isImageFile(file)) {
+                                        toast.error(
+                                            "Tệp tải lên phải có định dạng ảnh"
+                                        );
+                                        return false;
+                                    }
+                                    if (!isValidFileSize(file, 1)) {
+                                        toast.error(
+                                            "Kích thước ảnh đại diện không được vượt quá 1MB"
+                                        );
+                                        return false;
+                                    }
+                                    field.onChange(file);
+                                    return true;
+                                }}
+                                defaultImageURL={author?.imageUrl}
+                            />
+                        )}
                     />
-                    <div className="py-4 px-5">
-                        <Modal.FormInput<AuthorSchemaType>
-                            placeholder={'Nhập tên tác giả'}
-                            formState={formState}
-                            register={register}
-                            fieldName={'authorName'}
-                            label={'Tên tác giả'}/>
+                    <Modal.FormInput<FormType>
+                        placeholder={"Nhập tên tác giả"}
+                        register={register}
+                        required={true}
+                        fieldName={"name"}
+                        label={"Tên tác giả"}
+                        errorMessage={errors.name?.message}
+                    />
+
+                    <Modal.FormInput<FormType>
+                        isTextArea={true}
+                        rows={6}
+                        placeholder={"Nhập mô tả tác giả"}
+                        register={register}
+                        fieldName={"description"}
+                        label={"Mô tả"}
+                        errorMessage={errors.description?.message}
+                    />
+                </div>
+                <Modal.Footer>
+                    <div className="flex flex-wrap justify-end space-x-2">
+                        <Modal.SecondaryButton
+                            disabled={isSubmitting}
+                            onClick={handleOnClose}
+                            type="button"
+                        >
+                            Huỷ
+                        </Modal.SecondaryButton>
+
+                        <Modal.PrimaryButton
+                            disabled={
+                                isSubmitting ||
+                                (!isDirty && action === AuthorModalMode.UPDATE)
+                            }
+                            type="submit"
+                        >
+                            <Modal.SubmitTextWithLoading
+                                isLoading={isSubmitting}
+                                text={
+                                    action === AuthorModalMode.CREATE
+                                        ? "Thêm"
+                                        : "Cập nhật"
+                                }
+                                loadingText={
+                                    action === AuthorModalMode.CREATE
+                                        ? "Đang thêm"
+                                        : "Đang cập nhật"
+                                }
+                            />
+                        </Modal.PrimaryButton>
                     </div>
-                    <Modal.Footer>
-                        <div className="flex flex-wrap justify-end space-x-2">
-                            <button
-                                disabled={updateAuthorMutation.isLoading}
-                                onClick={handleOnClose}
-                                type="button"
-                                className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200"
-                            >
-                                Huỷ
-                            </button>
-
-                            <button
-                                disabled={formState.isSubmitting}
-                                type="submit"
-                                className="m-btn bg-indigo-500 text-white hover:bg-indigo-600 disabled:bg-indigo-500"
-                            >
-                                {action === AuthorModalMode.CREATE
-                                    ? createAuthorMutation.isLoading
-                                        ? "Đang thêm..."
-                                        : "Thêm"
-                                    : updateAuthorMutation.isLoading
-                                        ? "Đang cập nhật..."
-                                        : "Cập nhật"}
-                            </button>
-                        </div>
-                    </Modal.Footer>
-                </form>
-            </TransitionModal>
-        );
-    }
-;
-
+                </Modal.Footer>
+            </form>
+        </TransitionModal>
+    );
+};
 export default memo(AuthorModal);

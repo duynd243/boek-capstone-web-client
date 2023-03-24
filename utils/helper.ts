@@ -1,12 +1,39 @@
-import {format} from "date-fns";
-import {vi} from "date-fns/locale";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 import slugify from "slugify";
-import {hexColors} from "../constants/Colors";
-import {BookFormats, IBookFormat} from "../constants/BookFormats";
-import {IBook} from "../types/Book/IBook";
-import {IBookProduct} from "../types/Book/IBookProduct";
-import {randomBooks} from "../pages/admin/books";
+import { z } from "zod";
+import { BookFormats, IBookFormat } from "../constants/BookFormats";
+import { CampaignFormats } from "../constants/CampaignFormats";
+import { hexColors } from "../constants/Colors";
+import { IBook } from "../types/Book/IBook";
+import { IBookProduct } from "../types/Book/IBookProduct";
 
+
+const fullBookFormats = Object.values(BookFormats);
+
+export function getBookProductsFormatOptions(book: IBook | undefined, campaignFormatId: number | undefined) {
+    if (!book) {
+        return [];
+    }
+    if(campaignFormatId === CampaignFormats.OFFLINE.id){
+        return fullBookFormats.filter(o => o.id === BookFormats.PAPER.id);
+    }
+
+    if (book?.fullPdfAndAudio) {
+        return fullBookFormats;
+    }
+    if (book?.onlyPdf) {
+        return fullBookFormats.filter(o => o.id !== BookFormats.AUDIO.id);
+    }
+    if (book?.onlyAudio) {
+        return fullBookFormats.filter(o => o.id !== BookFormats.PDF.id);
+    }
+    return fullBookFormats.filter(o => o.id === BookFormats.PAPER.id);
+}
+
+export const isValidImageSrc = (src: string): boolean => {
+    return z.string().url().safeParse(src).success;
+};
 
 export function getRequestDateTime(date: Date) {
     return format(date, "yyyy-MM-dd'T'HH:mm:ss");
@@ -23,9 +50,16 @@ function randomColor(name?: string | undefined): string {
     return hexColors[name ? name?.length % hexColors.length : 0];
 }
 
-export function getAvatarFromName(name?: string | undefined): string {
+export function getAvatarFromName(
+    name?: string | undefined,
+    length?: number
+): string {
     const backgroundColor = randomColor(name);
-    return `https://ui-avatars.com/api/?name=${name}&color=FFFFFF&background=${backgroundColor}`;
+    return `https://ui-avatars.com/api/?name=${
+        name ? name : ""
+    }&color=FFFFFF&background=${backgroundColor}&length=${
+        length ? length : 2
+    }&format=svg`;
 }
 
 export function isInViewPort(element: Element): boolean {
@@ -39,7 +73,7 @@ export function isInViewPort(element: Element): boolean {
     );
 }
 
-const defaultLocaleFormat = {locale: vi};
+const defaultLocaleFormat = { locale: vi };
 
 export function getFormattedDate(
     dateStr: string | undefined,
@@ -53,9 +87,19 @@ export function getFormattedDate(
         day: date ? format(date, "dd", localeFormat) : "N/A",
         month: date ? format(date, "MM", localeFormat) : "N/A",
         year: date ? format(date, "yyyy", localeFormat) : "N/A",
-        withoutDayOfWeek: date ? format(date, "dd/MM/yyyy", localeFormat) : "N/A",
+        withoutDayOfWeek: date
+            ? format(date, "dd/MM/yyyy", localeFormat)
+            : "N/A",
         fullDate: date ? format(date, "eeee, dd/MM/yyyy", localeFormat) : "N/A",
     };
+}
+
+export function getFormattedTime(
+    dateStr: string | undefined,
+    formatType: string
+) {
+    const dateObj = dateStr ? new Date(dateStr) : undefined;
+    return dateObj ? format(dateObj, formatType, defaultLocaleFormat) : "N/A";
 }
 
 const slugifyOptions = {
@@ -92,7 +136,9 @@ export function isValidPhoneNumber(phoneNumber: string) {
     );
 }
 
-export function getFormatsOfBook(book: IBook | IBookProduct | undefined): IBookFormat[] {
+export function getFormatsOfBook(
+    book: IBook | IBookProduct | undefined
+): IBookFormat[] {
     if (!book) return [];
     const formats: IBookFormat[] = [BookFormats.PAPER];
     if (book.fullPdfAndAudio) {
@@ -120,4 +166,5 @@ export function getIntersectedFormatOfBooks(books: IBook[]): IBookFormat[] {
     );
 }
 
-export const VIETNAMESE_PHONE_REGEX = /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/;
+export const VIETNAMESE_PHONE_REGEX =
+    /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/;

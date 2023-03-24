@@ -1,11 +1,8 @@
-import {FormikValues} from "formik/dist/types";
 import Image from "next/image";
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useId, useState} from "react";
+import {Path, UseFormRegister} from "react-hook-form";
 import {BsCalendarWeek} from "react-icons/bs";
 import ErrorMessage from "./ErrorMessage";
-import {FormState, Path, UseFormRegister} from "react-hook-form";
-import errorMessage from "./ErrorMessage";
-import DefaultAvatar from "../../assets/images/default-avatar.png";
 
 type LabelProps = {
     fieldName?: string;
@@ -19,7 +16,8 @@ const Label = (props: LabelProps) => {
             className="mb-1 block text-sm font-medium text-gray-600"
             htmlFor={props.fieldName}
         >
-            {props.label} {props.required && <span className="text-rose-500">*</span>}
+            {props.label}
+            {props.required && <span className="text-rose-500"> *</span>}
         </label>
     );
 };
@@ -60,34 +58,34 @@ const Input = <T extends Record<string, any>>({
         ...rest,
     };
 
-
     return (
         <div>
-            <Label
-                fieldName={fieldName}
-                label={label}
-                required={required}
-            />
+            <Label fieldName={fieldName} label={label} required={required}  />
             {isTextArea ? (
-                <textarea {...commonProps} rows={3}/>
+                <textarea rows={7} {...commonProps} />
             ) : (
                 <input {...commonProps} type={inputType}/>
             )}
-            {errorMessage && (
-                <ErrorMessage>{errorMessage}</ErrorMessage>
-            )}
+            {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
         </div>
     );
-
 };
 type GroupLabelProps = {
     label: string;
     description?: string;
+    required?: boolean;
 };
-const GroupLabel: React.FC<GroupLabelProps> = ({label, description}) => {
+const GroupLabel: React.FC<GroupLabelProps> = ({
+                                                   label,
+                                                   description,
+                                                   required,
+                                               }) => {
     return (
         <div>
-            <h3 className="text-lg font-medium leading-6 text-gray-900">{label}</h3>
+            <h3 className="text-lg font-bold leading-6 text-gray-900">
+                {label}
+                {required && <span className="text-rose-500"> *</span>}
+            </h3>
             {description && (
                 <p className="mt-1 text-sm text-gray-500">{description}</p>
             )}
@@ -100,14 +98,17 @@ type ImageUploadPanelProps = {
     onChange?: (file: File) => boolean;
     onRemove?: () => void;
     label?: string;
+    style?: React.CSSProperties;
 };
 
 const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                                                                label,
                                                                onChange,
                                                                onRemove,
-                                                               defaultImageURL
+                                                               defaultImageURL,
                                                            }) => {
+
+    const inputId = useId();
     const [file, setFile] = useState<File | null>(null);
 
     const objectURL = file && URL.createObjectURL(file);
@@ -118,7 +119,7 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
         if (onChange?.(file)) {
             setFile(file);
         }
-    }
+    };
 
     useEffect(() => {
         if (objectURL) {
@@ -135,9 +136,11 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
     return (
         <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
             <div className="space-y-1 text-center">
-                {(imgSrc) ? (
+                {imgSrc ? (
                     <Image
-                        className={"mx-auto mb-4 rounded-md object-cover object-center"}
+                        className={
+                            "mb-4 w-40 rounded-md object-cover object-center"
+                        }
                         width={500}
                         height={500}
                         src={imgSrc}
@@ -160,19 +163,22 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                     </svg>
                 )}
                 {file && (
-                    <div className="mb-2 text-sm text-slate-600">{file?.name}</div>
+                    <div className="mb-2 text-sm text-slate-600">
+                        {file?.name}
+                    </div>
                 )}
                 <div className="flex flex-col justify-center gap-1 text-sm text-gray-600">
                     <label
-                        htmlFor="file-upload"
+                        htmlFor={inputId}
                         className="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
                     >
-                        <span>{(imgSrc) ? "Chọn ảnh khác" : "Tải ảnh lên"}</span>
+                        <span>{imgSrc ? "Chọn ảnh khác" : "Tải ảnh lên"}</span>
                         <input
                             onChange={handleFileChange}
-                            id="file-upload"
+                            id={inputId}
                             name="file-upload"
                             type="file"
+                            accept="image/*"
                             className="sr-only"
                         />
                     </label>
@@ -182,10 +188,11 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                             onClick={handleRemoveFile}
                             className="font-medium text-rose-500"
                         >
-                            {defaultImageURL ? "Khôi phục ảnh mặc định" : "Xóa ảnh"}
+                            {defaultImageURL
+                                ? "Khôi phục ảnh mặc định"
+                                : "Xóa ảnh"}
                         </button>
                     )}
-
                 </div>
                 <p className="text-xs text-gray-500">{label}</p>
             </div>
@@ -217,7 +224,10 @@ const DateTimeInputField: React.FC<DateTimeInputFieldProps> = ({
                 className={defaultInputClass}
                 type="text"
             />
-            <label htmlFor={id} className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400">
+            <label
+                htmlFor={id}
+                className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400"
+            >
                 <BsCalendarWeek/>
             </label>
         </div>

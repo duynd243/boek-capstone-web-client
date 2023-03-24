@@ -1,38 +1,32 @@
-import React, {useState} from "react";
-import Link from "next/link";
-import {
-    IoArrowForward,
-    IoChevronBack,
-    IoLocationSharp,
-} from "react-icons/io5";
-import {getFormattedDate} from "../../utils/helper";
-import Image from "next/image";
-import ContentHeader from "./ContentHeader";
-import Separator from "./Seperator";
-import StatusLabel from "./StatusLabel";
-import OrganizationCard from "./OrganizationCard";
 import {useInfiniteQuery} from "@tanstack/react-query";
+import Image from "next/image";
+import React, {useContext, useState} from "react";
+import {IoArrowForward, IoChevronBack, IoLocationSharp,} from "react-icons/io5";
 import {useAuth} from "../../context/AuthContext";
 import {PostService} from "../../old-services/PostService";
 import {IPostResponse} from "../../old-types/response/IPostResponse";
+import {getFormattedDate} from "../../utils/helper";
+import ContentHeader from "./ContentHeader";
+import OrganizationCard from "./OrganizationCard";
 import PostCard from "./PostCard";
+import Separator from "./Seperator";
+import StatusLabel from "./StatusLabel";
 // import ParticipationTable from '../Admin/ParticipationTable';
-import EmptySection from "./EmptySection";
-import {ICampaign} from "../../types/Campaign/ICampaign";
-import {CampaignFormats} from "../../constants/CampaignFormats";
+import {useRouter} from "next/router";
 import {HiStatusOnline} from "react-icons/hi";
-// import ParticipationSection from '../Admin/ParticipationSection';
-import { useRouter } from 'next/router';
+import {CampaignFormats} from "../../constants/CampaignFormats";
+import {CampaignContext} from "../../context/CampaignContext";
+import EmptySection from "./EmptySection";
 
-type Props = {
-    campaign: ICampaign | undefined;
-};
-
-const MainContent: React.FC<Props> = ({campaign}) => {
+const MainContent: React.FC = () => {
     const {loginUser} = useAuth();
     const postService = new PostService(loginUser?.accessToken);
-    const organizations = campaign?.campaignOrganizations;
+
     const router = useRouter();
+
+    const campaign = useContext(CampaignContext);
+
+    const campaignOrganizations = campaign?.campaignOrganizations;
 
     const [postPageSize, setPostPageSize] = useState(4);
 
@@ -53,7 +47,9 @@ const MainContent: React.FC<Props> = ({campaign}) => {
         {
             getNextPageParam: (lastPage) => {
                 const currentPage = lastPage?.metadata?.page;
-                const totalPages = Math.ceil(lastPage?.metadata?.total / postPageSize);
+                const totalPages = Math.ceil(
+                    lastPage?.metadata?.total / postPageSize
+                );
                 return currentPage < totalPages ? currentPage + 1 : undefined;
             },
         }
@@ -61,21 +57,12 @@ const MainContent: React.FC<Props> = ({campaign}) => {
 
     return (
         <div>
-            {/* <div className="mb-6">
-                <Link
-                    className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
-                    href="/admin/campaigns"
-                >
-                    <IoChevronBack size={"17"}/>
-                    <span>Quay lại</span>
-                </Link>
-            </div> */}
-             <div className="mb-6">
+            <div className="mb-6">
                 <button
                     className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
                     onClick={() => router.back()}
                 >
-                    <IoChevronBack size={"17"} />
+                    <IoChevronBack size={"17"}/>
                     <span>Quay lại</span>
                 </button>
             </div>
@@ -92,32 +79,37 @@ const MainContent: React.FC<Props> = ({campaign}) => {
             </header>
 
             {/* Meta */}
-            <div className="mb-6 space-y-3 sm:flex sm:items-center sm:justify-between sm:space-y-0">
+            <div className="mb-6 space-y-3 sm:flex flex-wrap gap-4 sm:items-center sm:justify-between sm:space-y-0">
                 {/* Location */}
                 <div className="flex items-center gap-1 sm:mr-4">
-                    {campaign?.format === CampaignFormats.OFFLINE.id &&
+                    {campaign?.format === CampaignFormats.OFFLINE.id && (
                         <>
-                            <IoLocationSharp size={20} className={"fill-red-700"}/>
+                            <IoLocationSharp
+                                size={20}
+                                className={"fill-red-700"}
+                            />
                             <div className="whitespace-nowrap text-sm">
                                 Diễn ra tại{" "}
                                 <span className="font-semibold text-slate-800">
-                            {campaign?.address}
-                        </span>
+                                    {campaign?.address}
+                                </span>
                             </div>
                         </>
-                    }
+                    )}
 
-                    {campaign?.format === CampaignFormats.ONLINE.id &&
+                    {campaign?.format === CampaignFormats.ONLINE.id && (
                         <>
-                            <HiStatusOnline size={20} className={"fill-green-700"}/>
+                            <HiStatusOnline
+                                size={20}
+                                className={"fill-green-700"}
+                            />
                             <div className="whitespace-nowrap text-sm">
-
                                 <span className="font-semibold text-slate-800">
-                            Hội sách tổ chức trực tuyến
-                        </span>
+                                    Hội sách tổ chức trực tuyến
+                                </span>
                             </div>
                         </>
-                    }
+                    )}
                 </div>
                 {/* Right side */}
                 <StatusLabel statusId={campaign?.status}/>
@@ -139,22 +131,33 @@ const MainContent: React.FC<Props> = ({campaign}) => {
 
             {/* Description */}
             <div>
-                <ContentHeader text={"Mô tả sự kiện"}/>
+                <ContentHeader text={"Mô tả hội sách"}/>
                 <p className="mt-2 mb-6 break-words">{campaign?.description}</p>
             </div>
             <Separator/>
 
             {/*Organizations*/}
             <div>
-                <ContentHeader text={`Tổ chức (${organizations?.length || 0})`}/>
-                {organizations && organizations?.length > 0 ? (
-                    <div className="my-6 grid  gap-4 sm:grid-cols-2">
-                        {organizations.map((org) => (
-                            <OrganizationCard organization={org} key={org.id}/>
+                <ContentHeader
+                    text={`${
+                        campaign?.isRecurring
+                            ? "Tổ chức và lịch trình"
+                            : "Tổ chức"
+                    } (${campaignOrganizations?.length || 0})`}
+                />
+                {campaignOrganizations && campaignOrganizations?.length > 0 ? (
+                    <div className="my-6 space-y-4">
+                        {campaignOrganizations.map((org) => (
+                            <OrganizationCard
+                                campaignOrganization={org}
+                                key={org.id}
+                            />
                         ))}
                     </div>
                 ) : (
-                    <EmptySection text={"Sự kiện này chưa có tổ chức nào tham gia"}/>
+                    <EmptySection
+                        text={"Sự kiện này chưa có tổ chức nào tham gia"}
+                    />
                 )}
             </div>
             <Separator/>
@@ -167,7 +170,9 @@ const MainContent: React.FC<Props> = ({campaign}) => {
             {/* Posts */}
             <div>
                 <ContentHeader
-                    text={`Sản phẩm (${posts?.pages[0]?.metadata.total || 0})`}
+                    text={`Sách đang được bán (${
+                        posts?.pages[0]?.metadata.total || 0
+                    })`}
                 />
                 {isInitialLoading ? (
                     <div className={"my-6"}>Đang tải...</div>
@@ -186,7 +191,9 @@ const MainContent: React.FC<Props> = ({campaign}) => {
                                 disabled={isFetchingNextPage}
                                 className="mx-auto mt-4 block rounded bg-indigo-50 px-4 py-2 text-base font-medium text-indigo-500 transition disabled:bg-gray-50 disabled:text-gray-500"
                             >
-                                {isFetchingNextPage ? "Đang tải..." : "Xem thêm bài đăng"}
+                                {isFetchingNextPage
+                                    ? "Đang tải..."
+                                    : "Xem thêm bài đăng"}
                             </button>
                         )}
                     </div>

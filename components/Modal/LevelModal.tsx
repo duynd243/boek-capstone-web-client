@@ -1,12 +1,20 @@
-import React, {useCallback} from "react";
-import * as Yup from "yup";
-import {useFormik} from "formik";
+import React, { useCallback } from "react";
 import TransitionModal from "./TransitionModal";
 import Modal from "./Modal";
-import {BsEmojiFrownFill, BsEmojiSmileFill} from "react-icons/bs";
+import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
 import ToggleButton from "../ToggleButton";
-import {customerLevels} from "../../pages/admin/customers";
-import {ILevel} from "../../types/Level/ILevel";
+import { ILevel } from "../../types/Level/ILevel";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "../../context/AuthContext";
+import {
+    CreateLevelParams,
+    LevelService,
+    UpdateLevelParams,
+} from "../../services/LevelService";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 
 export enum LevelModalMode {
     CREATE,
@@ -19,59 +27,138 @@ type Props = {
     isOpen: boolean;
     onClose: () => void;
     level?: ILevel;
+    afterLeave?: () => void;
 };
 
 const LevelModal: React.FC<Props> = ({
-                                         maxWidth,
-                                         action,
-                                         isOpen,
-                                         onClose,
-                                         level,
-                                     }) => {
-    const createLevelSchema = Yup.object({
-        levelName: Yup.string()
-            .trim()
-            .required("Tên cấp độ không được để trống")
-            .min(2, "Tên cấp độ phải có ít nhất 2 ký tự")
-            .max(50, "Tên cấp độ không được vượt quá 50 ký tự"),
-        levelRequiredPoint: Yup.number()
-            .required("Điểm yêu cầu không được để trống")
-            .integer("Điểm yêu cầu phải là số nguyên")
-            .min(0, "Điểm yêu cầu phải lớn hơn hoặc bằng 0"),
+    maxWidth,
+    action,
+    isOpen,
+    onClose,
+    level,
+    afterLeave,
+}) => {
+    const { loginUser } = useAuth();
+    const levelService = new LevelService(loginUser?.accessToken);
+    const queryClient = useQueryClient();
+
+    const CreateLevelSchema = z.object({
+        name: z
+            .string()
+            .min(2, { message: "Tên cấp độ phải có ít nhất 2 ký tự" })
+            .max(50, { message: "Tên cấp độ không được vượt quá 50 ký tự" }),
+        conditionalPoint: z.coerce
+            .number()
+            .int("Điểm yêu cầu phải là số nguyên")
+            .min(0, { message: "Điểm yêu cầu phải lớn hơn hoặc bằng 0" }),
     });
 
-    const updateLevelSchema = createLevelSchema.concat(
-        Yup.object({
-            levelStatus: Yup.boolean().required("Trạng thái không được để trống"),
-        })
-    );
+    const UpdateLevelSchema = CreateLevelSchema.extend({
+        status: z.boolean(),
+    });
 
-    const form = useFormik({
-        enableReinitialize: true,
-        initialValues: {
-            levelName: action === LevelModalMode.UPDATE ? level?.name : "",
-            levelRequiredPoint:
-                action === LevelModalMode.UPDATE ? level?.conditionalPoint : "",
-            levelStatus: true,
-        },
-        validationSchema:
-            action === LevelModalMode.CREATE ? createLevelSchema : updateLevelSchema,
-        onSubmit: async (values) => {
-        },
+    type FormType = Partial<z.infer<typeof CreateLevelSchema>> & {
+        status?: boolean;
+    };
+
+    const defaultValues: FormType = {
+        name: action === LevelModalMode.UPDATE ? level?.name : "",
+        conditionalPoint:
+            action === LevelModalMode.UPDATE
+                ? level?.conditionalPoint
+                : undefined,
+        status: LevelModalMode.UPDATE ? level?.status : true,
+    };
+
+    const {
+        register,
+        control,
+        watch,
+        handleSubmit,
+        reset,
+        formState: { errors, isSubmitting, isDirty },
+    } = useForm<FormType>({
+        resolver: zodResolver(
+            action === LevelModalMode.CREATE
+                ? CreateLevelSchema
+                : UpdateLevelSchema
+        ),
+        defaultValues,
     });
 
     const handleOnClose = useCallback(() => {
-        form.resetForm();
         onClose();
-    }, [form, onClose]);
+        if (action === LevelModalMode.CREATE) {
+            reset();
+        }
+    }, [onClose, action, reset]);
+
+    const commonMutationOptions = {
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(["levels"]);
+            handleOnClose();
+        },
+    };
+
+    const createLevelMutation = useMutation(
+        (level: CreateLevelParams) => levelService.createLevel(level),
+        commonMutationOptions
+    );
+
+    const updateLevelMutation = useMutation(
+        (level: UpdateLevelParams) => levelService.updateLevel(level),
+        commonMutationOptions
+    );
+
+    const onSubmit = async (values: FormType) => {
+        switch (action) {
+            case LevelModalMode.CREATE:
+                try {
+                    const data = CreateLevelSchema.parse(values);
+                    await toast.promise(createLevelMutation.mutateAsync(data), {
+                        loading: "Đang thêm cấp độ",
+                        success: "Thêm cấp độ thành công",
+                        error: (err) => err?.message || "Thêm cấp độ thất bại",
+                    });
+                } catch (error) {
+                    console.log(error);
+                    return;
+                }
+                break;
+            case LevelModalMode.UPDATE:
+                if (!level) return;
+                try {
+                    const data = UpdateLevelSchema.parse(values);
+                    await toast.promise(
+                        updateLevelMutation.mutateAsync({
+                            ...data,
+                            id: level.id,
+                        }),
+                        {
+                            loading: "Đang cập nhật cấp độ",
+                            success: "Cập nhật cấp độ thành công",
+                            error: (err) =>
+                                err?.message || "Cập nhật cấp độ thất bại",
+                        }
+                    );
+                } catch (error) {
+                    console.log(error);
+                    return;
+                }
+                break;
+        }
+    };
+
     return (
         <TransitionModal
             maxWidth={maxWidth}
             isOpen={isOpen}
             onClose={handleOnClose}
             closeOnOverlayClick={false}
+            afterLeave={afterLeave}
         >
-            <form onSubmit={form.handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {isSubmitting && <Modal.Backdrop />}
                 <Modal.Header
                     title={
                         action === LevelModalMode.CREATE
@@ -82,57 +169,48 @@ const LevelModal: React.FC<Props> = ({
                     showCloseButton={true}
                 />
                 <div className="space-y-3 py-4 px-5">
-                    <Modal.FormInputOld
+                    <Modal.FormInput<FormType>
                         placeholder="Nhập tên cấp độ"
                         required={true}
-                        formikForm={form}
-                        fieldName="levelName"
+                        register={register}
+                        fieldName="name"
                         label="Tên cấp độ"
+                        errorMessage={errors.name?.message}
                     />
 
-                    <Modal.FormInputOld
+                    <Modal.FormInput<FormType>
                         placeholder="Nhập điểm yêu cầu"
                         required={true}
-                        formikForm={form}
-                        fieldName="levelRequiredPoint"
+                        register={register}
+                        fieldName="conditionalPoint"
                         label="Điểm yêu cầu"
-                        inputType="number"
+                        inputType={"number"}
+                        errorMessage={errors.conditionalPoint?.message}
                     />
                     {action === LevelModalMode.UPDATE && (
                         <>
                             <Modal.FormLabel
-                                fieldName="levelStatus"
+                                fieldName="status"
                                 label="Trạng thái"
                                 required={true}
                             />
                             <div className="flex items-center justify-between">
-                                <div>
-                                    <div
-                                        className={`${
-                                            form.values.levelStatus ? "bg-green-500" : "bg-rose-500"
-                                        } flex w-fit items-center gap-2 rounded px-2.5 py-1 text-sm text-white transition`}
-                                    >
-                                        {form.values.levelStatus ? (
-                                            <>
-                                                Hoạt động <BsEmojiSmileFill/>
-                                            </>
-                                        ) : (
-                                            <>
-                                                Không hoạt động <BsEmojiFrownFill/>
-                                            </>
-                                        )}
-                                    </div>
-                                    <div className="mt-2 text-sm text-gray-700">
-                                        {form.values.levelStatus
-                                            ? "Cấp độ đang hoạt động"
-                                            : "Cấp độ sẽ bị vô hiệu hóa"}
-                                    </div>
-                                </div>
-                                <ToggleButton
-                                    isCheck={form.values.levelStatus || false}
-                                    onChange={(value) => {
-                                        form.setFieldValue("levelStatus", value);
-                                    }}
+                                <Modal.StatusSwitch
+                                    enabled={watch("status") || false}
+                                    enabledText="Cấp độ đang hoạt động"
+                                    disabledText="Cấp độ sẽ bị vô hiệu hóa"
+                                />
+                                <Controller
+                                    name="status"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <ToggleButton
+                                            isCheck={watch("status") || false}
+                                            onChange={(value) =>
+                                                field.onChange(value)
+                                            }
+                                        />
+                                    )}
                                 />
                             </div>
                         </>
@@ -140,22 +218,29 @@ const LevelModal: React.FC<Props> = ({
                 </div>
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">
-                        <button
-                            //disabled={updateAuthorMutation.isLoading}
-                            onClick={handleOnClose}
+                        <Modal.SecondaryButton
+                            disabled={isSubmitting}
                             type="button"
-                            className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200"
+                            onClick={handleOnClose}
                         >
                             Huỷ
-                        </button>
+                        </Modal.SecondaryButton>
 
-                        <button
-                            // disabled={action === LevelModalMode.CREATE ? createAuthorMutation.isLoading : updateAuthorMutation.isLoading}
+                        <Modal.PrimaryButton
+                            disabled={
+                                isSubmitting ||
+                                (!isDirty && action === LevelModalMode.UPDATE)
+                            }
                             type="submit"
-                            className="m-btn bg-indigo-500 text-white hover:bg-indigo-600 disabled:bg-indigo-500"
                         >
-                            {action === LevelModalMode.CREATE ? "Thêm cấp độ" : "Cập nhật"}
-                        </button>
+                            {action === LevelModalMode.CREATE
+                                ? isSubmitting
+                                    ? "Đang thêm..."
+                                    : "Thêm"
+                                : isSubmitting
+                                ? "Đang lưu..."
+                                : "Cập nhật"}
+                        </Modal.PrimaryButton>
                     </div>
                 </Modal.Footer>
             </form>

@@ -2,6 +2,7 @@ import { BaseService } from "./BaseService";
 import { ICampaign } from "../types/Campaign/ICampaign";
 import { IBaseListResponse } from "../types/Commons/IBaseListResponse";
 import { IBook } from "../types/Book/IBook";
+import qs from "qs";
 
 export class BookService extends BaseService {
   createBookByIssuer = async (payload: any) => {
@@ -25,18 +26,51 @@ export class BookService extends BaseService {
     return response.data;
   }
   getBooks$Issuer = async (params?: any) => {
-    const response = await this.axiosClient.get<
-      IBaseListResponse<IBook>
-    >("/issuer/books", {
+    const response = await this.axiosClient.get<IBaseListResponse<IBook>>(`/issuer/books`, {
       params,
+      // paramsSerializer: {
+      //   serialize: (params) => {
+      //     return qs.stringify(params, { arrayFormat: 'repeat' })
+      //   }
+      // }
     });
     return response.data;
   };
 
-  getBookById$Issuer = async (id: number, params? : any) => {
+
+  // getBooks$Issuer = async (params?: any) => {
+  //   const response = await this.axiosClient.get<
+  //     IBaseListResponse<IBook>
+  //   >(`/issuer/books`, {
+  //     params,
+  //     // paramsSerializer: {
+  //     //   encode: (params) => {
+  //     //     return qs.stringify(params, { arrayFormat: 'repeat' })
+  //     //   }
+  //     // }
+  //   });
+  //   return response.data;
+  // };
+
+  getBookById$Issuer = async (id: number, params?: any) => {
     const response = await this.axiosClient.get<
       IBook
     >(`/issuer/books/${id}`, { params });
+    return response.data;
+  };
+
+
+  getAddableBooksByIssuer = async (params?: any) => {
+    const response = await this.axiosClient.get<
+      IBaseListResponse<IBook>
+    >(`/issuer/books/products/odd-series`, {
+      params,
+      // paramsSerializer: {
+      //   serialize: (params) => {
+      //     return qs.stringify(params, { arrayFormat: 'repeat' })
+      //   }
+      // }
+    });
     return response.data;
   };
 }

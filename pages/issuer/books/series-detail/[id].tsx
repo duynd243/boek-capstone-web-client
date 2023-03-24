@@ -33,7 +33,6 @@ import TableHeader from './../../../../components/Admin/Table/TableHeader';
 import TableBody from './../../../../components/Admin/Table/TableBody';
 import TableData from './../../../../components/Admin/Table/TableData';
 import Image from "next/image";
-import { randomBooks } from './../../../admin/books/index';
 import { useCreateComboStore } from "../../../../stores/CreateComboStore";
 import { ICreateComboStore } from './../../../../stores/CreateComboStore';
 import { shallow } from 'zustand/shallow';
@@ -78,9 +77,9 @@ const SeriesBookForm = ({ book }: Props) => {
         }
     });
 
-    
+
     const UpdateSeriesBookSchema = z.object({
-        
+
         imageUrl: z.string(),
         id: z.number(),
         code: z.string(),
@@ -265,15 +264,39 @@ const SeriesBookForm = ({ book }: Props) => {
                 description={"Thông tin cơ bản về sách"}
             />
             <div className="mt-3 space-y-4">
-                <Form.Input<FormType>
-                    placeholder={"Nhập mã sách series"}
-                    register={register}
-                    fieldName={"code"}
-                    label="Mã series"
-                    required={true}
-                    errorMessage={errors.code?.message}
-                />
-                <Form.Input<FormType>
+                <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <div className="sm:col-span-2">
+                    <label
+                                htmlFor="cover-photo"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Ảnh bìa<span className="text-rose-500">*</span>
+                            </label>
+                            <Controller
+                control={control}
+                name="previewFile"
+                render={({ field }) => (
+                    <Form.ImageUploadPanel
+                        onChange={(file) => {
+                            if (!isImageFile(file)) {
+                                toast.error("Vui lòng tải lên tệp hình ảnh");
+                                return false;
+                            }
+                            // check file size
+                            if (!isValidFileSize(file, 1)) {
+                                toast.error("Kích thước tệp tối đa là 1MB");
+                                return false;
+                            }
+
+                            field.onChange(file)
+                            return true;
+                        }}
+                        defaultImageURL={book?.imageUrl} />
+                )}
+            />
+                    </div>
+                    <div className="sm:col-span-4">
+                    <Form.Input<FormType>
                     placeholder={"Nhập tên sách series"}
                     register={register}
                     fieldName={"name"}
@@ -281,7 +304,18 @@ const SeriesBookForm = ({ book }: Props) => {
                     required={true}
                     errorMessage={errors.name?.message}
                 />
-                <div className="grid gap-y-4 gap-x-4 sm:grid-cols-2">
+                 <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                 <div className="sm:col-span-2">
+                 <Form.Input<FormType>
+                        placeholder={"Nhập mã sách series"}
+                        register={register}
+                        fieldName={"code"}
+                        label="Mã series"
+                        required={true}
+                        errorMessage={errors.code?.message}
+                    />
+                    </div>
+                    <div className="sm:col-span-2">
                     <Form.Input<FormType>
                         placeholder={"Nhập ISBN10"}
                         register={register}
@@ -289,6 +323,8 @@ const SeriesBookForm = ({ book }: Props) => {
                         label="ISBN10"
                         errorMessage={errors.isbn10?.message}
                     />
+                    </div>
+                    <div className="sm:col-span-2">
                     <Form.Input<FormType>
                         placeholder={"Nhập ISBN13"}
                         register={register}
@@ -296,8 +332,8 @@ const SeriesBookForm = ({ book }: Props) => {
                         label="ISBN13"
                         errorMessage={errors.isbn13?.message}
                     />
-                </div>
-                <div className="grid gap-y-4 gap-x-4 sm:grid-cols-2">
+                    </div>
+                    <div className="sm:col-span-3">
                     <Form.Input<FormType>
                         inputType={"number"}
                         placeholder={"Nhập năm phát hành"}
@@ -307,6 +343,8 @@ const SeriesBookForm = ({ book }: Props) => {
                         label="Năm phát hành"
                         errorMessage={errors.releasedYear?.message}
                     />
+                    </div>
+                    <div className="sm:col-span-3">
                     <Form.Input<FormType>
                         inputType={"number"}
                         placeholder={"Nhập giá bìa"}
@@ -316,30 +354,13 @@ const SeriesBookForm = ({ book }: Props) => {
                         label="Giá bìa (đ)"
                         errorMessage={errors.coverPrice?.message}
                     />
+                        </div>
+                 </div>
+                    </div>
                 </div>
-                <Form.Label label={"Ảnh sản phẩm"} required={true} />
-                <Controller
-                    control={control}
-                    name="previewFile"
-                    render={({ field }) => (
-                        <Form.ImageUploadPanel
-                            onChange={(file) => {
-                                if (!isImageFile(file)) {
-                                    toast.error("Vui lòng tải lên tệp hình ảnh");
-                                    return false;
-                                }
-                                // check file size
-                                if (!isValidFileSize(file, 1)) {
-                                    toast.error("Kích thước tệp tối đa là 1MB");
-                                    return false;
-                                }
-
-                                field.onChange(file)
-                                return true;
-                            }}
-                            defaultImageURL={book?.imageUrl} />
-                    )}
-                />
+            </div>
+            
+            <div className="mt-3 space-y-4">
                 <Form.Divider />
                 <Form.GroupLabel
                     label={"Thể loại"}
@@ -370,22 +391,7 @@ const SeriesBookForm = ({ book }: Props) => {
                 </div>
 
                 <Form.Divider />
-                <Form.GroupLabel
-                    label={"Mô tả"}
-                    description="Mô tả về series sách"
-                />
-                <div className="mt-3">
-                    <Form.Input<FormType>
-                        isTextArea={true}
-                        placeholder={"Nhập mô tả sách series"}
-                        register={register}
-                        fieldName={"description"}
-                        label="Mô tả"
-                        required={true}
-                        errorMessage={errors.description?.message}
-                    />
-                </div>
-                <Form.Divider />
+
                 <Form.GroupLabel
                     label={"Chọn sách"}
                     description="Chọn những sách cùng thể loại cho series"
@@ -490,6 +496,22 @@ const SeriesBookForm = ({ book }: Props) => {
                 </div>
 
                 <Form.Divider />
+                <Form.GroupLabel
+                    label={"Mô tả"}
+                    description="Mô tả về series sách"
+                />
+                <div className="mt-3">
+                    <Form.Input<FormType>
+                        isTextArea={true}
+                        placeholder={"Nhập mô tả sách series"}
+                        register={register}
+                        fieldName={"description"}
+                        label="Mô tả"
+                        required={true}
+                        errorMessage={errors.description?.message}
+                    />
+                </div>
+                <Form.Divider />
                 <Form.GroupLabel label="Trạng thái" />
                 <Form.Label label="Trạng thái" />
                 <div>
@@ -579,26 +601,26 @@ const SeriesBookForm = ({ book }: Props) => {
                 confirmText={"Xoá"}
             />
             <ConfirmModal
-                    isOpen={showConfirmDisabledModal}
-                    onClose={() => setshowConfirmDisabledModal(false)}
-                    onConfirm={() => {
-                        setValue("status", 0);
-                        setshowConfirmDisabledModal(false);
-                    }}
-                    title={`Ngừng phát hành series`}
-                    confirmText={"Ngừng phát hành"}
-                    content={`Bạn có chắc chắn muốn ngừng phát hành series không?`}
-                >
-                    <div>
-                        {`Series đang có trong hội sách sau:`}
-                    </div>
-                    <div>
-                        {`Hội sách xuyên Việt - Lan tỏa tri thức,`}
-                    </div>
-                    <div>
-                        {`Campaign_Test_05`}
-                    </div>
-                </ConfirmModal>
+                isOpen={showConfirmDisabledModal}
+                onClose={() => setshowConfirmDisabledModal(false)}
+                onConfirm={() => {
+                    setValue("status", 0);
+                    setshowConfirmDisabledModal(false);
+                }}
+                title={`Ngừng phát hành series`}
+                confirmText={"Ngừng phát hành"}
+                content={`Bạn có chắc chắn muốn ngừng phát hành series không?`}
+            >
+                <div>
+                    {`Series đang có trong hội sách sau:`}
+                </div>
+                <div>
+                    {`Hội sách xuyên Việt - Lan tỏa tri thức,`}
+                </div>
+                <div>
+                    {`Campaign_Test_05`}
+                </div>
+            </ConfirmModal>
         </form>
     );
 };

@@ -234,7 +234,13 @@ const BookForm = ({ book }: Props) => {
             delete payload.previewFile;
 
             // console.log(JSON.stringify(payload));
-            await toast.promise(updateBookMutation.mutateAsync(payload), {
+            await toast.promise(updateBookMutation.mutateAsync({
+                ...payload,
+                pdfTrialUrl: payload.pdfTrialUrl || null,
+                audioTrialUrl: payload.audioTrialUrl || null,
+                pdfExtraPrice: payload.pdfExtraPrice || null,
+                audioExtraPrice: payload.audioExtraPrice || null,
+            }), {
                 loading: "Đang cập nhật sách",
                 success: () => {
                     return "Cập nhật sách thành công";
@@ -263,173 +269,190 @@ const BookForm = ({ book }: Props) => {
                         <span>Quay lại</span>
                     </Link>
                 </div>
+                <Form.GroupLabel
+                    label={"Thông tin chung"}
+                    description={"Thông tin cơ bản về sách"}
+                />
                 <div className="mt-3 space-y-4">
-                    <Form.Input<FormType>
-                        required={true}
-                        label="Tên sách"
-                        register={register}
-                        fieldName="name"
-                        errorMessage={errors.name?.message}
-                    />
-
-                    <Form.Input<FormType>
-                        required={true}
-                        label="Mã sách"
-                        register={register}
-                        fieldName="code"
-                        errorMessage={errors.code?.message}
-                    />
-
-                    <Form.Input<FormType>
-                        isTextArea={true}
-                        required={true}
-                        label="Mô tả"
-                        register={register}
-                        fieldName="description"
-                        errorMessage={errors.description?.message}
-                    />
-
-                    <Controller
-                        control={control}
-                        name="previewFile"
-                        render={({ field }) => (
-                            <Form.ImageUploadPanel
-                                onChange={(file) => {
-
-                                    if (!isImageFile(file)) {
-                                        toast.error("Vui lòng tải lên tệp hình ảnh");
-                                        return false;
-                                    }
-                                    // check file size
-                                    if (!isValidFileSize(file, 1)) {
-                                        toast.error("Kích thước tệp tối đa là 1MB");
-                                        return false;
-                                    }
-
-                                    field.onChange(file)
-                                    return true;
-                                }}
-                                defaultImageURL={book?.imageUrl} />
-                        )}
-                    />
-
-
-                    <div className='grid sm:grid-cols-2 gap-y-6 gap-x-4'>
-                        <Form.Input<FormType>
-                            // required={true}
-                            label={"ISBN10"}
-                            register={register}
-                            fieldName="isbn10"
-                            errorMessage={errors.isbn10?.message}
-                        />
-                        <Form.Input<FormType>
-                            // required={true}
-                            label={"ISBN13"}
-                            register={register}
-                            fieldName="isbn13"
-                            errorMessage={errors.isbn13?.message}
-                        /><Form.Input<FormType>
-                            inputType="number"
-                            required={true}
-                            label={"Giá bìa (đ)"}
-                            register={register}
-                            fieldName="coverPrice"
-                            errorMessage={errors.coverPrice?.message}
-                        /><Form.Input<FormType>
-
-                            required={true}
-                            label={"Kích thước"}
-                            register={register}
-                            fieldName="size"
-                            errorMessage={errors.size?.message}
-                        />
-
-                        <div>
-
-                            <Form.Label label="Ngôn ngữ" required={true} />
+                    <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div className="sm:col-span-2">
+                            <label
+                                htmlFor="cover-photo"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Ảnh bìa<span className="text-rose-500">*</span>
+                            </label>
                             <Controller
                                 control={control}
-                                name="language"
+                                name="previewFile"
                                 render={({ field }) => (
-                                    <SelectBox<{
-                                        value: string;
-                                    }>
-                                        value={
-                                            field.value ? {
-                                                value: field.value
-                                            } : null
-                                        }
-                                        displayKey='value'
-                                        dataSource={languageOptions}
-                                        placeholder='Chọn ngôn ngữ'
-                                        onValueChange={(l) => {
-                                            field.onChange(l.value);
+                                    <Form.ImageUploadPanel
+                                        onChange={(file) => {
+
+                                            if (!isImageFile(file)) {
+                                                toast.error("Vui lòng tải lên tệp hình ảnh");
+                                                return false;
+                                            }
+                                            // check file size
+                                            if (!isValidFileSize(file, 1)) {
+                                                toast.error("Kích thước tệp tối đa là 1MB");
+                                                return false;
+                                            }
+
+                                            field.onChange(file)
+                                            return true;
                                         }}
+                                        defaultImageURL={book?.imageUrl}
+                                        style={{ width: "100px", height: "100px" }}
                                     />
                                 )}
                             />
                         </div>
 
-                        <Form.Input<FormType>
-                            inputType="number"
-                            required={true}
-                            label={"Năm xuất bản"}
-                            register={register}
-                            fieldName="releasedYear"
-                            errorMessage={errors.releasedYear?.message}
-                        />
-
-                        <Form.Input<FormType>
-                            inputType="number"
-                            required={true}
-                            label={"Số trang"}
-                            register={register}
-                            fieldName="page"
-                            errorMessage={errors.page?.message}
-                        />
-
-
-                        <div>
-                            <Form.Label label="Nhà xuất bản" required={true} />
-                            <Controller
-                                control={control}
-                                name="publisherId"
-                                render={({ field }) => (
-                                    <SelectBox<IPublisher>
-                                        value={
-                                            publishers?.data?.find((p) => p.id === field.value) || null
-                                        }
-                                        displayKey='name'
-                                        dataSource={publishers?.data}
-                                        placeholder='Chọn nhà xuất bản'
-                                        onValueChange={(p) => {
-                                            field.onChange(p.id);
-                                        }}
-                                    />
-                                )}
+                        <div className="sm:col-span-4">
+                            <Form.Input<FormType>
+                                required={true}
+                                label="Tên sách"
+                                register={register}
+                                fieldName="name"
+                                errorMessage={errors.name?.message}
                             />
+                            <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                <div className="sm:col-span-2">
+                                    <Form.Input<FormType>
+                                        required={true}
+                                        label="Mã sách"
+                                        register={register}
+                                        fieldName="code"
+                                        errorMessage={errors.code?.message}
+                                    />
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <Form.Input<FormType>
+                                        // required={true}
+                                        label={"ISBN10"}
+                                        register={register}
+                                        fieldName="isbn10"
+                                        errorMessage={errors.isbn10?.message}
+                                    />
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <Form.Input<FormType>
+                                        // required={true}
+                                        label={"ISBN13"}
+                                        register={register}
+                                        fieldName="isbn13"
+                                        errorMessage={errors.isbn13?.message}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <Form.Input<FormType>
+                                        inputType="number"
+                                        required={true}
+                                        label={"Giá bìa (đ)"}
+                                        register={register}
+                                        fieldName="coverPrice"
+                                        errorMessage={errors.coverPrice?.message}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <Form.Input<FormType>
+                                        required={true}
+                                        label={"Kích thước"}
+                                        register={register}
+                                        fieldName="size"
+                                        errorMessage={errors.size?.message}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <Form.Label label="Ngôn ngữ" required={true} />
+                                    <Controller
+                                        control={control}
+                                        name="language"
+                                        render={({ field }) => (
+                                            <SelectBox<{
+                                                value: string;
+                                            }>
+                                                value={
+                                                    field.value ? {
+                                                        value: field.value
+                                                    } : null
+                                                }
+                                                displayKey='value'
+                                                dataSource={languageOptions}
+                                                placeholder='Chọn ngôn ngữ'
+                                                onValueChange={(l) => {
+                                                    field.onChange(l.value);
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <Form.Input<FormType>
+                                        inputType="number"
+                                        required={true}
+                                        label={"Năm xuất bản"}
+                                        register={register}
+                                        fieldName="releasedYear"
+                                        errorMessage={errors.releasedYear?.message}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <Form.Input<FormType>
+                                        inputType="number"
+                                        required={true}
+                                        label={"Số trang"}
+                                        register={register}
+                                        fieldName="page"
+                                        errorMessage={errors.page?.message}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <Form.Label label="Nhà xuất bản" required={true} />
+                                    <Controller
+                                        control={control}
+                                        name="publisherId"
+                                        render={({ field }) => (
+                                            <SelectBox<IPublisher>
+                                                value={
+                                                    publishers?.data?.find((p) => p.id === field.value) || null
+                                                }
+                                                displayKey='name'
+                                                dataSource={publishers?.data}
+                                                placeholder='Chọn nhà xuất bản'
+                                                onValueChange={(p) => {
+                                                    field.onChange(p.id);
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                                <div className="sm:col-span-3">
+                                    <Form.Label label="Thể loại" required={true} />
+                                    <Controller
+                                        
+                                        control={control}
+                                        name="genreId"
+                                        render={({ field }) => (
+                                            <SelectBox<IGenre>
+                                                disabled={!book?.allowChangingGenre}
+                                                value={
+                                                    genres?.find((g) => g.id === field.value) || null
+                                                }
+                                                displayKey='name'
+                                                dataSource={genres}
+                                                placeholder='Chọn thể loại'
+                                                onValueChange={(p) => {
+                                                    field.onChange(p.id);
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                            </div>
                         </div>
 
-                        <div>
-                            <Form.Label label="Thể loại" required={true} />
-                            <Controller
-                                control={control}
-                                name="genreId"
-                                render={({ field }) => (
-                                    <SelectBox<IGenre>
-                                        value={
-                                            genres?.find((g) => g.id === field.value) || null
-                                        }
-                                        displayKey='name'
-                                        dataSource={genres}
-                                        placeholder='Chọn thể loại'
-                                        onValueChange={(p) => {
-                                            field.onChange(p.id);
-                                        }}
-                                    />
-                                )}
-                            />
-                        </div>
                     </div>
                 </div>
                 <Form.Divider />
@@ -507,6 +530,16 @@ const BookForm = ({ book }: Props) => {
                         />
                     </div>
                 </div>
+                <Form.Divider />
+                <Form.GroupLabel label="Mô tả" />
+                <Form.Input<FormType>
+                    isTextArea={true}
+                    required={true}
+                    label="Mô tả"
+                    register={register}
+                    fieldName="description"
+                    errorMessage={errors.description?.message}
+                />
                 <Form.Divider />
                 <Form.GroupLabel label="Trạng thái" />
                 <div>

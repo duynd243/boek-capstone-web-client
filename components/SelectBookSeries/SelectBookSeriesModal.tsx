@@ -11,12 +11,18 @@ import Modal from './../Modal/Modal';
 import Link from 'next/link';
 import Image from 'next/image';
 import EmptyState, { EMPTY_STATE_TYPE } from '../EmptyState';
+import { BookProductService } from './../../services/BookProductService';
+import { IBookProduct } from '../../types/Book/IBookProduct';
+
+
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
     onItemSelect: (book: IBook) => void;
-    genreId?: number;
+    campaignId: number;
+    genreIds?: (number | undefined)[];
+    isSeries?: boolean;
     selectedBooks?: Array<Pick<IBook, "id"> | Partial<IBook>>;
 }
 
@@ -24,19 +30,23 @@ const SelectBookSeriesModal = ({
     isOpen,
     onClose,
     onItemSelect,
-    genreId,
+    genreIds,
     selectedBooks,
+    isSeries = false,
+    campaignId
 }: Props) => {
     const {loginUser} = useAuth();
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search, 500);
     const bookService = new BookService(loginUser?.accessToken);
+    const bookProductService = new BookProductService(loginUser?.accessToken);
 
-    const { data: books } = useQuery(["books", debouncedSearch], () =>
-        bookService.getBooks$Issuer({
+    const { data: books } = useQuery(["books", {debouncedSearch, campaignId, genreIds, isSeries}], () =>
+    bookService.getAddableBooksByIssuer({
             name: debouncedSearch,
-            genreId: genreId,
-            isSeries: false,
+            genreIds,
+            isSeries: isSeries,
+            CurrentCampaignId: campaignId,
         })
     );
 

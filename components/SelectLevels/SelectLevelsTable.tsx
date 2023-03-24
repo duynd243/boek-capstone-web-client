@@ -1,29 +1,26 @@
+import Image from "next/image";
 import React from "react";
-import TableHeading from "../Admin/Table/TableHeading";
-import TableHeader from "../Admin/Table/TableHeader";
+import { ILevel } from "../../types/Level/ILevel";
+import { getAvatarFromName } from "../../utils/helper";
 import TableBody from "../Admin/Table/TableBody";
 import TableData from "../Admin/Table/TableData";
-import Image from "next/image";
-import {getAvatarFromName} from "../../utils/helper";
+import TableHeader from "../Admin/Table/TableHeader";
+import TableHeading from "../Admin/Table/TableHeading";
 import TableWrapper from "../Admin/Table/TableWrapper";
-import {IGroup} from "../../types/Group/IGroup";
-import {ILevel} from "../../types/Level/ILevel";
 
 type Props = {
     selectedLevels: ILevel[];
     handleRemoveLevel: (level: ILevel) => void;
 };
 
-const SelectGroupsTable: React.FC<Props> = ({
-                                                selectedLevels,
-                                            handleRemoveLevel,
-                                            }) => {
-
-
+const SelectLevelsTable: React.FC<Props> = ({
+    selectedLevels,
+    handleRemoveLevel,
+}) => {
     return (
         <TableWrapper>
             <TableHeading>
-                <TableHeader>Tên nhóm</TableHeader>
+                <TableHeader>Tên cấp độ</TableHeader>
                 <TableHeader>Điểm yêu cầu</TableHeader>
                 <TableHeader>
                     <span className="sr-only">Actions</span>
@@ -41,7 +38,10 @@ const SelectGroupsTable: React.FC<Props> = ({
                                                 width={100}
                                                 height={100}
                                                 className="h-10 w-10 rounded-full object-cover"
-                                                src={getAvatarFromName(level?.name)}
+                                                src={getAvatarFromName(
+                                                    level?.name,
+                                                    1
+                                                )}
                                                 alt=""
                                             />
                                         </div>
@@ -78,7 +78,7 @@ const SelectGroupsTable: React.FC<Props> = ({
                             textAlignment={"text-center"}
                             className="text-sm font-medium uppercase leading-10 text-gray-500 "
                         >
-                            Chưa có nhóm nào được chọn
+                            Chưa có cấp độ nào được chọn
                         </TableData>
                     </tr>
                 )}
@@ -87,4 +87,4 @@ const SelectGroupsTable: React.FC<Props> = ({
     );
 };
 
-export default SelectGroupsTable;
+export default SelectLevelsTable;

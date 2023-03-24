@@ -3,19 +3,23 @@ export interface IBookFormat {
     displayName: string;
 }
 
-export class BookFormats {
-    static readonly PAPER: IBookFormat = {
+export const BookFormats = {
+    PAPER: {
         id: 1,
         displayName: "Sách giấy",
-    };
-    static readonly PDF: IBookFormat = {
+    },
+    PDF: {
         id: 2,
         displayName: "Sách PDF",
-    };
-    static readonly AUDIO: IBookFormat = {
+    },
+    AUDIO: {
         id: 3,
         displayName: "Sách Audio",
     }
+} satisfies Record<string, IBookFormat>
+
+export function getBookFormatById(id: number | undefined): IBookFormat | undefined {
+    return Object.values(BookFormats).find((format) => format.id === id);
 }
 
 const a = {

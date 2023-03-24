@@ -1,9 +1,10 @@
 import React from "react";
 
 import {Dialog} from "@headlessui/react";
-import ErrorMessage from "../Form/ErrorMessage";
-import {FormikValues} from "formik/dist/types";
-import {FormState, Path, UseFormRegister} from "react-hook-form";
+import Form from "../Form";
+import Link from "next/link";
+import {BsEmojiFrownFill, BsEmojiSmileFill} from "react-icons/bs";
+import {CgSpinnerAlt} from "react-icons/cg";
 
 type HeaderProps = {
     title: string;
@@ -13,24 +14,6 @@ type HeaderProps = {
 
 type FooterProps = {
     children: React.ReactNode;
-};
-
-type FormInputPropsOld = {
-    uppercase?: boolean;
-    formikForm: FormikValues;
-    fieldName: string;
-    label: string;
-    required?: boolean;
-    placeholder?: string;
-    isTextArea?: boolean;
-    inputType?: React.HTMLInputTypeAttribute;
-} & React.InputHTMLAttributes<HTMLInputElement> &
-    React.TextareaHTMLAttributes<HTMLTextAreaElement>;
-
-type FormLabelProps = {
-    fieldName?: string;
-    label: string;
-    required?: boolean;
 };
 
 const Header: React.FC<HeaderProps> = ({title, showCloseButton, onClose}) => {
@@ -61,125 +44,106 @@ const Footer: React.FC<FooterProps> = ({children}) => {
     );
 };
 
-const FormInputOld: React.FC<FormInputPropsOld> = ({
-                                                       uppercase = false,
-                                                       inputType = "text",
-                                                       formikForm,
-                                                       isTextArea,
-                                                       label,
-                                                       required,
-                                                       fieldName,
-                                                       placeholder,
-                                                       ...rest
-                                                   }) => {
-    const commonProps = {
-        id: fieldName,
-        name: fieldName,
-        value: formikForm.values[fieldName],
-        onChange: (
-            e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-        ) => {
-            formikForm.setFieldValue(
-                fieldName,
-                uppercase ? e.target.value.toUpperCase() : e.target.value
-            );
-        },
-        placeholder,
-        className:
-            "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
-        ...rest,
-    };
-    return (
-        <div>
-            <FormLabel
-                fieldName={fieldName}
-                label={label}
-                required={required}
-            />
-            {isTextArea ? (
-                <textarea {...commonProps} rows={3}/>
-            ) : (
-                <input {...commonProps} type={inputType}/>
-            )}
-            {formikForm.errors[fieldName] && formikForm.touched[fieldName] && (
-                <ErrorMessage>{formikForm.errors[fieldName]}</ErrorMessage>
-            )}
-        </div>
-    );
-};
-
-type FormInputProps<T extends Record<string, any>> = {
-    register: UseFormRegister<T>;
-    formState: FormState<T>;
-    uppercase?: boolean;
-    fieldName: Path<T>;
-    label: string;
-    required?: boolean;
-    placeholder?: string;
-    isTextArea?: boolean;
-    inputType?: React.HTMLInputTypeAttribute;
-    showErrorMessage?: boolean;
-} & React.InputHTMLAttributes<HTMLInputElement> &
-    React.TextareaHTMLAttributes<HTMLTextAreaElement>;
-
-const FormInput = <T extends Record<string, any>>({
-                                                      register,
-                                                      formState,
-                                                      uppercase = false,
-                                                      inputType = "text",
-                                                      isTextArea,
-                                                      label,
-                                                      required,
-                                                      fieldName,
-                                                      placeholder,
-                                                      showErrorMessage = true,
-                                                      ...rest
-                                                  }: FormInputProps<T>) => {
-    const commonProps = {
-        id: fieldName,
-        placeholder: placeholder,
-        className:
-            "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
-        ...register(fieldName),
-        ...rest,
-    };
-
-    const errorMessage = formState.errors[fieldName]
-        ?.message as string;
-    return (
-        <div>
-            <FormLabel
-                fieldName={fieldName}
-                label={label}
-                required={required}
-            />
-            {isTextArea ? (
-                <textarea {...commonProps} rows={3}/>
-            ) : (
-                <input {...commonProps} type={inputType}/>
-            )}
-            {showErrorMessage && errorMessage && (
-                <ErrorMessage>{errorMessage}</ErrorMessage>
-            )}
-        </div>
-    );
-};
-
-const FormLabel: React.FC<FormLabelProps> = ({
-                                                 label,
-                                                 required,
-                                                 fieldName,
-                                             }) => {
-    return (
-        <label className="mb-1 block text-sm font-medium" htmlFor={fieldName}>
-            {label} {required && <span className="text-rose-500">*</span>}
-        </label>
-    );
-};
-
 const Backdrop: React.FC = () => {
     return (
-        <div className="bg-black fixed top-0 right-0 bottom-0 left-0 z-[1000] opacity-50"></div>
+        <div className="bg-black fixed top-0 right-0 bottom-0 left-0 z-[1000] opacity-30"></div>
+    );
+};
+
+type ButtonProps = {
+    children: React.ReactNode;
+    href?: string;
+} & React.ButtonHTMLAttributes<HTMLButtonElement> &
+    React.AnchorHTMLAttributes<HTMLAnchorElement>;
+
+const PrimaryButton: React.FC<ButtonProps> = ({children, href, ...rest}) => {
+    const props = {
+        ...rest,
+        className:
+            "m-btn bg-indigo-500 text-white hover:bg-indigo-600 disabled:opacity-50",
+    };
+
+    if (href) {
+        return (
+            <Link href={href} {...props}>
+                {children}
+            </Link>
+        );
+    }
+
+    return <button {...props}>{children}</button>;
+};
+
+const SecondaryButton: React.FC<ButtonProps> = ({
+                                                    children,
+                                                    href,
+                                                    ...rest
+                                                }) => {
+    const props = {
+        ...rest,
+        className:
+            "m-btn bg-gray-100 text-slate-600 hover:bg-gray-200 disabled:opacity-50",
+    };
+
+    if (href) {
+        return (
+            <Link href={href} {...props}>
+                {children}
+            </Link>
+        );
+    }
+    return <button {...props}>{children}</button>;
+};
+
+const StatusSwitch = ({
+                          enabled,
+                          enabledText,
+                          disabledText,
+                      }: {
+    enabled: boolean;
+    enabledText: string;
+    disabledText: string;
+}) => {
+    return (
+        <div>
+            <div
+                className={`${
+                    enabled ? "bg-green-500" : "bg-rose-500"
+                } flex w-fit items-center gap-2 rounded px-2.5 py-1 text-sm text-white transition`}
+            >
+                {enabled ? (
+                    <>
+                        Hoạt động <BsEmojiSmileFill/>
+                    </>
+                ) : (
+                    <>
+                        Không hoạt động <BsEmojiFrownFill/>
+                    </>
+                )}
+            </div>
+            <div className="mt-2 text-sm font-medium text-slate-600">
+                {enabled ? enabledText : disabledText}
+            </div>
+        </div>
+    );
+};
+
+const SubmitTextWithLoading = (props: {
+    text: string;
+    loadingText: string;
+    isLoading: boolean;
+}) => {
+    return (
+        <>
+            {props.isLoading ? (
+                <>
+                    {props.loadingText}
+                    <CgSpinnerAlt className="animate-spin ml-2" size={18}/>
+                </>
+            ) : (
+                props.text
+            )}
+        </>
     );
 };
 
@@ -187,8 +151,11 @@ const Modal = {
     Backdrop,
     Header,
     Footer,
-    FormInputOld,
-    FormInput,
-    FormLabel,
+    FormInput: Form.Input,
+    FormLabel: Form.Label,
+    PrimaryButton,
+    SecondaryButton,
+    StatusSwitch,
+    SubmitTextWithLoading,
 };
 export default Modal;

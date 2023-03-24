@@ -20,8 +20,6 @@ import SelectBox from "../SelectBox";
 import TableHeading from "../Admin/Table/TableHeading";
 import TableHeader from "../Admin/Table/TableHeader";
 import TableBody from "../Admin/Table/TableBody";
-import { randomBooks } from "../../pages/admin/books";
-import { faker } from "@faker-js/faker/locale/vi";
 import { IBookResponse } from "../../old-types/response/IBookResponse";
 import TableData from "../Admin/Table/TableData";
 import Image from "next/image";
@@ -91,8 +89,8 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
     return formValues.selectedBooks ?? [];
   });
   const [toDeleteBook, setToDeleteBook] = useState<
-    (typeof randomBooks)[0] | null
-  >(null);
+    IBook | null
+  >();
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showAddBookModal, setShowAddBookModal] = useState<boolean>(false);
   const [searchBookQuery, setSearchBookQuery] = useState<string>("");
@@ -103,11 +101,6 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
     imageService.uploadImage(file)
   );
 
-  const searchBooks = useMemo(() => {
-    return randomBooks.filter((book) =>
-      book?.name?.toLowerCase().includes(searchBookQuery.toLowerCase())
-    );
-  }, [searchBookQuery]);
 
   const router = useRouter();
 
@@ -173,7 +166,7 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
         ...values,
         authors: values.authors.map((a: IAuthor) => a.id),
         imageUrl: "",
-        createBookItems: values.selectedBooks.map((b: (typeof randomBooks)[number], index) => {
+        createBookItems: values.selectedBooks.map((b: IBook, index) => {
           return {
             bookId: b.id,
             displayIndex: index
@@ -227,19 +220,19 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
 
   const handleAddBook = useCallback(
     (book: IBook) => {
-      if(selectedBooks.length > 0){
+      if (selectedBooks.length > 0) {
         const currentAuthorIds = selectedBooks.filter((b) => b?.bookAuthors)
-        .map((b) => b?.bookAuthors)
-        .flat()
-        .map((a) => a?.authorId) || [];
+          .map((b) => b?.bookAuthors)
+          .flat()
+          .map((a) => a?.authorId) || [];
 
-      const newBookAuthorIds = book?.bookAuthors?.map((a) => a?.authorId) || [];
+        const newBookAuthorIds = book?.bookAuthors?.map((a) => a?.authorId) || [];
 
-      const intersection = getIntersectedArray(currentAuthorIds, newBookAuthorIds);
-      if (intersection.length === 0) {
-        toast.error("Sách không có tác giả chung với các sách khác trong series");
-        return;
-      }
+        const intersection = getIntersectedArray(currentAuthorIds, newBookAuthorIds);
+        if (intersection.length === 0) {
+          toast.error("Sách không có tác giả chung với các sách khác trong series");
+          return;
+        }
       }
       if (selectedBooks.find((b) => b.id === book.id)) {
         toast.error("Sách đã tồn tại trong danh sách");
@@ -257,7 +250,7 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
   );
 
   const handleDeleteBook = useCallback(
-    (book: (typeof randomBooks)[0]) => {
+    (book: IBook) => {
       setToDeleteBook(null);
       setSelectedBooks((prev) => {
         const newState = prev.filter((b) => b.id !== book.id);
@@ -298,85 +291,105 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
             label={"Thông tin chung"}
             description={"Thông tin chung về series sách"}
           />
+
           <div className="mt-3 space-y-4">
-            <Form.Input
-              placeholder={"VD: S0001"}
-              register={register}
-              value={form.values.code}
-              onChange={form.handleChange}
-              required={true}
-              fieldName={"code"}
-              label={"Mã series"}
-            />
-            <Form.Input
-              placeholder={"Nhập tên series"}
-              register={register}
-              value={form.values.name}
-              onChange={form.handleChange}
-              required={true}
-              fieldName={"name"}
-              label={"Tên series"}
-            />
-            <div className="grid gap-y-4 gap-x-4 sm:grid-cols-2">
-              <Form.Input
-                placeholder={"Nhập ISBN10"}
-                uppercase={true}
-                maxLength={10}
-                register={register}
-                value={form.values.isbn10}
-                onChange={form.handleChange}
-                fieldName={"isbn10"}
-                label={"ISBN10"}
-              />
-              <Form.Input
-                placeholder={"Nhập ISBN13"}
-                uppercase={true}
-                maxLength={13}
-                value={form.values.isbn13}
-                onChange={form.handleChange}
-                register={register}
-                fieldName={"isbn13"}
-                label={"ISBN13"}
-              />
-            </div>
-            <div className="grid gap-y-4 gap-x-4 sm:grid-cols-2">
-              <Form.Input
-                placeholder={"Nhập năm phát hành"}
-                required={true}
-                inputType={"number"}
-                register={register}
-                value={form.values.releasedYear}
-                onChange={form.handleChange}
-                fieldName={"releasedYear"}
-                label={"Năm phát hành"}
-              />
-              <Form.Input
-                placeholder={"Nhập giá bìa"}
-                required={true}
-                inputType={"number"}
-                register={register}
-                value={form.values.coverPrice}
-                onChange={form.handleChange}
-                fieldName={"coverPrice"}
-                label={"Giá bìa (đ)"}
-              />
-            </div>
-            <Form.Label label={"Ảnh sản phẩm"} required={true} />
+            <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor="cover-photo"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Ảnh bìa<span className="text-rose-500">*</span>
+                </label>
+                <Form.ImageUploadPanel onChange={(file) => {
+                  if (!isImageFile(file)) {
+                    toast.error("Vui lòng tải lên tệp hình ảnh");
+                    return false;
+                  }
+                  // check file size
+                  if (!isValidFileSize(file, 1)) {
+                    toast.error("Kích thước tệp tối đa là 1MB");
+                    return false;
+                  }
 
-            <Form.ImageUploadPanel onChange={(file) => {
-              if (!isImageFile(file)) {
-                toast.error("Vui lòng tải lên tệp hình ảnh");
-                return false;
-              }
-              // check file size
-              if (!isValidFileSize(file, 1)) {
-                toast.error("Kích thước tệp tối đa là 1MB");
-                return false;
-              }
+                  form.setFieldValue("previewFile", file);
+                  return true;
+                }} />
+              </div>
 
-              form.setFieldValue("previewFile", file);
-              return true;
-            }} />
+              <div className="sm:col-span-4">
+                <Form.Input
+                  placeholder={"Nhập tên series"}
+                  register={register}
+                  value={form.values.name}
+                  onChange={form.handleChange}
+                  required={true}
+                  fieldName={"name"}
+                  label={"Tên series"}
+                />
+                <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                  <div className="sm:col-span-2">
+                    <Form.Input
+                      placeholder={"VD: S0001"}
+                      register={register}
+                      value={form.values.code}
+                      onChange={form.handleChange}
+                      required={true}
+                      fieldName={"code"}
+                      label={"Mã series"}
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Form.Input
+                      placeholder={"Nhập ISBN10"}
+                      uppercase={true}
+                      maxLength={10}
+                      register={register}
+                      value={form.values.isbn10}
+                      onChange={form.handleChange}
+                      fieldName={"isbn10"}
+                      label={"ISBN10"}
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Form.Input
+                      placeholder={"Nhập ISBN13"}
+                      uppercase={true}
+                      maxLength={13}
+                      value={form.values.isbn13}
+                      onChange={form.handleChange}
+                      register={register}
+                      fieldName={"isbn13"}
+                      label={"ISBN13"}
+                    />
+                  </div>
+                  <div className="sm:col-span-3">
+                    <Form.Input
+                      placeholder={"Nhập năm phát hành"}
+                      required={true}
+                      inputType={"number"}
+                      register={register}
+                      value={form.values.releasedYear}
+                      onChange={form.handleChange}
+                      fieldName={"releasedYear"}
+                      label={"Năm phát hành"}
+                    />
+                  </div>
+                  <div className="sm:col-span-3">
+                    <Form.Input
+                      placeholder={"Nhập giá bìa"}
+                      required={true}
+                      inputType={"number"}
+                      register={register}
+                      value={form.values.coverPrice}
+                      onChange={form.handleChange}
+                      fieldName={"coverPrice"}
+                      label={"Giá bìa (đ)"}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <Form.Divider />
           <Form.GroupLabel
@@ -408,21 +421,6 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
           {form.errors.genreId && form.touched.genreId && (
             <ErrorMessage>{form.errors.genreId}</ErrorMessage>
           )}
-          <Form.Divider />
-          <Form.GroupLabel label={"Mô tả"} description="Mô tả về series sách" />
-          <div className="mt-3">
-            <Form.Input
-              placeholder={"Nhập mô tả"}
-              isTextArea={true}
-              register={register}
-              value={form.values.description}
-              onChange={form.handleChange}
-              required={true}
-              fieldName={"description"}
-              label={"Mô tả"}
-            />
-          </div>
-
           <Form.Divider />
           <Form.GroupLabel
             label={"Chọn sách"}
@@ -539,7 +537,22 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
               <ErrorMessage>{form.errors.selectedBooks}</ErrorMessage>
             )}
           </div>
+          <Form.Divider />
+          <Form.GroupLabel label={"Mô tả"} description="Mô tả về series sách" />
+          <div className="mt-3">
+            <Form.Input
+              placeholder={"Nhập mô tả"}
+              isTextArea={true}
+              register={register}
+              value={form.values.description}
+              onChange={form.handleChange}
+              required={true}
+              fieldName={"description"}
+              label={"Mô tả"}
+            />
+          </div>
 
+          <Form.Divider />
           <button
             type={"submit"}
             className="mt-5 inline-flex items-center gap-2 rounded bg-slate-200 py-2 px-4 text-sm font-medium text-gray-800 hover:bg-slate-300"

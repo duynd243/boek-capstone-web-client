@@ -7,21 +7,15 @@ import {
     Unsubscribe,
     User,
 } from "firebase/auth";
-import { useRouter } from "next/router";
-import React, {
-    createContext,
-    ReactNode,
-    useContext,
-    useEffect,
-    useState,
-} from "react";
+import {useRouter} from "next/router";
+import React, {createContext, ReactNode, useContext, useEffect, useState,} from "react";
 import LoadingProgress from "../components/LoadingProgress";
 import { toast } from "react-hot-toast";
 import LogoutModal from "../components/Modal/LogoutModal";
-import { ILoginData } from "../types/User/ILoginData";
-import { UserService } from "../services/UserService";
-import { Roles } from "../constants/Roles";
-import { IUser } from "../types/User/IUser";
+import {ILoginData} from "../types/User/ILoginData";
+import {UserService} from "../services/UserService";
+import {Roles} from "../constants/Roles";
+import {IUser} from "../types/User/IUser";
 
 export interface IAuthContext {
     user: User | null;
@@ -86,7 +80,7 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
         const userService = new UserService();
         const handleServerAuthentication = async (idToken: string) => {
             try {
-                const { data } = await userService.loginWithFirebaseIdToken(
+                const {data} = await userService.loginWithFirebaseIdToken(
                     idToken
                 );
                 if (!data) return;

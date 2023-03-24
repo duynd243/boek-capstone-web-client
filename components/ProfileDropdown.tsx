@@ -1,17 +1,17 @@
-import React, {useEffect, useRef, useState} from "react";
-import {useAuth} from "../context/AuthContext";
+import React, { useEffect, useRef, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import Image from "next/image";
-import {Transition} from "@headlessui/react";
+import { Transition } from "@headlessui/react";
 import DefaultAvatar from "../assets/images/default-avatar.png";
-import {findRole} from "../constants/Roles";
+import { findRole } from "../constants/Roles";
 import Link from "next/link";
 
 type Props = {
     align: "left" | "right";
 };
 
-const ProfileDropdown: React.FC<Props> = ({align}) => {
-    const {loginUser, user, logOut} = useAuth();
+const ProfileDropdown: React.FC<Props> = ({ align }) => {
+    const { loginUser, user, logOut } = useAuth();
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
     const trigger = useRef<HTMLButtonElement>(null);
@@ -19,7 +19,7 @@ const ProfileDropdown: React.FC<Props> = ({align}) => {
 
     // close on click outside
     useEffect(() => {
-        const clickHandler = ({target}: { target: any }) => {
+        const clickHandler = ({ target }: { target: any }) => {
             if (!dropdown.current) return;
             if (
                 !dropdownOpen ||
@@ -43,21 +43,25 @@ const ProfileDropdown: React.FC<Props> = ({align}) => {
                 aria-expanded={dropdownOpen}
             >
                 <Image
-                    className="h-8 w-8 rounded-full"
-                    src={loginUser?.imageUrl || user?.photoURL || DefaultAvatar.src}
-                    width="32"
-                    height="32"
+                    className="h-8 w-8 rounded-full object-cover"
+                    src={
+                        loginUser?.imageUrl ||
+                        user?.photoURL ||
+                        DefaultAvatar.src
+                    }
+                    width={500}
+                    height={500}
                     alt={loginUser?.name || user?.displayName || "Guest"}
                 />
                 <div className="flex items-center truncate">
-          <span className="ml-2 hidden truncate text-sm font-medium group-hover:text-slate-800 lg:block">
-            {loginUser?.name || user?.displayName}
-          </span>
+                    <span className="ml-2 hidden truncate text-sm font-medium group-hover:text-slate-800 lg:block">
+                        {loginUser?.name || user?.displayName}
+                    </span>
                     <svg
                         className="ml-1 h-3 w-3 shrink-0 fill-current text-slate-400"
                         viewBox="0 0 12 12"
                     >
-                        <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z"/>
+                        <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
                     </svg>
                 </div>
             </button>
@@ -91,7 +95,9 @@ const ProfileDropdown: React.FC<Props> = ({align}) => {
                         <li>
                             <Link
                                 className="flex items-center py-1 px-3 text-sm font-medium text-indigo-500 hover:text-indigo-600"
-                                href="/profile"
+                                href={`${
+                                    findRole(loginUser?.role)?.defaultRoute
+                                }/settings/profile`}
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
                             >
                                 Hồ sơ

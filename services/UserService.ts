@@ -2,11 +2,12 @@ import { IBaseRequestParams } from "./../types/Request/IBaseRequestParams";
 import { ILoginData } from "../types/User/ILoginData";
 import { IBaseStatusResponse } from "../types/Commons/IBaseStatusResponse";
 import { BaseService } from "./BaseService";
+import { IUser } from "../types/User/IUser";
 import { IBaseListResponse } from "../types/Commons/IBaseListResponse";
-import { IUser } from './../types/User/IUser';
 
-export type UpdateUserParams = Required<Pick<IUser, 'id' | 'role'>> & Partial<IUser>;
-export type CreateUserParams = Omit<UpdateUserParams, 'id'>;
+export type UpdateUserParams = Required<Pick<IUser, "id" | "role">> &
+    Partial<IUser>;
+export type CreateUserParams = Omit<UpdateUserParams, "id">;
 
 export class UserService extends BaseService {
     // common
@@ -20,9 +21,8 @@ export class UserService extends BaseService {
         return response.data;
     };
 
-
     getLoggedInUser = async () => {
-        const response = await this.axiosClient.get<IUser| {id: string, description?: string, user: IUser}>("/users/me");
+        const response = await this.axiosClient.get<IUser>("/users/me");
         return response.data;
     };
 
@@ -54,14 +54,22 @@ export class UserService extends BaseService {
         );
         return response.data;
     };
+
     updateProfileByIssuer = async (payload: {
-        description?: string,
-        user: UpdateUserParams,
+        description?: string;
+        user: UpdateUserParams;
     }) => {
         const response = await this.axiosClient.put<any>(
             `/users/issuer`,
             payload
         );
         return response.data;
-    }
+    };
+
+    getUnattendedStaffsByCampaignId = async (campaignId: number) => {
+        const response = await this.axiosClient.get<IUser[]>(
+            `/admin/campaigns/${campaignId}/unattended-staff`
+        );
+        return response.data;
+    };
 }

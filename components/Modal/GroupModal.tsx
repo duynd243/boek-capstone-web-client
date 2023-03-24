@@ -1,8 +1,19 @@
-import React, {useCallback} from "react";
-import * as Yup from "yup";
-import {useFormik} from "formik";
-import TransitionModal from "./TransitionModal";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useCallback } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { z } from "zod";
+import { useAuth } from "../../context/AuthContext";
+import {
+    CreateGroupParams,
+    GroupService,
+    UpdateGroupParams,
+} from "../../services/GroupService";
+import { IGroup } from "../../types/Group/IGroup";
+import ToggleButton from "../ToggleButton";
 import Modal from "./Modal";
+import TransitionModal from "./TransitionModal";
 
 export enum GroupModalMode {
     CREATE,
@@ -14,85 +25,216 @@ type Props = {
     action: GroupModalMode;
     isOpen: boolean;
     onClose: () => void;
-    group?: {
-        code?: string;
-        name?: string;
-    };
+    afterLeave?: () => void;
+    group?: IGroup;
 };
 
 const GroupModal: React.FC<Props> = ({
-                                         maxWidth,
-                                         action,
-                                         isOpen,
-                                         onClose,
-                                         group,
-                                     }) => {
-    const categorySchema = Yup.object({
-        groupName: Yup.string()
-            .trim()
-            .required("Tên nhóm không được để trống")
+    maxWidth,
+    action,
+    isOpen,
+    onClose,
+    afterLeave,
+    group,
+}) => {
+    const BaseGroupSchema = z.object({
+        name: z
+            .string()
             .min(2, "Tên nhóm phải có ít nhất 2 ký tự")
             .max(50, "Tên nhóm không được vượt quá 50 ký tự"),
+        description: z
+            .string()
+            .min(2, "Mô tả phải có ít nhất 2 ký tự")
+            .max(50, "Mô tả không được vượt quá 50 ký tự"),
     });
 
-    const form = useFormik({
-        enableReinitialize: true,
-        initialValues: {
-            groupName: action === GroupModalMode.UPDATE ? group?.name : "",
-        },
-        validationSchema: categorySchema,
-        onSubmit: async (values) => {
-        },
+    const UpdateGroupSchema = BaseGroupSchema.extend({
+        id: z.number().int().positive(),
+        status: z.boolean(),
     });
+
+    type FormType = Partial<z.infer<typeof UpdateGroupSchema>>;
+
+    const defaultValues: FormType = {
+        id: group?.id,
+        name: group?.name,
+        description: group?.description,
+        status: group?.status,
+    };
+    const {
+        register,
+        control,
+        watch,
+        reset,
+        handleSubmit,
+        formState: { errors, isSubmitting, isDirty },
+    } = useForm<FormType>({
+        resolver: zodResolver(
+            action === GroupModalMode.CREATE
+                ? BaseGroupSchema
+                : UpdateGroupSchema
+        ),
+        defaultValues,
+    });
+
+    const { loginUser } = useAuth();
+    const groupService = new GroupService(loginUser?.accessToken);
+    const queryClient = useQueryClient();
+
+    const commonMutationOptions = {
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(["groups"]);
+            handleOnClose();
+        },
+    };
+
+    const createGroupMutation = useMutation((data: CreateGroupParams) => {
+        return groupService.createGroup(data);
+    }, commonMutationOptions);
+
+    const updateGroupMutation = useMutation((data: UpdateGroupParams) => {
+        return groupService.updateGroup(data);
+    }, commonMutationOptions);
+
+    const onSubmit = async (data: FormType) => {
+        switch (action) {
+            case GroupModalMode.CREATE:
+                try {
+                    const createPayload = BaseGroupSchema.parse(data);
+                    await toast.promise(
+                        createGroupMutation.mutateAsync(createPayload),
+                        {
+                            loading: "Đang thêm nhóm",
+                            success: "Thêm nhóm thành công",
+                            error: (error) =>
+                                error?.message || "Thêm nhóm thất bại",
+                        }
+                    );
+                } catch (error) {
+                    return;
+                }
+                break;
+            case GroupModalMode.UPDATE:
+                try {
+                    const updatePayload = UpdateGroupSchema.parse(data);
+                    await toast.promise(
+                        updateGroupMutation.mutateAsync(updatePayload),
+                        {
+                            loading: "Đang cập nhật nhóm",
+                            success: "Cập nhật nhóm thành công",
+                            error: (error) =>
+                                error?.message || "Cập nhật nhóm thất bại",
+                        }
+                    );
+                } catch (error) {
+                    return;
+                }
+                break;
+        }
+    };
 
     const handleOnClose = useCallback(() => {
-        form.resetForm();
+        reset();
         onClose();
-    }, [form, onClose]);
+    }, [reset, onClose]);
     return (
         <TransitionModal
             maxWidth={maxWidth}
             isOpen={isOpen}
             onClose={handleOnClose}
             closeOnOverlayClick={false}
+            afterLeave={afterLeave}
         >
-            <form onSubmit={form.handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {isSubmitting && <Modal.Backdrop />}
                 <Modal.Header
                     title={
                         action === GroupModalMode.CREATE
                             ? "Thêm nhóm"
-                            : `Cập nhật ${group?.name}`
+                            : `Cập nhật nhóm ${group?.name}`
                     }
                     onClose={handleOnClose}
                     showCloseButton={true}
                 />
                 <div className="space-y-3 py-4 px-5">
-                    <Modal.FormInputOld
+                    <Modal.FormInput<FormType>
                         placeholder="Nhập tên nhóm"
                         required={true}
-                        formikForm={form}
-                        fieldName="groupName"
+                        register={register}
+                        fieldName="name"
                         label="Tên nhóm"
+                        errorMessage={errors.name?.message}
                     />
+                    <Modal.FormInput<FormType>
+                        isTextArea={true}
+                        placeholder="Nhập mô tả"
+                        required={true}
+                        register={register}
+                        fieldName="description"
+                        label="Mô tả"
+                        errorMessage={errors.description?.message}
+                    />
+
+                    {action === GroupModalMode.UPDATE && (
+                        <>
+                            <Modal.FormLabel
+                                fieldName="status"
+                                label="Trạng thái"
+                                required={true}
+                            />
+                            <div className="flex items-center justify-between">
+                                <Modal.StatusSwitch
+                                    enabled={watch("status") || false}
+                                    enabledText="Nhóm đang hoạt động"
+                                    disabledText="Nhóm sẽ bị vô hiệu hóa"
+                                />
+                                <Controller
+                                    name="status"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <ToggleButton
+                                            isCheck={watch("status") || false}
+                                            onChange={(value) =>
+                                                field.onChange(value)
+                                            }
+                                        />
+                                    )}
+                                />
+                            </div>
+                        </>
+                    )}
                 </div>
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">
-                        <button
-                            //disabled={updateAuthorMutation.isLoading}
+                        <Modal.SecondaryButton
+                            disabled={isSubmitting}
                             onClick={handleOnClose}
                             type="button"
-                            className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200"
                         >
                             Huỷ
-                        </button>
+                        </Modal.SecondaryButton>
 
-                        <button
-                            // disabled={action === GroupModalMode.CREATE ? createAuthorMutation.isLoading : updateAuthorMutation.isLoading}
+                        <Modal.PrimaryButton
+                            disabled={
+                                isSubmitting ||
+                                (!isDirty && action === GroupModalMode.UPDATE)
+                            }
                             type="submit"
-                            className="m-btn bg-indigo-500 text-white hover:bg-indigo-600 disabled:bg-indigo-500"
                         >
-                            {action === GroupModalMode.CREATE ? "Thêm nhóm" : "Cập nhật"}
-                        </button>
+                            <Modal.SubmitTextWithLoading
+                                isLoading={isSubmitting}
+                                text={
+                                    action === GroupModalMode.CREATE
+                                        ? "Thêm nhóm"
+                                        : "Cập nhật"
+                                }
+                                loadingText={
+                                    action === GroupModalMode.CREATE
+                                        ? "Đang thêm"
+                                        : "Đang cập nhật"
+                                }
+                            />
+                        </Modal.PrimaryButton>
                     </div>
                 </Modal.Footer>
             </form>

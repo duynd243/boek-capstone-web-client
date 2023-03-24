@@ -1,19 +1,34 @@
-import React, { Fragment, ReactElement, useState } from 'react'
-import { NextPageWithLayout } from "../../../../../_app";
-import AdminLayout from "../../../../../../components/Layout/AdminLayout";
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from "next/router";
+import { Fragment, ReactElement, useMemo, useState } from 'react';
 import { GiBookCover } from "react-icons/gi";
-import SelectSellingBookModal
-    from "../../../../../../components/SelectSellingBook/SelectSellingBookModal";
-import SelectBookSeriesModal from "../../../../../../components/SelectBookSeries/SelectBookSeriesModal";
 import { IoChevronBack } from 'react-icons/io5';
+import AdminLayout from "../../../../../../components/Layout/AdminLayout";
+import SelectBookSeriesModal from "../../../../../../components/SelectBookSeries/SelectBookSeriesModal";
+import { useAuth } from '../../../../../../context/AuthContext';
+import { CampaignService } from '../../../../../../services/CampaignService';
+import { NextPageWithLayout } from "../../../../../_app";
 
 const SelectBookPage: NextPageWithLayout = () => {
     const router = useRouter();
+    const {loginUser} = useAuth();
+    const campaignService = new CampaignService(loginUser?.accessToken);
 
     const [showModal, setShowModal] = useState(false);
 
     const campaignId = router.query.id;
+
+
+    const { data: campaign, isFetching, isInitialLoading, isError } = useQuery(
+        ["issuer_campaign", campaignId],
+        () => campaignService.getCampaignByIdByIssuer(Number(campaignId)),
+        {
+            enabled: !!campaignId,
+        }
+    );
+
+    const genreIds = useMemo(() => campaign?.campaignCommissions?.map(c => c.genre?.id) || [], [campaign]);
+
     return (
         <Fragment>
             <div className='mx-auto max-w-6xl overflow-hidden rounded-md bg-white p-3'>
@@ -45,7 +60,12 @@ const SelectBookPage: NextPageWithLayout = () => {
                 onItemSelect={(book) => {
                     router.push(`/issuer/campaigns/${campaignId}/books/add-book/${book.id}`);
                 }} /> */}
-            <SelectBookSeriesModal isOpen={showModal} onClose={() => setShowModal(false)}
+            <SelectBookSeriesModal
+                campaignId={Number(campaignId)}
+                isOpen={showModal} 
+                onClose={() => setShowModal(false)}
+                genreIds={genreIds}
+                isSeries={false}
                 onItemSelect={(book) => {
                     router.push(`/issuer/campaigns/${campaignId}/books/add-book/${book.id}`);
                 }} />

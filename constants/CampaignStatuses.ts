@@ -26,4 +26,13 @@ export const CampaignStatuses = {
         displayName: string;
         statusColor?: string;
     }
->
+>;
+
+export const CampaignStatusTabs = [
+    {
+        id: undefined,
+        displayName: "Tất cả trạng thái",
+        statusColor: undefined,
+    },
+    ...Object.values(CampaignStatuses),
+];

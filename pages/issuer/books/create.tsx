@@ -32,7 +32,7 @@ import ErrorMessage from './../../../components/Form/ErrorMessage';
 
 
 const IssuerCreateBookPage: NextPageWithLayout = () => {
-  
+
   const { loginUser } = useAuth();
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
   const [selectedAuthorId, setSelectedAuthorId] = useState<string | null>(null);
@@ -237,7 +237,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
       //   return;
       // }
 
-      
+
       // // upload cover photo to firebase
       //
       // firebaseUploadPromise(coverPhoto)
@@ -268,27 +268,27 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
         authors: values.authors.map((a: IAuthor) => a.id),
         audioTrialUrl: values.audioTrialUrl || null,
         pdfTrialUrl: values.pdfTrialUrl || null,
-        pdfExtraPrice: values.pdfExtraPrice <=0 ? null : values.pdfExtraPrice,
-        audioExtraPrice: values.audioExtraPrice <=0 ? null : values.audioExtraPrice,
+        pdfExtraPrice: values.pdfExtraPrice <= 0 ? null : values.pdfExtraPrice,
+        audioExtraPrice: values.audioExtraPrice <= 0 ? null : values.audioExtraPrice,
         imageUrl: "",
       };
 
 
-      if(!coverPhoto) {
-        toast.error("Vui lòng chọn ảnh bìa"); 
+      if (!coverPhoto) {
+        toast.error("Vui lòng chọn ảnh bìa");
         return;
       }
       try {
-          await toast.promise(uploadImageMutation.mutateAsync(coverPhoto), {
-            loading: "Đang tải ảnh lên",
-            success: (data) => {
-              payload.imageUrl = data?.url || "";
-              return "Tải ảnh lên thành công"
-            }
-              ,
-            error: (err) => err?.message || "Tải ảnh lên thất bại",
-          })
-      } catch(err) {
+        await toast.promise(uploadImageMutation.mutateAsync(coverPhoto), {
+          loading: "Đang tải ảnh lên",
+          success: (data) => {
+            payload.imageUrl = data?.url || "";
+            return "Tải ảnh lên thành công"
+          }
+          ,
+          error: (err) => err?.message || "Tải ảnh lên thất bại",
+        })
+      } catch (err) {
         console.log(err);
         return;
       }
@@ -311,7 +311,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
 
 
 
-     
+
       console.log(payload);
 
       try {
@@ -328,7 +328,17 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
   console.log(form.errors);
   return (
     <Fragment>
-      <div className="mb-6">
+      <form
+        onSubmit={form.handleSubmit}
+        className="mx-auto max-w-6xl space-y-8 bg-white p-10"
+      >
+        
+        <div className="mb-4 sm:mb-0">
+          <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
+            Thêm sách lẻ ✨
+          </h1>
+        </div>
+        <div className="mb-6">
         <Link
           className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
           href="/issuer/books"
@@ -337,16 +347,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
           <span>Quay lại</span>
         </Link>
       </div>
-      <form
-        onSubmit={form.handleSubmit}
-        className="mx-auto max-w-6xl space-y-8 divide-y divide-gray-200 bg-white p-10"
-      >
-        <div className="mb-4 sm:mb-0">
-          <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
-            Thêm sách lẻ ✨
-          </h1>
-        </div>
-        <div className="space-y-8 divide-y divide-gray-200">
+        <div className="space-y-8">
           <div>
             <div>
               <h3 className="text-lg font-bold leading-6 text-gray-900">
@@ -358,74 +359,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-              <div className="sm:col-span-6">
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Tên sách<span className="text-rose-500">*</span>
-                </label>
-                <div className="mt-1">
-                  <input
-                    value={form.values.name}
-                    onChange={form.handleChange}
-                    type="text"
-                    name="name"
-                    id="name"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                </div>
-                {form.errors.name && form.touched.name && (
-                  <div className={"input-error"}>{form.errors.name}</div>
-                )}
-              </div>
-
-              <div className="sm:col-span-6">
-                <label
-                  htmlFor="code"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Mã sách<span className="text-rose-500">*</span>
-                </label>
-                <div className="mt-1">
-                  <input
-                    placeholder="VD: TB001"
-                    value={form.values.code}
-                    onChange={form.handleChange}
-                    type="text"
-                    name="code"
-                    id="code"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                </div>
-                {form.errors.code && form.touched.code && (
-                  <div className={"input-error"}>{form.errors.code}</div>
-                )}
-              </div>
-
-              <div className="sm:col-span-6">
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Mô tả<span className="text-rose-500">*</span>
-                </label>
-                <div className="mt-1">
-                  <textarea
-                    value={form.values.description}
-                    onChange={form.handleChange}
-                    id="description"
-                    name="description"
-                    rows={3}
-                    className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                </div>
-                {form.errors.description && form.touched.description && (
-                  <div className={"input-error"}>{form.errors.description}</div>
-                )}
-              </div>
-
-              <div className="sm:col-span-6">
+              <div className="sm:col-span-2">
                 <label
                   htmlFor="cover-photo"
                   className="block text-sm font-medium text-gray-700"
@@ -437,7 +371,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                     {coverPhoto ? (
                       <Image
                         className={
-                          "mb-4 w-52 rounded-md object-cover object-center"
+                          "mb-4 w-40 rounded-md object-cover object-center"
                         }
                         width={500}
                         height={500}
@@ -483,12 +417,50 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="pt-8">
-            <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-              <div className="sm:col-span-3">
+              <div className="sm:col-span-4">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Tên sách<span className="text-rose-500">*</span>
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      value={form.values.name}
+                      onChange={form.handleChange}
+                      type="text"
+                      name="name"
+                      id="name"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  {form.errors.name && form.touched.name && (
+                    <div className={"input-error"}>{form.errors.name}</div>
+                  )}
+                  <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                  <div className="sm:col-span-2">
+                <label
+                  htmlFor="code"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Mã sách<span className="text-rose-500">*</span>
+                </label>
+                <div className="mt-1">
+                  <input
+                    placeholder="VD: TB001"
+                    value={form.values.code}
+                    onChange={form.handleChange}
+                    type="text"
+                    name="code"
+                    id="code"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+                {form.errors.code && form.touched.code && (
+                  <div className={"input-error"}>{form.errors.code}</div>
+                )}
+              </div>
+              <div className="sm:col-span-2">
                 <label
                   htmlFor="isbn10"
                   className="block text-sm font-medium text-gray-700"
@@ -511,7 +483,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 )}
               </div>
 
-              <div className="sm:col-span-3">
+              <div className="sm:col-span-2">
                 <label
                   htmlFor="isbn13"
                   className="block text-sm font-medium text-gray-700"
@@ -606,29 +578,6 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   </select>
                 </div>
               </div>
-              {/* 
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="unitInStock"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Số lượng<span className="text-rose-500">*</span>
-                </label>
-                <div className="mt-1">
-                  <input
-                    value={form.values.unitInStock}
-                    onChange={form.handleChange}
-                    type="number"
-                    name="unitInStock"
-                    id="unitInStock"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
-                </div>
-                {form.errors.unitInStock && form.touched.unitInStock && (
-                  <div className={"input-error"}>{form.errors.unitInStock}</div>
-                )}
-              </div> */}
-
               <div className="sm:col-span-3">
                 <label
                   htmlFor="releasedYear"
@@ -720,6 +669,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                     ))}
                   </select>
                 </div>
+              </div>
+                  </div>
               </div>
             </div>
           </div>
@@ -876,6 +827,32 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                   <div className={"input-error"}>{form.errors.audioExtraPrice}</div>
                 )}
               </div>
+            </div>
+          </div>
+          <div className="pt-8">
+            <h3 className="text-lg font-bold leading-6 text-gray-900">
+              Mô tả sách
+            </h3>
+            <div className="sm:col-span-6">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Mô tả<span className="text-rose-500">*</span>
+              </label>
+              <div className="mt-1">
+                <textarea
+                  value={form.values.description}
+                  onChange={form.handleChange}
+                  id="description"
+                  name="description"
+                  rows={7}
+                  className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              {form.errors.description && form.touched.description && (
+                <div className={"input-error"}>{form.errors.description}</div>
+              )}
             </div>
           </div>
         </div>
