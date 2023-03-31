@@ -12,6 +12,7 @@ export interface IOrderDetail {
     discount?: number;
     withPdf?: boolean;
     withAudio?: boolean;
+    subTotal?: number;
     bookProduct?: IBookProduct;
 }
 

@@ -27,7 +27,7 @@ const AdminOrderDetailsPage: NextPageWithLayout = () => {
 
     const orderPaymentMethod = getOrderPaymentMethodById(order?.payment);
     return (
-        <div className="py-8 px-4 lg:px-8 2xl:px-12 bg-white">
+        <div className="max-w-5xl mx-auto rounded py-8 px-4 lg:px-8 2xl:px-12 bg-white">
             <div className="mx-auto">
                 <h1 className="mb-6 text-2xl font-bold text-slate-800">
                     Chi tiết đơn hàng
@@ -43,7 +43,7 @@ const AdminOrderDetailsPage: NextPageWithLayout = () => {
                     <div>
                         <SectionHeader label={"Danh sách sản phẩm"} />
                         {/* Cart items */}
-                        <div className={"grid grid-cols-2 gap-4"}>
+                        <div className={"grid md:grid-cols-2 gap-4"}>
                             {/* Cart item */}
                             {order?.orderDetails?.map((item) => <OrderItem orderItem={item}
                                                                            key={item?.id} />)}

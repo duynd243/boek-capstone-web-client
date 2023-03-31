@@ -9,7 +9,7 @@ type Props = {
 const OrderItem: React.FC<Props> = ({ orderItem }) => {
     return (
         <div
-            className="border-b border-slate-200 bg-slate-50 px-4 space-y-3 py-3 sm:space-y-0 sm:flex items-center justify-between">
+            className="border-slate-200 bg-slate-50 px-4 space-y-3 py-3 sm:space-y-0 sm:flex items-center justify-between">
             <div className="flex items-center">
                 <div
                     className="mr-2 block shrink-0 xl:mr-4"
@@ -37,21 +37,24 @@ const OrderItem: React.FC<Props> = ({ orderItem }) => {
                         }).format(orderItem?.bookProduct?.book?.coverPrice || 0)
                         }
                         </h5>
-
-                        <h5 className="text-xs font-medium text-slate-500">
-                            Giá PDF: {new Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                        }).format(5000)
+                        {orderItem?.withPdf &&
+                            <h5 className="text-xs font-medium text-slate-500">
+                                Giá PDF: {new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                            }).format(orderItem?.bookProduct?.pdfExtraPrice)
+                            }
+                            </h5>
                         }
-                        </h5>
-                        <h5 className="text-xs font-medium text-slate-500">
-                            Giá Audio: {new Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                        }).format(5000)
+                        {orderItem?.withAudio &&
+                            <h5 className="text-xs font-medium text-slate-500">
+                                Giá Audio: {new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                            }).format(orderItem?.bookProduct?.audioExtraPrice)
+                            }
+                            </h5>
                         }
-                        </h5>
                     </div>
                 </div>
             </div>
@@ -63,24 +66,25 @@ const OrderItem: React.FC<Props> = ({ orderItem }) => {
                         style: "currency",
                         currency: "VND",
                     }).format(
-                        (20000),
+                        (orderItem?.subTotal || 0),
                     )}
                </span>
                 <div>
-                    <span className={"mr-2 bg-rose-600 text-white p-1 rounded"}>-25%</span>
+                    <span className={"mr-2 bg-rose-600 text-white p-1 rounded"}>-{orderItem?.discount || 0}%</span>
                     <span>
                     {new Intl.NumberFormat("vi-VN", {
                         style: "currency",
                         currency: "VND",
                     }).format(
-                        (15000),
+                        (orderItem?.subTotal - (orderItem?.subTotal * orderItem?.discount) / 100),
                     )}
                     </span>
                 </div>
             </div>
 
         </div>
-    );
+    )
+        ;
 };
 
 export default OrderItem;
