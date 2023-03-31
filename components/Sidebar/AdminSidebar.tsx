@@ -1,55 +1,56 @@
-import React, {useEffect, useRef, useState} from "react";
-import {ISidebarMenu, ISidebarMenuGroup} from "../../constants/SidebarMenus";
-import {useAuth} from "../../context/AuthContext";
-import {findRole} from "../../constants/Roles";
+import React, { useEffect, useMemo, useRef } from "react";
+import { ISidebarMenuGroup } from "../../constants/SidebarMenus";
+import { useAuth } from "../../context/AuthContext";
+import { findRole } from "../../constants/Roles";
 import Link from "next/link";
 import AdminSidebarMenu from "./AdminSidebarMenu";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 
 type Props = {
     isSidebarOpen: boolean;
     setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const AdminSidebar: React.FC<Props> = ({isSidebarOpen, setIsSidebarOpen}) => {
+const AdminSidebar: React.FC<Props> = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const router = useRouter();
-    const [sidebarMenuGroups, setSidebarMenuGroups] = useState<
-        ISidebarMenuGroup[]
-    >([]);
-    const [activeMenu, setActiveMenu] = useState<ISidebarMenu | undefined>(
-        undefined
-    );
-    const {loginUser} = useAuth();
+    const { loginUser } = useAuth();
 
     // create ref for sidebar
     const sidebarRef = useRef<HTMLDivElement>(null);
     const trigger = useRef<HTMLButtonElement>(null);
 
-    useEffect(() => {
+
+    const sidebarMenuGroups: ISidebarMenuGroup[] = useMemo(() => {
         const role = findRole(loginUser?.role);
-        if (role?.sidebarMenuGroups) {
-            setSidebarMenuGroups(role.sidebarMenuGroups);
-        }
+        return role?.sidebarMenuGroups || [];
     }, [loginUser?.role]);
 
-    useEffect(() => {
-        //let activeMenu = sidebarMenus.find(menu => 'path' in menu && menu.path === router.pathname);
+    const activeMenu = useMemo(() => {
         const sidebarMenus = sidebarMenuGroups.map((group) => group.menus).flat();
-        let activeMenu = sidebarMenus.find((menu) => menu.path === router.pathname);
+        const x1 = sidebarMenus.filter((menu) => !menu.subMenus || menu.subMenus.length === 0);
+        const x2 = sidebarMenus.filter((menu) => menu.subMenus && menu.subMenus.length > 0).map((menu) => menu.subMenus).flat();
+        const allMenus = [...x1, ...x2];
+
+        let activeMenu = allMenus.find((menu) => menu?.path === router.pathname);
         if (!activeMenu) {
             const role = findRole(loginUser?.role);
-            activeMenu = sidebarMenus.find(
+            activeMenu = allMenus.find(
                 (menu) =>
-                    menu.path !== role?.defaultRoute &&
-                    router.pathname.startsWith(menu.path)
+                    menu !== undefined &&
+                    menu?.path !== role?.defaultRoute &&
+                    router.pathname.startsWith(menu?.path),
             );
         }
-        setActiveMenu(activeMenu);
+        return activeMenu;
     }, [loginUser?.role, router.pathname, sidebarMenuGroups]);
+
+    console.log(activeMenu);
+    console.log(router);
+
 
     // close on click outside
     useEffect(() => {
-        const clickHandler = ({target}: { target: any }) => {
+        const clickHandler = ({ target }: { target: any }) => {
             if (!sidebarRef.current || !trigger.current) return;
             if (
                 !isSidebarOpen ||
@@ -94,7 +95,7 @@ const AdminSidebar: React.FC<Props> = ({isSidebarOpen, setIsSidebarOpen}) => {
                             viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg"
                         >
-                            <path d="M10.7 18.7l1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3-1.4-1.4L4 12z"/>
+                            <path d="M10.7 18.7l1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3-1.4-1.4L4 12z" />
                         </svg>
                     </button>
                     {/* Logo */}
@@ -108,8 +109,8 @@ const AdminSidebar: React.FC<Props> = ({isSidebarOpen, setIsSidebarOpen}) => {
                                     y2="108.156%"
                                     id="logo-a"
                                 >
-                                    <stop stopColor="#A5B4FC" stopOpacity="0" offset="0%"/>
-                                    <stop stopColor="#A5B4FC" offset="100%"/>
+                                    <stop stopColor="#A5B4FC" stopOpacity="0" offset="0%" />
+                                    <stop stopColor="#A5B4FC" offset="100%" />
                                 </linearGradient>
                                 <linearGradient
                                     x1="88.638%"
@@ -118,11 +119,11 @@ const AdminSidebar: React.FC<Props> = ({isSidebarOpen, setIsSidebarOpen}) => {
                                     y2="100%"
                                     id="logo-b"
                                 >
-                                    <stop stopColor="#38BDF8" stopOpacity="0" offset="0%"/>
-                                    <stop stopColor="#38BDF8" offset="100%"/>
+                                    <stop stopColor="#38BDF8" stopOpacity="0" offset="0%" />
+                                    <stop stopColor="#38BDF8" offset="100%" />
                                 </linearGradient>
                             </defs>
-                            <rect fill="#6366F1" width="32" height="32" rx="16"/>
+                            <rect fill="#6366F1" width="32" height="32" rx="16" />
                             <path
                                 d="M18.277.16C26.035 1.267 32 7.938 32 16c0 8.837-7.163 16-16 16a15.937 15.937 0 01-10.426-3.863L18.277.161z"
                                 fill="#4F46E5"
@@ -147,13 +148,19 @@ const AdminSidebar: React.FC<Props> = ({isSidebarOpen, setIsSidebarOpen}) => {
                                     {group.groupName}
                                 </div>
                                 <ul>
-                                    {group.menus.map((menu) => (
-                                        <AdminSidebarMenu
-                                            isActive={activeMenu?.path === menu.path}
-                                            data={menu}
-                                            key={menu?.path}
-                                        />
-                                    ))}
+                                    {group.menus.map((menu) => {
+                                            return <AdminSidebarMenu
+                                                activeMenu={activeMenu}
+                                                isActive={activeMenu?.path === menu.path || menu.subMenus?.find((subMenu) =>
+                                                    (subMenu?.path === activeMenu?.path || router.asPath.startsWith(subMenu?.path)),
+                                                ) !== undefined}
+                                                data={menu}
+                                                key={menu?.path}
+
+                                            />;
+                                        },
+                                    )}
+
                                 </ul>
                             </div>
                         );
@@ -161,7 +168,8 @@ const AdminSidebar: React.FC<Props> = ({isSidebarOpen, setIsSidebarOpen}) => {
                 </div>
             </div>
         </div>
-    );
+    )
+        ;
 };
 
 export default AdminSidebar;

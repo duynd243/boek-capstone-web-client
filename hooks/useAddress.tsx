@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { AddressService } from "../services/AddressService";
-import { IDistrict } from "../types/Address/IDistrict";
-import { IProvince } from "../types/Address/IProvince";
-import { IWard } from "../types/Address/IWard";
+import {useQuery} from "@tanstack/react-query";
+import {useState} from "react";
+import {AddressService} from "../services/AddressService";
+import {IDistrict} from "../types/Address/IDistrict";
+import {IProvince} from "../types/Address/IProvince";
+import {IWard} from "../types/Address/IWard";
 
 type Props = {
     defaultProvinceCode?: number;
@@ -27,7 +27,7 @@ function useAddress(props: Props) {
 
     const [selectedWard, setSelectedWard] = useState<IWard | null>(null);
 
-    const { data: provinces, isLoading: provincesLoading } = useQuery(
+    const {data: provinces, isInitialLoading: provincesLoading} = useQuery(
         ["provinces"],
         () => addressService.getProvinces(),
         {
@@ -43,7 +43,7 @@ function useAddress(props: Props) {
         }
     );
 
-    const { data: districts, isLoading: districtsLoading } = useQuery(
+    const {data: districts, isInitialLoading: districtsLoading} = useQuery(
         ["districts", selectedProvince?.code],
         () => {
             if (selectedProvince) {
@@ -67,7 +67,7 @@ function useAddress(props: Props) {
         }
     );
 
-    const { data: wards, isLoading: wardsLoading } = useQuery(
+    const {data: wards, isInitialLoading: wardsLoading} = useQuery(
         ["wards", selectedDistrict?.code],
         () => {
             if (selectedDistrict) {

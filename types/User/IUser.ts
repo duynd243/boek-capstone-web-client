@@ -1,14 +1,15 @@
-import { ICustomerLevel } from "./../CustomerLevel/ICustomerLevel";
+import {ICustomerLevel} from "./../CustomerLevel/ICustomerLevel";
 
-import { IAddress } from "./../Address/IAddress";
+import {IAddress} from "./../Address/IAddress";
 
 export interface ICustomer {
     id: string;
     levelId?: number;
-    dob?: Date;
+    dob?: string;
     gender?: boolean;
     point?: number;
     level?: ICustomerLevel;
+    user?: IUser;
 }
 
 export interface IIssuer {

@@ -17,6 +17,11 @@ export const CampaignStatuses = {
     FINISHED: {
         id: 3,
         displayName: "Đã kết thúc",
+        statusColor: "blue",
+    },
+    CANCELLED: {
+        id: 4,
+        displayName: "Đã hủy",
         statusColor: "red",
     },
 } satisfies Record<
@@ -27,3 +32,16 @@ export const CampaignStatuses = {
         statusColor?: string;
     }
 >;
+
+export function getCampaignStatusById(id: number | undefined) {
+    return Object.values(CampaignStatuses).find((status) => status.id === id);
+}
+
+export const CampaignStatusTabs = [
+    {
+        id: undefined,
+        displayName: "Tất cả trạng thái",
+        statusColor: undefined,
+    },
+    ...Object.values(CampaignStatuses),
+];

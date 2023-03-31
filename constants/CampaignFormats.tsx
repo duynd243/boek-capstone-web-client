@@ -29,7 +29,15 @@ export const CampaignFormats = {
 } satisfies Record<string, ICampaignFormat>;
 
 export function getCampaignFormatById(
-    id?: number
+    id?: number,
 ): ICampaignFormat | undefined {
     return Object.values(CampaignFormats).find((format) => format.id === id);
 }
+
+export const CampaignFormatTabs = [
+    {
+        id: undefined,
+        name: "Tất cả hình thức",
+    },
+    ...Object.values(CampaignFormats),
+];

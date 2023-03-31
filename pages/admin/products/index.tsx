@@ -1,36 +1,39 @@
-import React, {Fragment, ReactElement, useState} from 'react'
+import React, { Fragment, ReactElement, useState } from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
-import {NextPageWithLayout} from "../../_app";
+import { NextPageWithLayout } from "../../_app";
 import PageHeading from "../../../components/Admin/PageHeading";
 import SearchForm from "../../../components/Admin/SearchForm";
 import useTableManagementPage from "../../../hooks/useTableManagementPage";
-import {Tab} from "@headlessui/react";
-import {BookProductStatuses} from "../../../constants/BookProductStatuses";
-import {useQuery} from "@tanstack/react-query";
-import {useAuth} from "../../../context/AuthContext";
-import {BookService} from "../../../services/BookService";
+import { Tab } from "@headlessui/react";
+import { BookProductStatuses, getBookProductStatusById } from "../../../constants/BookProductStatuses";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../../../context/AuthContext";
 import Chip from "../../../components/Admin/Chip";
 import TableWrapper from "../../../components/Admin/Table/TableWrapper";
 import TableHeading from "../../../components/Admin/Table/TableHeading";
 import TableHeader from "../../../components/Admin/Table/TableHeader";
 import TableBody from "../../../components/Admin/Table/TableBody";
+import TableFooter from "../../../components/Admin/Table/TableFooter";
+import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
+import { useRouter } from "next/router";
+import { BookProductService } from "../../../services/BookProductService";
+import { CampaignStatuses } from "../../../constants/CampaignStatuses";
+import { getBookTypeById } from "../../../constants/BookTypes";
 import TableData from "../../../components/Admin/Table/TableData";
 import Image from "next/image";
-import {isValidImageSrc} from "../../../utils/helper";
-import DefaultAvatar from "../../../assets/images/default-avatar.png";
-import StatusCard from "../../../components/StatusCard";
-import TableFooter from "../../../components/Admin/Table/TableFooter";
-import EmptyState, {EMPTY_STATE_TYPE} from "../../../components/EmptyState";
+import { isValidImageSrc } from "../../../utils/helper";
 import Link from "next/link";
+import DefaultAvatar from "../../../assets/images/default-avatar.png";
+import TableRowSkeleton from "../../../components/Admin/Table/TableRowSkeleton";
 
 const BookProductTabs = [
     BookProductStatuses.Pending,
     BookProductStatuses.Rejected,
     BookProductStatuses.Selling,
     {
-        id: 'Stopped',
+        id: "Stopped",
         displayName: "Ngừng bán",
-    }
+    },
 ];
 const NotSaleStatusTabs = [
     BookProductStatuses.NotSale,
@@ -39,11 +42,12 @@ const NotSaleStatusTabs = [
     BookProductStatuses.NotSaleDueEndDate,
     BookProductStatuses.NotSaleDuePostponedCampaign,
     BookProductStatuses.Unreleased,
-]
+];
 const AdminBookProductsPage: NextPageWithLayout = () => {
+    const router = useRouter();
 
-    const {loginUser} = useAuth();
-    const bookService = new BookService(loginUser?.accessToken);
+    const { loginUser } = useAuth();
+    const bookProductService = new BookProductService(loginUser?.accessToken);
 
     const [status, setStatus] = useState(BookProductTabs[0].id);
     const [notSaleStatus, setNotSaleStatus] = useState(NotSaleStatusTabs[0].id);
@@ -60,30 +64,30 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
     const handleStatusChange = (tab: typeof BookProductTabs[number]) => {
         setStatus(tab.id);
         setPage(1);
-    }
+    };
 
     const handleNotSaleStatusChange = (tab: typeof NotSaleStatusTabs[number]) => {
         setNotSaleStatus(tab.id);
         setPage(1);
-    }
+    };
+
+    const params = {
+        title: search,
+        page,
+        size,
+        status: status === "Stopped" ? notSaleStatus : status,
+        sort: "CreatedDate desc, UpdatedDate desc",
+        "Campaign.Status": status === BookProductStatuses.Pending.id ? CampaignStatuses.NOT_STARTED.id : undefined,
+    };
 
     const {
         data: productData,
         isLoading,
         isFetching,
     } = useQuery(
-        ["admin_products", {search, page, size, status: status === 'Stopped' ? notSaleStatus : status}],
+        ["admin_products", params],
         () =>
-            bookService.getBookProducts({
-                title: search,
-                page,
-                size,
-                status: status === 'Stopped' ? notSaleStatus : status,
-                sort: "id desc",
-            }),
-        {
-            keepPreviousData: true,
-        }
+            bookProductService.getBookProducts(params),
     );
     return (
         <Fragment>
@@ -97,7 +101,7 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
 
             <div className="bg-white px-4 md:px-6 rounded">
                 <Tab.Group>
-                    <div className="border-b pt-2 border-gray-200">
+                    <div className="pt-2 border-gray-200">
                         <ul className="flex flex-wrap gap-2">
                             {BookProductTabs.map((tab) => (
                                 <Tab
@@ -115,7 +119,7 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
                         </ul>
                     </div>
                 </Tab.Group>
-                {status === 'Stopped' &&
+                {status === "Stopped" &&
                     <Tab.Group>
                         <div className="py-6">
                             <ul className="flex flex-wrap gap-2">
@@ -126,7 +130,7 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
                                         className={"focus:outline-none"}
                                         key={tab.displayName}
                                     >
-                                        {({selected}) => {
+                                        {({ selected }) => {
                                             return (
                                                 <Chip active={selected}>
                                                     {/*{tab?.statusColor && (*/}
@@ -147,120 +151,133 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
 
 
             </div>
-            <div className="mt-4">
+            <div className="mt-3">
                 {productData?.data && productData?.data?.length > 0 ? (
-                    <TableWrapper>
-                        <TableHeading>
-                            <TableHeader>Tên sách</TableHeader>
-                            <TableHeader>Giá bán</TableHeader>
-                            <TableHeader>Được tạo bởi</TableHeader>
-                            <TableHeader>Hội sách</TableHeader>
-                            <TableHeader>ISBN13</TableHeader>
-                            <TableHeader>Tác giả</TableHeader>
-                            <TableHeader>Năm phát hành</TableHeader>
-                            <TableHeader textAlignment="text-center">Trạng thái</TableHeader>
-                        </TableHeading>
-                        <TableBody>
-                            {productData?.data?.map((book) => {
-                                return (
-                                    <tr key={book?.id}>
+                        <TableWrapper>
+                            <TableHeading>
+                                <TableHeader>Tên sách</TableHeader>
+                                <TableHeader>Giá bán</TableHeader>
+                                <TableHeader>Được tạo bởi</TableHeader>
+                                <TableHeader>Hội sách</TableHeader>
+                                <TableHeader>Loại sách</TableHeader>
+                                <TableHeader textAlignment="text-center">Trạng thái</TableHeader>
+                                <TableHeader>
+                                    <span className="sr-only">Edit</span>
+                                </TableHeader>
+                            </TableHeading>
+                            <TableBody>
+                                <TableRowSkeleton numberOfColumns={7} />
+                                {productData?.data?.map((book) => {
+                                    const bookType = getBookTypeById(book?.type);
+                                    const bookStatus = getBookProductStatusById(book?.status);
 
-                                        <TableData className="max-w-72">
-                                            <div title={book?.title} className="flex items-center gap-4 w-72 truncate">
-                                                <Image
-                                                    width={500}
-                                                    height={500}
-                                                    className="h-20 w-16 object-cover rounded-sm shadow-sm"
-                                                    src={book?.imageUrl || ""}
-                                                    alt=""
-                                                />
-                                                <div
-                                                    className="overflow-hidden text-ellipsis text-sm font-medium text-gray-900">
-                                                    {book?.title}
-                                                </div>
-                                            </div>
-                                        </TableData>
-                                        <TableData className="text-sm font-semibold text-emerald-600">
-                                            {new Intl.NumberFormat("vi-VN", {
-                                                style: "currency",
-                                                currency: "VND",
-                                            }).format(book?.salePrice || 0)}
-                                        </TableData>
-                                        <TableData>
-                                            <div className="flex items-center">
-                                                <div className="h-10 w-10 flex-shrink-0">
+                                    return (
+                                        <tr key={book?.id}>
+
+                                            <TableData className="max-w-72">
+                                                <div title={book?.title} className="flex items-center gap-4 w-72 truncate">
                                                     <Image
-                                                        width={100}
-                                                        height={100}
-                                                        className="h-10 w-10 rounded-full object-cover"
-                                                        src={book?.issuer?.user?.imageUrl && isValidImageSrc(book?.issuer?.user?.imageUrl)
-                                                            ? book?.issuer?.user?.imageUrl
-                                                            : DefaultAvatar.src}
+                                                        width={500}
+                                                        height={500}
+                                                        className="h-20 w-16 object-cover rounded-sm shadow-sm"
+                                                        src={book?.imageUrl || ""}
                                                         alt=""
                                                     />
-                                                </div>
-                                                <div className="ml-4">
-                                                    <div className="text-sm text-gray-900">
-                                                        {book?.issuer?.user?.name}
+                                                    <div
+                                                        className="overflow-hidden text-ellipsis text-sm font-medium text-gray-900">
+                                                        {book?.title}
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </TableData>
-                                        <TableData className="text-sm text-gray-700 font-medium">
-                                            <Link href={`campaigns/${book?.campaignId}`}>
-                                                {book?.campaign?.name || "-"}
-                                            </Link>
-                                        </TableData>
+                                            </TableData>
+                                            <TableData className="text-sm font-semibold text-emerald-600">
+                                                {new Intl.NumberFormat("vi-VN", {
+                                                    style: "currency",
+                                                    currency: "VND",
+                                                }).format(book?.salePrice || 0)}
+                                            </TableData>
+                                            <TableData>
+                                                <div className="flex items-center">
+                                                    <div className="h-10 w-10 flex-shrink-0">
+                                                        <Image
+                                                            width={100}
+                                                            height={100}
+                                                            className="h-10 w-10 rounded-full object-cover"
+                                                            src={book?.issuer?.user?.imageUrl && isValidImageSrc(book?.issuer?.user?.imageUrl)
+                                                                ? book?.issuer?.user?.imageUrl
+                                                                : DefaultAvatar.src}
+                                                            alt=""
+                                                        />
+                                                    </div>
+                                                    <div className="ml-4">
+                                                        <div className="text-sm text-gray-900">
+                                                            {book?.issuer?.user?.name}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </TableData>
+                                            <TableData className="text-sm text-gray-700 font-medium">
+                                                <Link href={`campaigns/${book?.campaignId}`}>
+                                                    {book?.campaign?.name || "-"}
+                                                </Link>
+                                            </TableData>
 
-                                        <TableData className="text-sm text-gray-500">
-                                            {book?.isbn13 || "-"}
-                                        </TableData>
-                                        <TableData className="text-sm text-gray-500">
-                                            {book?.bookAuthors?.map((author) => (author?.author?.name)).join(", ") || "-"}
-                                        </TableData>
-                                        <TableData
-                                            textAlignment="text-center"
-                                            className="text-sm text-gray-500"
-                                        >
-                                            {book?.releasedYear}
-                                        </TableData>
-                                        <TableData textAlignment="text-center">
-                                            {book?.status ?
-                                                <StatusCard label='Đang phát hành'/> :
-                                                <StatusCard variant='error' label='Ngưng phát hành'/>}
-                                        </TableData>
-                                    </tr>
-                                );
-                            })}
-                        </TableBody>
-                        <TableFooter
-                            colSpan={10}
-                            size={size}
-                            onSizeChange={onSizeChange}
-                            page={page}
-                            onPageChange={setPage}
-                            totalPages={productData?.metadata?.total || 0}
-                            pageSizeOptions={pageSizeOptions}
-                        />
-                    </TableWrapper>
-                ) : (<div className="pt-8">
-                    {search ? (
-                        <EmptyState
-                            keyword={search}
-                            status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
-                        />
-                    ) : (
-                        <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}
-                                    customMessage={"Không có sách nào ở trạng thái này"}
-                        />
-                    )}
-                </div>)}
+                                            <TableData className="text-sm text-gray-600">
+                                                <div
+                                                    className="w-fit px-3 py-2 flex items-center justify-center rounded-full border bg-gray-50">
+                                                    {bookType?.icon} {bookType?.displayName}
+                                                </div>
+                                            </TableData>
+                                            <TableData className="text-sm">
+                                                <span
+                                                    className={`w-fit flex items-center h-6 px-3 text-xs font-semibold ${bookStatus?.label?.classNames}`}>
+                                                {bookStatus?.commonDisplayName || bookStatus?.displayName}
+                                            </span>
+                                            </TableData>
+
+                                            <TableData className="text-right text-sm font-medium">
+                                                <Link
+                                                    href={`products/${book?.id}`}
+                                                    className="text-indigo-600 hover:text-indigo-700"
+                                                >
+                                                    Chi tiết
+                                                </Link>
+                                            </TableData>
+                                        </tr>
+                                    );
+                                })}
+
+                            </TableBody>
+                            <TableFooter
+                                colSpan={10}
+                                size={size}
+                                onSizeChange={onSizeChange}
+                                page={page}
+                                onPageChange={setPage}
+                                totalPages={productData?.metadata?.total || 0}
+                                pageSizeOptions={pageSizeOptions}
+                            />
+                        </TableWrapper>
+                    )
+                    :
+                    (<div className="pt-8">
+                        {search ? (
+                            <EmptyState
+                                keyword={search}
+                                status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
+                            />
+                        ) : (
+                            <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}
+                                        customMessage={"Không có sách nào ở trạng thái này"}
+                            />
+                        )}
+                    </div>)
+                }
             </div>
         </Fragment>
-    )
-}
+    );
+};
 AdminBookProductsPage.getLayout = function getLayout(page: ReactElement) {
     return <AdminLayout>{page}</AdminLayout>;
 };
 
-export default AdminBookProductsPage
+export default AdminBookProductsPage;

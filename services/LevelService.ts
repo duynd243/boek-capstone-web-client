@@ -1,8 +1,7 @@
-import { IBaseRequestParams } from "./../types/Request/IBaseRequestParams";
+import { IBaseRequestParams } from "../types/Request/IBaseRequestParams";
 import { BaseService } from "./BaseService";
 import { IBaseListResponse } from "../types/Commons/IBaseListResponse";
 import { ILevel } from "../types/Level/ILevel";
-import { type } from "os";
 
 type LevelRequestParams = IBaseRequestParams<ILevel> & {
     withCustomers?: boolean;

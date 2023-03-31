@@ -1,19 +1,20 @@
 import {ICampaign} from "../Campaign/ICampaign";
 import {IBook} from "./IBook";
 import {IUser} from "../User/IUser";
+import {IGenre} from "../Genre/IGenre";
 
 export interface IBookProductItem {
     id: number;
     parentBookProductId: string;
     bookId: number;
-    format?: number;
-    displayIndex?: number;
-    withPdf?: boolean;
+    format: number;
+    displayIndex: number;
+    withPdf: boolean;
     pdfExtraPrice?: number;
-    displayPdfIndex?: number;
-    withAudio?: boolean;
+    displayPdfIndex: number;
+    withAudio: boolean;
     audioExtraPrice?: number;
-    displayAudioIndex?: number;
+    displayAudioIndex: number;
     book: IBook;
 }
 
@@ -21,6 +22,7 @@ export interface IBookProduct {
     id: string;
     bookId: number;
     genreId?: number;
+    genre?: IGenre;
     campaignId?: number;
     issuerId?: string;
     title?: string;

@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import React, {useContext, useState} from "react";
 import {AiOutlineUsergroupAdd} from "react-icons/ai";
 import {CampaignStatuses} from "../../constants/CampaignStatuses";
@@ -10,9 +9,11 @@ import {CampaignContext} from "../../context/CampaignContext";
 import InviteIssuerModal from "../Modal/InviteIssuerModal";
 import DefaultAvatar from "./../../assets/images/default-avatar.png";
 import SidebarBlockWrapper from "./SidebarBlockWrapper";
-import JoinedIssuerModal from "../Modal/JoinedIssuerModal";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import IssuerHoverCard from "../IssuerHoverCard";
+import SidebarButton from "./SidebarButton";
+import {SidebarTable} from "./SidebarTable";
+import JoinedIssuerModal from "../Modal/JoinedIssuerModal";
 
 type Props = {
     maxRows?: number;
@@ -39,30 +40,19 @@ const SidebarIssuersTable: React.FC<Props> = ({maxRows = 10}) => {
 
     return (
         <SidebarBlockWrapper>
-            <div className="mb-5 flex flex-wrap items-center justify-between gap-1">
-                <div className="text-base font-semibold text-slate-800">
-                    Nhà phát hành tham gia ({joinedIssuers?.length})
-                </div>
-                {joinedIssuers?.length > 0 &&
-                    joinedIssuers?.length > maxRows && (
-                        <>
-                            <button
-                                onClick={() => setShowAllModal(true)}
-                                className="text-base font-medium text-indigo-500 hover:text-indigo-600 disabled:text-gray-500">
-                                Xem tất cả
-                            </button>
-                            <JoinedIssuerModal
-                                isOpen={showAllModal}
-                                onClose={() => setShowAllModal(false)}
-                                joinedIssuers={joinedIssuers}
-                            />
-                        </>
-                    )}
-            </div>
+
+            <SidebarTable.Heading
+                text={`Nhà phát hành tham gia (${joinedIssuers?.length})`}
+                showAllButtonVisible={joinedIssuers?.length > 0 && joinedIssuers?.length > maxRows}
+                onShowAllClick={() => setShowAllModal(true)}>
+                <JoinedIssuerModal
+                    isOpen={showAllModal}
+                    onClose={() => setShowAllModal(false)}
+                    joinedIssuers={joinedIssuers}
+                />
+            </SidebarTable.Heading>
             {joinedIssuers?.length === 0 ? (
-                <div className="text-sm text-slate-500">
-                    Sự kiện này hiện chưa có nhà phát hành nào tham gia.
-                </div>
+                <SidebarTable.Content text={'Hội sách này hiện chưa có nhà phát hành nào tham gia.'}/>
             ) : (
                 <ul className="space-y-3.5">
                     {joinedIssuers?.slice(0, maxRows).map((issuer) => (
@@ -117,29 +107,26 @@ const SidebarIssuersTable: React.FC<Props> = ({maxRows = 10}) => {
                     ))}
                 </ul>
             )}
-
             {isAdmin && (
                 <div className="space-y-2.5 mt-5">
                     {showInviteIssuer && (
-                        <>
-                            <button
-                                className="m-btn bg-indigo-500 text-white w-full"
-                                onClick={() => setShowInviteModal(true)}
-                            >
-                                <AiOutlineUsergroupAdd
-                                    className="mr-2.5"
-                                    size={17}
-                                />
-                                Mời NPH tham gia
-                            </button>
-                        </>
+                        <SidebarButton
+                            onClick={() => setShowInviteModal(true)}
+                        >
+                            <AiOutlineUsergroupAdd
+                                className="mr-2.5"
+                                size={17}
+                            />
+                            Mời NPH tham gia
+                        </SidebarButton>
                     )}
-                    <Link
-                        href={`/admin/participants/campaigns/${campaign?.id}`}
-                        className="m-btn bg-slate-50 text-slate-600 w-full border"
+                    <SidebarButton
+                        variant='secondary'
+                        href={`/admin/participants?campaign=${campaign?.id}`}
+                        className="m-btn bg-white !border-slate-200 !shadow text-slate-600 w-full border bg-slate-50"
                     >
                         Quản lý yêu cầu tham gia
-                    </Link>
+                    </SidebarButton>
                 </div>
             )}
 

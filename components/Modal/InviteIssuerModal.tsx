@@ -242,7 +242,11 @@ const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
                 </div>
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">
-                        <Modal.SecondaryButton type="button" onClick={onClose}>
+                        <Modal.SecondaryButton
+                            disabled={
+                                inviteIssuerMutation.isLoading
+                            }
+                            type="button" onClick={onClose}>
                             Đóng
                         </Modal.SecondaryButton>
                         <Modal.PrimaryButton

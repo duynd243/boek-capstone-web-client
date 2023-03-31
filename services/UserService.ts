@@ -1,9 +1,9 @@
-import { IBaseRequestParams } from "./../types/Request/IBaseRequestParams";
-import { ILoginData } from "../types/User/ILoginData";
-import { IBaseStatusResponse } from "../types/Commons/IBaseStatusResponse";
-import { BaseService } from "./BaseService";
-import { IUser } from "../types/User/IUser";
-import { IBaseListResponse } from "../types/Commons/IBaseListResponse";
+import {IBaseRequestParams} from "./../types/Request/IBaseRequestParams";
+import {ILoginData} from "../types/User/ILoginData";
+import {IBaseStatusResponse} from "../types/Commons/IBaseStatusResponse";
+import {BaseService} from "./BaseService";
+import {IUser} from "../types/User/IUser";
+import {IBaseListResponse} from "../types/Commons/IBaseListResponse";
 
 export type UpdateUserParams = Required<Pick<IUser, "id" | "role">> &
     Partial<IUser>;
@@ -62,13 +62,6 @@ export class UserService extends BaseService {
         const response = await this.axiosClient.put<any>(
             `/users/issuer`,
             payload
-        );
-        return response.data;
-    };
-
-    getUnattendedStaffsByCampaignId = async (campaignId: number) => {
-        const response = await this.axiosClient.get<IUser[]>(
-            `/admin/campaigns/${campaignId}/unattended-staff`
         );
         return response.data;
     };

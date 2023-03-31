@@ -12,15 +12,13 @@ export class BookService extends BaseService {
         return response.data;
     }
 
-    getBookByIdByIssuer = async (id: number) => {
-        const response = await this.axiosClient.get<IBook>(`/issuer/books/${id}`);
+    getBookById = async (id: number) => {
+        const response = await this.axiosClient.get<IBook>(`/books/${id}`);
         return response.data;
     }
 
-    getBookProducts = async (params?: any) => {
-        const response = await this.axiosClient.get<IBaseListResponse<IBookProduct>>("/books/products",
-            {params}
-        );
+    getBookByIdByIssuer = async (id: number) => {
+        const response = await this.axiosClient.get<IBook>(`/issuer/books/${id}`);
         return response.data;
     }
 }

@@ -1,22 +1,25 @@
 import Image from "next/image";
-import Link from "next/link";
-import React, {memo, useMemo} from "react";
-import {BsCalendarWeek, BsThreeDots} from "react-icons/bs";
-import {IoMdInformation} from "react-icons/io";
-import {IoLocationSharp, IoPeopleSharp} from "react-icons/io5";
+import React, { memo, useMemo } from "react";
+import { BsCalendarWeek, BsThreeDots } from "react-icons/bs";
+import { IoMdInformation } from "react-icons/io";
+import { IoLocationSharp, IoPeopleSharp } from "react-icons/io5";
 import NoImage from "../../assets/images/no-image.png";
-import {ParticipantStatuses} from "../../constants/ParticipantStatuses";
-import {ICampaign} from "../../types/Campaign/ICampaign";
-import {getFormattedTime} from "../../utils/helper";
+import { ParticipantStatuses } from "../../constants/ParticipantStatuses";
+import { ICampaign } from "../../types/Campaign/ICampaign";
+import { getFormattedTime } from "../../utils/helper";
 import AvatarGroup from "../AvatarGroup";
 import FormatCard from "./FormatCard";
 import IssuerHoverCard from "../IssuerHoverCard";
+import { motion } from "framer-motion";
+import Link from "next/link";
+
 
 type Props = {
+    horizontalOnly?: boolean;
     campaign: ICampaign;
 };
 
-const CampaignCard: React.FC<Props> = ({campaign}) => {
+const CampaignCard: React.FC<Props> = ({ campaign, horizontalOnly = false }) => {
 
     const issuerAvatars = useMemo(() => {
         return (
@@ -24,7 +27,7 @@ const CampaignCard: React.FC<Props> = ({campaign}) => {
                 ?.filter(
                     (p) =>
                         p?.status === ParticipantStatuses.RequestApproved.id ||
-                        p?.status === ParticipantStatuses.InvitationAccepted.id
+                        p?.status === ParticipantStatuses.InvitationAccepted.id,
                 )
                 .map((p) => {
                     return {
@@ -34,16 +37,18 @@ const CampaignCard: React.FC<Props> = ({campaign}) => {
                 }) || []
         );
     }, [campaign]);
+
+    const href = useMemo(() => `campaigns/${campaign?.id}`, [campaign]);
+
     const issuerOfParticipants = useMemo(() => {
         return campaign?.participants?.map((p) => p?.issuer?.user) || [];
     }, [campaign]);
     const issuerHoverCardElements = issuerOfParticipants.map((issuer) => {
         return (
-            <IssuerHoverCard issuer={issuer} key={issuer?.id}/>
-        )
+            <IssuerHoverCard issuer={issuer} key={issuer?.id} />
+        );
     });
 
-    console.log("issuerAvatars", issuerAvatars);
 
     const metadataItemClassName = {
         container: "flex items-center justify-between gap-3",
@@ -55,17 +60,27 @@ const CampaignCard: React.FC<Props> = ({campaign}) => {
         value: "text-sm font-medium text-slate-600 line-clamp-1",
     };
     return (
-        <Link
-            href={`campaigns/${campaign?.id}`}
-            className="relative border cursor-pointer transition-all duration-300 shadow rounded overflow-hidden flex flex-col xl:flex-row"
+        <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            layout
+
+
+            //href={`campaigns/${campaign?.id}`}
+            className={`relative border shadow rounded overflow-hidden flex flex-col ${horizontalOnly ? "" : "xl:flex-row"}`}
         >
-            <Image
-                src={campaign?.imageUrl || NoImage.src}
-                width={1000}
-                height={1000}
-                className="object-cover w-full h-48 xl:h-auto xl:w-1/3"
-                alt=""
-            />
+            <Link href={href}
+                  className={`w-full h-48 ${horizontalOnly ? "" : "xl:h-auto xl:w-52"}`}>
+                <Image
+                    src={campaign?.imageUrl || NoImage.src}
+                    width={1000}
+                    height={1000}
+                    className="object-cover w-full h-full"
+                    alt=""
+                />
+            </Link>
 
             {/* Info */}
             <div className="p-4 flex-1 min-w-0 flex flex-col">
@@ -82,7 +97,7 @@ const CampaignCard: React.FC<Props> = ({campaign}) => {
                         <span>
                             {getFormattedTime(
                                 campaign?.startDate,
-                                "dd/MM/yyyy"
+                                "dd/MM/yyyy",
                             )}
                             {" - "}
                             {getFormattedTime(campaign?.endDate, "dd/MM/yyyy")}
@@ -90,9 +105,10 @@ const CampaignCard: React.FC<Props> = ({campaign}) => {
                     </div>
 
                     {/* Title */}
-                    <div className="text-slate-800 font-semibold lg:font-bold text-xl line-clamp-2">
+                    <Link href={href}
+                          className="text-slate-800 font-semibold lg:font-bold text-xl line-clamp-2">
                         {campaign?.name}
-                    </div>
+                    </Link>
 
                     {/* Description */}
                     <p className="mt-3 text-slate-600 text-sm overflow-hidden overflow-ellipsis line-clamp-3">
@@ -114,7 +130,7 @@ const CampaignCard: React.FC<Props> = ({campaign}) => {
                                 Hình thức
                             </span>
                         </div>
-                        <FormatCard formatId={campaign?.format}/>
+                        <FormatCard formatId={campaign?.format} />
                     </div>
                     <div
                         className={`${metadataItemClassName.container} min-w-0`}
@@ -167,9 +183,9 @@ const CampaignCard: React.FC<Props> = ({campaign}) => {
 
             {/* Status Card */}
             <button className="border rounded-full absolute bg-white p-1.5 top-3 right-3">
-                <BsThreeDots className="fill-slate-600"/>
+                <BsThreeDots className="fill-slate-600" />
             </button>
-        </Link>
+        </motion.div>
     );
 };
 

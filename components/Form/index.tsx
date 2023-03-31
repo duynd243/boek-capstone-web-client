@@ -8,12 +8,13 @@ type LabelProps = {
     fieldName?: string;
     label: string;
     required?: boolean;
+    textAlignment?: "text-left" | "text-center" | "text-right";
 };
 
 const Label = (props: LabelProps) => {
     return (
         <label
-            className="mb-1 block text-sm font-medium text-gray-600"
+            className={`mb-1 block text-sm font-medium text-gray-600 ${props.textAlignment || "text-left"}`}
             htmlFor={props.fieldName}
         >
             {props.label}
@@ -202,15 +203,14 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
 type DateTimeInputFieldProps = {
     value: string;
     onClick?: () => void;
-    id: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 const DateTimeInputField: React.FC<DateTimeInputFieldProps> = ({
                                                                    placeholder,
-                                                                   id,
                                                                    onClick,
                                                                    value,
                                                                    ...rest
                                                                }) => {
+    const id = useId();
     return (
         <div className="relative">
             <input

@@ -55,7 +55,7 @@ const Page: NextPageWithLayout = () => {
         console.log(data);
     };
 
-    console.log(errors);
+   // console.log(errors);
 
     try {
         FormSchema.parse({
@@ -66,7 +66,7 @@ const Page: NextPageWithLayout = () => {
             continuous: false,
         });
     } catch (error) {
-        console.log(error);
+        //console.log(error);
     }
 
     return (

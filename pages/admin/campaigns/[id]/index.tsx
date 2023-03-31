@@ -28,7 +28,6 @@ const CampaignDetails: NextPageWithLayout = () => {
         }),
         {
             enabled: !!campaignId,
-            refetchOnWindowFocus: false,
         }
     );
 
@@ -77,7 +76,7 @@ const CampaignDetails: NextPageWithLayout = () => {
 
 CampaignDetails.getLayout = function getLayout(page: ReactElement) {
     return (
-        <AdminLayout containerClassName="px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <AdminLayout containerClassName="px-4 sm:px-6 lg:px-8 py-8 w-full" bgClassName='bg-gray-50'>
             {page}
         </AdminLayout>
     );

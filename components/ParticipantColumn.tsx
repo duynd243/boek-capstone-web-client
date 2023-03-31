@@ -1,11 +1,12 @@
 import React from 'react'
-import {IParticipantStatus, ParticipantStatuses} from "../constants/ParticipantStatuses";
+import {IParticipantStatus} from "../constants/ParticipantStatuses";
 import Kanban from "./Kanban";
 import {useQuery} from "@tanstack/react-query";
 import {useAuth} from "../context/AuthContext";
 import {ParticipantService} from "../services/ParticipantService";
-import ParticipantCard from "./ParticipantCard";
 import {Roles} from "../constants/Roles";
+import ParticipantCardSkeleton from "./ParticipantCard/ParticipantCardSkeleton";
+import ParticipantCard from "./ParticipantCard";
 import EmptyState, {EMPTY_STATE_TYPE} from "./EmptyState";
 
 const ParticipantStatusLabel = ({
@@ -23,31 +24,27 @@ const ParticipantStatusLabel = ({
 
 
 type Props = {
-    participantStatus: IParticipantStatus
+    participantStatus: IParticipantStatus;
+    campaignId: number | null;
 }
 
-const ParticipantColumn: React.FC<Props> = ({participantStatus}) => {
+const ParticipantColumn: React.FC<Props> = ({participantStatus, campaignId}) => {
 
     const {loginUser} = useAuth();
     const participantService = new ParticipantService(loginUser?.accessToken);
     const queryKey = loginUser?.role === Roles.SYSTEM.id ? 'admin_participants' : 'issuer_participants';
+
+    const params = {
+        size: 100,
+        status: participantStatus?.id,
+        sort: 'CreatedDate desc, UpdatedDate desc',
+        campaignId: campaignId || undefined,
+    };
     const {data: participantsData, isLoading: isParticipantsLoading} = useQuery(
-        [queryKey, participantStatus?.id],
-        loginUser?.role === Roles.SYSTEM.id ? () => participantService.getParticipantsByAdmin({
-            size: 100,
-            status: participantStatus?.id,
-            sort: participantStatus.id === ParticipantStatuses.PendingRequest.id
-            || participantStatus.id === ParticipantStatuses.PendingInvitation.id
-                ?
-                'createdDate desc' : 'updatedDate desc'
-        }) : () => participantService.getParticipantsByIssuer({
-            size: 100,
-            status: participantStatus?.id,
-            sort: participantStatus.id === ParticipantStatuses.PendingRequest.id
-            || participantStatus.id === ParticipantStatuses.PendingInvitation.id
-                ?
-                'createdDate desc' : 'updatedDate desc'
-        }),
+        [queryKey, participantStatus?.id, campaignId],
+        loginUser?.role === Roles.SYSTEM.id ?
+            () => participantService.getParticipantsByAdmin(params) :
+            () => participantService.getParticipantsByIssuer(params),
     );
     return (
         <Kanban.Column header={
@@ -56,11 +53,23 @@ const ParticipantColumn: React.FC<Props> = ({participantStatus}) => {
                 count={participantsData?.metadata?.total || 0}
                 status={`${participantStatus?.icon} ${participantStatus.displayName}`}/>
         } columnWidth={'w-[400px]'}>
-            {participantsData?.data?.map((p) => (
-                <div key={p?.id} className='pr-2'>
-                    <ParticipantCard key={p?.id} participant={p}/>
+
+            {isParticipantsLoading && (
+                <div className='space-y-6'>
+                    <ParticipantCardSkeleton/>
+                    <ParticipantCardSkeleton/>
                 </div>
-            ))}
+
+            )}
+            {!isParticipantsLoading && participantsData?.data && participantsData?.data?.length > 0 &&
+                <div className='space-y-6 pr-2'>
+                    {participantsData?.data?.map((p) => (
+                        <div key={p?.id} className=''>
+                            <ParticipantCard key={p?.id} participant={p}/>
+                        </div>
+                    ))}
+                </div>
+            }
             {participantsData?.data?.length === 0 && !isParticipantsLoading && (
                 <div className={'bg-white py-8 rounded'}>
                     <EmptyState
