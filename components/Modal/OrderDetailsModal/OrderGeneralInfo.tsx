@@ -6,6 +6,7 @@ import { IOrder } from "../../../types/Order/IOrder";
 import { getFormattedTime } from "../../../utils/helper";
 import { OrderTypes } from "../../../constants/OrderTypes";
 import { getOrderPaymentMethodById } from "../../../constants/OrderPaymentMethods";
+import DefaultAvatar from "../../../assets/images/default-avatar.png";
 
 type Props = {
     order: IOrder | undefined;
@@ -27,7 +28,7 @@ const OrderGeneralInfo: React.FC<Props> = ({ order }) => {
                     <div className={"flex items-center gap-2"}>
                         <Image
                             className="rounded-full object-cover w-8 h-8"
-                            src={order?.customer?.user?.imageUrl || ""} alt={""}
+                            src={order?.customer?.user?.imageUrl || DefaultAvatar.src} alt={""}
                             width={100} height={100} />
                         <div className={"truncate"}>
                             <div className="text-sm font-medium text-slate-800">{order?.customerName}</div>
@@ -62,7 +63,7 @@ const OrderGeneralInfo: React.FC<Props> = ({ order }) => {
                     <div className={labelClasses}>Địa chỉ giao hàng</div>
                     <div
                         className="text-sm font-medium text-slate-800 sm:text-right">
-                        {order?.type === OrderTypes.DELIVERY.id ? (order?.address || "-") : "Nhận tại quầy"}
+                        {order?.type === OrderTypes.DELIVERY.id ? (order?.address || "-") : (order?.campaign?.address || "-")}
                     </div>
                 </li>
 
