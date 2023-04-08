@@ -1,40 +1,46 @@
 import Image from "next/image";
-import React, {useContext, useState} from "react";
-import {AiOutlineUsergroupAdd} from "react-icons/ai";
-import {CampaignStatuses} from "../../constants/CampaignStatuses";
-import {ParticipantStatuses} from "../../constants/ParticipantStatuses";
-import {Roles} from "../../constants/Roles";
-import {useAuth} from "../../context/AuthContext";
-import {CampaignContext} from "../../context/CampaignContext";
+import React, { useContext, useState } from "react";
+import { AiOutlineUsergroupAdd } from "react-icons/ai";
+import { CampaignStatuses } from "../../constants/CampaignStatuses";
+import { ParticipantStatuses } from "../../constants/ParticipantStatuses";
+import { Roles } from "../../constants/Roles";
+import { useAuth } from "../../context/AuthContext";
+import { CampaignContext, CustomerCampaignContext } from "../../context/CampaignContext";
 import InviteIssuerModal from "../Modal/InviteIssuerModal";
 import DefaultAvatar from "./../../assets/images/default-avatar.png";
 import SidebarBlockWrapper from "./SidebarBlockWrapper";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import IssuerHoverCard from "../IssuerHoverCard";
 import SidebarButton from "./SidebarButton";
-import {SidebarTable} from "./SidebarTable";
+import { SidebarTable } from "./SidebarTable";
 import JoinedIssuerModal from "../Modal/JoinedIssuerModal";
 
 type Props = {
     maxRows?: number;
 };
 
-const SidebarIssuersTable: React.FC<Props> = ({maxRows = 10}) => {
+const SidebarIssuersTable: React.FC<Props> = ({ maxRows = 10 }) => {
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showAllModal, setShowAllModal] = useState(false);
-    const {loginUser} = useAuth();
+    const { loginUser } = useAuth();
 
     const campaign = useContext(CampaignContext);
-    const joinedIssuers =
-        campaign?.participants
-            ?.filter(
-                (p) =>
-                    p?.status === ParticipantStatuses.RequestApproved.id ||
-                    p?.status === ParticipantStatuses.InvitationAccepted.id
-            )
-            ?.map((p) => p?.issuer?.user) || [];
+    const customerCampaign = useContext(CustomerCampaignContext);
 
     const isAdmin = loginUser?.role === Roles.SYSTEM.id;
+    const isIssuer = loginUser?.role === Roles.ISSUER.id;
+    const isCustomer = loginUser?.role === Roles.CUSTOMER.id;
+    const joinedIssuers =
+        (isAdmin || isIssuer) ?
+            (campaign?.participants
+                ?.filter(
+                    (p) =>
+                        p?.status === ParticipantStatuses.RequestApproved.id ||
+                        p?.status === ParticipantStatuses.InvitationAccepted.id,
+                )
+                ?.map((p) => p?.issuer?.user) || [])
+            : (customerCampaign?.issuers?.map(i => i?.user) || []);
+
     const showInviteIssuer =
         isAdmin && campaign?.status === CampaignStatuses.NOT_STARTED.id;
 
@@ -52,7 +58,7 @@ const SidebarIssuersTable: React.FC<Props> = ({maxRows = 10}) => {
                 />
             </SidebarTable.Heading>
             {joinedIssuers?.length === 0 ? (
-                <SidebarTable.Content text={'Hội sách này hiện chưa có nhà phát hành nào tham gia.'}/>
+                <SidebarTable.Content text={"Hội sách này hiện chưa có nhà phát hành nào tham gia."} />
             ) : (
                 <ul className="space-y-3.5">
                     {joinedIssuers?.slice(0, maxRows).map((issuer) => (
@@ -82,26 +88,26 @@ const SidebarIssuersTable: React.FC<Props> = ({maxRows = 10}) => {
                                     </HoverCard.Trigger>
                                     <HoverCard.Portal>
                                         <HoverCard.Content
-                                            className={'radix-side-top:animate-slide-up radix-side-bottom:animate-slide-down rounded-lg p-4 pt-0 md:w-full animate-fade-in'}
+                                            className={"radix-side-top:animate-slide-up radix-side-bottom:animate-slide-down rounded-lg p-4 pt-0 md:w-full animate-fade-in"}
                                             align="start"
                                             sideOffset={4}>
-                                            <HoverCard.Arrow className="fill-current text-gray-50"/>
-                                            <IssuerHoverCard issuer={issuer}/>
+                                            <HoverCard.Arrow className="fill-current text-gray-50" />
+                                            <IssuerHoverCard issuer={issuer} />
                                         </HoverCard.Content>
                                     </HoverCard.Portal>
                                 </HoverCard.Root>
 
-                                <button className="rounded-full text-slate-400 hover:text-slate-500">
+                                {isAdmin && <button className="rounded-full text-slate-400 hover:text-slate-500">
                                     <span className="sr-only">Menu</span>
                                     <svg
                                         className="h-8 w-8 fill-current"
                                         viewBox="0 0 32 32"
                                     >
-                                        <circle cx="16" cy="16" r="2"/>
-                                        <circle cx="10" cy="16" r="2"/>
-                                        <circle cx="22" cy="16" r="2"/>
+                                        <circle cx="16" cy="16" r="2" />
+                                        <circle cx="10" cy="16" r="2" />
+                                        <circle cx="22" cy="16" r="2" />
                                     </svg>
-                                </button>
+                                </button>}
                             </div>
                         </li>
                     ))}
@@ -121,7 +127,7 @@ const SidebarIssuersTable: React.FC<Props> = ({maxRows = 10}) => {
                         </SidebarButton>
                     )}
                     <SidebarButton
-                        variant='secondary'
+                        variant="secondary"
                         href={`/admin/participants?campaign=${campaign?.id}`}
                         className="m-btn bg-white !border-slate-200 !shadow text-slate-600 w-full border bg-slate-50"
                     >

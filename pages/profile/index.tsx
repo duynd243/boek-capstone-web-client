@@ -1,12 +1,8 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../_app";
-import CustomerLayout from "../../components/Layout/CustomerLayout";
-import AdminSettingsLayout from "../../components/Layout/AdminSettingsLayout";
 import { useAuth } from "../../context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserService } from "../../services/UserService";
-import { getFormattedTime } from "../../utils/helper";
-import { RiCake2Line, RiMapPin2Line, RiUserAddLine } from "react-icons/ri";
 import { AiOutlineCamera, AiOutlineInfo } from "react-icons/ai";
 import { Tab } from "@headlessui/react";
 import Form from "../../components/Form";
@@ -20,25 +16,106 @@ import TransitionModal from "../../components/Modal/TransitionModal";
 import { LevelService } from "../../services/LevelService";
 import { OrganizationService } from "../../services/OrganizationService";
 import EmptyState, { EMPTY_STATE_TYPE } from "../../components/EmptyState";
+import CustomerSettingsLayout from "../../components/Layout/CustomerSettingsLayout";
+import CustomerLayout from "../../components/Layout/CustomerLayout";
+import CoverImage from "../../assets/images/default-customer-cover.jpg";
+import Image from "next/image";
+import BioSection from "../../components/CustomerProfile/BioSection";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import DateTimePickerModal from "../../components/Modal/DateTimePickerModal";
+import { format } from "date-fns";
+import { toast } from "react-hot-toast";
+import ErrorMessage from "../../components/Form/ErrorMessage";
+import FollowOrganizationModal from "../../components/Modal/FollowOrganizationModal";
+import { getAvatarFromName } from "../../utils/helper";
+import { IOrganization } from "../../types/Organization/IOrganization";
+import { GroupService } from "../../services/GroupService";
+import FollowGroupModal from "../../components/Modal/FollowGroupModal";
+import { BiUser } from "react-icons/bi";
+import { Roles } from "../../constants/Roles";
 
-const Index: NextPageWithLayout = () => {
+const genderOptions = {
+    MALE: {
+        label: "Nam",
+        value: true,
+    },
+    FEMALE: {
+        label: "Nữ",
+        value: false,
+    },
+} satisfies Record<string, { label: string, value: boolean }>;
+const CustomerProfilePage: NextPageWithLayout = () => {
     const { loginUser, user, logOut } = useAuth();
 
-    const [showLevelModal, setShowLevelModal] = React.useState(false);
+    const [showLevelModal, setShowLevelModal] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showOrgModal, setShowOrgModal] = useState(false);
+    const [showGroupModal, setShowGroupModal] = useState(false);
 
     const userService = new UserService(loginUser?.accessToken);
+    const queryClient = useQueryClient();
 
     const organizationService = new OrganizationService(loginUser?.accessToken);
+    const groupService = new GroupService(loginUser?.accessToken);
 
-
-    const { data: userProfile } = useQuery(
-        ["userProfile", loginUser?.id],
-        () => userService.getLoggedInUser(),
+    const unfollowOrganizationMutation = useMutation(
+        (organizationId: number) => organizationService.unfollowOrganization(organizationId),
+        {
+            onSuccess: async (data) => {
+                await queryClient.invalidateQueries(["following_organizations"]);
+            },
+        },
     );
 
-    const { data: followingOrganizations } = useQuery(
+    const unfollowGroupMutation = useMutation(
+        (groupId: number) => groupService.unfollowGroup(groupId),
+        {
+            onSuccess: async (data) => {
+                await queryClient.invalidateQueries(["following_groups"]);
+            },
+        },
+    );
+
+    const onUnfollowOrganization = async (organization: IOrganization) => {
+        await toast.promise(unfollowOrganizationMutation.mutateAsync(organization?.id), {
+            loading: `Đang bỏ theo dõi ${organization?.name}`,
+            success: `Đã bỏ theo dõi ${organization?.name}`,
+            error: (err) => err?.message || "Có lỗi xảy ra",
+        });
+    };
+
+    const onUnfollowGroup = async (group: IOrganization) => {
+        await toast.promise(unfollowGroupMutation.mutateAsync(group?.id), {
+            loading: `Đang bỏ theo dõi ${group?.name}`,
+            success: `Đã bỏ theo dõi ${group?.name}`,
+            error: (err) => err?.message || "Có lỗi xảy ra",
+        });
+    };
+
+
+    const {
+        data: followingOrganizations,
+        isInitialLoading: isFollowingOrganizationsLoading,
+
+    } = useQuery(
         ["following_organizations", loginUser?.id],
-        () => organizationService.getFollowingOrganizationsByCustomer(),
+        () => organizationService.getFollowingOrganizationsByCustomer({
+            withCustomers: true,
+            withCampaigns: true,
+        }),
+    );
+
+    const {
+        data: followingGroups,
+        isInitialLoading: isFollowingGroupsLoading,
+
+    } = useQuery(
+        ["following_groups", loginUser?.id],
+        () => groupService.getFollowingGroupsByCustomer({
+            withCustomers: true,
+            withCampaigns: true,
+        }),
     );
 
 
@@ -61,6 +138,69 @@ const Index: NextPageWithLayout = () => {
     );
 
 
+    const UpdateProfileSchema = z.object({
+        dob: z.date().optional(),
+        gender: z.boolean(),
+        user: z.object({
+            id: z.string(),
+            name: z.string(),
+            email: z.string(),
+            phone: z.string(),
+            addressRequest: z.object({
+                detail: z.string(),
+                provinceCode: z.number(),
+                districtCode: z.number(),
+                wardCode: z.number(),
+            }),
+            imageUrl: z.string(),
+        }),
+    });
+
+    type UpdateProfileSchemaType = Partial<z.infer<typeof UpdateProfileSchema>>;
+
+
+    const {
+        register,
+        control,
+        watch,
+        setValue,
+        reset,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<UpdateProfileSchemaType>({
+        resolver: zodResolver(UpdateProfileSchema),
+    });
+
+    const {
+        data: profile,
+        isInitialLoading: profileLoading,
+    } = useQuery(
+        ["profile", loginUser?.id],
+        () => userService.getProfileByCustomer(),
+        {
+            onSuccess: (profile) => {
+                reset({
+                    dob: profile?.dob ? new Date(profile?.dob) : undefined,
+                    gender: profile?.gender,
+                    user: {
+                        id: profile?.user?.id,
+                        name: profile?.user?.name,
+                        phone: profile?.user?.phone,
+                        imageUrl: profile?.user?.imageUrl,
+                        email: profile?.user?.email,
+                        addressRequest: {
+                            detail: profile?.user?.addressViewModel?.detail,
+                            provinceCode: profile?.user?.addressViewModel?.provinceCode,
+                            districtCode: profile?.user?.addressViewModel?.districtCode,
+                            wardCode: profile?.user?.addressViewModel?.wardCode,
+                        },
+                    },
+                });
+            },
+        },
+    );
+
+
     const {
         selectedProvince,
         selectedDistrict,
@@ -75,40 +215,60 @@ const Index: NextPageWithLayout = () => {
         handleDistrictChange,
         handleWardChange,
     } = useAddress({
-        defaultProvinceCode: userProfile?.user?.addressViewModel?.provinceCode,
-        defaultDistrictCode: userProfile?.user?.addressViewModel?.districtCode,
-        defaultWardCode: userProfile?.user?.addressViewModel?.wardCode,
+        defaultProvinceCode: profile?.user?.addressViewModel?.provinceCode,
+        defaultDistrictCode: profile?.user?.addressViewModel?.districtCode,
+        defaultWardCode: profile?.user?.addressViewModel?.wardCode,
     });
 
 
-    const { register, control, watch, setValue, handleSubmit, formState: { errors } } = useForm({
-        defaultValues: {
-            name: loginUser?.name,
-            email: loginUser?.email,
-            phone: loginUser?.phone,
-            addressRequest: {
-                detail: userProfile?.user?.addressViewModel?.detail,
-                provinceCode: userProfile?.user?.addressViewModel?.provinceCode,
-                districtCode: userProfile?.user?.addressViewModel?.districtCode,
-                wardCode: userProfile?.user?.addressViewModel?.wardCode,
+    const updateProfileMutation = useMutation(
+        (data: any) => userService.updateProfileByCustomer(data),
+        {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries(["profile", loginUser?.id]);
             },
         },
-    });
+    );
+
+    const onSubmit = async (data: UpdateProfileSchemaType) => {
+        try {
+            const payload = UpdateProfileSchema.parse(data);
+            await toast.promise(
+                updateProfileMutation.mutateAsync({
+                    ...payload,
+                    user: {
+                        ...payload.user,
+                        status: true,
+                        role: Roles.CUSTOMER.id,
+                    },
+                }),
+                {
+                    loading: "Đang cập nhật thông tin",
+                    success: "Cập nhật thông tin thành công",
+                    error: (e) => e?.message || "Có lỗi xảy ra",
+                },
+            );
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    console.log(errors);
     return (
         <div
             className={`grow flex flex-col`}
         >
-             <button onClick={logOut}>Logout</button>
             {/* Profile background */}
             <div className="relative h-44 bg-slate-200">
-                <img className="object-cover h-full w-full shadow-inner"
-                     src={"https://unitrain.edu.vn/wp-content/uploads/2017/02/maxresdefault--818x460.jpg"}
-                     width="979" height="220"
-                     alt="Profile background" />
+                <Image className="object-cover h-full w-full shadow-inner"
+                       src={CoverImage.src}
+                       width="979" height="220"
+                       alt="" />
                 {/* Close button */}
                 <button
                     className="md:hidden absolute top-4 left-4 sm:left-6 text-white opacity-80 hover:opacity-100"
-                    onClick={() => setProfileSidebarOpen(!true)}
+                    onClick={() => {
+                    }}
                     aria-controls="profile-sidebar"
                     aria-expanded={true}
                 >
@@ -146,13 +306,13 @@ const Index: NextPageWithLayout = () => {
                             <div className="flex items-center space-x-2">
                                 <div
                                     className="text-sm text-green-600 font-medium bg-green-100 rounded-sm px-3 py-1 border border-green-200">
-                                    {userProfile?.level?.name}
+                                    {profile?.level?.name}
                                 </div>
                                 <div
                                     className="text-sm text-amber-600 font-medium bg-amber-100 rounded-sm px-3 py-1 border border-amber-200">
                                     <span className={"font-normal"}>
                                         Điểm: </span>
-                                    {userProfile?.point}
+                                    {profile?.point}
                                 </div>
                                 <button onClick={
                                     () => setShowLevelModal(true)
@@ -176,34 +336,7 @@ const Index: NextPageWithLayout = () => {
                                 d="M13 6a.75.75 0 0 1-.75-.75 1.5 1.5 0 0 0-1.5-1.5.75.75 0 1 1 0-1.5 1.5 1.5 0 0 0 1.5-1.5.75.75 0 1 1 1.5 0 1.5 1.5 0 0 0 1.5 1.5.75.75 0 1 1 0 1.5 1.5 1.5 0 0 0-1.5 1.5A.75.75 0 0 1 13 6ZM6 16a1 1 0 0 1-1-1 4 4 0 0 0-4-4 1 1 0 0 1 0-2 4 4 0 0 0 4-4 1 1 0 1 1 2 0 4 4 0 0 0 4 4 1 1 0 0 1 0 2 4 4 0 0 0-4 4 1 1 0 0 1-1 1Z" />
                         </svg>
                     </div>
-                    {/* Bio */}
-                    {/*<div className="text-sm mb-3">Fitness Fanatic, Design Enthusiast, Mentor, Meetup Organizer & PHP*/}
-                    {/*    Lover.*/}
-                    {/*</div>*/}
-                    {/* Meta */}
-                    <div className="space-y-2.5">
-
-                        <div className="flex items-center">
-                            <RiUserAddLine className="text-slate-500" />
-                            <span className="text-sm font-medium whitespace-nowrap text-slate-500 ml-2">
-                                Tham gia Boek từ {getFormattedTime(userProfile?.user?.createdDate, "dd-MM-yyyy")}
-                            </span>
-                        </div>
-
-                        <div className="flex items-center">
-                            <RiCake2Line className="text-slate-500" />
-                            <span className="text-sm font-medium whitespace-nowrap text-slate-500 ml-2">
-                                {getFormattedTime(userProfile?.dob, "dd-MM-yyyy")}
-                            </span>
-                        </div>
-
-                        <div className="flex items-center">
-                            <RiMapPin2Line className="text-slate-500" />
-                            <span className="text-sm font-medium whitespace-nowrap text-slate-500 ml-2">{
-                                userProfile?.user?.address || "Chưa cập nhật"
-                            }</span>
-                        </div>
-                    </div>
+                    <BioSection profile={profile} isLoading={profileLoading} />
                 </header>
 
                 <Tab.Group>
@@ -219,7 +352,6 @@ const Index: NextPageWithLayout = () => {
                                 </span>
                             </Tab>
 
-
                             <Tab as={"div"}
                                  className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer">
                                 <span
@@ -227,7 +359,6 @@ const Index: NextPageWithLayout = () => {
                                     Tổ chức
                                 </span>
                             </Tab>
-
 
                             <Tab as={"div"}
                                  className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer">
@@ -237,323 +368,112 @@ const Index: NextPageWithLayout = () => {
                                 </span>
                             </Tab>
 
-
-                            {/*<li className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">*/}
-                            {/*    <a className="block pb-3 text-slate-500 hover:text-slate-600 whitespace-nowrap"*/}
-                            {/*       href="#0">*/}
-                            {/*        Connections*/}
-                            {/*    </a>*/}
-                            {/*</li>*/}
-
                         </ul>
                     </Tab.List>
                     <Tab.Panels>
                         <Tab.Panel>
-                            {/* Profile content */}
-                            {/*<div className="flex flex-col xl:flex-row xl:space-x-16">*/}
-                            {/*    /!* Main content *!/*/}
-                            {/*    <div className="space-y-5 mb-8 xl:mb-0">*/}
-                            {/*        /!* About Me *!/*/}
-                            {/*        <div>*/}
-                            {/*            <h2 className="text-slate-800 font-semibold mb-2">About Me</h2>*/}
-                            {/*            <div className="text-sm space-y-2">*/}
-                            {/*                <p>*/}
-                            {/*                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod*/}
-                            {/*                    tempor*/}
-                            {/*                    incididunt ut labore et dolore magna aliqua. Ut enim*/}
-                            {/*                    ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut*/}
-                            {/*                    aliquip ex ea*/}
-                            {/*                    commodo consequat. Duis aute irure dolor in*/}
-                            {/*                    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla*/}
-                            {/*                    pariatur.*/}
-                            {/*                </p>*/}
-                            {/*                <p>Consectetur adipiscing elit, sed do eiusmod tempor magna aliqua.</p>*/}
-                            {/*            </div>*/}
-                            {/*        </div>*/}
+                            <form className="space-y-4"
+                                  onSubmit={handleSubmit(onSubmit)}>
 
-                            {/*        /!* Departments *!/*/}
-                            {/*        <div>*/}
-                            {/*            <h2 className="text-slate-800 font-semibold mb-2">Departments</h2>*/}
-                            {/*            /!* Cards *!/*/}
-                            {/*            <div className="grid xl:grid-cols-2 gap-4">*/}
-                            {/*                /!* Card *!/*/}
-                            {/*                <div className="bg-white p-4 border border-slate-200 rounded-sm shadow-sm">*/}
-                            {/*                    /!* Card header *!/*/}
-                            {/*                    <div className="grow flex items-center truncate mb-2">*/}
-                            {/*                        <div*/}
-                            {/*                            className="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-700 rounded-full mr-2">*/}
-                            {/*                            <img className="ml-1" src={faker.image.avatar()} width="14"*/}
-                            {/*                                 height="14"*/}
-                            {/*                                 alt="Icon 03"/>*/}
-                            {/*                        </div>*/}
-                            {/*                        <div className="truncate">*/}
-                            {/*                    <span*/}
-                            {/*                        className="text-sm font-medium text-slate-800">Acme Marketing</span>*/}
-                            {/*                        </div>*/}
-                            {/*                    </div>*/}
-                            {/*                    /!* Card content *!/*/}
-                            {/*                    <div className="text-sm mb-3">Duis aute irure dolor in reprehenderit in*/}
-                            {/*                        voluptate*/}
-                            {/*                        velit esse cillum dolore.*/}
-                            {/*                    </div>*/}
-                            {/*                    /!* Card footer *!/*/}
-                            {/*                    <div className="flex justify-between items-center">*/}
-                            {/*                        /!* Avatars group *!/*/}
-                            {/*                        <div className="flex -space-x-3 -ml-0.5">*/}
-                            {/*                            <img className="rounded-full border-2 border-white box-content"*/}
-                            {/*                                 src={faker.image.avatar()} width="24" height="24"*/}
-                            {/*                                 alt="Avatar"/>*/}
-                            {/*                            <img className="rounded-full border-2 border-white box-content"*/}
-                            {/*                                 src={faker.image.avatar()} width="24" height="24"*/}
-                            {/*                                 alt="Avatar"/>*/}
-                            {/*                            <img className="rounded-full border-2 border-white box-content"*/}
-                            {/*                                 src={faker.image.avatar()} width="24" height="24"*/}
-                            {/*                                 alt="Avatar"/>*/}
-                            {/*                            <img className="rounded-full border-2 border-white box-content"*/}
-                            {/*                                 src={faker.image.avatar()} width="24" height="24"*/}
-                            {/*                                 alt="Avatar"/>*/}
-                            {/*                        </div>*/}
-                            {/*                        /!* Link *!/*/}
-                            {/*                        <div>*/}
-                            {/*                            <a className="text-sm font-medium text-indigo-500 hover:text-indigo-600"*/}
-                            {/*                               href="#0">*/}
-                            {/*                                View -&gt;*/}
-                            {/*                            </a>*/}
-                            {/*                        </div>*/}
-                            {/*                    </div>*/}
-                            {/*                </div>*/}
-
-                            {/*                /!* Card *!/*/}
-                            {/*                <div className="bg-white p-4 border border-slate-200 rounded-sm shadow-sm">*/}
-                            {/*                    /!* Card header *!/*/}
-                            {/*                    <div className="grow flex items-center truncate mb-2">*/}
-                            {/*                        <div*/}
-                            {/*                            className="w-8 h-8 shrink-0 flex items-center justify-center bg-slate-700 rounded-full mr-2">*/}
-                            {/*                            <img className="ml-1" src={faker.image.avatar()} width="14"*/}
-                            {/*                                 height="14"*/}
-                            {/*                                 alt="Icon 02"/>*/}
-                            {/*                        </div>*/}
-                            {/*                        <div className="truncate">*/}
-                            {/*                            <span className="text-sm font-medium text-slate-800">Acme Product</span>*/}
-                            {/*                        </div>*/}
-                            {/*                    </div>*/}
-                            {/*                    /!* Card content *!/*/}
-                            {/*                    <div className="text-sm mb-3">Duis aute irure dolor in reprehenderit in*/}
-                            {/*                        voluptate*/}
-                            {/*                        velit esse cillum dolore.*/}
-                            {/*                    </div>*/}
-                            {/*                    /!* Card footer *!/*/}
-                            {/*                    <div className="flex justify-between items-center">*/}
-                            {/*                        /!* Avatars group *!/*/}
-                            {/*                        <div className="flex -space-x-3 -ml-0.5">*/}
-                            {/*                            <img className="rounded-full border-2 border-white box-content"*/}
-                            {/*                                 src={faker.image.avatar()} width="24" height="24"*/}
-                            {/*                                 alt="Avatar"/>*/}
-                            {/*                            <img className="rounded-full border-2 border-white box-content"*/}
-                            {/*                                 src={faker.image.avatar()} width="24" height="24"*/}
-                            {/*                                 alt="Avatar"/>*/}
-                            {/*                            <img className="rounded-full border-2 border-white box-content"*/}
-                            {/*                                 src={faker.image.avatar()} width="24" height="24"*/}
-                            {/*                                 alt="Avatar"/>*/}
-                            {/*                        </div>*/}
-                            {/*                        /!* Link *!/*/}
-                            {/*                        <div>*/}
-                            {/*                            <a className="text-sm font-medium text-indigo-500 hover:text-indigo-600"*/}
-                            {/*                               href="#0">*/}
-                            {/*                                View -&gt;*/}
-                            {/*                            </a>*/}
-                            {/*                        </div>*/}
-                            {/*                    </div>*/}
-                            {/*                </div>*/}
-                            {/*            </div>*/}
-                            {/*        </div>*/}
-
-                            {/*        /!* Work History *!/*/}
-                            {/*        <div>*/}
-                            {/*            <h2 className="text-slate-800 font-semibold mb-2">Work History</h2>*/}
-                            {/*            <div className="bg-white p-4 border border-slate-200 rounded-sm shadow-sm">*/}
-                            {/*                <ul className="space-y-3">*/}
-                            {/*                    /!* Item *!/*/}
-                            {/*                    <li className="sm:flex sm:items-center sm:justify-between">*/}
-                            {/*                        <div className="sm:grow flex items-center text-sm">*/}
-                            {/*                            /!* Icon *!/*/}
-                            {/*                            <div*/}
-                            {/*                                className="w-8 h-8 rounded-full shrink-0 bg-amber-500 my-2 mr-3">*/}
-                            {/*                                <svg className="w-8 h-8 fill-current text-amber-50"*/}
-                            {/*                                     viewBox="0 0 32 32">*/}
-                            {/*                                    <path*/}
-                            {/*                                        d="M21 14a.75.75 0 0 1-.75-.75 1.5 1.5 0 0 0-1.5-1.5.75.75 0 1 1 0-1.5 1.5 1.5 0 0 0 1.5-1.5.75.75 0 1 1 1.5 0 1.5 1.5 0 0 0 1.5 1.5.75.75 0 1 1 0 1.5 1.5 1.5 0 0 0-1.5 1.5.75.75 0 0 1-.75.75Zm-7 10a1 1 0 0 1-1-1 4 4 0 0 0-4-4 1 1 0 0 1 0-2 4 4 0 0 0 4-4 1 1 0 0 1 2 0 4 4 0 0 0 4 4 1 1 0 0 1 0 2 4 4 0 0 0-4 4 1 1 0 0 1-1 1Z"/>*/}
-                            {/*                                </svg>*/}
-                            {/*                            </div>*/}
-                            {/*                            /!* Position *!/*/}
-                            {/*                            <div>*/}
-                            {/*                                <div className="font-medium text-slate-800">Senior Product*/}
-                            {/*                                    Designer*/}
-                            {/*                                </div>*/}
-                            {/*                                <div*/}
-                            {/*                                    className="flex flex-nowrap items-center space-x-2 whitespace-nowrap">*/}
-                            {/*                                    <div>Remote</div>*/}
-                            {/*                                    <div className="text-slate-400">·</div>*/}
-                            {/*                                    <div>April, 2020 - Today</div>*/}
-                            {/*                                </div>*/}
-                            {/*                            </div>*/}
-                            {/*                        </div>*/}
-                            {/*                        /!* Tags *!/*/}
-                            {/*                        <div className="sm:ml-2 mt-2 sm:mt-0">*/}
-                            {/*                            <ul className="flex flex-wrap sm:justify-end -m-1">*/}
-                            {/*                                <li className="m-1">*/}
-                            {/*                                    <button*/}
-                            {/*                                        className="inline-flex items-center justify-center text-xs font-medium leading-5 rounded-full px-2.5 py-0.5 border border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500 duration-150 ease-in-out">*/}
-                            {/*                                        Marketing*/}
-                            {/*                                    </button>*/}
-                            {/*                                </li>*/}
-                            {/*                                <li className="m-1">*/}
-                            {/*                                    <button*/}
-                            {/*                                        className="inline-flex items-center justify-center text-xs font-medium leading-5 rounded-full px-2.5 py-0.5 border border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500 duration-150 ease-in-out">*/}
-                            {/*                                        +4*/}
-                            {/*                                    </button>*/}
-                            {/*                                </li>*/}
-                            {/*                            </ul>*/}
-                            {/*                        </div>*/}
-                            {/*                    </li>*/}
-
-                            {/*                    /!* Item *!/*/}
-                            {/*                    <li className="sm:flex sm:items-center sm:justify-between">*/}
-                            {/*                        <div className="sm:grow flex items-center text-sm">*/}
-                            {/*                            /!* Icon *!/*/}
-                            {/*                            <div*/}
-                            {/*                                className="w-8 h-8 rounded-full shrink-0 bg-indigo-500 my-2 mr-3">*/}
-                            {/*                                <svg className="w-8 h-8 fill-current text-indigo-50"*/}
-                            {/*                                     viewBox="0 0 32 32">*/}
-                            {/*                                    <path*/}
-                            {/*                                        d="M8.994 20.006a1 1 0 0 1-.707-1.707l4.5-4.5a1 1 0 0 1 1.414 0l3.293 3.293 4.793-4.793a1 1 0 1 1 1.414 1.414l-5.5 5.5a1 1 0 0 1-1.414 0l-3.293-3.293L9.7 19.713a1 1 0 0 1-.707.293Z"/>*/}
-                            {/*                                </svg>*/}
-                            {/*                            </div>*/}
-                            {/*                            /!* Position *!/*/}
-                            {/*                            <div>*/}
-                            {/*                                <div className="font-medium text-slate-800">Product*/}
-                            {/*                                    Designer*/}
-                            {/*                                </div>*/}
-                            {/*                                <div*/}
-                            {/*                                    className="flex flex-nowrap items-center space-x-2 whitespace-nowrap">*/}
-                            {/*                                    <div>Milan, IT</div>*/}
-                            {/*                                    <div className="text-slate-400">·</div>*/}
-                            {/*                                    <div>April, 2018 - April 2020</div>*/}
-                            {/*                                </div>*/}
-                            {/*                            </div>*/}
-                            {/*                        </div>*/}
-                            {/*                        /!* Tags *!/*/}
-                            {/*                        <div className="sm:ml-2 mt-2 sm:mt-0">*/}
-                            {/*                            <ul className="flex flex-wrap sm:justify-end -m-1">*/}
-                            {/*                                <li className="m-1">*/}
-                            {/*                                    <button*/}
-                            {/*                                        className="inline-flex items-center justify-center text-xs font-medium leading-5 rounded-full px-2.5 py-0.5 border border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500 duration-150 ease-in-out">*/}
-                            {/*                                        Marketing*/}
-                            {/*                                    </button>*/}
-                            {/*                                </li>*/}
-                            {/*                                <li className="m-1">*/}
-                            {/*                                    <button*/}
-                            {/*                                        className="inline-flex items-center justify-center text-xs font-medium leading-5 rounded-full px-2.5 py-0.5 border border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500 duration-150 ease-in-out">*/}
-                            {/*                                        +4*/}
-                            {/*                                    </button>*/}
-                            {/*                                </li>*/}
-                            {/*                            </ul>*/}
-                            {/*                        </div>*/}
-                            {/*                    </li>*/}
-
-                            {/*                    /!* Item *!/*/}
-                            {/*                    <li className="sm:flex sm:items-center sm:justify-between">*/}
-                            {/*                        <div className="sm:grow flex items-center text-sm">*/}
-                            {/*                            /!* Icon *!/*/}
-                            {/*                            <div*/}
-                            {/*                                className="w-8 h-8 rounded-full shrink-0 bg-indigo-500 my-2 mr-3">*/}
-                            {/*                                <svg className="w-8 h-8 fill-current text-indigo-50"*/}
-                            {/*                                     viewBox="0 0 32 32">*/}
-                            {/*                                    <path*/}
-                            {/*                                        d="M8.994 20.006a1 1 0 0 1-.707-1.707l4.5-4.5a1 1 0 0 1 1.414 0l3.293 3.293 4.793-4.793a1 1 0 1 1 1.414 1.414l-5.5 5.5a1 1 0 0 1-1.414 0l-3.293-3.293L9.7 19.713a1 1 0 0 1-.707.293Z"/>*/}
-                            {/*                                </svg>*/}
-                            {/*                            </div>*/}
-                            {/*                            /!* Position *!/*/}
-                            {/*                            <div>*/}
-                            {/*                                <div className="font-medium text-slate-800">Product*/}
-                            {/*                                    Designer*/}
-                            {/*                                </div>*/}
-                            {/*                                <div*/}
-                            {/*                                    className="flex flex-nowrap items-center space-x-2 whitespace-nowrap">*/}
-                            {/*                                    <div>Milan, IT</div>*/}
-                            {/*                                    <div className="text-slate-400">·</div>*/}
-                            {/*                                    <div>April, 2018 - April 2020</div>*/}
-                            {/*                                </div>*/}
-                            {/*                            </div>*/}
-                            {/*                        </div>*/}
-                            {/*                        /!* Tags *!/*/}
-                            {/*                        <div className="sm:ml-2 mt-2 sm:mt-0">*/}
-                            {/*                            <ul className="flex flex-wrap sm:justify-end -m-1">*/}
-                            {/*                                <li className="m-1">*/}
-                            {/*                                    <button*/}
-                            {/*                                        className="inline-flex items-center justify-center text-xs font-medium leading-5 rounded-full px-2.5 py-0.5 border border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500 duration-150 ease-in-out">*/}
-                            {/*                                        Marketing*/}
-                            {/*                                    </button>*/}
-                            {/*                                </li>*/}
-                            {/*                                <li className="m-1">*/}
-                            {/*                                    <button*/}
-                            {/*                                        className="inline-flex items-center justify-center text-xs font-medium leading-5 rounded-full px-2.5 py-0.5 border border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500 duration-150 ease-in-out">*/}
-                            {/*                                        +4*/}
-                            {/*                                    </button>*/}
-                            {/*                                </li>*/}
-                            {/*                            </ul>*/}
-                            {/*                        </div>*/}
-                            {/*                    </li>*/}
-                            {/*                </ul>*/}
-                            {/*            </div>*/}
-                            {/*        </div>*/}
-                            {/*    </div>*/}
-
-                            {/*    /!* Sidebar *!/*/}
-                            {/*    <aside className="xl:min-w-56 xl:w-56 space-y-3">*/}
-                            {/*        <div className="text-sm">*/}
-                            {/*            <h3 className="font-medium text-slate-800">Title</h3>*/}
-                            {/*            <div>Senior Product Designer</div>*/}
-                            {/*        </div>*/}
-                            {/*        <div className="text-sm">*/}
-                            {/*            <h3 className="font-medium text-slate-800">Location</h3>*/}
-                            {/*            <div>Milan, IT - Remote</div>*/}
-                            {/*        </div>*/}
-                            {/*        <div className="text-sm">*/}
-                            {/*            <h3 className="font-medium text-slate-800">Email</h3>*/}
-                            {/*            <div>carolinmcneail@acme.com</div>*/}
-                            {/*        </div>*/}
-                            {/*        <div className="text-sm">*/}
-                            {/*            <h3 className="font-medium text-slate-800">Birthdate</h3>*/}
-                            {/*            <div>4 April, 1987</div>*/}
-                            {/*        </div>*/}
-                            {/*        <div className="text-sm">*/}
-                            {/*            <h3 className="font-medium text-slate-800">Joined Acme</h3>*/}
-                            {/*            <div>7 April, 2017</div>*/}
-                            {/*        </div>*/}
-                            {/*    </aside>*/}
-                            {/*</div>*/}
-
-                            <div className="space-y-4">
                                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                    <Form.Input
+                                    <Form.Input<UpdateProfileSchemaType>
                                         register={register}
-                                        fieldName={"name"}
+                                        fieldName={"user.name"}
                                         label="Họ và tên"
                                         placeholder={"Nhập họ và tên"}
+                                        errorMessage={errors?.user?.name?.message}
                                     />
-                                    <Form.Input
+                                    <Form.Input<UpdateProfileSchemaType>
                                         register={register}
-                                        fieldName={"phone"}
+                                        fieldName={"user.phone"}
                                         label="Số điện thoại"
                                         placeholder={"Nhập số điện thoại"}
+                                        errorMessage={errors?.user?.phone?.message}
                                     />
                                 </div>
 
-                                <Form.Input
+                                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                    <div>
+                                        <Form.Label label="Giới tính" />
+                                        <Controller
+                                            control={control}
+                                            name="gender"
+                                            render={({ field }) => (
+                                                <SelectBox<{
+                                                    label: string;
+                                                    value: boolean;
+                                                }>
+                                                    value={watch("gender") ? genderOptions.MALE : genderOptions.FEMALE}
+                                                    placeholder="Giới tính"
+                                                    onValueChange={(g) => {
+                                                        field.onChange(g.value);
+                                                    }}
+                                                    displayKey="label"
+                                                    dataSource={Object.values(genderOptions)}
+                                                    searchable={false}
+                                                />
+                                            )}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Form.Label label="Ngày sinh" />
+                                        <Controller
+                                            control={control}
+                                            name="dob"
+                                            render={({ field }) => {
+                                                return (
+                                                    <>
+                                                        <DateTimePickerModal
+                                                            showTime={false}
+                                                            value={field.value}
+                                                            title={
+                                                                "Ngày sinh"
+                                                            }
+                                                            isOpen={showDatePicker}
+                                                            onDismiss={() =>
+                                                                setShowDatePicker(
+                                                                    false,
+                                                                )
+                                                            }
+                                                            onClose={(date) => {
+                                                                if (date) {
+                                                                    field.onChange(
+                                                                        date,
+                                                                    );
+                                                                }
+                                                                setShowDatePicker(
+                                                                    false,
+                                                                );
+                                                            }}
+                                                        />
+                                                        <ErrorMessage>
+                                                            {errors?.dob?.message}
+                                                        </ErrorMessage>
 
+                                                        <Form.DateTimeInputField
+                                                            value={
+                                                                field.value
+                                                                    ? format(
+                                                                        field.value,
+                                                                        "dd/MM/yyyy",
+                                                                    )
+                                                                    : ""
+                                                            }
+                                                            onClick={() =>
+                                                                setShowDatePicker(
+                                                                    true,
+                                                                )
+                                                            }
+                                                        />
+                                                    </>
+                                                );
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <Form.Input<UpdateProfileSchemaType>
                                     register={register}
-                                    fieldName={"addressRequest.detail"}
+                                    fieldName={"user.addressRequest.detail"}
                                     label="Địa chỉ"
                                     placeholder={"Nhập địa chỉ"}
                                     isTextArea={true}
@@ -563,7 +483,7 @@ const Index: NextPageWithLayout = () => {
                                         <Form.Label label="Tỉnh / Thành phố" />
                                         <Controller
                                             control={control}
-                                            name="addressRequest.provinceCode"
+                                            name="user.addressRequest.provinceCode"
                                             render={({ field }) => (
                                                 <SelectBox<IProvince>
                                                     value={selectedProvince}
@@ -571,17 +491,17 @@ const Index: NextPageWithLayout = () => {
                                                     onValueChange={(p) => {
                                                         if (
                                                             p.code ===
-                                                            watch("addressRequest.provinceCode")
+                                                            watch("user.addressRequest.provinceCode")
                                                         )
                                                             return;
 
                                                         field.onChange(p.code);
                                                         setValue(
-                                                            "addressRequest.districtCode" as any,
+                                                            "user.addressRequest.districtCode" as any,
                                                             undefined,
                                                         );
                                                         setValue(
-                                                            "addressRequest.wardCode" as any,
+                                                            "user.addressRequest.wardCode" as any,
                                                             undefined,
                                                         );
                                                         handleProvinceChange(p);
@@ -597,7 +517,7 @@ const Index: NextPageWithLayout = () => {
                                         <Form.Label label="Quận / Huyện" />
                                         <Controller
                                             control={control}
-                                            name="addressRequest.districtCode"
+                                            name="user.addressRequest.districtCode"
                                             render={({ field }) => (
                                                 <SelectBox<IDistrict>
                                                     value={selectedDistrict}
@@ -605,12 +525,12 @@ const Index: NextPageWithLayout = () => {
                                                     onValueChange={(d) => {
                                                         if (
                                                             d.code ===
-                                                            watch("addressRequest.districtCode")
+                                                            watch("user.addressRequest.districtCode")
                                                         )
                                                             return;
                                                         field.onChange(d.code);
                                                         setValue(
-                                                            "addressRequest.wardCode" as any,
+                                                            "user.addressRequest.wardCode" as any,
                                                             undefined,
                                                         );
                                                         handleDistrictChange(d);
@@ -622,12 +542,11 @@ const Index: NextPageWithLayout = () => {
                                             )}
                                         />
                                     </div>
-
                                     <div>
                                         <Form.Label label="Phường / Xã" />
                                         <Controller
                                             control={control}
-                                            name="addressRequest.wardCode"
+                                            name="user.addressRequest.wardCode"
                                             render={({ field }) => (
                                                 <SelectBox<IWard>
                                                     value={selectedWard}
@@ -635,7 +554,7 @@ const Index: NextPageWithLayout = () => {
                                                     onValueChange={(w) => {
                                                         if (
                                                             w.code ===
-                                                            watch("addressRequest.wardCode")
+                                                            watch("user.addressRequest.wardCode")
                                                         )
                                                             return;
                                                         field.onChange(w.code);
@@ -648,25 +567,66 @@ const Index: NextPageWithLayout = () => {
                                             )}
                                         />
                                     </div>
+
                                 </div>
-                            </div>
+                                <div className="flex justify-end">
+                                    <button
+                                        disabled={isSubmitting}
+                                        type="submit"
+                                        className="ml-5 inline-flex justify-center rounded-md border border-transparent bg-indigo-700 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                    transition duration-150
+                    disabled:opacity-50"
+                                    >
+                                        {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
+                                    </button>
+                                </div>
+                            </form>
+
                         </Tab.Panel>
 
                         <Tab.Panel>
-                            {followingOrganizations?.data && followingOrganizations.data.length > 0 ? (
-                                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                                    {followingOrganizations.data.map((o) => (
-                                        <OrganizationCard
-                                            key={o.id}
-                                            organization={o}
-                                            onUnfollow={() => {
+                            <div className={"flex justify-end"}>
+                                <button
+                                    onClick={() => setShowOrgModal(true)}
+                                    className="m-btn bg-indigo-500 text-white">
 
-                                            }
-                                            }
-                                        />
+                                    Chọn tổ chức
+                                </button>
+                            </div>
+                            {isFollowingOrganizationsLoading && <div>Loading...</div>}
+                            {!isFollowingOrganizationsLoading && followingOrganizations?.organizations && followingOrganizations.organizations.length > 0 &&
+                                <div className={"grid grid-cols-1 gap-6 sm:grid-cols-3 mt-4"}>
+                                    {followingOrganizations.organizations.map((o) => (
+                                        <div key={o?.organization?.id}
+                                             className={"flex flex-col items-center justify-center rounded border p-4"}>
+                                            <Image src={o?.organization?.imageUrl
+                                                || getAvatarFromName(o?.organization?.name)
+                                            } alt={""} width={100} height={100}
+                                                   className={"rounded-full w-20 h-20 object-cover"}
+                                            />
+                                            <span
+                                                className={"mt-4 text-center font-medium"}>{o?.organization?.name}</span>
+                                            <div
+                                                className={"flex items-center text-gray-500 gap-2 justify-center mt-4"}>
+                                                <BiUser />
+                                                <span className={"text-gray-500 text-sm text-center"}>{o?.total} người thuộc tổ chức</span>
+                                            </div>
+
+                                            {/*Unfollow button*/}
+                                            <button
+                                                onClick={async () => {
+                                                    if (o?.organization) {
+                                                        await onUnfollowOrganization(o?.organization);
+                                                    }
+                                                }}
+                                                className="m-btn bg-red-50 text-red-500 mt-4">
+                                                Bỏ theo dõi
+                                            </button>
+                                        </div>
                                     ))}
-                                </div>
-                            ) : (
+                                </div>}
+
+                            {!isFollowingOrganizationsLoading && (followingOrganizations === null) && (
                                 <div className="flex flex-col items-center justify-center w-full h-full">
                                     <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}
                                                 customMessage={"Bạn chưa theo dõi tổ chức nào"}
@@ -675,7 +635,54 @@ const Index: NextPageWithLayout = () => {
                             )}
                         </Tab.Panel>
                         <Tab.Panel>
-                            456
+                            <div className={"flex justify-end"}>
+                                <button
+                                    onClick={() => setShowGroupModal(true)}
+                                    className="m-btn bg-indigo-500 text-white">
+
+                                    Thêm mới
+                                </button>
+                            </div>
+                            {isFollowingGroupsLoading && <div>Loading...</div>}
+                            {!isFollowingGroupsLoading && followingGroups?.groups && followingGroups.groups.length > 0 &&
+                                <div className={"grid grid-cols-1 gap-6 sm:grid-cols-3"}>
+                                    {followingGroups.groups.map((group) => (
+                                        <div key={group?.group?.id}
+                                             className={"flex flex-col items-center justify-center rounded border p-4"}>
+                                            <Image src={getAvatarFromName(group?.group?.name)
+                                            } alt={""} width={100} height={100}
+                                                   className={"rounded-full w-20 h-20 object-cover"}
+                                            />
+                                            <span className={"mt-4 text-center font-medium"}>{group?.group?.name}</span>
+
+                                             <div
+                                                className={"flex items-center text-gray-500 gap-2 justify-center mt-4"}>
+                                                <BiUser />
+                                                <span className={"text-gray-500 text-sm text-center"}>{group?.total} người tham gia nhóm</span>
+                                            </div>
+
+                                            {/*Unfollow button*/}
+                                            <button
+                                                onClick={async () => {
+                                                    if (group) {
+                                                        await onUnfollowGroup(group?.group);
+                                                    }
+                                                }
+                                                }
+                                                className="m-btn bg-red-50 text-red-500 mt-4">
+                                                Bỏ theo dõi
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>}
+
+                            {!isFollowingGroupsLoading && (followingGroups === null) && (
+                                <div className="flex flex-col items-center justify-center w-full h-full">
+                                    <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}
+                                                customMessage={"Bạn chưa theo dõi nhóm nào"}
+                                    />
+                                </div>
+                            )}
                         </Tab.Panel>
 
                     </Tab.Panels>
@@ -689,17 +696,34 @@ const Index: NextPageWithLayout = () => {
                         123
                     </div>
                 </TransitionModal>
+
+                <FollowOrganizationModal isOpen={showOrgModal}
+                                         onClose={() => setShowOrgModal(false)}
+                                         followedOrganizationIds={followingOrganizations?.organizations?.map(o => o?.organization?.id) || []}
+                />
+
             </div>
+
+            <FollowGroupModal isOpen={showGroupModal}
+                              onClose={() => setShowGroupModal(false)}
+                              followedGroupIds={followingGroups?.groups?.map(g => g?.group?.id) || []}
+            />
+
+            <pre>
+                {JSON.stringify(watch(), null, 2)}
+            </pre>
         </div>
     );
 };
 
-Index.getLayout = function getLayout(page: ReactElement) {
-    return <CustomerLayout>
-        <AdminSettingsLayout childrenWrapperClassName={"lg:col-span-9"}>
-            {page}
-        </AdminSettingsLayout>
-    </CustomerLayout>;
+CustomerProfilePage.getLayout = function getLayout(page: ReactElement) {
+    return (
+        <CustomerLayout>
+            <CustomerSettingsLayout>
+                {page}
+            </CustomerSettingsLayout>
+        </CustomerLayout>
+    );
 };
 
-export default Index;
+export default CustomerProfilePage;

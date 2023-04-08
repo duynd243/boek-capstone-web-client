@@ -20,7 +20,6 @@ const CustomerHomePage: NextPageWithLayout = () => {
     );
     return (
         <div className={"space-y-6"}>
-            <button onClick={logOut}>Logout</button>
 
             {data?.hierarchicalCustomerCampaigns?.map((hcc, index) => (
                 <div key={index} className={""}>

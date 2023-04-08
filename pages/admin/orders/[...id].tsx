@@ -43,64 +43,13 @@ const AdminOrderDetailsPage: NextPageWithLayout = () => {
                     <div>
                         <SectionHeader label={"Danh sách sản phẩm"} />
                         {/* Cart items */}
-                        <div className={"grid grid-cols-2 gap-4"}>
+                        <div className={"grid md:grid-cols-2 gap-4"}>
                             {/* Cart item */}
                             {order?.orderDetails?.map((item) => <OrderItem orderItem={item}
                                                                            key={item?.id} />)}
                         </div>
                         {/* Fees, discount and total */}
-                        <ul>
-                            <li className="flex items-center justify-between border-b border-slate-200 py-3">
-                                <div className="text-sm">Tạm tính</div>
-                                <div
-                                    className="ml-2 text-sm font-medium text-slate-800">
-                                    {new Intl.NumberFormat("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                    }).format(
-                                        order?.subTotal || 0,
-                                    )}
-                                </div>
-                            </li>
-                            <li className="flex items-center justify-between border-b border-slate-200 py-3">
-                                <div className="text-sm">
-                                    <span className={"mr-2"}>Phí vận chuyển</span>
-                                    <span
-                                        className="inline-flex whitespace-nowrap rounded-full bg-slate-200 px-2.5 py-1 text-center text-xs font-medium uppercase text-slate-500">
-                                      Nội thành
-                                    </span></div>
-                                <div
-                                    className="ml-2 text-sm font-medium text-slate-800">
-                                    {new Intl.NumberFormat("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                    }).format(order?.freight || 0)}
-                                </div>
-                            </li>
 
-                            <li className="flex items-center justify-between border-b border-slate-200 py-3">
-                                <div className="text-sm">
-                                    <span className={"mr-2"}>Giảm giá</span>
-
-                                </div>
-                                <div
-                                    className="ml-2 text-sm font-medium text-slate-800">
-                                    {new Intl.NumberFormat("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                    }).format(order?.discountTotal || 0)}
-                                </div>
-                            </li>
-                            <li className="flex items-center justify-between border-b border-slate-200 py-3">
-                                <div className="font-medium">Tổng tiền</div>
-                                <div className="ml-2 font-medium text-emerald-600">
-                                    {new Intl.NumberFormat("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                    }).format(order?.total || 0)}
-                                </div>
-                            </li>
-                        </ul>
                     </div>
 
                     {/* Payment Details */}
@@ -192,6 +141,62 @@ const AdminOrderDetailsPage: NextPageWithLayout = () => {
                         {/*}*/}
 
                     </div>
+                    <ul>
+                        <li className="flex items-center justify-between border-b border-slate-200 py-3">
+                            <div className="text-sm">Tạm tính</div>
+                            <div
+                                className="ml-2 text-sm font-medium text-slate-800">
+                                {new Intl.NumberFormat("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                }).format(
+                                    order?.subTotal || 0,
+                                )}
+                            </div>
+                        </li>
+                        <li className="flex items-center justify-between border-b border-slate-200 py-3">
+                            <div className="text-sm">
+                                <span className={"mr-2"}>Phí vận chuyển</span>
+                                {(order?.freightName && order?.freight && order?.freight > 0) ? (
+                                    <span
+                                        className="inline-flex whitespace-nowrap rounded-full bg-slate-200 px-2.5 py-1 text-center text-xs font-medium uppercase text-slate-500">
+                                      {order?.freightName}
+                                    </span>
+                                ) : null}
+                            </div>
+                            <div
+                                className="ml-2 text-sm font-medium text-slate-800">
+                                {new Intl.NumberFormat("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                }).format(order?.freight || 0)}
+                            </div>
+                        </li>
+
+                        <li className="flex items-center justify-between border-b border-slate-200 py-3">
+                            <div className="text-sm">
+                                <span className={"mr-2"}>Giảm giá</span>
+
+                            </div>
+                            <div
+                                className="ml-2 text-sm font-medium text-slate-800">
+                                {new Intl.NumberFormat("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                }).format(order?.discountTotal || 0)}
+                            </div>
+                        </li>
+                        <li className="flex items-center justify-between border-b border-slate-200 py-3">
+                            <div className="font-medium">Tổng tiền</div>
+                            <div className="ml-2 font-medium text-emerald-600">
+                                {new Intl.NumberFormat("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                }).format(order?.total || 0)}
+                            </div>
+                        </li>
+                    </ul>
+
 
                     {/*{loginUser?.role === Roles.ISSUER.id &&*/}
                     {/*    <>*/}

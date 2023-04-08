@@ -1,17 +1,17 @@
 import Link from "next/link";
-import {useRouter} from "next/router";
-import React, {useMemo} from "react";
-import {findRole} from "../../constants/Roles";
-import {useAuth} from "../../context/AuthContext";
+import { useRouter } from "next/router";
+import React, { useMemo } from "react";
+import { findRole } from "../../constants/Roles";
+import { useAuth } from "../../context/AuthContext";
 
 type Props = {
     children: React.ReactNode;
     childrenWrapperClassName?: string;
 };
 
-const AdminSettingsLayout = ({children, childrenWrapperClassName}: Props) => {
+const AdminSettingsLayout = ({ children, childrenWrapperClassName }: Props) => {
     const router = useRouter();
-    const {loginUser} = useAuth();
+    const { loginUser } = useAuth();
     const menus = useMemo(() => {
         return findRole(loginUser?.role)?.settingsMenus || [];
     }, [loginUser]);
@@ -56,7 +56,7 @@ const AdminSettingsLayout = ({children, childrenWrapperClassName}: Props) => {
                             </nav>
                         </aside>
 
-                        <div className={childrenWrapperClassName || 'py-6 px-4 sm:p-6 lg:col-span-9'}>
+                        <div className={childrenWrapperClassName || "py-6 px-4 sm:p-6 lg:col-span-9"}>
                             {children}
                         </div>
                     </div>

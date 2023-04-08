@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import AdminHeader from "../Header/AdminHeader";
 import AdminSidebar from "../Sidebar/AdminSidebar";
+import { SignalRContext } from "../ProtectedRouteWrapper";
+import { toast } from "react-hot-toast";
 
 type Props = {
     children: React.ReactElement;
@@ -15,6 +17,16 @@ const AdminLayout: React.FC<Props> = ({ children, containerClassName, bgClassNam
         isSidebarOpen,
         setIsSidebarOpen,
     };
+
+    SignalRContext.useSignalREffect("ReceiveMess",
+        (NotificationType, NotificationTypeName, Status, StatusName, Message) => {
+            toast.success(`Bạn có thông báo mới!
+        Nội dung: ${Message}`,{
+                icon: "📩",
+                duration: 10000,
+            });
+        },
+        []);
 
     return (
         <div className="flex h-screen overflow-hidden">

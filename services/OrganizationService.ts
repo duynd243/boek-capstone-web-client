@@ -1,6 +1,7 @@
 import { BaseService } from "./BaseService";
 import { IBaseListResponse } from "../types/Commons/IBaseListResponse";
 import { IOrganization } from "../types/Organization/IOrganization";
+import { ICustomerOrganization } from "../types/Customer_Organization/ICustomerOrganization";
 
 
 export type UpdateOrganizationParams = Required<Pick<IOrganization, "id">> & Partial<IOrganization>;
@@ -13,6 +14,19 @@ export class OrganizationService extends BaseService {
         >("/organizations", {
             params,
         });
+        return response.data;
+    };
+
+    getAllOrganizations = async (params?: any) => {
+        const response = await this.getOrganizations(params);
+        const { data, metadata: { total } } = response;
+        if (data.length < total) {
+            const newResponse = await this.getOrganizations({
+                ...params,
+                size: total,
+            });
+            return newResponse.data;
+        }
         return response.data;
     };
 
@@ -40,11 +54,28 @@ export class OrganizationService extends BaseService {
     };
 
     getFollowingOrganizationsByCustomer = async (params?: any) => {
-        const response = await this.axiosClient.get<
-            IBaseListResponse<IOrganization>
-        >("/organizations/customer", {
+        const response = await this.axiosClient.get<ICustomerOrganization>("/organizations/customer", {
             params,
         });
+        if (response.status === 204) {
+            return null;
+        }
+        return response.data;
+    };
+
+    followOrganization = async (id: number) => {
+        const response = await this.axiosClient.post<IOrganization>(
+            `/organizations/customer`, {
+                organizationId: id,
+            },
+        );
+        return response.data;
+    };
+
+    unfollowOrganization = async (id: number) => {
+        const response = await this.axiosClient.delete<IOrganization>(
+            `/organizations/customer/${id}`,
+        );
         return response.data;
     };
 }

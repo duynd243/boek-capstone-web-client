@@ -1,9 +1,9 @@
-import {IParticipant} from "./../Participant/IParticipant";
-import {ICampaignLevel} from "./../Campaign_Level/ICampaignLevel";
-import {ICampaignGroup} from "./../Campaign_Group/ICampaignGroup";
+import {IParticipant} from "../Participant/IParticipant";
+import {ICampaignLevel} from "../Campaign_Level/ICampaignLevel";
+import {ICampaignGroup} from "../Campaign_Group/ICampaignGroup";
 import {ICampaignOrganization} from "../Campaign_Organization/ICampaignOrganization";
 import {ICampaignCommission} from "../Campaign_Commission/ICampaignCommission";
-import {IAddress} from "./../Address/IAddress";
+import {IAddress} from "../Address/IAddress";
 
 export interface ICampaign {
     id: number;

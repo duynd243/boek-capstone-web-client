@@ -13,6 +13,7 @@ export interface IOrderDetail {
     withPdf?: boolean;
     withAudio?: boolean;
     bookProduct?: IBookProduct;
+    subTotal?: number;
 }
 
 export interface IOrder {
@@ -26,6 +27,7 @@ export interface IOrder {
     customerEmail?: string;
     address?: string;
     freight?: number;
+    freightName?: string;
     payment?: number;
     paymentName?: string;
     type?: number;

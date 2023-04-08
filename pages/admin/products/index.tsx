@@ -14,7 +14,6 @@ import TableHeading from "../../../components/Admin/Table/TableHeading";
 import TableHeader from "../../../components/Admin/Table/TableHeader";
 import TableBody from "../../../components/Admin/Table/TableBody";
 import TableFooter from "../../../components/Admin/Table/TableFooter";
-import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import { useRouter } from "next/router";
 import { BookProductService } from "../../../services/BookProductService";
 import { CampaignStatuses } from "../../../constants/CampaignStatuses";
@@ -24,7 +23,12 @@ import Image from "next/image";
 import { isValidImageSrc } from "../../../utils/helper";
 import Link from "next/link";
 import DefaultAvatar from "../../../assets/images/default-avatar.png";
+import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import TableRowSkeleton from "../../../components/Admin/Table/TableRowSkeleton";
+import { CampaignService } from "../../../services/CampaignService";
+import { Roles } from "../../../constants/Roles";
+import SelectBox from "../../../components/SelectBox";
+import { ICampaign } from "../../../types/Campaign/ICampaign";
 
 const BookProductTabs = [
     BookProductStatuses.Pending,
@@ -48,6 +52,23 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
 
     const { loginUser } = useAuth();
     const bookProductService = new BookProductService(loginUser?.accessToken);
+    const campaignService = new CampaignService(loginUser?.accessToken);
+
+    const { data: campaigns, isInitialLoading: isCampaignsLoading } = useQuery(
+        [loginUser?.role === Roles.SYSTEM.id ? "admin_campaigns" : "issuer_campaigns"],
+        loginUser?.role === Roles.SYSTEM.id ?
+            () => campaignService.getCampaignsByAdmin({
+                size: 100,
+                sort: "CreatedDate desc, UpdatedDate desc",
+            })
+            :
+            () => campaignService.getCampaignsByCustomer({
+                size: 100,
+                sort: "CreatedDate desc, UpdatedDate desc",
+            }),
+    );
+    const campaignIdFromUrl = router.query["campaign"] as string;
+    const [campaignId, setCampaignId] = useState<number | null>(Number(campaignIdFromUrl) || null);
 
     const [status, setStatus] = useState(BookProductTabs[0].id);
     const [notSaleStatus, setNotSaleStatus] = useState(NotSaleStatusTabs[0].id);
@@ -78,12 +99,14 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
         status: status === "Stopped" ? notSaleStatus : status,
         sort: "CreatedDate desc, UpdatedDate desc",
         "Campaign.Status": status === BookProductStatuses.Pending.id ? CampaignStatuses.NOT_STARTED.id : undefined,
+        campaignId: campaignId || undefined,
     };
 
     const {
         data: productData,
         isLoading,
         isFetching,
+        isInitialLoading,
     } = useQuery(
         ["admin_products", params],
         () =>
@@ -99,9 +122,9 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
                 />
             </PageHeading>
 
-            <div className="bg-white px-4 md:px-6 rounded">
-                <Tab.Group>
-                    <div className="pt-2 border-gray-200">
+            <div className="bg-white rounded mb-3">
+                <div className="border-b px-4 border-gray-200 flex items-center justify-between">
+                    <Tab.Group>
                         <ul className="flex flex-wrap gap-2">
                             {BookProductTabs.map((tab) => (
                                 <Tab
@@ -111,17 +134,44 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
                                     key={tab.id}
                                 >
                                     <div
-                                        className="cursor-pointer ui-selected:border-indigo-500 ui-selected:text-indigo-600 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
+                                        className="cursor-pointer ui-selected:border-indigo-500 ui-selected:text-indigo-600 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-4 border-b-2 font-medium text-sm">
                                         {tab.displayName}
                                     </div>
                                 </Tab>
                             ))}
                         </ul>
+                    </Tab.Group>
+
+                    <div className={"w-72"}>
+                        <SelectBox<Partial<ICampaign>>
+                            value={
+                                campaigns?.data?.find((c) => c?.id === campaignId) || null
+                            }
+                            placeholder={isCampaignsLoading ? "Đang tải..." : "Tất cả hội sách"}
+                            dataSource={[{
+                                id: undefined,
+                                name: "Tất cả hội sách",
+                            }, ...campaigns?.data || []]}
+                            onValueChange={async (c) => {
+                                if (c) {
+                                    if (c?.id === campaignId) return;
+                                    setCampaignId(c?.id || null);
+                                    await router.push({
+                                        pathname: router.pathname,
+                                        query: {
+                                            ...router.query,
+                                            "campaign": c?.id,
+                                        },
+                                    });
+                                }
+                            }}
+                            disabled={isCampaignsLoading}
+                            displayKey={"name"} />
                     </div>
-                </Tab.Group>
+                </div>
                 {status === "Stopped" &&
                     <Tab.Group>
-                        <div className="py-6">
+                        <div className="py-6 px-4">
                             <ul className="flex flex-wrap gap-2">
                                 {NotSaleStatusTabs.map((tab) => (
                                     <Tab
@@ -152,22 +202,25 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
 
             </div>
             <div className="mt-3">
-                {productData?.data && productData?.data?.length > 0 ? (
-                        <TableWrapper>
-                            <TableHeading>
-                                <TableHeader>Tên sách</TableHeader>
-                                <TableHeader>Giá bán</TableHeader>
-                                <TableHeader>Được tạo bởi</TableHeader>
-                                <TableHeader>Hội sách</TableHeader>
-                                <TableHeader>Loại sách</TableHeader>
-                                <TableHeader textAlignment="text-center">Trạng thái</TableHeader>
-                                <TableHeader>
-                                    <span className="sr-only">Edit</span>
-                                </TableHeader>
-                            </TableHeading>
-                            <TableBody>
-                                <TableRowSkeleton numberOfColumns={7} />
-                                {productData?.data?.map((book) => {
+                <TableWrapper>
+                    <TableHeading>
+                        <TableHeader>Tên sách</TableHeader>
+                        <TableHeader>Giá bán</TableHeader>
+                        <TableHeader>Được tạo bởi</TableHeader>
+                        <TableHeader>Hội sách</TableHeader>
+                        <TableHeader>Loại sách</TableHeader>
+                        <TableHeader textAlignment="text-center">Trạng thái</TableHeader>
+                        <TableHeader>
+                            <span className="sr-only">Edit</span>
+                        </TableHeader>
+                    </TableHeading>
+                    <TableBody>
+                        {isInitialLoading
+                            ? new Array(8).fill(0).map((_, index) => (
+                                <TableRowSkeleton numberOfColumns={7} key={index} />
+                            ))
+                            : productData?.data && productData?.data?.length > 0 ?
+                                productData?.data?.map((book) => {
                                     const bookType = getBookTypeById(book?.type);
                                     const bookStatus = getBookProductStatusById(book?.status);
 
@@ -175,7 +228,8 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
                                         <tr key={book?.id}>
 
                                             <TableData className="max-w-72">
-                                                <div title={book?.title} className="flex items-center gap-4 w-72 truncate">
+                                                <div title={book?.title}
+                                                     className="flex items-center gap-4 w-72 truncate">
                                                     <Image
                                                         width={500}
                                                         height={500}
@@ -244,34 +298,23 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
                                             </TableData>
                                         </tr>
                                     );
-                                })}
-
-                            </TableBody>
-                            <TableFooter
-                                colSpan={10}
-                                size={size}
-                                onSizeChange={onSizeChange}
-                                page={page}
-                                onPageChange={setPage}
-                                totalPages={productData?.metadata?.total || 0}
-                                pageSizeOptions={pageSizeOptions}
-                            />
-                        </TableWrapper>
-                    )
-                    :
-                    (<div className="pt-8">
-                        {search ? (
-                            <EmptyState
-                                keyword={search}
-                                status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
-                            />
-                        ) : (
-                            <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}
-                                        customMessage={"Không có sách nào ở trạng thái này"}
-                            />
-                        )}
-                    </div>)
-                }
+                                })
+                                : <td colSpan={7} className="py-12">
+                                    {search ? <EmptyState status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND} /> :
+                                        <EmptyState status={EMPTY_STATE_TYPE.NO_DATA} />}
+                                </td>
+                        }
+                    </TableBody>
+                    {productData?.data && productData?.data?.length > 0 && <TableFooter
+                        colSpan={10}
+                        size={size}
+                        onSizeChange={onSizeChange}
+                        page={page}
+                        onPageChange={setPage}
+                        totalPages={productData?.metadata?.total || 0}
+                        pageSizeOptions={pageSizeOptions}
+                    />}
+                </TableWrapper>
             </div>
         </Fragment>
     );

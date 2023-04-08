@@ -25,7 +25,9 @@ const BookItemsSection: React.FC<Props> = ({}) => {
                         className="w-full flex bg-gray-50 shadow-sm overflow-hidden border rounded">
                         {/* Image */}
                         <Image
-                            src={bi?.book?.imageUrl || "https://scontent.fsgn5-12.fna.fbcdn.net/v/t39.30808-6/320423417_1188427822092521_4974823010366772211_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=RnHGA8v9O90AX-p_Pon&_nc_ht=scontent.fsgn5-12.fna&oh=00_AfBKcUg0nUkCMkU_Prv-HR7hbDE1bfENmDGnJZDfyAlDvg&oe=64293699"}
+                            src={bi?.book?.imageUrl ||
+                                ""
+                            }
                             alt={""} width={500} height={500}
                             className={"w-40 object-cover"}
                         />

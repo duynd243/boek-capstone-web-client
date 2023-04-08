@@ -1,22 +1,21 @@
-import React, {Fragment, useEffect, useState} from "react";
-import {useAuth} from "../context/AuthContext";
-import {useRouter} from "next/router";
-import {IProtectedRoute} from "../constants/ProtectedRoutes";
-import {findRole} from "../constants/Roles";
-import * as signalR from "@microsoft/signalr";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useRouter } from "next/router";
+import { IProtectedRoute } from "../constants/ProtectedRoutes";
+import { findRole } from "../constants/Roles";
 
+import { createSignalRContext } from "react-signalr";
+
+export const SignalRContext = createSignalRContext();
 type Props = {
     routeData: IProtectedRoute;
     children: React.ReactNode;
 };
 
-const ProtectedRouteWrapper: React.FC<Props> = ({children, routeData}) => {
+const ProtectedRouteWrapper: React.FC<Props> = ({ children, routeData }) => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const {loginUser} = useAuth();
+    const { loginUser } = useAuth();
     const router = useRouter();
-
-
-
 
     useEffect(() => {
         (async () => {
@@ -32,7 +31,12 @@ const ProtectedRouteWrapper: React.FC<Props> = ({children, routeData}) => {
         })();
     }, [loginUser, routeData.allowedRoleIDs, router]);
 
-    return <Fragment>{!isLoading && children}</Fragment>;
+    return <SignalRContext.Provider
+        connectEnabled={!!loginUser?.accessToken}
+        accessTokenFactory={() => loginUser?.accessToken ?? ""}
+        dependencies={[loginUser]}
+        url={"https://server.boek.live/notificationHub"}
+    >{!isLoading && children}</SignalRContext.Provider>;
 };
 
 export default ProtectedRouteWrapper;

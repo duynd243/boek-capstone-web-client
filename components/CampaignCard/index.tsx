@@ -12,6 +12,8 @@ import FormatCard from "./FormatCard";
 import IssuerHoverCard from "../IssuerHoverCard";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { CampaignFormats } from "../../constants/CampaignFormats";
+import { CampaignStatuses, getCampaignStatusById } from "../../constants/CampaignStatuses";
 
 
 type Props = {
@@ -20,6 +22,8 @@ type Props = {
 };
 
 const CampaignCard: React.FC<Props> = ({ campaign, horizontalOnly = false }) => {
+
+    const campaignStatus = useMemo(() => getCampaignStatusById(campaign?.status), [campaign]);
 
     const issuerAvatars = useMemo(() => {
         return (
@@ -71,6 +75,19 @@ const CampaignCard: React.FC<Props> = ({ campaign, horizontalOnly = false }) => 
             //href={`campaigns/${campaign?.id}`}
             className={`relative border shadow rounded overflow-hidden flex flex-col ${horizontalOnly ? "" : "xl:flex-row"}`}
         >
+            {/*<div className={'absolute top-0 left-0 z-10 text-white bg-green-500'}>*/}
+            {/*    Something*/}
+            {/*</div>*/}
+
+            <div
+                className="absolute top-2 left-2 z-10 bg-white text-gray-800 m-btn-xs !rounded-full">
+                <span
+                    className={`mr-2 inline-block h-2 w-2 rounded-full bg-${campaignStatus?.statusColor || "slate"}-500 ${campaign?.status === CampaignStatuses.STARTING.id ? "animate-bounce" : ""}`}
+                />
+                {campaignStatus?.displayName}
+            </div>
+
+
             <Link href={href}
                   className={`w-full h-48 ${horizontalOnly ? "" : "xl:h-auto xl:w-52"}`}>
                 <Image
@@ -85,6 +102,7 @@ const CampaignCard: React.FC<Props> = ({ campaign, horizontalOnly = false }) => 
             {/* Info */}
             <div className="p-4 flex-1 min-w-0 flex flex-col">
                 <div className="flex-1 min-w-0">
+
                     {/* Time */}
                     <div
                         className="flex text-blue-600 items-center gap-1.5 text-sm font-medium uppercase tracking-wide ">
@@ -147,7 +165,7 @@ const CampaignCard: React.FC<Props> = ({ campaign, horizontalOnly = false }) => 
                             title={campaign?.address}
                             className={metadataItemClassName.value}
                         >
-                            {campaign?.address || "Chưa có thông tin"}
+                            {campaign?.format === CampaignFormats.OFFLINE.id ? (campaign?.address || "Chưa có thông tin") : "Tổ chức trực tuyến"}
                         </span>
                     </div>
                     <div

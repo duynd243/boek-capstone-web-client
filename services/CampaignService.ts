@@ -3,6 +3,10 @@ import { BaseService } from "./BaseService";
 import { ICampaign } from "../types/Campaign/ICampaign";
 import { IBaseListResponse } from "../types/Commons/IBaseListResponse";
 import { ICampaignHomepage } from "../types/Campaign/ICampainHomepage";
+import { ICustomerCampaign } from "../types/Campaign/ICustomerCampaign";
+
+
+export type GetCampaignsParams = IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean };
 
 export class CampaignService extends BaseService {
     createCampaign = async (payload: any) => {
@@ -48,7 +52,7 @@ export class CampaignService extends BaseService {
 
     getCampaignByIdByAdmin = async (
         id: number,
-        params?: IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean },
+        params?: GetCampaignsParams,
     ) => {
         const response = await this.axiosClient.get<ICampaign>(
             `/admin/campaigns/${id}`,
@@ -61,7 +65,7 @@ export class CampaignService extends BaseService {
 
     getCampaignByIdByIssuer = async (
         id: number,
-        params?: IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean },
+        params?: GetCampaignsParams,
     ) => {
         const response = await this.axiosClient.get<ICampaign>(
             `/issuer/campaigns/${id}`,
@@ -72,8 +76,21 @@ export class CampaignService extends BaseService {
         return response.data;
     };
 
+    getCampaignByIdByCustomer = async (
+        id: number,
+        params?: IBaseRequestParams<ICustomerCampaign>,
+    ) => {
+        const response = await this.axiosClient.get<ICustomerCampaign>(
+            `/campaigns/customer/${id}`,
+            {
+                params,
+            },
+        );
+        return response.data;
+    };
+
     getCampaignsByAdmin = async (
-        params?: IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean },
+        params?: GetCampaignsParams,
     ) => {
         const response = await this.axiosClient.get<
             IBaseListResponse<ICampaign>
@@ -84,7 +101,7 @@ export class CampaignService extends BaseService {
     };
 
     getCampaignsByCustomer = async (
-        params?: IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean },
+        params?: any,
     ) => {
         const response = await this.axiosClient.get<
             IBaseListResponse<ICampaign>
@@ -94,9 +111,24 @@ export class CampaignService extends BaseService {
         return response.data;
     };
 
+    getAllCampaignsByCustomer = async (
+        params?: GetCampaignsParams,
+    ) => {
+        const response = await this.getCampaignsByCustomer(params);
+        const { data, metadata: { total } } = response;
+        if (data.length < total) {
+            const newResponse = await this.getCampaignsByCustomer({
+                ...params,
+                size: total,
+            });
+            return newResponse.data;
+        }
+        return data;
+    };
+
 
     getCampaignsByIssuer = async (
-        params?: IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean },
+        params?: GetCampaignsParams,
     ) => {
         const response = await this.axiosClient.get<
             IBaseListResponse<ICampaign>
@@ -107,7 +139,7 @@ export class CampaignService extends BaseService {
     };
 
     getOtherCampaignsByIssuer = async (
-        params?: IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean },
+        params?: GetCampaignsParams,
     ) => {
         const response = await this.axiosClient.get<
             IBaseListResponse<ICampaign>
@@ -163,7 +195,7 @@ export class CampaignService extends BaseService {
         const response = await this.axiosClient.get<ICampaignHomepage>(
             `/campaigns/customer/home-page`, {
                 params,
-            }
+            },
         );
         return response.data;
     };

@@ -104,7 +104,9 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
                     return;
                 }
                 console.log("Login User: ", data);
-                setLoginUser(data);
+                setLoginUser({
+                    ...data,
+                });
                 toast.success("Đăng nhập thành công");
             } catch (err: any) {
                 if (err?.code === 404) {
