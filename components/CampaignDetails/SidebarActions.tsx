@@ -26,30 +26,30 @@ const primaryBtn = "m-btn bg-indigo-500 text-white w-full";
 const secondaryBtn = "m-btn bg-white !border-slate-200 !shadow text-slate-600 w-full border bg-slate-50";
 const CREATE_BOOK_BUTTONS = [
     {
-        label: "Thêm Sách Lẻ",
-        description: "Thêm sách lẻ vào hội sách",
-        href: "books/add-book",
-        icon: GiBookCover,
+      label: "Sách Lẻ",
+      description: "Thêm sách lẻ vào hội sách",
+      href: "books/add-book",
+      icon: GiBookCover,
     },
     {
-        label: "Thêm Sách Combo",
-        description: "Thêm sách combo vào hội sách",
-        href: "books/add-combo",
-        icon: GiBookPile,
+      label: "Sách Combo",
+      description: "Thêm sách combo vào hội sách",
+      href: "books/add-combo",
+      icon: GiBookPile,
     },
     {
-        label: "Thêm Sách Combo Cũ",
+        label: "Sách Combo Cũ",
         description: "Thêm sách combo cũ vào hội sách",
         href: "books/add-old-combo",
         icon: GiBookPile,
-    },
+      },
     {
-        label: "Sách Series",
-        description: "Thêm sách series vào hội sách",
-        href: "books/add-series",
-        icon: GiBookmarklet,
+      label: "Sách Series",
+      description: "Thêm sách series vào hội sách",
+      href: "books/add-series",
+      icon: GiBookmarklet,
     },
-];
+  ];
 const SidebarActions: React.FC<Props> = ({}) => {
     const { loginUser } = useAuth();
     const router = useRouter();

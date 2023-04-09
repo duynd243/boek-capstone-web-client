@@ -9,15 +9,15 @@ export type UpdateAuthorParams = Required<Pick<IAuthor, "id" | "name">> &
 export type CreateAuthorParams = Omit<UpdateAuthorParams, "id">;
 
 export class AuthorService extends BaseService {
-    getAuthorsByAdmin = async (params?: IBaseRequestParams<IAuthor>) => {
-        const response = await this.axiosClient.get<IBaseListResponse<IAuthor>>(
-            "/admin/authors",
-            {
-                params,
-            },
-        );
-        return response.data;
-    };
+    // getAuthorsByAdmin = async (params?: IBaseRequestParams<IAuthor>) => {
+    //     const response = await this.axiosClient.get<IBaseListResponse<IAuthor>>(
+    //         "/admin/authors",
+    //         {
+    //             params,
+    //         },
+    //     );
+    //     return response.data;
+    // };
 
     getAuthors = async (params?: IBaseRequestParams<IAuthor>) => {
         const response = await this.axiosClient.get<IBaseListResponse<IAuthor>>(

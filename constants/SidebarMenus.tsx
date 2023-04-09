@@ -1,3 +1,4 @@
+
 import React from "react";
 
 import {
@@ -266,9 +267,24 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                 icon: <MdContactMail />,
             },
             {
+                name: "Sách bán",
+                path: "/issuer/products",
+                icon: <MdBook />,
+            },
+            {
                 name: "Đơn hàng",
-                path: "/issuer/orders",
+                path: "issuer/orders",
                 icon: <BsFillFileEarmarkMedicalFill />,
+                subMenus: [
+                    {
+                        name: "Đơn giao",
+                        path: "/issuer/orders/delivery",
+                    },
+                    {
+                        name: "Đơn tại quầy",
+                        path: "/issuer/orders/pickup",
+                    },
+                ]
             },
         ],
     },
@@ -280,21 +296,21 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                 path: "/issuer/books",
                 icon: <ImBook />,
             },
-            {
-                name: "Nhà xuất bản",
-                path: "/admin/publishers",
-                icon: <BsPrinterFill />,
-            },
-            {
-                name: "Tác giả",
-                path: "/admin/authors",
-                icon: <BsFillPenFill />,
-            },
-            {
-                name: "Thể loại sách",
-                path: "/admin/categories",
-                icon: <BsFillTagsFill />,
-            },
+            // {
+            //     name: "Nhà xuất bản",
+            //     path: "/admin/publishers",
+            //     icon: <BsPrinterFill />,
+            // },
+            // {
+            //     name: "Tác giả",
+            //     path: "/admin/authors",
+            //     icon: <BsFillPenFill />,
+            // },
+            // {
+            //     name: "Thể loại sách",
+            //     path: "/admin/categories",
+            //     icon: <BsFillTagsFill />,
+            // },
             {
                 name: "Cài đặt",
                 path: "/issuer/settings/profile",

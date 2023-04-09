@@ -37,15 +37,21 @@ const CancelOrderModal: React.FC<Props> = ({maxWidth, isOpen, order, onClose}) =
                     onClose={handleOnClose}
                     showCloseButton={true}
                 />
-                <div className="py-4 px-5">
-                    <Modal.FormInputOld
+                <div className="py-4 px-5 overflow-hidden rounded-xl">
+                    {/* <Modal.FormInputOld
                         isTextArea={true}
                         placeholder="Nhập lý do huỷ đơn hàng"
                         required={true}
                         formikForm={form}
                         fieldName="personnelAddress"
                         label="Lý do huỷ"
-                    />
+                    /> */}
+                {/* I want to code add description input */}
+                <input
+              type="text"
+              placeholder="Nhập lý do huỷ đơn hàng"
+              className="h-12 w-full border-0 pl-11 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:ring-0"
+            />
                 </div>
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">

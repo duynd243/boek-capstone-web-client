@@ -11,8 +11,7 @@ export class GenreService extends BaseService {
             "/genres",
             {
                 params,
-            },
-        );
+            });
         return response.data;
     };
 
@@ -25,6 +24,14 @@ export class GenreService extends BaseService {
                 params,
             },
         );
+        return response.data;
+    };
+    getChildGenres = async (params?: any) => {
+        const response = await this.axiosClient.get<IGenre[]>(
+            "/genres/child-genres",
+            {
+                params,
+            });
         return response.data;
     };
 }

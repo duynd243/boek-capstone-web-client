@@ -106,7 +106,7 @@ const Posts: NextPage = () => {
           Tạo
         </Link>
       </div>
-      <div>{JSON.stringify(postData)}</div>
+      {/* <div>{JSON.stringify(postData)}</div> */}
     </form>
   );
 };

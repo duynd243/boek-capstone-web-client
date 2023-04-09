@@ -13,6 +13,7 @@ type Props = {
     confirmText: string;
     cancelText?: string;
     color?: string;
+    children?: React.ReactNode; 
     disableButtons?: boolean;
 };
 
@@ -25,6 +26,13 @@ const ConfirmModal: React.FC<Props> = (props) => {
         <TransitionModal closeOnOverlayClick={false} {...props}>
             <Fragment>
                 <Modal.Header title={props.title}/>
+                {props.children ? 
+                <div className="flex items-center gap-3 p-5">
+                    <p className="text-base font-medium text-slate-800">
+                        {props.children}
+                    </p>
+                </div>
+                : null }
                 <div className="flex items-center gap-3 p-5">
                     <div className={`rounded-full p-1.5 ${iconBgColor}`}>
                         <HiExclamationCircle className={`text-3xl ${iconColor}`}/>

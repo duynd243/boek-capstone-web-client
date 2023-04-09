@@ -20,12 +20,10 @@ import SelectBox from "../SelectBox";
 import TableHeading from "../Admin/Table/TableHeading";
 import TableHeader from "../Admin/Table/TableHeader";
 import TableBody from "../Admin/Table/TableBody";
-import { randomBooks } from "../../pages/admin/books";
-import { faker } from "@faker-js/faker/locale/vi";
 import { IBookResponse } from "../../old-types/response/IBookResponse";
 import TableData from "../Admin/Table/TableData";
 import Image from "next/image";
-import { getAvatarFromName } from "../../utils/helper";
+import { getAvatarFromName, getIntersectedArray } from "../../utils/helper";
 import TableWrapper from "../Admin/Table/TableWrapper";
 import ErrorMessage from "../Form/ErrorMessage";
 import ConfirmModal from "../Modal/ConfirmModal";
@@ -36,6 +34,18 @@ import { BsSearch } from "react-icons/bs";
 import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 import Modal from "../Modal/Modal";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import SelectBookModal from './../SelectBookSeries/SelectBookModal';
+import { IoChevronBack } from 'react-icons/io5';
+import { useMutation } from "@tanstack/react-query";
+import { BookService } from './../../services/BookService';
+import { useAuth } from "../../context/AuthContext";
+import { IAuthor } from './../../types/Author/IAuthor';
+import { ImageUploadService } from './../../services/ImageUploadService';
+import { isImageFile } from "../../utils/helper";
+import { isValidFileSize } from './../../utils/helper';
+import { IBook } from "../../types/Book/IBook";
+
 
 type Props = {
   formMode: "create" | "edit";
@@ -50,6 +60,7 @@ interface IGenre {
 }
 
 const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
+  const { loginUser } = useAuth();
   const [formValues, setFormValues] = useCreateComboStore(
     (state: ICreateComboStore) => [state.formValues, state.setFormValues],
     shallow
@@ -74,23 +85,28 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
     return getSelectedGenre(Number(formValues.genreId)) ?? null;
   });
 
-  const [selectedBooks, setSelectedBooks] = useState<typeof randomBooks>(() => {
+  const [selectedBooks, setSelectedBooks] = useState<IBook[]>(() => {
     return formValues.selectedBooks ?? [];
   });
   const [toDeleteBook, setToDeleteBook] = useState<
-    (typeof randomBooks)[0] | null
-  >(null);
+    IBook | null
+  >();
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showAddBookModal, setShowAddBookModal] = useState<boolean>(false);
   const [searchBookQuery, setSearchBookQuery] = useState<string>("");
+  const bookService = new BookService(loginUser?.accessToken);
 
-  const searchBooks = useMemo(() => {
-    return randomBooks.filter((book) =>
-      book?.name?.toLowerCase().includes(searchBookQuery.toLowerCase())
-    );
-  }, [searchBookQuery]);
+  const imageService = new ImageUploadService(loginUser?.accessToken);
+  const uploadImageMutation = useMutation((file: File) =>
+    imageService.uploadImage(file)
+  );
+
 
   const router = useRouter();
+
+  const createBookSeriesMutation = useMutation(
+    (values: any) => bookService.createBookSeriesByIssuer(values)
+  );
   const form = useFormik({
     initialValues: {
       ...formValues,
@@ -98,15 +114,15 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
     validationSchema: Yup.object({
       code: Yup.string().required("Mã series không được để trống"),
       name: Yup.string().required("Tên series không được để trống"),
-      isbn10: Yup.string()
-        .length(10, "ISBN10 phải có 10 ký tự")
-        .matches(/^(97(8|9))?\d{9}(\d|X)$/, "ISBN10 không hợp lệ"),
-      isbn13: Yup.string()
-        .length(13, "ISBN13 phải có 13 ký tự")
-        .matches(
-          /^(97(8|9))?\d{9}(\d|X)$/,
-          "ISBN13 không hợp lệ (bắt đầu bằng 978 hoặc 979)"
-        ),
+      // isbn10: Yup.string()
+      //   .length(10, "ISBN10 phải có 10 ký tự")
+      //   .matches(/^(97(8|9))?\d{9}(\d|X)$/, "ISBN10 không hợp lệ"),
+      // isbn13: Yup.string()
+      //   .length(13, "ISBN13 phải có 13 ký tự")
+      //   .matches(
+      //     /^(97(8|9))?\d{9}(\d|X)$/,
+      //     "ISBN13 không hợp lệ (bắt đầu bằng 978 hoặc 979)"
+      //   ),
       releasedYear: Yup.number()
         .required("Năm phát hành không được để trống")
         .integer("Năm phát hành phải là số nguyên")
@@ -121,14 +137,103 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
       genreId: Yup.number().required("Thể loại không được để trống"),
       description: Yup.string().required("Mô tả không được để trống"),
       selectedBooks: Yup.array().min(1, "Series phải có ít nhất 1 sách"),
+      previewFile: Yup.mixed()
     }),
-    onSubmit: (values) => {
-      //router.push('/issuer/campaigns');
+    onSubmit: async (values) => {
+      // if (coverPhoto === null) {
+      //   toast.error("Vui lòng chọn ảnh bìa");
+      //   return;
+      // }
+
+      // if (!selectedAuthorId) {
+      //   toast.error("Vui lòng chọn tác giả");
+      //   return;
+      // }
+      // if (!selectedPublisherId) {
+      //   toast.error("Vui lòng chọn nhà xuất bản");
+      //   return;
+      // }
+      // if (!selectedCategoryId) {
+      //   toast.error("Vui lòng chọn thể loại");
+      //   return;
+      // }
+
+
+
+
+
+      let payload = {
+        ...values,
+        authors: values.authors.map((a: IAuthor) => a.id),
+        imageUrl: "",
+        createBookItems: values.selectedBooks.map((b: IBook, index) => {
+          return {
+            bookId: b.id,
+            displayIndex: index
+          }
+        })
+
+      };
+
+
+      if (!values.previewFile) {
+        return;
+      }
+      try {
+        await toast.promise(uploadImageMutation.mutateAsync(values.previewFile), {
+          loading: "Đang tải ảnh lên",
+          success: (data) => {
+            payload.imageUrl = data?.url || "";
+            return "Tải ảnh lên thành công"
+          }
+          ,
+          error: (err) => err?.message || "Tải ảnh lên thất bại",
+        })
+      } catch (err) {
+        console.log(err);
+        return;
+      }
+
+      async function createBookWithToast(promise: Promise<any>) {
+        await toast.promise(promise, {
+          loading: "Đang tạo sách series",
+          success: (data) => {
+            if (data?.id) {
+              router.push(`/issuer/books`);
+
+            }
+            return "Tạo sách series thành công"
+          },
+          error: (error) => {
+            return error?.message || "Tạo sách series thất bại";
+          },
+        })
+      }
+      try {
+        await createBookWithToast(createBookSeriesMutation.mutateAsync(payload));
+      } catch (err) {
+        console.log(err);
+      }
     },
   });
+  console.log(form.errors);
 
   const handleAddBook = useCallback(
-    (book: (typeof randomBooks)[0]) => {
+    (book: IBook) => {
+      if (selectedBooks.length > 0) {
+        const currentAuthorIds = selectedBooks.filter((b) => b?.bookAuthors)
+          .map((b) => b?.bookAuthors)
+          .flat()
+          .map((a) => a?.authorId) || [];
+
+        const newBookAuthorIds = book?.bookAuthors?.map((a) => a?.authorId) || [];
+
+        const intersection = getIntersectedArray(currentAuthorIds, newBookAuthorIds);
+        if (intersection.length === 0) {
+          toast.error("Sách không có tác giả chung với các sách khác trong series");
+          return;
+        }
+      }
       if (selectedBooks.find((b) => b.id === book.id)) {
         toast.error("Sách đã tồn tại trong danh sách");
         return;
@@ -145,7 +250,7 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
   );
 
   const handleDeleteBook = useCallback(
-    (book: (typeof randomBooks)[0]) => {
+    (book: IBook) => {
       setToDeleteBook(null);
       setSelectedBooks((prev) => {
         const newState = prev.filter((b) => b.id !== book.id);
@@ -156,20 +261,27 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
     [form]
   );
 
+  const { register } = useForm();
+
   useEffect(() => {
     setFormValues(form.values);
   }, [form.values, setFormValues]);
 
+
+  console.log(form.values.genreId)
+
   return (
     <Fragment>
+      <div className="mb-6">
+        <Link
+          className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
+          href="/issuer/books"
+        >
+          <IoChevronBack size={"17"} />
+          <span>Quay lại</span>
+        </Link>
+      </div>
       <div className="mx-auto max-w-6xl border bg-white p-10">
-        {/*Back button*/}
-        {/*<button*/}
-        {/*    className='bg-slate-200 hover:bg-slate-300 text-gray-800 text-sm font-medium py-2 px-4 rounded inline-flex gap-2 items-center'>*/}
-        {/*    <BiArrowBack/>*/}
-        {/*    <span>Quay lại</span>*/}
-        {/*</button>*/}
-
         <h1 className="mb-6 text-2xl font-bold text-slate-800 md:text-3xl">
           {formMode === "create" ? "Thêm" : "Sửa"} sách series ✨
         </h1>
@@ -179,91 +291,103 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
             label={"Thông tin chung"}
             description={"Thông tin chung về series sách"}
           />
+
           <div className="mt-3 space-y-4">
-            <Form.Input
-              placeholder={"VD: S0001"}
-              formikForm={form}
-              required={true}
-              fieldName={"code"}
-              label={"Mã series"}
-            />
-            <Form.Input
-              placeholder={"Nhập tên series"}
-              formikForm={form}
-              required={true}
-              fieldName={"name"}
-              label={"Tên series"}
-            />
-            <div className="grid gap-y-4 gap-x-4 sm:grid-cols-2">
-              <Form.Input
-                placeholder={"Nhập ISBN10"}
-                uppercase={true}
-                maxLength={10}
-                formikForm={form}
-                fieldName={"isbn10"}
-                label={"ISBN10"}
-              />
-              <Form.Input
-                placeholder={"Nhập ISBN13"}
-                uppercase={true}
-                maxLength={13}
-                formikForm={form}
-                fieldName={"isbn13"}
-                label={"ISBN13"}
-              />
-            </div>
-            <div className="grid gap-y-4 gap-x-4 sm:grid-cols-2">
-              <Form.Input
-                placeholder={"Nhập năm phát hành"}
-                required={true}
-                inputType={"number"}
-                formikForm={form}
-                fieldName={"releasedYear"}
-                label={"Năm phát hành"}
-              />
-              <Form.Input
-                placeholder={"Nhập giá bìa"}
-                required={true}
-                inputType={"number"}
-                formikForm={form}
-                fieldName={"coverPrice"}
-                label={"Giá bìa (đ)"}
-              />
-            </div>
-            <Form.Label label={"Ảnh sản phẩm"} required={true} />
-            <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
-              <div className="space-y-1 text-center">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  stroke="currentColor"
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  aria-hidden="true"
+            <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor="cover-photo"
+                  className="block text-sm font-medium text-gray-700"
                 >
-                  <path
-                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  ></path>
-                </svg>
-                <div className="flex justify-center text-sm text-gray-600">
-                  <label
-                    htmlFor="file-upload"
-                    className="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
-                  >
-                    <span>Tải ảnh lên</span>
-                    <input
-                      id="file-upload"
-                      name="file-upload"
-                      type="file"
-                      className="sr-only"
+                  Ảnh bìa<span className="text-rose-500">*</span>
+                </label>
+                <Form.ImageUploadPanel onChange={(file) => {
+                  if (!isImageFile(file)) {
+                    toast.error("Vui lòng tải lên tệp hình ảnh");
+                    return false;
+                  }
+                  // check file size
+                  if (!isValidFileSize(file, 1)) {
+                    toast.error("Kích thước tệp tối đa là 1MB");
+                    return false;
+                  }
+
+                  form.setFieldValue("previewFile", file);
+                  return true;
+                }} />
+              </div>
+
+              <div className="sm:col-span-4">
+                <Form.Input
+                  placeholder={"Nhập tên series"}
+                  register={register}
+                  value={form.values.name}
+                  onChange={form.handleChange}
+                  required={true}
+                  fieldName={"name"}
+                  label={"Tên series"}
+                />
+                <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                  <div className="sm:col-span-2">
+                    <Form.Input
+                      placeholder={"VD: S0001"}
+                      register={register}
+                      value={form.values.code}
+                      onChange={form.handleChange}
+                      required={true}
+                      fieldName={"code"}
+                      label={"Mã series"}
                     />
-                  </label>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Form.Input
+                      placeholder={"Nhập ISBN10"}
+                      uppercase={true}
+                      maxLength={10}
+                      register={register}
+                      value={form.values.isbn10}
+                      onChange={form.handleChange}
+                      fieldName={"isbn10"}
+                      label={"ISBN10"}
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Form.Input
+                      placeholder={"Nhập ISBN13"}
+                      uppercase={true}
+                      maxLength={13}
+                      value={form.values.isbn13}
+                      onChange={form.handleChange}
+                      register={register}
+                      fieldName={"isbn13"}
+                      label={"ISBN13"}
+                    />
+                  </div>
+                  <div className="sm:col-span-3">
+                    <Form.Input
+                      placeholder={"Nhập năm phát hành"}
+                      required={true}
+                      inputType={"number"}
+                      register={register}
+                      value={form.values.releasedYear}
+                      onChange={form.handleChange}
+                      fieldName={"releasedYear"}
+                      label={"Năm phát hành"}
+                    />
+                  </div>
+                  <div className="sm:col-span-3">
+                    <Form.Input
+                      placeholder={"Nhập giá bìa"}
+                      required={true}
+                      inputType={"number"}
+                      register={register}
+                      value={form.values.coverPrice}
+                      onChange={form.handleChange}
+                      fieldName={"coverPrice"}
+                      label={"Giá bìa (đ)"}
+                    />
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500">
-                  PNG, JPG, GIF tối đa 1MB
-                </p>
               </div>
             </div>
           </div>
@@ -275,34 +399,28 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
           <div className="mt-3">
             <Form.Label label={"Thể loại"} required={true} />
           </div>
-          <SelectBox
-            placeholder={genresLoading ? "Đang tải..." : "Chọn thể loại"}
-            value={selectedGenre}
-            onChange={(value) => {
-              if (value) {
-                setSelectedGenre(value);
-                form.setFieldValue("genreId", value?.id);
-              }
-            }}
-            dataSource={genres}
-            displayKey={"name"}
-          />
+          <div className="mt-1">
+            <select
+              onChange={(e) => {
+                form.handleChange(e);
+                form.setFieldValue("selectedBooks", []);
+                setSelectedBooks([]);
+              }}
+              value={form.values.genreId}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              name="genreId"
+              id="genreId"
+            >
+              {genres?.map((genre) => (
+                <option value={genre?.id} key={genre?.id}>
+                  {genre?.name}
+                </option>
+              ))}
+            </select>
+          </div>
           {form.errors.genreId && form.touched.genreId && (
             <ErrorMessage>{form.errors.genreId}</ErrorMessage>
           )}
-          <Form.Divider />
-          <Form.GroupLabel label={"Mô tả"} description="Mô tả về series sách" />
-          <div className="mt-3">
-            <Form.Input
-              placeholder={"Nhập mô tả"}
-              isTextArea={true}
-              formikForm={form}
-              required={true}
-              fieldName={"description"}
-              label={"Mô tả"}
-            />
-          </div>
-
           <Form.Divider />
           <Form.GroupLabel
             label={"Chọn sách"}
@@ -311,6 +429,7 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
           <div className="mt-3">
             <div className="mb-4 flex justify-end gap-4">
               <CreateButton
+                disabled={!form.values.genreId}
                 label={"Thêm sách"}
                 onClick={() => {
                   setShowAddBookModal(true);
@@ -323,7 +442,7 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
                 <TableHeader>Tên sách</TableHeader>
                 <TableHeader>Giá sách</TableHeader>
                 <TableHeader>Nhà xuất bản</TableHeader>
-                <TableHeader>Định dạng</TableHeader>
+                {/* <TableHeader>Định dạng</TableHeader> */}
                 <TableHeader>
                   <span className="sr-only">Edit</span>
                 </TableHeader>
@@ -331,42 +450,10 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
               <TableBody>
                 {selectedBooks.length > 0 ? (
                   selectedBooks.map((book, index) => {
-                    faker.datatype.boolean();
-                    faker.datatype.number({
-                      min: 0,
-                      max: randomBooks.length - 1,
-                    });
-                    const fakeBook: IBookResponse = {
-                      id: index,
-                      code: `B${faker.datatype.number({
-                        min: 10000,
-                        max: 99999,
-                      })}`,
-
-                      publisher: {
-                        name: faker.company.name(),
-                      },
-                      isbn10: faker.datatype
-                        .number({
-                          min: 1000000000,
-                          max: 9999999999,
-                        })
-                        .toString(),
-                      isbn13: faker.datatype
-                        .number({
-                          min: 1000000000000,
-                          max: 9999999999999,
-                        })
-                        .toString(),
-                      releasedYear: faker.datatype.number({
-                        min: 2010,
-                        max: 2022,
-                      }),
-                    };
                     return (
                       <tr key={index}>
                         <TableData className="text-sm font-medium uppercase text-gray-500">
-                          {fakeBook.code}
+                          {book.code}
                         </TableData>
                         <TableData className="max-w-72">
                           <div className="flex items-center gap-4">
@@ -386,7 +473,7 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
                           {new Intl.NumberFormat("vi-VN", {
                             style: "currency",
                             currency: "VND",
-                          }).format(faker.datatype.number())}
+                          }).format(book?.coverPrice || 0)}
                         </TableData>
                         <TableData>
                           <div className="flex items-center">
@@ -396,19 +483,19 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
                                 height={100}
                                 className="h-10 w-10 rounded-full"
                                 src={getAvatarFromName(
-                                  fakeBook.publisher?.name
+                                  book.publisher?.name
                                 )}
                                 alt=""
                               />
                             </div>
                             <div className="ml-4">
                               <div className="text-sm text-gray-900">
-                                {fakeBook.publisher?.name}
+                                {book.publisher?.name}
                               </div>
                             </div>
                           </div>
                         </TableData>
-                        <TableData
+                        {/* <TableData
                           textAlignment="text-center"
                           className="text-sm text-gray-500"
                         >
@@ -417,7 +504,7 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
                             <option value="2">Sách audio</option>
                             <option value="3">Sách điện tử</option>
                           </select>
-                        </TableData>
+                        </TableData> */}
                         <TableData className="text-right text-sm font-medium">
                           <button
                             onClick={() => {
@@ -450,7 +537,22 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
               <ErrorMessage>{form.errors.selectedBooks}</ErrorMessage>
             )}
           </div>
+          <Form.Divider />
+          <Form.GroupLabel label={"Mô tả"} description="Mô tả về series sách" />
+          <div className="mt-3">
+            <Form.Input
+              placeholder={"Nhập mô tả"}
+              isTextArea={true}
+              register={register}
+              value={form.values.description}
+              onChange={form.handleChange}
+              required={true}
+              fieldName={"description"}
+              label={"Mô tả"}
+            />
+          </div>
 
+          <Form.Divider />
           <button
             type={"submit"}
             className="mt-5 inline-flex items-center gap-2 rounded bg-slate-200 py-2 px-4 text-sm font-medium text-gray-800 hover:bg-slate-300"
@@ -475,7 +577,15 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
         confirmText={"Xoá"}
       />
 
-      <TransitionModal
+      {form.values.genreId && <SelectBookModal
+        key={form.values.genreId}
+        onItemSelect={b => handleAddBook(b)}
+        onClose={() => setShowAddBookModal(false)}
+        isOpen={showAddBookModal}
+        genreId={Number(form.values.genreId)}
+      />}
+
+      {/* <TransitionModal
         maxWidth={"max-w-3xl"}
         isOpen={showAddBookModal}
         closeOnOverlayClick={true}
@@ -565,7 +675,7 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
             </div>
           </Modal.Footer>
         </div>
-      </TransitionModal>
+      </TransitionModal> */}
     </Fragment>
   );
 };

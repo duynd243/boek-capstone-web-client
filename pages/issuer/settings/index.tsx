@@ -2,6 +2,7 @@ import { ReactElement, useState } from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { NextPageWithLayout } from "../../_app";
 import { getAvatarFromName } from "../../../utils/helper";
+import  Image  from 'next/image';
 
 const user = {
   name: "Debbie Lewis",
@@ -38,7 +39,7 @@ export const ProfilePicture = () => {
       >
         <img
           className="h-full w-full rounded-full"
-          src={user.imageUrl}
+          src=""
           alt=""
         />
       </div>
@@ -132,7 +133,7 @@ const Settings: NextPageWithLayout = () => {
                       <div className="mt-1 flex rounded-md shadow-sm">
                         <input
                           disabled={true}
-                          defaultValue="manhhungtran2308@gmail.com"
+                          defaultValue="hopthubandoc@nxbtre.com.vn"
                           type="text"
                           name="email"
                           id="email"
@@ -148,7 +149,7 @@ const Settings: NextPageWithLayout = () => {
                         Họ và tên
                       </label>
                       <input
-                        defaultValue={"Hùng Issuer"}
+                        defaultValue={"NXB Trẻ"}
                         type="text"
                         name="fullName"
                         id="fullName"
@@ -169,7 +170,7 @@ const Settings: NextPageWithLayout = () => {
                           name="about"
                           rows={3}
                           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          defaultValue={""}
+                          defaultValue={"161B Lý Chính Thắng, phường Võ Thị Sáu, Quận 3, TP. Hồ Chí Minh"}
                         />
                       </div>
                       <p className="mt-2 text-sm text-gray-500">
@@ -192,10 +193,12 @@ const Settings: NextPageWithLayout = () => {
                           className="inline-block h-12 w-12 flex-shrink-0 overflow-hidden rounded-full"
                           aria-hidden="true"
                         >
-                          <img
+                          <Image
                             className="h-full w-full rounded-full"
-                            src={user.imageUrl}
+                            src="https://www.nxbtre.com.vn/css/skin/logo.png"
                             alt=""
+                            width={48}
+                            height={48}
                           />
                         </div>
                         <div className="ml-5 rounded-md shadow-sm">
@@ -221,7 +224,7 @@ const Settings: NextPageWithLayout = () => {
                     <div className="relative hidden overflow-hidden rounded-full lg:block">
                       <img
                         className="relative h-40 w-40 rounded-full"
-                        src={user.imageUrl}
+                        src="https://www.netabooks.vn/data/author/16034/logo-nxb-tre.jpg"
                         alt=""
                       />
                       <label
@@ -251,7 +254,7 @@ const Settings: NextPageWithLayout = () => {
                     </label>
                     <input
                       disabled={true}
-                      defaultValue={"A123456"}
+                      defaultValue={"NXBTre"}
                       type="text"
                       name="code"
                       id="code"
@@ -268,7 +271,7 @@ const Settings: NextPageWithLayout = () => {
                       Số điện thoại
                     </label>
                     <input
-                      defaultValue={"0123456789"}
+                      defaultValue={"02839317849"}
                       type="text"
                       name="phoneNumber"
                       id="phoneNumber"
@@ -277,7 +280,7 @@ const Settings: NextPageWithLayout = () => {
                     />
                   </div>
                 </div>
-                <div className="mt-6 grid grid-cols-12 gap-6">
+                {/* <div className="mt-6 grid grid-cols-12 gap-6">
                   <div className="col-span-12 sm:col-span-6">
                     <label
                       htmlFor="code"
@@ -295,7 +298,7 @@ const Settings: NextPageWithLayout = () => {
                       className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-100 sm:text-sm"
                     />
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Privacy section */}

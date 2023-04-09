@@ -54,7 +54,7 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
     } = useQuery(
         ["authors", { search, page, size }],
         () =>
-            authorService.getAuthorsByAdmin({
+            authorService.getAuthors({
                 page,
                 size,
                 name: search,

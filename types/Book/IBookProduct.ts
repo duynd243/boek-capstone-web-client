@@ -40,6 +40,7 @@ export interface IBookProduct {
     withPdf?: boolean;
     pdfExtraPrice?: number;
     displayPdfIndex?: number;
+
     withAudio?: boolean;
     displayAudioIndex?: number;
     audioExtraPrice?: number;
