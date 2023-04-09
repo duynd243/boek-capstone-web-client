@@ -68,18 +68,18 @@ const SelectAuthorModal: React.FC<Props> = ({
                 </div>
                 <div className="h-96 overflow-y-auto">
                     {!isLoading && authors ? (
-                        authors?.map((group) => {
+                        authors?.map((author) => {
                             const isSelected = selectedAuthors?.find(
-                                (o) => o?.id === group?.id
+                                (o) => o?.id === author?.id
                             );
                             return (
                                 <div
                                     onClick={() => {
                                         if (!isSelected) {
-                                            onItemSelect(group);
+                                            onItemSelect(author);
                                         }
                                     }}
-                                    key={group?.id}
+                                    key={author?.id}
                                     className={`relative flex justify-between border-b border-gray-300 p-4 pr-12 ${
                                         isSelected
                                             ? "cursor-not-allowed bg-slate-100"
@@ -90,16 +90,16 @@ const SelectAuthorModal: React.FC<Props> = ({
                                         <Image
                                             width={500}
                                             height={500}
-                                            className="h-16 w-16 object-cover"
-                                            src={getAvatarFromName(group?.name)}
+                                            className="h-16 w-16 object-cover rounded-full shrink-0"
+                                            src={author?.imageUrl || getAvatarFromName(author?.name)}
                                             alt=""
                                         />
                                         <div>
                                             <div className="mb-1 text-sm font-medium text-gray-900">
-                                                {group?.name}
+                                                {author?.name}
                                             </div>
                                             <div className="text-sm font-medium text-gray-500">
-                                                {group?.description}
+                                                {author?.description}
                                             </div>
                                         </div>
                                     </div>

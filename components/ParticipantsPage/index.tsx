@@ -1,40 +1,51 @@
-import React, {Fragment, useState} from 'react'
-import {ParticipantFlowTabs} from "../../constants/ParticipantStatuses";
-import {useAuth} from "../../context/AuthContext";
-import {CampaignService} from "../../services/CampaignService";
-import {useRouter} from "next/router";
-import {useQuery} from "@tanstack/react-query";
-import {ICampaign} from "../../types/Campaign/ICampaign";
+import React, { Fragment, useEffect, useState } from "react";
+import { ParticipantFlowTabs } from "../../constants/ParticipantStatuses";
+import { useAuth } from "../../context/AuthContext";
+import { CampaignService } from "../../services/CampaignService";
+import { useRouter } from "next/router";
+import { useQuery } from "@tanstack/react-query";
+import { ICampaign } from "../../types/Campaign/ICampaign";
 import PageHeading from "../Admin/PageHeading";
-import {Tab} from "@headlessui/react";
+import { Tab } from "@headlessui/react";
 import Kanban from "../Kanban";
 import ParticipantColumn from "../ParticipantColumn";
 import SelectBox from "../SelectBox";
-import {Roles} from "../../constants/Roles";
+import { Roles } from "../../constants/Roles";
+import { toast } from "react-hot-toast";
 
 type Props = {}
 
 const ParticipantsPage: React.FC<Props> = ({}) => {
-    const [selectedFlowTab, setSelectedFlowTab] = useState(ParticipantFlowTabs[0]);
-
-    const {loginUser} = useAuth();
-    const campaignService = new CampaignService(loginUser?.accessToken);
     const router = useRouter();
+    const urlTab = router.query["tab"] as string;
+    const [selectedFlowTab, setSelectedFlowTab] = useState(
+        ParticipantFlowTabs[0],
+    );
 
-    const {data: campaigns, isInitialLoading: isCampaignsLoading} = useQuery(
-        [loginUser?.role === Roles.SYSTEM.id ? 'admin_campaigns' : 'issuer_campaigns'],
+    useEffect(() => {
+        if(urlTab === 'request') {
+           setSelectedFlowTab(ParticipantFlowTabs[1])
+        }
+    }, [urlTab]);
+
+
+    const { loginUser } = useAuth();
+    const campaignService = new CampaignService(loginUser?.accessToken);
+
+    const { data: campaigns, isInitialLoading: isCampaignsLoading } = useQuery(
+        [loginUser?.role === Roles.SYSTEM.id ? "admin_campaigns" : "issuer_campaigns"],
         loginUser?.role === Roles.SYSTEM.id ?
             () => campaignService.getCampaignsByAdmin({
                 size: 100,
-                sort: 'CreatedDate desc, UpdatedDate desc',
+                sort: "CreatedDate desc, UpdatedDate desc",
             })
             :
             () => campaignService.getCampaignsByCustomer({
                 size: 100,
-                sort: 'CreatedDate desc, UpdatedDate desc',
-            })
+                sort: "CreatedDate desc, UpdatedDate desc",
+            }),
     );
-    const campaignIdFromUrl = router.query['campaign'] as string;
+    const campaignIdFromUrl = router.query["campaign"] as string;
     const [campaignId, setCampaignId] = useState<number | null>(Number(campaignIdFromUrl) || null);
 
     return (
@@ -49,6 +60,7 @@ const ParticipantsPage: React.FC<Props> = ({}) => {
                             <ul className="flex flex-wrap gap-2">
                                 {ParticipantFlowTabs.map((tab) => (
                                     <Tab
+
                                         onClick={() => {
                                             setSelectedFlowTab(tab);
                                         }}
@@ -66,15 +78,15 @@ const ParticipantsPage: React.FC<Props> = ({}) => {
                         </div>
                     </Tab.Group>
 
-                    <div className={'w-72'}>
+                    <div className={"w-72"}>
                         <SelectBox<Partial<ICampaign>>
                             value={
                                 campaigns?.data?.find((c) => c?.id === campaignId) || null
                             }
-                            placeholder={isCampaignsLoading ? 'Đang tải...' : 'Tất cả hội sách'}
+                            placeholder={isCampaignsLoading ? "Đang tải..." : "Tất cả hội sách"}
                             dataSource={[{
                                 id: undefined,
-                                name: 'Tất cả hội sách',
+                                name: "Tất cả hội sách",
                             }, ...campaigns?.data || []]}
                             onValueChange={async (c) => {
                                 if (c) {
@@ -84,26 +96,26 @@ const ParticipantsPage: React.FC<Props> = ({}) => {
                                         pathname: router.pathname,
                                         query: {
                                             ...router.query,
-                                            'campaign': c?.id,
+                                            "campaign": c?.id,
                                         },
                                     });
                                 }
                             }}
                             disabled={isCampaignsLoading}
-                            displayKey={'name'}/>
+                            displayKey={"name"} />
                     </div>
                 </div>
 
-                <Kanban.Wrapper gap={'gap-10'}>
+                <Kanban.Wrapper gap={"gap-10"}>
                     {selectedFlowTab.statusTabs.map((statusTab) =>
                         <ParticipantColumn campaignId={campaignId}
                                            key={statusTab?.id}
-                                           participantStatus={statusTab}/>
+                                           participantStatus={statusTab} />,
                     )}
                 </Kanban.Wrapper>
             </div>
         </Fragment>
     );
-}
+};
 
-export default ParticipantsPage
+export default ParticipantsPage;

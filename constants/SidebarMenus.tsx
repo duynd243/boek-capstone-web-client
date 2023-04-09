@@ -9,7 +9,6 @@ import {
     BsFillGearFill,
     BsFillPenFill,
     BsFillPeopleFill,
-    BsFillPersonVcardFill,
     BsFillPieChartFill,
     BsFillTagsFill,
     BsPrinterFill,
@@ -74,7 +73,7 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                 icon: <MdContactMail/>,
             },
             {
-                name: "Xét duyệt sách bán",
+                name: "Sách bán",
                 path: "/admin/products",
                 icon: <MdBook/>,
             },
@@ -91,10 +90,6 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                         name: "Đơn tại quầy",
                         path: "/admin/orders/pickup",
                     },
-                    // {
-                    //     name: "Mocks",
-                    //     path: "/admin/orders",
-                    // },
                 ],
             },
             {
@@ -175,23 +170,23 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
 
 export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
     {
-        groupName: "Chung",
+        groupName: "Hệ Thống",
         menus: [
             {
-                name: "Tổng quan",
+                name: "Thống kê",
                 path: "/issuer",
-                icon: <BsFillPieChartFill/>,
+                icon: <BsFillPieChartFill />,
             },
 
             {
                 name: "Hội sách",
                 path: "/issuer/campaigns",
-                icon: <BsFillCalendarWeekFill/>,
+                icon: <BsFillCalendarWeekFill />,
             },
             {
                 name: "Tham gia hội sách",
                 path: "/issuer/participants",
-                icon: <MdContactMail/>,
+                icon: <MdContactMail />,
             },
             {
                 name: "Sách bán",
@@ -223,45 +218,17 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                 path: "/issuer/books",
                 icon: <ImBook />,
             },
-            // {
-            //     name: "Nhà xuất bản",
-            //     path: "/admin/publishers",
-            //     icon: <BsPrinterFill />,
-            // },
-            // {
-            //     name: "Tác giả",
-            //     path: "/admin/authors",
-            //     icon: <BsFillPenFill />,
-            // },
-            // {
-            //     name: "Thể loại sách",
-            //     path: "/admin/categories",
-            //     icon: <BsFillTagsFill />,
-            // },
-            {
-                name: "Kho sách",
-                path: "/issuer/books",
-                icon: <ImBook />,
-            },
-            {
-                name: "Nhà xuất bản",
-                path: "/admin/publishers",
-                icon: <BsPrinterFill />,
-            },
-            {
-                name: "Tác giả",
-                path: "/admin/authors",
-                icon: <BsFillPenFill />,
-            },
-            {
-                name: "Thể loại sách",
-                path: "/admin/categories",
-                icon: <BsFillTagsFill />,
-            },
+
+        ],
+    },
+
+    {
+        groupName: "Cài đặt",
+        menus: [
             {
                 name: "Cài đặt",
-                path: "/issuer/settings",
-                icon: <BsFillGearFill/>,
+                path: "/issuer/settings/profile",
+                icon: <BsFillGearFill />,
             },
         ],
     },

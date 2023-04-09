@@ -38,6 +38,7 @@ import { useState } from 'react';
 import Modal from './../Modal/Modal';
 import TransitionModal from './../Modal/TransitionModal';
 import ConfirmModal from './../Modal/ConfirmModal';
+import { BOOK_IMAGE_UPLOAD_CONTAINER } from "../../constants/TailwindClasses";
 
 type Props = {
     book: IBook;
@@ -76,7 +77,8 @@ const BookForm = ({ book }: Props) => {
     }, {
         onSuccess: async () => {
             await queryClient.invalidateQueries(['issuer_book']);
-            router.push('/issuer/books');
+            await queryClient.invalidateQueries(['issuer_books']);
+            await router.push('/issuer/books');
         }
     });
 
@@ -287,6 +289,7 @@ const BookForm = ({ book }: Props) => {
                                 name="previewFile"
                                 render={({ field }) => (
                                     <Form.ImageUploadPanel
+                                        imageClassName={BOOK_IMAGE_UPLOAD_CONTAINER}
                                         onChange={(file) => {
 
                                             if (!isImageFile(file)) {

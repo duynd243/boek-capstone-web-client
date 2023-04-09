@@ -6,9 +6,7 @@ import TableData from "../Admin/Table/TableData";
 import Image from "next/image";
 import { getAvatarFromName } from "../../utils/helper";
 import TableWrapper from "../Admin/Table/TableWrapper";
-import { IGroup } from "../../types/Group/IGroup";
-import { IAuthor } from './../../types/Author/IAuthor';
-import { AuthorService } from './../../old-services/AuthorService';
+import { IAuthor } from "./../../types/Author/IAuthor";
 
 type Props = {
     selectedAuthors: IAuthor[];
@@ -30,9 +28,9 @@ const SelectGroupsTable: React.FC<Props> = ({
             </TableHeading>
             <TableBody>
                 {selectedAuthors && selectedAuthors?.length > 0 ? (
-                    selectedAuthors?.map((group, index) => {
+                    selectedAuthors?.map((author, index) => {
                         return (
-                            <tr key={group?.id}>
+                            <tr key={author?.id}>
                                 <TableData>
                                     <div className="flex items-center">
                                         <div className="h-10 w-10 flex-shrink-0">
@@ -40,27 +38,27 @@ const SelectGroupsTable: React.FC<Props> = ({
                                                 width={100}
                                                 height={100}
                                                 className="h-10 w-10 rounded-full object-cover"
-                                                src={getAvatarFromName(group?.name)}
+                                                src={author?.imageUrl || getAvatarFromName(author?.name)}
                                                 alt=""
                                             />
                                         </div>
                                         <div className="ml-4">
                                             <div className="text-sm font-medium text-gray-900">
-                                                {group?.name}
+                                                {author?.name}
                                             </div>
                                         </div>
                                     </div>
                                 </TableData>
                                 <TableData>
                                     <div className="text-sm text-gray-900">
-                                        {group?.description}
+                                        {author?.description}
                                     </div>
                                 </TableData>
 
                                 <TableData className="text-right text-sm font-medium">
                                     <button
                                         onClick={() => {
-                                            handleRemoveAuthor(group);
+                                            handleRemoveAuthor(author);
                                         }}
                                         className="text-rose-600 hover:text-rose-800"
                                     >

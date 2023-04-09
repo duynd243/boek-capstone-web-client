@@ -41,6 +41,7 @@ import { useEffect } from 'react';
 import { BookProductStatuses } from '../../constants/BookProductStatuses';
 import { CampaignStatuses } from './../../constants/CampaignStatuses';
 import useEditBookProduct from './useEditBookProduct';
+import { BOOK_IMAGE_UPLOAD_CONTAINER } from "../../constants/TailwindClasses";
 
 type Props = {
   product: IBookProduct;
@@ -450,7 +451,8 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
                   name="previewFile"
                   render={({ field }) => (
                     <Form.ImageUploadPanel
-                      onChange={(file) => {
+                      imageClassName={BOOK_IMAGE_UPLOAD_CONTAINER}
+                        onChange={(file) => {
                         if (!isImageFile(file)) {
                           toast.error("Vui lòng tải lên tệp hình ảnh");
                           return false;

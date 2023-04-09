@@ -56,9 +56,11 @@ const AddSellingBookPage: NextPageWithLayout = () => {
     const updateOddBookMutation = useMutation((data: any) => {
         return bookProductService.updateOddBookProductByIssuer(data)
     }, {
-        onSuccess: () => {
-            queryClient.invalidateQueries(['books', book?.id]);
-            router.push(`/issuer/campaigns/${campaignId}`);
+        onSuccess: async () => {
+
+            await queryClient.invalidateQueries(['issuer_books']);
+            await queryClient.invalidateQueries(['books']);
+            await router.push(`/issuer/campaigns/${campaignId}`);
         }
     });
     // const createOddBookMutation = useMutation(
