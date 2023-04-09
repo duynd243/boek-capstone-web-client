@@ -1,164 +1,226 @@
-import React, { ChangeEventHandler, ReactElement, useState } from 'react'
-import { NextPageWithLayout } from "../../../../../_app";
-import AdminLayout from "../../../../../../components/Layout/AdminLayout";
-import { useRouter } from "next/router";
-import {fakeBookSeries, randomBooks} from "../../../../../admin/books";
-import FormPageLayout from "../../../../../../components/Layout/FormPageLayout";
-import WelcomeBanner from "../../../../../../components/WelcomBanner";
-import { useFormik } from "formik";
-import Form, { defaultInputClass } from "../../../../../../components/Form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from "next/image";
-import * as Yup from "yup";
-import SelectBox from "../../../../../../components/SelectBox";
+import { useRouter } from "next/router";
+import { ReactElement } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
+import { IoChevronBack } from 'react-icons/io5';
+import { z } from 'zod';
+import Form from "../../../../../../components/Form";
 import ErrorMessage from "../../../../../../components/Form/ErrorMessage";
-import CreateButton from "../../../../../../components/Admin/CreateButton";
-import TableWrapper from "../../../../../../components/Admin/Table/TableWrapper";
-import TableHeading from "../../../../../../components/Admin/Table/TableHeading";
-import TableHeader from "../../../../../../components/Admin/Table/TableHeader";
-import TableBody from "../../../../../../components/Admin/Table/TableBody";
-import TableData from "../../../../../../components/Admin/Table/TableData";
-import { faker } from "@faker-js/faker/locale/vi";
-import { getAvatarFromName } from "../../../../../../utils/helper";
+import AdminLayout from "../../../../../../components/Layout/AdminLayout";
+import FormPageLayout from "../../../../../../components/Layout/FormPageLayout";
+import SelectBox from "../../../../../../components/SelectBox";
+import WelcomeBanner from "../../../../../../components/WelcomBanner";
+import { BookFormats, IBookFormat } from '../../../../../../constants/BookFormats';
+import { useAuth } from '../../../../../../context/AuthContext';
+import { BookProductService } from '../../../../../../services/BookProductService';
+import { BookService } from '../../../../../../services/BookService';
+import { IBook } from '../../../../../../types/Book/IBook';
+import { NextPageWithLayout } from "../../../../../_app";
+import { getBookFormatById } from './../../../../../../constants/BookFormats';
+import { IssuerCampaignService } from './../../../../../../old-services/Issuer/Issuer_CampaignService';
+import { CampaignFormats } from './../../../../../../constants/CampaignFormats';
+import { CampaignService } from './../../../../../../services/CampaignService';
+import { getBookProductsFormatOptions } from './../../../../../../utils/helper';
+import { IBookProduct } from '../../../../../../types/Book/IBookProduct';
 
-const fullFormats = [{
-    id: 1,
-    name: 'Sách giấy'
-}, {
-    id: 2,
-    name: 'PDF'
-}, {
-    id: 3,
-    name: 'Audio'
-}];
 
-function getFormatOptions(book: typeof fakeBookSeries[number] | undefined) {
-    if (!book) {
-        return [];
-    }
-    if (book?.fullPdfAndAudio) {
-        return fullFormats;
-    }
-    if (book?.onlyPdf) {
-        return fullFormats.filter(o => o.name !== 'Audio');
-    }
-    if (book?.onlyAudio) {
-        return fullFormats.filter(o => o.name !== 'PDF');
-    }
-    return fullFormats.filter(o => o.name === 'Sách giấy');
-}
 
 const AddSellingBookPage: NextPageWithLayout = () => {
+    const { loginUser } = useAuth();
+    const queryClient = useQueryClient();
     const router = useRouter();
     const bookId = router.query['book-id'];
-    const bookSeries = fakeBookSeries.find(b => b.id === Number(bookId));
-
-    const [selectedBooks, setSelectedBooks] = useState<typeof randomBooks>(randomBooks);
-
-
-    const availableFormats = getFormatOptions(bookSeries);
-    const [selectedFormat, setSelectedFormat] = useState<typeof fullFormats[number] | null>(availableFormats?.length === 1 ? availableFormats[0] : null);
-
-    const availableBonuses = availableFormats.filter((format) => format.id !== selectedFormat?.id && format.name !== 'Sách giấy');
-    console.log(availableFormats);
+    const issuerCampaignService = new CampaignService(
+        loginUser?.accessToken
+    );
+    const bookService = new BookService(loginUser?.accessToken);
+    const bookProductService = new BookProductService(loginUser?.accessToken);
+    // const bookId = router.query.id as string;
+    const campaignId = router.query.id as string;
 
 
-    const [selectedBonus, setSelectedBonus] = useState<number[]>([]);
-
-    const handleAddBonus = (bonusId: number) => {
-        if (selectedBonus.includes(bonusId)) {
-            setSelectedBonus(selectedBonus.filter(b => b !== bonusId));
-        } else {
-            setSelectedBonus([...selectedBonus, bonusId]);
-        }
-    }
-
-    const handleRemoveBonus = (bonusId: number) => {
-        setSelectedBonus(selectedBonus.filter(b => b !== bonusId));
-    }
-
-
-    const form = useFormik(
+    const { data: book, isLoading } = useQuery(
+        ["issuer_book", bookId],
+        () => bookService.getBookById$Issuer(Number(bookId), { withCampaigns: true }),
         {
-            initialValues: {
-                discount: 0,
-                saleQuantity: '',
-                format: '',
-                bookProductItems: []
-            },
-            validationSchema: Yup.object({
-                discount: Yup.number()
-                    .min(0, ({ min }) => `Phần trăm giảm giá tối thiểu là ${min}`)
-                    .max(100, ({ max }) => `Phần trăm giảm giá tối đa là ${max}`)
-                    .integer('Phần trăm giảm giá phải là số nguyên'),
-                saleQuantity: Yup.number()
-                    .required('Số lượng bán không được để trống')
-                    .min(1, ({ min }) => `Số lượng bán tối thiểu là ${min}`)
-                    .integer('Số lượng bán phải là số nguyên'),
-                format: Yup.number()
-                    .required('Định dạng không được để trống'),
-                bookProductItems: Yup.array().min(1, 'Bạn phải chọn ít nhất 1 sản phẩm')
-            }),
-            onSubmit: (values) => {
-
+            refetchOnWindowFocus: false,
+            enabled: !!bookId,
+            onSuccess: (data) => {
             }
         }
-    )
+    );
+    const { data: campaigns } = useQuery(
+        ["issuer_campaign", campaignId],
+        () => issuerCampaignService.getCampaignByIdByIssuer(Number(campaignId)),{
+            onSuccess: (data) => {
+                reset(v=>({
+                    ...v,
+                    commission: data?.campaignCommissions?.find(c=>c.genreId  === book?.genre?.parentId)?.minimalCommission
+                }))
+            }
+        }
+    );
+
+    const minimalCommission = campaigns?.campaignCommissions?.find(c => c.genreId === book?.genre?.parentId)?.minimalCommission || 0;
+    const createOddBookMutation = useMutation((data: any) => {
+        return bookProductService.createOddBookProductByIssuer(data)
+    }, {
+        onSuccess: () => {
+            queryClient.invalidateQueries(['books', book?.id]);
+            router.push(`/issuer/campaigns/${campaignId}`);
+        }
+    });
+    // const createOddBookMutation = useMutation(
+    //     (values: any) => bookService.createOddBookByIssuer(values)
+    // );
+
+    const CreatOddBookSchema = z.object({
+        bookId: z.literal(Number(bookId)),
+        campaignId: z.literal(Number(campaignId)),
+        format: z.number(),
+        saleQuantity: z.coerce.number().min(1),
+        discount: z.coerce.number().min(0).max(100),
+        commission: z.coerce.number().min(minimalCommission, `Chiết khẩu tối thiểu phải từ ${minimalCommission}%`).max(100),
+        withPdf: z.boolean().default(false),
+        displayPdfIndex: z.number(),
+        withAudio: z.boolean().default(false),
+        displayAudioIndex: z.number()
+    });
+
+
+    type FormType = Partial<z.infer<typeof CreatOddBookSchema>>;
+
+    const defaultValues: FormType = {
+        bookId : Number(bookId),
+        campaignId: Number(campaignId),
+        saleQuantity: 0,
+        discount: 0,
+        // i want to display default value 's commission by minimalCommission 
+        // commission: campaigns?.campaignCommissions?.find(c=>c.genreId  === book?.genre?.parentId)?.minimalCommission,
+        withPdf: false,
+        displayPdfIndex: 0,
+        withAudio: false,
+        displayAudioIndex: 0
+    };
+
+
+    const { register, watch, reset, control, setValue, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormType>({
+        resolver: zodResolver(CreatOddBookSchema),
+        defaultValues,
+    });
+
+
+    const availableFormats = getBookProductsFormatOptions(book, campaigns?.format);
+    const selectedFormat = getBookFormatById(watch('format'));
+
+    const availableBonuses = availableFormats.filter((format) => format.id !== selectedFormat?.id && format.id !== BookFormats.PAPER.id);
+    console.log(errors);
+
+
+
+    const onSubmit = async (data: FormType) => {
+
+        //alert(JSON.stringify(data));
+        try {
+            const payload = CreatOddBookSchema.parse(data);
+            // payload.commission = 10;
+
+            console.log(JSON.stringify(payload));
+            await toast.promise(createOddBookMutation.mutateAsync(payload), {
+                loading: "Đang thêm sách",
+                success: () => {
+                    return "Thêm sách thành công";
+                },
+                error: (err) => err?.message || "Thêm sách thất bại",
+            });
+            console.log(payload)
+        } catch (error) {
+            console.log(error);
+            return;
+        }
+    }
 
 
     return (
         <FormPageLayout>
-            <WelcomeBanner label={'Thêm sách bán lẻ cho sự kiện Tri ân thầy cô 📚'} className="p-6 sm:p-10" />
+            <WelcomeBanner label={`Thêm sách bán lẻ cho hội sách✨${campaigns?.name} 📚`} className="p-6 sm:p-10" />
             <div>
-                <form className="p-6 sm:p-10" onSubmit={form.handleSubmit}>
+                <form className="p-6 sm:p-10" onSubmit={handleSubmit(onSubmit)}>
+                    <div className="mb-6">
+                        <button
+                            type='button'
+                            className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
+                            onClick={() => router.back()}
+                        >
+                            <IoChevronBack size={"17"} />
+                            <span>Quay lại</span>
+                        </button>
+                    </div>
                     <Form.GroupLabel
                         label={"Thông tin chung"}
                         description={"Thông tin cơ bản về sách"}
                     />
                     <div className='mt-3 space-y-4 md:space-y-0 md:flex gap-6'>
                         <Image
-                            width={1000}
-                            height={1000}
+                            width={1200}
+                            height={1200}
                             className={'rounded-md w-64 h-72 object-cover max-w-full shadow-md'}
-                            src={bookSeries?.imageUrl || ''} alt={bookSeries?.name || ''} />
+                            src={book?.imageUrl || ''} alt={book?.name || ''} />
                         <div>
                             <div
-                                className='mb-2 bg-blue-500 text-sm font-medium text-white py-2 px-3 w-fit rounded'>S81239
+                                className='inline mb-2 bg-blue-500 text-sm font-medium text-white py-2 px-3 w-fit rounded'>{book?.code}
                             </div>
-                            <h1 className="mb-2 text-2xl font-medium text-slate-800">{bookSeries?.name}</h1>
-                            <div className="text-gray-500">NXB: {bookSeries?.publisher}</div>
+                            <div
+                                className='inline ml-2 mb-2 bg-amber-500 text-sm font-medium text-white py-2 px-3 w-fit rounded'>{book?.genre?.name}
+                            </div>
+                            <h1 className="mt-3 mb-2 text-2xl font-medium text-slate-800">{book?.name}</h1>
+                            <div className="text-gray-500">NXB: {book?.publisher?.name}</div>
 
 
                             {/* Price */}
-                            <div className="text-emerald-600 font-medium text-xl mt-3">{
-                                new Intl.NumberFormat('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND'
-                                }).format(145500)
-                            }</div>
+                            <div className="text-emerald-600 font-medium text-xl mt-3">
+                                {new Intl.NumberFormat("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                }).format(book?.coverPrice || 0)}
+                            </div>
 
                             {/* Description */}
                             <div className="mt-3 text-sm text-gray-500">
-                                {bookSeries?.description}
+                                {book?.description}
                             </div>
                         </div>
                     </div>
 
                     <div className="mt-4 space-y-4">
-                        <div className="grid gap-y-4 gap-x-4 sm:grid-cols-2">
-                            <Form.Input
+                        <div className="grid gap-y-4 gap-x-4 sm:grid-cols-3">
+                            <Form.Input<FormType>
+                                register={register}
                                 inputType={'number'}
                                 placeholder={"Giảm giá"}
-                                formikForm={form}
                                 fieldName={"discount"}
                                 label={"Giảm giá (%)"}
+                                errorMessage={errors?.discount?.message}
                             />
-                            <Form.Input
+                            <Form.Input<FormType>
+                                register={register}
+                                inputType={'number'}
+                                placeholder={"Chiết khấu"}
+                                fieldName={"commission"}
+                                label={`Chiết khấu (tối thiểu phải từ ${minimalCommission}%)`}
+                                errorMessage={errors?.commission?.message}
+                            />
+                            <Form.Input<FormType>
+                                register={register}
                                 inputType={'number'}
                                 placeholder={"Nhập số lượng sách sẽ được bán"}
-                                formikForm={form}
                                 required={true}
                                 fieldName={"saleQuantity"}
                                 label={"Số lượng"}
+                                errorMessage={errors?.saleQuantity?.message}
                             />
                         </div>
                     </div>
@@ -170,59 +232,67 @@ const AddSellingBookPage: NextPageWithLayout = () => {
                     <div className="mt-3 space-y-4">
                         <div>
                             <Form.Label required={true} label={"Định dạng sách"} />
-                            <SelectBox
-                                placeholder={"Chọn định dạng"}
-                                value={selectedFormat}
-                                onChange={(value) => {
-                                    if (value) {
-                                        setSelectedFormat(value);
-                                        form.setFieldValue("format", value?.id);
-                                    }
-                                }}
-                                dataSource={availableFormats}
-                                displayKey={"name"}
+                            <Controller
+                                control={control}
+                                name="format"
+                                render={({ field }) => (
+                                    <SelectBox<IBookFormat>
+                                        placeholder={"Chọn định dạng"}
+                                        value={selectedFormat || null}
+                                        onValueChange={(value) => {
+                                            if (value) {
+                                                field.onChange(value.id);
+                                                setValue("withPdf", false);
+                                                setValue("withAudio", false);
+                                            }
+                                        }}
+                                        dataSource={availableFormats}
+                                        displayKey={"displayName"}
+                                    />
+                                )}
+
                             />
-                            {form.errors.format && form.touched.format && (
-                                <ErrorMessage>{form.errors.format}</ErrorMessage>
-                            )}
+                            <ErrorMessage>{errors.format?.message}</ErrorMessage>
                         </div>
                         <div>
                             <Form.Label label={"Tặng kèm"} />
                             <div className="grid sm:grid-cols-2">
-                                {selectedFormat ? (availableBonuses?.length > 0 ? availableBonuses.map((format) => (
-                                    <div key={format.id} className="relative flex items-start">
-                                        <div className="flex h-5 items-center">
-                                            <input
-                                                id={`bonus-${format.id}`}
-                                                name="bonus"
-                                                type="checkbox"
-                                                value={format.id}
-                                                onChange={(event => {
-                                                    if (event.target.checked) {
-                                                        handleAddBonus(format.id);
-                                                    } else {
-                                                        handleRemoveBonus(format.id);
-                                                    }
-                                                })
-                                                }
-                                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                            />
+                                {selectedFormat ? (availableBonuses?.length > 0 ? availableBonuses.map((format) => {
+                                    const registerName = format.id === BookFormats.PDF.id ? "withPdf" : "withAudio";
+                                    return (
+                                        <div key={format.id} className="relative flex items-start">
+                                            <div className="flex h-5 items-center">
+                                                <input
+                                                    id={`bonus-${format.id}`}
+                                                    type="checkbox"
+                                                    {...register(registerName)}
+                                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                />
+                                            </div>
+                                            <div className="ml-3 text-sm">
+                                                <label
+                                                    htmlFor={`bonus-${format.id}`}
+                                                    className="text-sm font-medium text-gray-600"
+                                                >
+                                                    Sách {format.displayName} -
+                                                    {selectedFormat?.id === BookFormats.PAPER.id ? (
+                                                        //If the format is a paper book, it will display 2 checkboxes that are audio books and pdf books, each checkbox has a different value
+                                                        <span className="text-gray-500">{format?.id === BookFormats.PDF.id ? (
+                                                            <span className="text-gray-500">{book?.pdfExtraPrice} ₫</span>
+                                                        ) : (
+                                                            <span className="text-gray-500">{book?.audioExtraPrice} ₫</span>
+                                                        )
+                                                        }</span>
+                                                    ) : selectedFormat?.id === BookFormats.PDF.id ? (
+                                                        <span className="text-gray-500">{book?.audioExtraPrice} ₫</span>
+                                                    ) : (
+                                                        <span className="text-gray-500">{book?.pdfExtraPrice} ₫</span>
+                                                    )}
+                                                </label>
+                                            </div>
                                         </div>
-                                        <div className="ml-3 text-sm">
-                                            <label
-                                                htmlFor={`bonus-${format.id}`}
-                                                className="text-sm font-medium text-gray-600"
-                                            >
-                                                Sách {format.name} - {
-                                                    new Intl.NumberFormat('vi-VN', {
-                                                        style: 'currency',
-                                                        currency: 'VND',
-                                                    }).format(145500)
-                                                }
-                                            </label>
-                                        </div>
-                                    </div>
-                                )) : <div className="text-gray-500 text-sm">Không tìm thấy tặng kèm khả dụng.</div>) : (
+                                    )
+                                }) : <div className="text-gray-500 text-sm">Không tìm thấy tặng kèm khả dụng.</div>) : (
                                     <div className="text-gray-500 text-sm">Bạn cần chọn định dạng để xem được các mục
                                         tặng kèm khả dụng.</div>
                                 )}
@@ -239,8 +309,9 @@ const AddSellingBookPage: NextPageWithLayout = () => {
                         </button>
                     </div>
                 </form>
+                <pre>{JSON.stringify(watch(), null, 2)}</pre>
             </div>
-        </FormPageLayout>
+        </FormPageLayout >
     )
 }
 

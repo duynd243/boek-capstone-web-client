@@ -49,4 +49,42 @@ export class OrderService extends BaseService {
         const response = await this.axiosClient.get<IOrder>(`/issuer/orders/${id}`);
         return response.data;
     };
+
+    updateOrderToShippingStatus = async (param?: any) => {
+        const response = await this.axiosClient.put<IOrder>(
+            "/issuer/orders/shipping", param
+        );
+        return response.data;
+    }
+
+    updateShippingToShippedStatus = async (param?: any) => {
+        const response = await this.axiosClient.put<IOrder>(
+            "/issuer/orders/shipped", param
+        );
+        return response.data;
+    }
+
+    updateCancelOrderStatus = async (param?: any) => {
+        const response = await this.axiosClient.put<IOrder>(
+            "/issuer/orders/cancel", param
+        );
+        return response.data;
+    }
+    updatePickUpOrderToShippingStatus = async (param?: any) => {
+        const response = await this.axiosClient.put<IOrder>(
+            "/issuer/orders/available", param
+        );
+        return response.data;
+    }
+    updatePickUpOrderAdress = async (param?: any) => {
+        const response = await this.axiosClient.put<IOrder>(
+            "/issuer/orders/available/address", param
+        );
+        return response.data;
+    }
+
+    getOrderAddressesIdByIssuer = async (id: string) => {
+        const response = await this.axiosClient.get<string[]>(`/issuer/orders/campaigns/addresses/${id}`);
+        return response.data;
+    };
 }

@@ -63,7 +63,7 @@ const Input = <T extends Record<string, any>>({
         <div>
             <Label fieldName={fieldName} label={label} required={required}/>
             {isTextArea ? (
-                <textarea rows={3} {...commonProps} />
+                <textarea rows={7} {...commonProps} />
             ) : (
                 <input {...commonProps} type={inputType}/>
             )}
@@ -139,7 +139,7 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                 {imgSrc ? (
                     <Image
                         className={
-                            "mx-auto mb-4 rounded-md object-cover object-center"
+                            "mb-4 w-40 rounded-md object-cover object-center"
                         }
                         width={500}
                         height={500}

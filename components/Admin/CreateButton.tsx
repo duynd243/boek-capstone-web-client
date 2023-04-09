@@ -7,11 +7,12 @@ type Props = {
     onClick?: () => void;
     label: string;
     className?: string;
-};
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-const CreateButton: React.FC<Props> = ({label, onClick, href, className}) => {
+const CreateButton: React.FC<Props> = ({label, onClick, href, className, ...rest}) => {
     const commonProps = {
-        className: `m-btn gap-1 bg-indigo-500 text-white hover:bg-indigo-600 ${className}`,
+        className: `m-btn gap-1 bg-indigo-500 text-white hover:bg-indigo-600 ${className} disabled:opacity-50 disabled:cursor-not-allowed`,
+        ...rest,
     };
 
     const children = (

@@ -11,13 +11,13 @@ import TableHeading from "../../../components/Admin/Table/TableHeading";
 import TableHeader from "../../../components/Admin/Table/TableHeader";
 import TableBody from "../../../components/Admin/Table/TableBody";
 import TableData from "../../../components/Admin/Table/TableData";
-import OrderDetailsModal, {IMockOrder, mockOrders} from "../../../components/Modal/OrderDetailsModal";
+import OrderPickUpDetailsModal, {IMockOrder, mockOrders} from "../../../components/Modal/OrderPickUpDetailsModal";
 import {OrderTypes} from "../../../constants/OrderTypes";
-import {getOrderStatusById, OrderStatuses} from "../../../constants/OrderStatuses";
+import {getOrderPickUpStatusById, OrderPickUpStatuses} from "../../../constants/OrderPickUpStatuses";
 import {FiMoreHorizontal} from "react-icons/fi";
 import {Menu, Tab} from "@headlessui/react";
 import {MdBlock, MdEdit, MdSort} from "react-icons/md";
-import OrderStatusModal from "../../../components/Modal/OrderStatusModal";
+import OrderStatusPickUpModal from "../../../components/Modal/OrderStatusPickUpModal";
 import CancelOrderModal from "../../../components/Modal/CancelOrderModal";
 import Form from "../../../components/Form";
 import Chip from "../../../components/Admin/Chip";
@@ -27,13 +27,13 @@ const OrderTypeTabs = [
     {
         id: undefined,
         name: "All",
-        displayName: "Tất cả loại đơn hàng",
+        displayName: "Đơn nhận tại quầy",
     },
-    {
-        ...OrderTypes.PICKUP,
-    }, {
-        ...OrderTypes.SHIPPING,
-    }
+    // {
+    //     ...OrderTypes.PICKUP,
+    // }, {
+    //     ...OrderTypes.SHIPPING,
+    // }
 ];
 
 const OrderStatusTabs = [
@@ -41,10 +41,26 @@ const OrderStatusTabs = [
         id: undefined,
         name: "All",
         displayName: "Tất cả trạng thái",
-    }, ...Object.values(OrderStatuses)
+    },
+    // , ...Object.values(OrderStatuses)
+    {
+        id: OrderPickUpStatuses.PROCESSING,
+        name: "Đang xử lý",
+        displayName: "Đang xử lý",
+    },
+    {   
+        id: OrderPickUpStatuses.WAITING_RECEIVE,
+        name: "Đang chờ nhận",
+        displayName: "Đang chờ nhận",
+    },
+    {
+        id: OrderPickUpStatuses.RECEIVED,
+        name: "Đã nhận",
+        displayName: "Đã nhận",
+    },
 ];
 
-const IssuerOrdersPage: NextPageWithLayout = () => {
+const IssuerOrdersPickUpPage: NextPageWithLayout = () => {
         const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
         const [showDetails, setShowDetails] = useState(false);
         const [showUpdateStatusModal, setShowUpdateStatusModal] = useState(false);
@@ -80,7 +96,7 @@ const IssuerOrdersPage: NextPageWithLayout = () => {
         ]
         return (
             <Fragment>
-                <PageHeading label="Đơn hàng"></PageHeading>
+                <PageHeading label="Đơn nhận tại quầy"></PageHeading>
                 <div className='bg-white px-4 rounded mb-2'>
                     <Tab.Group>
                         <div className="border-b pt-2 border-gray-200 flex items-center justify-between">
@@ -146,7 +162,7 @@ const IssuerOrdersPage: NextPageWithLayout = () => {
                         <TableHeader>Ngày đặt hàng</TableHeader>
                         <TableHeader>Địa chỉ giao / nhận hàng</TableHeader>
                         <TableHeader>Tổng tiền</TableHeader>
-                        <TableHeader>Loại đơn hàng</TableHeader>
+                        <TableHeader>Hội sách</TableHeader>
                         <TableHeader>Trạng thái</TableHeader>
                         <TableHeader>
                             <span className="sr-only">Edit</span>
@@ -197,7 +213,10 @@ const IssuerOrdersPage: NextPageWithLayout = () => {
                                             currency: "VND",
                                         }).format(order.total)}
                                     </TableData>
-                                    <TableData>
+                                    <TableData className="text-sm text-gray-500">
+                                        {order.campaignName}
+                                    </TableData>
+                                    {/* <TableData>
                   <span
                       className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase leading-5 text-slate-600">
                     {order.orderType === OrderTypes.SHIPPING.id ? (
@@ -212,11 +231,11 @@ const IssuerOrdersPage: NextPageWithLayout = () => {
                         </>
                     )}
                   </span>
-                                    </TableData>
+                                    </TableData> */}
                                     <TableData>
                   <span
                       className="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-semibold uppercase leading-5 text-green-800">
-                    {getOrderStatusById(order.status)?.displayName}
+                    {getOrderPickUpStatusById(order.status)?.displayName}
                   </span>
                                     </TableData>
                                     <TableData className="text-right text-sm font-medium">
@@ -267,13 +286,13 @@ const IssuerOrdersPage: NextPageWithLayout = () => {
                     </TableBody>
                 </TableWrapper>
 
-                <OrderDetailsModal isOpen={showDetails}
+                <OrderPickUpDetailsModal isOpen={showDetails}
                                    order={selectedOrder}
                                    onClose={() => setShowDetails(false)}
                                    afterLeave={() => selectedOrder && setSelectedOrder(undefined)}
                 />
 
-                <OrderStatusModal isOpen={showUpdateStatusModal}
+                <OrderStatusPickUpModal isOpen={showUpdateStatusModal}
                                   onClose={() => setShowUpdateStatusModal(false)}
                                   order={selectedOrder}/>
 
@@ -286,7 +305,7 @@ const IssuerOrdersPage: NextPageWithLayout = () => {
     }
 ;
 
-IssuerOrdersPage.getLayout = function getLayout(page: ReactElement) {
+IssuerOrdersPickUpPage.getLayout = function getLayout(page: ReactElement) {
     return <AdminLayout>{page}</AdminLayout>;
 };
-export default IssuerOrdersPage;
+export default IssuerOrdersPickUpPage;

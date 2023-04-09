@@ -14,7 +14,6 @@ export interface IOrderDetail {
     withAudio?: boolean;
     subTotal?: number;
     bookProduct?: IBookProduct;
-    subTotal?: number;
 }
 
 export interface IOrder {

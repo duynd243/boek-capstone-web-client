@@ -23,6 +23,8 @@ import { findRole, Roles } from "../../constants/Roles";
 import { IParticipation } from "../../old-types/participation/IParticipation";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { IOrganizationCampaign } from "../../old-types/joins/IOrganizationCampaign";
+
 
 const FeaturedItem: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -120,8 +122,9 @@ const SystemActions: React.FC<{ campaign: ICampaign }> = ({ campaign }) => {
 
 type Props = {
   campaign: ICampaign;
+  organization: IOrganizationCampaign;
 };
-const AdminCampaignCard: React.FC<Props> = ({ campaign }) => {
+const AdminCampaignCard: React.FC<Props> = ({ campaign, organization }) => {
   const { loginUser } = useAuth();
   const router = useRouter();
   const issuers = campaign.participations
@@ -189,13 +192,15 @@ const AdminCampaignCard: React.FC<Props> = ({ campaign }) => {
             <IoBusiness />
             <span>
               Tổ chức:{" "}
-              {campaign?.organizationCampaigns &&
+              {/* {campaign?.organizationCampaigns &&
               campaign?.organizationCampaigns?.length > 0
                 ? campaign?.organizationCampaigns
                     ?.map((o) => o?.organization?.name)
                     .join(", ")
-                : "Chưa có"}
+                : "Chưa có"} */}
+          {organization?.organization?.name}
             </span>
+            
           </FeaturedItem>
           <FeaturedItem>
             <IoLocation />

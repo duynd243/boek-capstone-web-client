@@ -54,24 +54,6 @@ export const ISSUER_SETTINGS_MENUS: ISidebarMenu[] = [
     },
 ];
 
-export const CUSTOMER_SETTINGS_MENUS: ISidebarMenu[] = [
-    {
-        icon: <BsFillPersonVcardFill />,
-        name: "Hồ sơ",
-        path: "/profile",
-    },
-    {
-        icon: <BsFillFileEarmarkMedicalFill />,
-        name: "Đơn hàng",
-        path: "/orders",
-    },
-    {
-        name: "Cài đặt khác",
-        path: "/other",
-    },
-];
-
-
 export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
     {
         groupName: "Hệ thống",
@@ -79,22 +61,22 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
             {
                 name: "Thống kê",
                 path: "/admin",
-                icon: <BsFillPieChartFill />,
+                icon: <BsFillPieChartFill/>,
             },
             {
                 name: "Hội sách",
                 path: "/admin/campaigns",
-                icon: <GiShop />,
+                icon: <GiShop/>,
             },
             {
                 name: "Tham gia hội sách",
                 path: "/admin/participants",
-                icon: <MdContactMail />,
+                icon: <MdContactMail/>,
             },
             {
-                name: "Sách bán",
+                name: "Xét duyệt sách bán",
                 path: "/admin/products",
-                icon: <MdBook />,
+                icon: <MdBook/>,
             },
             {
                 name: "Đơn hàng",
@@ -115,20 +97,10 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                     // },
                 ],
             },
-            // {
-            //     name: "Đơn hàng trực tuyến",
-            //     path: "/admin/orders",
-            //     icon: <BsFillFileEarmarkMedicalFill />,
-            // },
-            // {
-            //     name: "Đơn hàng hội sách",
-            //     path: "/admin/orders2",
-            //     icon: <BsFillFileEarmarkMedicalFill />,
-            // },
             {
                 name: "Nhân sự",
                 path: "/admin/personnels",
-                icon: <BsFillBriefcaseFill />,
+                icon: <BsFillBriefcaseFill/>,
             },
         ],
     },
@@ -138,27 +110,27 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
             {
                 name: "Nhà phát hành",
                 path: "/admin/issuers",
-                icon: <BsStack />,
+                icon: <BsStack/>,
             },
             {
                 name: "Kho sách",
                 path: "/admin/books",
-                icon: <ImBook />,
+                icon: <ImBook/>,
             },
             {
                 name: "Nhà xuất bản",
                 path: "/admin/publishers",
-                icon: <BsPrinterFill />,
+                icon: <BsPrinterFill/>,
             },
             {
                 name: "Tác giả",
                 path: "/admin/authors",
-                icon: <BsFillPenFill />,
+                icon: <BsFillPenFill/>,
             },
             {
                 name: "Thể loại sách",
                 path: "/admin/genres",
-                icon: <BsFillTagsFill />,
+                icon: <BsFillTagsFill/>,
             },
         ],
     },
@@ -168,23 +140,23 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
             {
                 name: "Khách hàng",
                 path: "/admin/customers",
-                icon: <BsFillPeopleFill />,
+                icon: <BsFillPeopleFill/>,
             },
             {
                 name: "Tổ chức",
                 path: "/admin/organizations",
-                icon: <BsFillDiagram3Fill />,
+                icon: <BsFillDiagram3Fill/>,
             },
             {
                 name: "Nhóm",
                 path: "/admin/groups",
-                icon: <BsCollectionFill />,
+                icon: <BsCollectionFill/>,
             },
 
             {
                 name: "Cấp độ khách hàng",
                 path: "/admin/levels",
-                icon: <IoMedalSharp />,
+                icon: <IoMedalSharp/>,
             },
         ],
     },
@@ -195,86 +167,77 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
             {
                 name: "Cài đặt",
                 path: "/admin/settings/profile",
-                icon: <BsFillGearFill />,
+                icon: <BsFillGearFill/>,
             },
         ],
     },
 ];
 
-// export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
-//     {
-//         groupName: "Chung",
-//         menus: [
-//             {
-//                 name: "Tổng quan",
-//                 path: "/issuer",
-//                 icon: <BsFillPieChartFill/>,
-//             },
-//
-//             {
-//                 name: "Hội sách",
-//                 path: "/issuer/campaigns",
-//                 icon: <BsFillCalendarWeekFill/>,
-//             },
-//             {
-//                 name: "Tham gia hội sách",
-//                 path: "/issuer/participants",
-//                 icon: <MdContactMail/>,
-//             },
-//             {
-//                 name: "Kho sách",
-//                 path: "/issuer/books",
-//                 icon: <ImBook/>,
-//             },
-//             {
-//                 name: "Đơn hàng",
-//                 path: "/issuer/orders",
-//                 icon: <BsFillFileEarmarkMedicalFill/>,
-//             },
-//         ],
-//     },
-//     {
-//         groupName: "Cài đặt",
-//         menus: [
-//             {
-//                 name: "Cài đặt",
-//                 path: "/issuer/settings",
-//                 icon: <BsFillGearFill/>,
-//             },
-//         ],
-//     },
-// ];
-
 export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
     {
-        groupName: "Hệ Thống",
+        groupName: "Chung",
         menus: [
             {
-                name: "Thống kê",
+                name: "Tổng quan",
                 path: "/issuer",
-                icon: <BsFillPieChartFill />,
+                icon: <BsFillPieChartFill/>,
             },
 
             {
                 name: "Hội sách",
                 path: "/issuer/campaigns",
-                icon: <BsFillCalendarWeekFill />,
+                icon: <BsFillCalendarWeekFill/>,
             },
             {
                 name: "Tham gia hội sách",
                 path: "/issuer/participants",
-                icon: <MdContactMail />,
+                icon: <MdContactMail/>,
+            },
+            {
+                name: "Sách bán",
+                path: "/issuer/products",
+                icon: <MdBook />,
             },
             {
                 name: "Đơn hàng",
-                path: "/issuer/orders",
+                path: "issuer/orders",
                 icon: <BsFillFileEarmarkMedicalFill />,
+                subMenus: [
+                    {
+                        name: "Đơn giao",
+                        path: "/issuer/orders/delivery",
+                    },
+                    {
+                        name: "Đơn tại quầy",
+                        path: "/issuer/orders/pickup",
+                    },
+                ]
             },
         ],
     },
     {
         groupName: "Đối tác",
         menus: [
+            {
+                name: "Kho sách",
+                path: "/issuer/books",
+                icon: <ImBook />,
+            },
+            // {
+            //     name: "Nhà xuất bản",
+            //     path: "/admin/publishers",
+            //     icon: <BsPrinterFill />,
+            // },
+            // {
+            //     name: "Tác giả",
+            //     path: "/admin/authors",
+            //     icon: <BsFillPenFill />,
+            // },
+            // {
+            //     name: "Thể loại sách",
+            //     path: "/admin/categories",
+            //     icon: <BsFillTagsFill />,
+            // },
             {
                 name: "Kho sách",
                 path: "/issuer/books",
@@ -297,8 +260,8 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
             },
             {
                 name: "Cài đặt",
-                path: "/issuer/settings/profile",
-                icon: <BsFillGearFill />,
+                path: "/issuer/settings",
+                icon: <BsFillGearFill/>,
             },
         ],
     },

@@ -10,6 +10,8 @@ const initialFormValues = {
   genreId: "",
   description: "",
   selectedBooks: [],
+  authors: [],
+  previewFile: null,
 };
 
 export interface ICreateComboStore {

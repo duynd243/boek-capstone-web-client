@@ -22,23 +22,6 @@ export class BookFormats {
     }
 }
 
-const a = {
-    hobbies: [{
-        id: 1,
-        name: "Reading",
-    }, {
-        id: 2,
-        name: "Writing",
-    }],
+export function getBookFormatById(id: number | undefined): IBookFormat | undefined {
+    return Object.values(BookFormats).find((format) => format.id === id);
 }
-
-const b = {
-    hobbies: [{
-        id: 1,
-        name: "Reading",
-    }, {
-        id: 3,
-        name: "Drawing",
-    }],
-}
-

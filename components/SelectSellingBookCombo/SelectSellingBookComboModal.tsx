@@ -1,42 +1,58 @@
-import React, {useState} from 'react'
-import {fakeBookSeries, randomBooks} from "../../pages/admin/books";
-import {BsCheckCircle, BsSearch} from "react-icons/bs";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
-import Modal from "../Modal/Modal";
-import TransitionModal from "../Modal/TransitionModal";
-import Image from "next/image";
-import {faker} from "@faker-js/faker/locale/vi";
-import Link from "next/link";
-import {IBook} from "../../types/Book/IBook";
-import {IBookProduct} from "../../types/Book/IBookProduct";
-import {getFormatsOfBook} from "../../utils/helper";
+import React from 'react'
+import { IBook } from './../../types/Book/IBook';
+import TransitionModal from './../Modal/TransitionModal';
+import { BsSearch } from 'react-icons/bs';
+import useDebounce from './../../hooks/useDebounce';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '../../context/AuthContext';
+import { BookService } from './../../services/BookService';
+import Modal from './../Modal/Modal';
+import Link from 'next/link';
+import Image from 'next/image';
+import EmptyState, { EMPTY_STATE_TYPE } from '../EmptyState';
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    selectedBooks: IBook[];
     onItemSelect: (book: IBook) => void;
-};
-const SelectSellingBookComboModal: React.FC<Props> = ({
-                                                          isOpen,
-                                                          onClose,
-                                                          selectedBooks,
-                                                          onItemSelect
-                                                      }) => {
+    genreId?: number;
+    selectedBooks?: Array<Pick<IBook, "id"> | Partial<IBook>>;
+}
 
-    const [search, setSearch] = useState<string>("");
-    const searchedBooks = randomBooks.filter((book) => book?.name?.toLowerCase().includes(search.toLowerCase()));
+const SelectSellingBookComboModal = ({
+    isOpen,
+    onClose,
+    onItemSelect,
+    genreId,
+    selectedBooks,
+}: Props) => {
+    const {loginUser} = useAuth();
+    const [search, setSearch] = useState("");
+    const debouncedSearch = useDebounce(search, 500);
+    const bookService = new BookService(loginUser?.accessToken);
+
+    const { data: books } = useQuery(["issuer_books", debouncedSearch, genreId], () =>
+        bookService.getBooks$Issuer({
+            name: debouncedSearch,
+            genreIds: [genreId],
+            isSeries: false,
+        })
+    );
+
+
+
 
     return (
         <TransitionModal
-            maxWidth={"max-w-2xl"}
+            maxWidth={"max-w-3xl"}
             isOpen={isOpen}
-            closeOnOverlayClick={true}
+            closeOnOverlayClick={false}
             onClose={onClose}
         >
             <div className="overflow-hidden rounded-xl">
                 <div>
-                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Tìm kiếm sách"
@@ -46,15 +62,19 @@ const SelectSellingBookComboModal: React.FC<Props> = ({
                     />
                 </div>
                 <div className="h-96 overflow-y-auto">
-                    {searchedBooks.length > 0 ? (
-                        searchedBooks.map((book, index) => {
-                            const isSelected = selectedBooks?.find(b => b?.id === book?.id);
+                    {books?.data && books?.data.length > 0 ? (
+                        books?.data.map((book, index) => {
+                            const isSelected = selectedBooks?.find(
+                                (item) => item.id === book.id
+                            );
                             return (
                                 <div
                                     onClick={() => {
-                                        if (!isSelected) onItemSelect(book)
+                                        if (!isSelected) {
+                                            onItemSelect(book);
+                                        }
                                     }}
-                                    key={book?.id}
+                                    key={index}
                                     className={`relative flex justify-between border-b border-gray-300 p-4 pr-12 ${
                                         isSelected
                                             ? "cursor-not-allowed bg-slate-100"
@@ -70,27 +90,17 @@ const SelectSellingBookComboModal: React.FC<Props> = ({
                                             alt=""
                                         />
                                         <div>
-                                            <div
-                                                className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
-                                                {`B${faker.datatype.number({
-                                                    min: 10000,
-                                                    max: 99999,
-                                                })}`}
+                                            <div className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
+                                                {book?.code}
                                             </div>
                                             <div className="mb-1 text-sm font-medium text-gray-900">
-                                                {book.name}
+                                                {book?.name}
                                             </div>
+                                            {/* <div className="text-sm font-medium text-gray-500">
+                                                Số sách trong Series: {book?.bookItems?.length}
+                                            </div> */}
                                             <div className="text-sm font-medium text-gray-500">
-                                                NXB: {faker.company.name()}
-                                            </div>
-                                            <div className='flex gap-1.5 flex-wrap mt-3'>
-                                                {getFormatsOfBook(book).map(format => (
-                                                    <div
-                                                        key={format?.id}
-                                                        className="inline-block rounded py-1 px-2 text-xs text-blue-500 bg-white border border-blue-500">{format?.displayName}
-                                                    </div>
-                                                ))}
-
+                                                Thể loại: {book?.genre?.name}
                                             </div>
                                         </div>
                                     </div>
@@ -98,14 +108,8 @@ const SelectSellingBookComboModal: React.FC<Props> = ({
                                         {new Intl.NumberFormat("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
-                                        }).format(faker.datatype.number())}
+                                        }).format(book?.coverPrice || 0)}
                                     </div>
-
-                                    {isSelected && (
-                                        <div className="absolute top-1/2 right-4 -translate-y-1/2 transform">
-                                            <BsCheckCircle className="text-green-500"/>
-                                        </div>
-                                    )}
                                 </div>
                             );
                         })
@@ -129,7 +133,7 @@ const SelectSellingBookComboModal: React.FC<Props> = ({
                             href="/issuer/books/create-series"
                             className="m-btn bg-indigo-600 text-white hover:bg-indigo-700"
                         >
-                            Tạo mới
+                            Tạo sách mới
                         </Link>
                     </div>
                 </Modal.Footer>
