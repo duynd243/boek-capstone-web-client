@@ -63,8 +63,8 @@ const AdminProfilePage = () => {
             return userService.updateUserByAdmin(data);
         },
         {
-            onSuccess: () => {
-                queryClient.invalidateQueries(["profile"]);
+            onSuccess: async () => {
+                await queryClient.invalidateQueries(["profile"]);
                 // reinitialize the form with the new data
                 //formMethods.reset(defaultValues);
             },
@@ -77,7 +77,6 @@ const AdminProfilePage = () => {
 
     const onSubmit = async (data: UpdateProfileFormType) => {
 
-        console.log(data);
         if (data.previewFile && data.previewFile instanceof File) {
             try {
                 await toast.promise(

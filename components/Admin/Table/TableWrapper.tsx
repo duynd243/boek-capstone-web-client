@@ -1,23 +1,23 @@
 import React from "react";
 
 type Props = {
-  children: React.ReactNode;
+    children: React.ReactNode;
 };
 
 const TableWrapper: React.FC<Props> = ({ children }) => {
-  return (
-    <div className="flex flex-col">
-      <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div className="overflow-hidden border border-slate-200 shadow sm:rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200 bg-gray-50">
-              {children}
-            </table>
-          </div>
+    return (
+        <div className="flex flex-col">
+            <div className="overflow-x-auto border border-slate-200 shadow-lg rounded-sm">
+                <div className="inline-block min-w-full align-middle">
+                    <div className="overflow-hidden shadow">
+                        <table className="min-w-full divide-y divide-gray-200 bg-slate-50">
+                            {children}
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default TableWrapper;

@@ -1,9 +1,9 @@
-import axios, {AxiosInstance, AxiosResponse} from "axios";
-import  qs from 'qs';
+import axios, { AxiosInstance, AxiosResponse } from "axios";
+import qs from "qs";
 
 const getAxiosClient = (
     accessToken?: string,
-    customURL?: string
+    customURL?: string,
 ): AxiosInstance => {
     const axiosClient = axios.create({
         
@@ -14,14 +14,14 @@ const getAxiosClient = (
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
         config.paramsSerializer = {
-            serialize: (params) => qs.stringify(params, { arrayFormat: 'repeat' })
-          }
+            serialize: (params) => qs.stringify(params, { arrayFormat: "repeat" }),
+        };
         return config;
     });
 
     axiosClient.interceptors.response.use(
         (response: AxiosResponse) => response,
-        (error) => Promise.reject(error.response && error.response.data)
+        (error) => Promise.reject(error.response && error.response.data),
     );
 
     return axiosClient;

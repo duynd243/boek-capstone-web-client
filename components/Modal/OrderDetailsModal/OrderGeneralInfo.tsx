@@ -1,19 +1,12 @@
-import React from 'react'
+import React from "react";
 import SectionHeader from "./SectionHeader";
-import {IMockOrder} from "./index";
 import Image from "next/image";
-import {getOrderStatusById} from "../../../constants/OrderStatuses";
-import { IOrder } from '../../../types/Order/IOrder';
-import { useRouter } from 'next/router';
-import { useAuth } from '../../../context/AuthContext';
-import { OrderService } from './../../../services/OrderService';
-import { useQuery } from '@tanstack/react-query';
-import DefaultAvatar from "../../../assets/images/default-avatar.png";
+import { getOrderStatusById } from "../../../constants/OrderStatuses";
+import { IOrder } from "../../../types/Order/IOrder";
 import { getFormattedTime } from "../../../utils/helper";
 import { OrderTypes } from "../../../constants/OrderTypes";
-
-
-
+import { getOrderPaymentMethodById } from "../../../constants/OrderPaymentMethods";
+import DefaultAvatar from "../../../assets/images/default-avatar.png";
 
 type Props = {
     order: IOrder | undefined;
@@ -70,7 +63,7 @@ const OrderGeneralInfo: React.FC<Props> = ({ order }) => {
                     <div className={labelClasses}>Địa chỉ giao hàng</div>
                     <div
                         className="text-sm font-medium text-slate-800 sm:text-right">
-                        {order?.type === OrderTypes.DELIVERY.id ? (order?.address || "-") : order?.type === OrderTypes.PICKUP.id ? (order?.address || "-") : "-"}
+                        {order?.type === OrderTypes.DELIVERY.id ? (order?.address || "-") : (order?.campaign?.address || "-")}
                     </div>
                 </li>
 
@@ -79,4 +72,4 @@ const OrderGeneralInfo: React.FC<Props> = ({ order }) => {
     );
 };
 
-export default OrderGeneralInfo
+export default OrderGeneralInfo;

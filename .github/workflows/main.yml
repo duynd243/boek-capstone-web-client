@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: 18
       - run: npm i -g pnpm
-      - run: pnpm install
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm build
       # Copy workspace into server
       - name: Deploy to Staging server

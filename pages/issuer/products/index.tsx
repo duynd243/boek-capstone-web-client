@@ -24,6 +24,12 @@ import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import Link from "next/link";
 import { BookProductService } from './../../../services/BookProductService';
 import { getBookTypeById } from "../../../constants/BookTypes";
+import { useRouter } from 'next/router';
+import { CampaignStatuses } from '../../../constants/CampaignStatuses copy';
+import SelectBox from '../../../components/SelectBox';
+import { ICampaign } from '../../../types/Campaign/ICampaign';
+import { Roles } from '../../../constants/Roles';
+import { CampaignService } from '../../../services/CampaignService';
 
 const BookProductTabs = [
     BookProductStatuses.Pending,
@@ -43,12 +49,30 @@ const NotSaleStatusTabs = [
     BookProductStatuses.Unreleased,
 ]
 const IssuerBookProductsPage: NextPageWithLayout = () => {
-
+    const router = useRouter();
     const { loginUser } = useAuth();
     const bookProductService = new BookProductService(loginUser?.accessToken);
+    
+    const campaignIdFromUrl = router.query["campaign"] as string;
+    const [campaignId, setCampaignId] = useState<number | null>(Number(campaignIdFromUrl) || null);
 
+    const campaignService = new CampaignService(loginUser?.accessToken);
     const [status, setStatus] = useState(BookProductTabs[0].id);
     const [notSaleStatus, setNotSaleStatus] = useState(NotSaleStatusTabs[0].id);
+
+    const { data: campaigns, isInitialLoading: isCampaignsLoading } = useQuery(
+        [loginUser?.role === Roles.SYSTEM.id ? "admin_campaigns" : "issuer_campaigns"],
+        loginUser?.role === Roles.SYSTEM.id ?
+            () => campaignService.getCampaignsByAdmin({
+                size: 100,
+                sort: "CreatedDate desc, UpdatedDate desc",
+            })
+            :
+            () => campaignService.getCampaignsByCustomer({
+                size: 100,
+                sort: "CreatedDate desc, UpdatedDate desc",
+            }),
+    );
     const {
         search,
         setSearch,
@@ -69,20 +93,24 @@ const IssuerBookProductsPage: NextPageWithLayout = () => {
         setPage(1);
     }
 
+    const params = {
+        title: search,
+        page,
+        size,
+        status: status === "Stopped" ? notSaleStatus : status,
+        sort: "CreatedDate desc, UpdatedDate desc",
+        "Campaign.Status": status === BookProductStatuses.Pending.id ? CampaignStatuses.NOT_STARTED.id : undefined,
+        campaignId: campaignId || undefined,
+    };
+
     const {
         data: productData,
         isLoading,
         isFetching,
     } = useQuery(
-        ["issuer_products", { search, page, size, status: status === 'Stopped' ? notSaleStatus : status }],
+        ["issuer_products", params],
         () =>
-            bookProductService.getBookProductsByIssuer({
-                title: search,
-                page,
-                size,
-                status: status === 'Stopped' ? notSaleStatus : status,
-                sort: "id desc",
-            }),
+            bookProductService.getBookProductsByIssuer(params),
         {
             keepPreviousData: true,
         }
@@ -97,9 +125,9 @@ const IssuerBookProductsPage: NextPageWithLayout = () => {
                 />
             </PageHeading>
 
-            <div className="bg-white px-4 md:px-6 rounded">
-                <Tab.Group>
-                    <div className="border-b pt-2 border-gray-200">
+            <div className="bg-white rounded mb-3">
+                <div className="border-b px-4 border-gray-200 flex items-center justify-between">
+                    <Tab.Group>
                         <ul className="flex flex-wrap gap-2">
                             {BookProductTabs.map((tab) => (
                                 <Tab
@@ -109,17 +137,44 @@ const IssuerBookProductsPage: NextPageWithLayout = () => {
                                     key={tab.id}
                                 >
                                     <div
-                                        className="cursor-pointer ui-selected:border-indigo-500 ui-selected:text-indigo-600 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
+                                        className="cursor-pointer ui-selected:border-indigo-500 ui-selected:text-indigo-600 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-4 border-b-2 font-medium text-sm">
                                         {tab.displayName}
                                     </div>
                                 </Tab>
                             ))}
                         </ul>
+                    </Tab.Group>
+
+                    <div className={"w-72"}>
+                        <SelectBox<Partial<ICampaign>>
+                            value={
+                                campaigns?.data?.find((c) => c?.id === campaignId) || null
+                            }
+                            placeholder={isCampaignsLoading ? "Đang tải..." : "Tất cả hội sách"}
+                            dataSource={[{
+                                id: undefined,
+                                name: "Tất cả hội sách",
+                            }, ...campaigns?.data || []]}
+                            onValueChange={async (c) => {
+                                if (c) {
+                                    if (c?.id === campaignId) return;
+                                    setCampaignId(c?.id || null);
+                                    await router.push({
+                                        pathname: router.pathname,
+                                        query: {
+                                            ...router.query,
+                                            "campaign": c?.id,
+                                        },
+                                    });
+                                }
+                            }}
+                            disabled={isCampaignsLoading}
+                            displayKey={"name"} />
                     </div>
-                </Tab.Group>
-                {status === 'Stopped' &&
+                </div>
+                {status === "Stopped" &&
                     <Tab.Group>
-                        <div className="py-6">
+                        <div className="py-6 px-4">
                             <ul className="flex flex-wrap gap-2">
                                 {NotSaleStatusTabs.map((tab) => (
                                     <Tab
@@ -149,7 +204,7 @@ const IssuerBookProductsPage: NextPageWithLayout = () => {
 
 
             </div>
-            <div className="mt-4">
+            <div className="mt-3">
                 {productData?.data && productData?.data?.length > 0 ? (
                     <TableWrapper>
                         <TableHeading>

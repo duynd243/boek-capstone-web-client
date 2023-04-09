@@ -1,10 +1,4 @@
-import React, {
-    Fragment,
-    ReactElement,
-    useCallback,
-    useEffect,
-    useState,
-} from "react";
+import React, { Fragment, ReactElement, useCallback, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import PageHeading from "../../../components/Admin/PageHeading";
@@ -14,10 +8,7 @@ import Image from "next/image";
 import { useAuth } from "../../../context/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
-import { useRouter } from "next/router";
-import AuthorModal, {
-    AuthorModalMode,
-} from "../../../components/Modal/AuthorModal";
+import AuthorModal, { AuthorModalMode } from "../../../components/Modal/AuthorModal";
 import TableFooter from "../../../components/Admin/Table/TableFooter";
 import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import TableData from "../../../components/Admin/Table/TableData";
@@ -28,7 +19,6 @@ import TableHeading from "../../../components/Admin/Table/TableHeading";
 import { getAvatarFromName } from "../../../utils/helper";
 import LoadingTopPage from "../../../components/LoadingTopPage";
 import { IAuthor } from "../../../types/Author/IAuthor";
-import useSearchQuery from "../../../hooks/useSearchQuery";
 import useTableManagementPage from "../../../hooks/useTableManagementPage";
 import { AuthorService } from "../../../services/AuthorService";
 import ConfirmModal from "../../../components/Modal/ConfirmModal";

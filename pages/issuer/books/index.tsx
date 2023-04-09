@@ -147,7 +147,7 @@ const IssuerBooksPage: NextPageWithLayout = () => {
                       src={book.imageUrl || ""}
                       alt=""
                     />
-                    <div className="max-w-56 overflow-hidden text-ellipsis text-sm font-medium text-gray-900">
+                    <div className="max-w-[15rem] overflow-hidden text-ellipsis text-sm font-medium text-gray-900">
                       {book.name}
                     </div>
                   </div>

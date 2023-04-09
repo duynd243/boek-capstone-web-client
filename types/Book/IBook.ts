@@ -10,6 +10,15 @@ export interface IBookItem {
     displayIndex: number;
     book: IBook;
 }
+import {IUser} from "../User/IUser";
+
+export interface IBookItem {
+    id: number;
+    parentBookId?: number;
+    bookId: number;
+    displayIndex: number;
+    book: IBook;
+}
 
 export interface IBook {
     id: number;
@@ -44,8 +53,14 @@ export interface IBook {
         description?: string;
         user?: IUser;
     };
+    issuer?: {
+        id: string;
+        description?: string;
+        user?: IUser;
+    };
     publisher?: IPublisher;
     bookAuthors?: IBookAuthor[];
     bookItems?: IBookItem[];
     allowChangingGenre?: boolean;
 }
+

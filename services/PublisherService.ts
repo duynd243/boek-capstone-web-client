@@ -17,6 +17,22 @@ export class PublisherService extends BaseService {
         return response.data;
     };
 
+    getAllPublishers = async (): Promise<IPublisher[]> => {
+        const response = await this.getPublishers();
+        const { data, metadata: { total } } = response;
+        if (data.length < total) {
+            const newResponse = await this.axiosClient.get<
+                IBaseListResponse<IPublisher>
+            >("/publishers", {
+                params: {
+                    size: total,
+                },
+            });
+            return newResponse.data.data;
+        }
+        return data;
+    }
+
     deletePublisher = async (id: number) => {
         const response = await this.axiosClient.delete<IPublisher>(
             `/admin/publishers/${id}`

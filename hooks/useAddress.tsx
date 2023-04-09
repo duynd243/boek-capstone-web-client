@@ -18,16 +18,16 @@ function useAddress(props: Props) {
     const [edited, setEdited] = useState(false);
 
     const [selectedProvince, setSelectedProvince] = useState<IProvince | null>(
-        null
+        null,
     );
 
     const [selectedDistrict, setSelectedDistrict] = useState<IDistrict | null>(
-        null
+        null,
     );
 
     const [selectedWard, setSelectedWard] = useState<IWard | null>(null);
 
-    const { data: provinces, isLoading: provincesLoading } = useQuery(
+    const { data: provinces, isInitialLoading: provincesLoading } = useQuery(
         ["provinces"],
         () => addressService.getProvinces(),
         {
@@ -35,20 +35,20 @@ function useAddress(props: Props) {
                 if (props?.defaultProvinceCode && !selectedProvince && !edited) {
                     const defaultProvince = data.find(
                         (province) =>
-                            province.code === props.defaultProvinceCode
+                            province.code === props.defaultProvinceCode,
                     );
                     setSelectedProvince(defaultProvince || null);
                 }
             },
-        }
+        },
     );
 
-    const { data: districts, isLoading: districtsLoading } = useQuery(
+    const { data: districts, isInitialLoading: districtsLoading } = useQuery(
         ["districts", selectedProvince?.code],
         () => {
             if (selectedProvince) {
                 return addressService.getDistrictsByProvinceId(
-                    selectedProvince.code
+                    selectedProvince.code,
                 );
             }
             return [];
@@ -59,20 +59,20 @@ function useAddress(props: Props) {
                 if (props?.defaultDistrictCode && !selectedDistrict && !edited) {
                     const defaultDistrict = data.find(
                         (district) =>
-                            district.code === props.defaultDistrictCode
+                            district.code === props.defaultDistrictCode,
                     );
                     setSelectedDistrict(defaultDistrict || null);
                 }
             },
-        }
+        },
     );
 
-    const { data: wards, isLoading: wardsLoading } = useQuery(
+    const { data: wards, isInitialLoading: wardsLoading } = useQuery(
         ["wards", selectedDistrict?.code],
         () => {
             if (selectedDistrict) {
                 return addressService.getWardsByDistrictId(
-                    selectedDistrict.code
+                    selectedDistrict.code,
                 );
             }
             return [];
@@ -82,12 +82,12 @@ function useAddress(props: Props) {
             onSuccess: (data) => {
                 if (props?.defaultWardCode && !selectedWard && !edited) {
                     const defaultWard = data.find(
-                        (ward) => ward.code === props.defaultWardCode
+                        (ward) => ward.code === props.defaultWardCode,
                     );
                     setSelectedWard(defaultWard || null);
                 }
             },
-        }
+        },
     );
 
     const handleProvinceChange = (province: IProvince) => {

@@ -86,7 +86,7 @@ const OrderTable: React.FC<Props> = ({
                                 </TableData>
                                 <TableData>
                                     <div className="text-sm text-gray-500 truncate w-[300px]">
-                                        {order.type === OrderTypes.DELIVERY.id ? (order?.address || "Chưa có địa chỉ nhận hàng") : order?.address || "Chưa có địa chỉ nhận hàng"}
+                                        {order.type === OrderTypes.DELIVERY.id ? (order?.address || "-") : "Nhận tại quầy"}
                                     </div>
                                 </TableData>
                                 <TableData className="text-sm font-semibold text-emerald-600">
@@ -103,7 +103,7 @@ const OrderTable: React.FC<Props> = ({
                                 <TableData>
                                     <span
                                         className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase leading-5 ${orderStatus?.labelColor}`}>
-                                            {order?.statusName}
+                                            {orderStatus?.displayName}
                                     </span>
                                 </TableData>
                                 <TableData className="text-right text-sm font-medium">

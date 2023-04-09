@@ -1,7 +1,8 @@
-import {ICampaign} from "../Campaign/ICampaign";
-import {IBook} from "./IBook";
-import {IUser} from "../User/IUser";
-import { IGenre } from './../Genre/IGenre';
+import { ICampaign } from "../Campaign/ICampaign";
+import { IBook } from "./IBook";
+import { IIssuer } from "../User/IUser";
+import { IGenre } from "../Genre/IGenre";
+import { IUnhierarchicalBookProduct } from "./IUnhierarchicalBookProduct";
 
 export interface IBookProductItem {
     id: number;
@@ -23,7 +24,7 @@ export interface IBookProduct {
     bookId: number;
     genreId?: number;
     genre?: IGenre;
-    campaignId: number;
+    campaignId?: number;
     issuerId?: string;
     title?: string;
     description?: string;
@@ -53,10 +54,19 @@ export interface IBookProduct {
     onlyAudio?: boolean;
     campaign?: ICampaign;
     book?: IBook;
-    issuer?: {
-        id?: string;
-        description?: string;
-        user?: IUser;
-    };
+    issuer?: IIssuer;
     bookProductItems?: IBookProductItem[];
+}
+
+export interface ICustomerBookProduct extends IBookProduct {
+    otherMobileBookProducts?: {
+        id: string;
+        bookId: number;
+        genreId?: number;
+        campaignId?: number;
+        campaignName?: string;
+        discount?: number;
+        salePrice?: number;
+    }[];
+    unhierarchicalBookProducts?: IUnhierarchicalBookProduct[];
 }

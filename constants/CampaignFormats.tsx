@@ -1,6 +1,6 @@
-import {IconType} from "react-icons";
-import {HiStatusOnline} from "react-icons/hi";
-import {HiBuildingStorefront} from "react-icons/hi2";
+import { IconType } from "react-icons";
+import { HiStatusOnline } from "react-icons/hi";
+import { HiBuildingStorefront } from "react-icons/hi2";
 
 type ICampaignFormat = {
     id: number;
@@ -29,7 +29,7 @@ export const CampaignFormats = {
 } satisfies Record<string, ICampaignFormat>;
 
 export function getCampaignFormatById(
-    id?: number
+    id?: number,
 ): ICampaignFormat | undefined {
     return Object.values(CampaignFormats).find((format) => format.id === id);
 }

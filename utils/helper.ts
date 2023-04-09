@@ -3,19 +3,67 @@ import { vi } from "date-fns/locale";
 import slugify from "slugify";
 import { z } from "zod";
 import { BookFormats, IBookFormat } from "../constants/BookFormats";
-import { CampaignFormats } from "../constants/CampaignFormats";
 import { hexColors } from "../constants/Colors";
 import { IBook } from "../types/Book/IBook";
 import { IBookProduct } from "../types/Book/IBookProduct";
+import { CampaignFormats } from "../constants/CampaignFormats";
 
 
 const fullBookFormats = Object.values(BookFormats);
 
-export function getBookProductsFormatOptions(book: IBook | undefined, campaignFormatId: number | undefined) {
+
+export function getBookFormatOptions(book: IBook | undefined) {
     if (!book) {
         return [];
     }
-    if(campaignFormatId === CampaignFormats.OFFLINE.id){
+    if (book?.fullPdfAndAudio) {
+        return fullBookFormats;
+    }
+    if (book?.onlyPdf) {
+        return fullBookFormats.filter(o => o.id !== BookFormats.AUDIO.id);
+    }
+    if (book?.onlyAudio) {
+        return fullBookFormats.filter(o => o.id !== BookFormats.PDF.id);
+    }
+    return fullBookFormats.filter(o => o.id === BookFormats.PAPER.id);
+}
+
+export function getBookFormatPrice(book: IBook | undefined, format: IBookFormat) {
+    if (!book) {
+        return 0;
+    }
+    if (format.id === BookFormats.PAPER.id) {
+        return book.coverPrice;
+    }
+    if (format.id === BookFormats.PDF.id) {
+        return book.pdfExtraPrice;
+    }
+    if (format.id === BookFormats.AUDIO.id) {
+        return book.audioExtraPrice;
+    }
+}
+
+export function getBookProductFormatPrice(book: IBookProduct | undefined, format: IBookFormat) {
+    if (!book) {
+        return 0;
+    }
+    if (format.id === BookFormats.PAPER.id) {
+        return book.salePrice;
+    }
+    if (format.id === BookFormats.PDF.id) {
+        return book.pdfExtraPrice;
+    }
+    if (format.id === BookFormats.AUDIO.id) {
+        return book.audioExtraPrice;
+    }
+}
+
+
+export function getBookProductsFormatOptions(book: IBookProduct | undefined, campaignFormatId: number | undefined) {
+    if (!book) {
+        return [];
+    }
+    if (campaignFormatId === CampaignFormats.OFFLINE.id) {
         return fullBookFormats.filter(o => o.id === BookFormats.PAPER.id);
     }
 
@@ -38,6 +86,7 @@ export const isValidImageSrc = (src: string): boolean => {
 export function getRequestDateTime(date: Date) {
     return format(date, "yyyy-MM-dd'T'HH:mm:ss");
 }
+
 export function isImageFile(file: File) {
     return file.type.startsWith("image");
 }
@@ -52,7 +101,7 @@ function randomColor(name?: string | undefined): string {
 
 export function getAvatarFromName(
     name?: string | undefined,
-    length?: number
+    length?: number,
 ): string {
     const backgroundColor = randomColor(name);
     return `https://ui-avatars.com/api/?name=${
@@ -79,7 +128,7 @@ export function getFormattedDate(
     dateStr: string | undefined,
     localeFormat: {
         locale: Locale;
-    } = defaultLocaleFormat
+    } = defaultLocaleFormat,
 ) {
     const date = dateStr ? new Date(dateStr) : undefined;
     return {
@@ -96,7 +145,7 @@ export function getFormattedDate(
 
 export function getFormattedTime(
     dateStr: string | undefined,
-    formatType: string
+    formatType: string,
 ) {
     const dateObj = dateStr ? new Date(dateStr) : undefined;
     return dateObj ? format(dateObj, formatType, defaultLocaleFormat) : "N/A";
@@ -118,7 +167,7 @@ export function getSlug(str?: string) {
 export function getSlugUrl(
     rootPath?: string,
     title?: string,
-    id?: number | string
+    id?: number | string,
 ) {
     return `${rootPath}/${getSlug(title)}/${id}`;
 }
@@ -132,12 +181,12 @@ export function getFormattedPrice(number: number) {
 
 export function isValidPhoneNumber(phoneNumber: string) {
     return /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(
-        phoneNumber
+        phoneNumber,
     );
 }
 
 export function getFormatsOfBook(
-    book: IBook | IBookProduct | undefined
+    book: IBook | IBookProduct | undefined,
 ): IBookFormat[] {
     if (!book) return [];
     const formats: IBookFormat[] = [BookFormats.PAPER];
@@ -162,7 +211,7 @@ export function getIntersectedFormatOfBooks(books: IBook[]): IBookFormat[] {
     if (!books || books.length === 0) return [];
     const formatsOfBooks = books.map((book) => getFormatsOfBook(book));
     return formatsOfBooks.reduce((prev, curr) =>
-        getIntersectedArray(prev, curr)
+        getIntersectedArray(prev, curr),
     );
 }
 

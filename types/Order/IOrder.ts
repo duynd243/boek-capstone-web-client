@@ -27,6 +27,7 @@ export interface IOrder {
     customerEmail?: string;
     address?: string;
     freight?: number;
+    freightName?: string;
     payment?: number;
     paymentName?: string;
     type?: number;
@@ -42,6 +43,7 @@ export interface IOrder {
     statusName?: string;
     total?: number;
     subTotal?: number;
+    discountTotal?: number;
     campaign?: ICampaign;
     campaignStaff?: ICampaignStaff;
     customer?: ICustomer;

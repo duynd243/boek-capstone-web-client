@@ -122,6 +122,7 @@ const StatusCard: React.FC<Props> = ({ order, campaignOrganization }) => {
         }
 
         setShowConfirmModal(false);
+        setShowConfirmAdressModal(false);
     };
 
     return (

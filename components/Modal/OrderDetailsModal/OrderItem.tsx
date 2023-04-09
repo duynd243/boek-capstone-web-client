@@ -1,14 +1,12 @@
-import React from 'react'
+import React from "react";
 import Image from "next/image";
-import {faker} from "@faker-js/faker/locale/vi";
-import {IMockOrderItem} from "./index";
-import { IOrderDetail } from './../../../types/Order/IOrder';
+import { IOrderDetail } from "../../../types/Order/IOrder";
 
 type Props = {
     orderItem: IOrderDetail
 }
 
-const OrderItem: React.FC<Props> = ({orderItem}) => {
+const OrderItem: React.FC<Props> = ({ orderItem }) => {
     return (
         <div
             className="border-slate-200 bg-slate-50 px-4 space-y-3 py-3 sm:space-y-0 sm:flex items-center justify-between">
@@ -44,7 +42,7 @@ const OrderItem: React.FC<Props> = ({orderItem}) => {
                                 Giá PDF: {new Intl.NumberFormat("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
-                            }).format(orderItem?.bookProduct?.pdfExtraPrice)
+                            }).format(orderItem?.bookProduct?.pdfExtraPrice || 0)
                             }
                             </h5>
                         }
@@ -53,7 +51,7 @@ const OrderItem: React.FC<Props> = ({orderItem}) => {
                                 Giá Audio: {new Intl.NumberFormat("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
-                            }).format(orderItem?.bookProduct?.audioExtraPrice)
+                            }).format(orderItem?.bookProduct?.audioExtraPrice || 0)
                             }
                             </h5>
                         }
@@ -78,16 +76,14 @@ const OrderItem: React.FC<Props> = ({orderItem}) => {
                         style: "currency",
                         currency: "VND",
                     }).format(
-                        (orderItem?.subTotal - (orderItem?.subTotal * orderItem?.discount) / 100),
+                        ((orderItem?.subTotal || 0) - ((orderItem?.subTotal || 0) * (orderItem?.discount || 0) / 100)),
                     )}
                     </span>
                 </div>
             </div>
 
         </div>
-    )
-        ;
+    );
 };
 
-
-export default OrderItem
+export default OrderItem;

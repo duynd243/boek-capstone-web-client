@@ -42,7 +42,7 @@ const CampaignCard: React.FC<Props> = ({ campaign, horizontalOnly = false }) => 
         );
     }, [campaign]);
 
-    const href = useMemo(() =>`campaigns/${campaign?.id}`, [campaign]);
+    const href = useMemo(() => `campaigns/${campaign?.id}`, [campaign]);
 
     const issuerOfParticipants = useMemo(() => {
         return campaign?.participants?.map((p) => p?.issuer?.user) || [];

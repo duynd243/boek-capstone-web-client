@@ -10,6 +10,7 @@ import {
     BsFillGearFill,
     BsFillPenFill,
     BsFillPeopleFill,
+    BsFillPersonVcardFill,
     BsFillPieChartFill,
     BsFillTagsFill,
     BsPrinterFill,
@@ -19,7 +20,6 @@ import { GiShop } from "react-icons/gi";
 import { ImBook } from "react-icons/im";
 import { IoMedalSharp } from "react-icons/io5";
 import { MdBook, MdContactMail } from "react-icons/md";
-
 
 export interface ISidebarMenu {
     name: string;
@@ -55,6 +55,24 @@ export const ISSUER_SETTINGS_MENUS: ISidebarMenu[] = [
     },
 ];
 
+export const CUSTOMER_SETTINGS_MENUS: ISidebarMenu[] = [
+    {
+        icon: <BsFillPersonVcardFill />,
+        name: "Hồ sơ",
+        path: "/profile",
+    },
+    {
+        icon: <BsFillFileEarmarkMedicalFill />,
+        name: "Đơn hàng",
+        path: "/orders",
+    },
+    {
+        name: "Cài đặt khác",
+        path: "/other",
+    },
+];
+
+
 export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
     {
         groupName: "Hệ thống",
@@ -75,20 +93,39 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                 icon: <MdContactMail />,
             },
             {
-                name: "Xét duyệt sách bán",
+                name: "Sách bán",
                 path: "/admin/products",
                 icon: <MdBook />,
             },
             {
-                name: "Đơn hàng trực tuyến",
-                path: "/admin/orders",
+                name: "Đơn hàng",
+                path: "admin/orders",
                 icon: <BsFillFileEarmarkMedicalFill />,
+                subMenus: [
+                    {
+                        name: "Đơn giao",
+                        path: "/admin/orders/delivery",
+                    },
+                    {
+                        name: "Đơn tại quầy",
+                        path: "/admin/orders/pickup",
+                    },
+                    // {
+                    //     name: "Mocks",
+                    //     path: "/admin/orders",
+                    // },
+                ],
             },
-            {
-                name: "Đơn hàng hội sách",
-                path: "/admin/orders2",
-                icon: <BsFillFileEarmarkMedicalFill />,
-            },
+            // {
+            //     name: "Đơn hàng trực tuyến",
+            //     path: "/admin/orders",
+            //     icon: <BsFillFileEarmarkMedicalFill />,
+            // },
+            // {
+            //     name: "Đơn hàng hội sách",
+            //     path: "/admin/orders2",
+            //     icon: <BsFillFileEarmarkMedicalFill />,
+            // },
             {
                 name: "Nhân sự",
                 path: "/admin/personnels",

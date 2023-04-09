@@ -71,8 +71,8 @@ const SeriesBookForm = ({ book }: Props) => {
     const updateSeriesBookMutation = useMutation((data: any) => {
         return bookService.updateSeriesBookByIssuer(data)
     }, {
-        onSuccess: () => {
-            queryClient.invalidateQueries(['books', book?.id]);
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(['book']);
             router.push('/issuer/books');
         }
     });

@@ -1,10 +1,10 @@
 import {
-    ADMIN_SIDEBAR_MENUS,
-    ISidebarMenuGroup,
-    ISidebarMenu,
-    ISSUER_SIDEBAR_MENUS,
     ADMIN_SETTINGS_MENUS,
+    ADMIN_SIDEBAR_MENUS, CUSTOMER_SETTINGS_MENUS,
+    ISidebarMenu,
+    ISidebarMenuGroup,
     ISSUER_SETTINGS_MENUS,
+    ISSUER_SIDEBAR_MENUS,
 } from "./SidebarMenus";
 
 export interface IRole {
@@ -44,6 +44,7 @@ export const Roles = {
         name: "customer",
         displayName: "Khách hàng",
         defaultRoute: "/",
+        settingsMenus: CUSTOMER_SETTINGS_MENUS,
     },
 } satisfies Record<string, IRole>;
 

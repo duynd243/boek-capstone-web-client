@@ -1,6 +1,4 @@
-import {BaseService} from "./BaseService";
-import {IBaseListResponse} from "../types/Commons/IBaseListResponse";
-import {IGenre} from "../types/Genre/IGenre";
+import { BaseService } from "./BaseService";
 
 export class LanguageService extends BaseService {
     getLanguages = async (params?: any) => {

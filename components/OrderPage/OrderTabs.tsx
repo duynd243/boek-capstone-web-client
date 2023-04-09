@@ -1,12 +1,9 @@
 import React from "react";
 import { Tab } from "@headlessui/react";
-// import { IOrderStatus } from "../constants/OrderStatuses";
-// import { IBaseListResponse } from "../types/Commons/IBaseListResponse";
-// import { IOrder } from "../types/Order/IOrder";
- import { IOrderStatus } from "../../constants/OrderStatuses";
- import { IBaseListResponse } from "../../types/Commons/IBaseListResponse";
- import { IOrder } from "../../types/Order/IOrder";
- 
+import { IOrderStatus } from "../../constants/OrderStatuses";
+import { IBaseListResponse } from "../../types/Commons/IBaseListResponse";
+import { IOrder } from "../../types/Order/IOrder";
+
 type Props = {
     tabs: Partial<IOrderStatus>[];
     orderData: IBaseListResponse<IOrder> | undefined;

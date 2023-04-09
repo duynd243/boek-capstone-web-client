@@ -69,6 +69,9 @@ const AdminProfileForm = ({onSubmit}: Props) => {
         handleProvinceChange,
         handleDistrictChange,
         handleWardChange,
+        districtsLoading,
+        wardsLoading,
+        provincesLoading,
         selectedProvince,
         selectedDistrict,
         selectedWard,
@@ -97,10 +100,10 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                 <h2 className="text-lg font-medium leading-6 text-gray-900">
                     Hồ sơ
                 </h2>
-                <p className="mt-1 text-sm text-gray-500">
-                    Thông tin này sẽ được hiển thị công khai vì vậy hãy cẩn thận
-                    những gì bạn chia sẻ.
-                </p>
+                {/*<p className="mt-1 text-sm text-gray-500">*/}
+                {/*    Thông tin này sẽ được hiển thị công khai vì vậy hãy cẩn thận*/}
+                {/*    những gì bạn chia sẻ.*/}
+                {/*</p>*/}
             </div>
 
             <div className="mt-6 flex gap-6 lg:flex-row flex-col-reverse">
@@ -128,13 +131,10 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                     />
                 </div>
 
-                <div className="flex-grow mt-0  lg:flex-shrink-0 lg:flex-grow-0">
-                    <label
-            className="mb-1 block text-sm text-center font-medium text-gray-600">
-            Ảnh đại diện
-        </label>
-                    
-                    <div className="relative overflow-hidden rounded-full w-fit">
+                <div className="flex-grow mt-0 lg:flex-shrink-0 lg:flex-grow-0">
+                    <Form.Label textAlignment='text-center' label="Ảnh đại diện"/>
+
+                    <div className="relative mt-4 overflow-hidden rounded-full w-fit">
                         <Image
                             width={512}
                             height={512}
@@ -202,7 +202,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                         render={({field}) => (
                             <SelectBox<IProvince>
                                 value={selectedProvince}
-                                placeholder="Chọn tỉnh / thành phố"
+                                placeholder={provincesLoading ? "Đang tải..." : "Chọn tỉnh / thành phố"}
                                 onValueChange={(p) => {
                                     if (
                                         p.code ===
@@ -223,6 +223,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                                 }}
                                 displayKey="nameWithType"
                                 dataSource={provinces}
+                                disabled={provincesLoading}
                             />
                         )}
                     />
@@ -238,7 +239,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                         render={({field}) => (
                             <SelectBox<IDistrict>
                                 value={selectedDistrict}
-                                placeholder="Chọn quận / huyện"
+                                placeholder={districtsLoading ? "Đang tải..." : "Chọn quận / huyện"}
                                 onValueChange={(d) => {
                                     if (
                                         d.code ===
@@ -254,6 +255,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                                 }}
                                 displayKey="nameWithType"
                                 dataSource={districts}
+                                disabled={districtsLoading}
                             />
                         )}
                     />
@@ -270,7 +272,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                         render={({field}) => (
                             <SelectBox<IWard>
                                 value={selectedWard}
-                                placeholder="Chọn phường / xã"
+                                placeholder={wardsLoading ? "Đang tải..." : "Chọn phường / xã"}
                                 onValueChange={(w) => {
                                     if (
                                         w.code ===
@@ -282,6 +284,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                                 }}
                                 displayKey="nameWithType"
                                 dataSource={wards}
+                                disabled={wardsLoading}
                             />
                         )}
                     />
@@ -328,3 +331,6 @@ const AdminProfileForm = ({onSubmit}: Props) => {
 };
 
 export default AdminProfileForm;
+
+
+

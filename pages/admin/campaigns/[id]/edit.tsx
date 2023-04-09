@@ -13,6 +13,8 @@ import {useAuth} from "../../../../context/AuthContext";
 import {CampaignContext} from "../../../../context/CampaignContext";
 import {CampaignService} from "../../../../services/CampaignService";
 import {NextPageWithLayout} from "../../../_app";
+import useCampaign from "../../../../hooks/useCampaign";
+import BasicCampaignForm from "../../../../components/CampaignForm/BasicCampaignForm";
 
 const CampaignEditPage: NextPageWithLayout = () => {
     const router = useRouter();
@@ -30,6 +32,19 @@ const CampaignEditPage: NextPageWithLayout = () => {
         }
     );
 
+    const {isOnlyBasicInfoEditable} = useCampaign({campaign});
+
+    function getLabel() {
+        if (isOnlyBasicInfoEditable) return "Chỉnh sửa thông tin cơ bản 🏪";
+        if (campaign?.format === CampaignFormats.OFFLINE.id) {
+            return "Chỉnh sửa hội sách trực tiếp 🏪";
+        }
+        if (campaign?.format === CampaignFormats.ONLINE.id) {
+            return "Chỉnh sửa hội sách trực tuyến 🏪";
+        }
+        return "Chỉnh sửa hội sách 🏪";
+    }
+
     return (
         <Fragment>
             {isLoading && <LoadingSpinnerWithOverlay label={"Đang tải..."}/>}
@@ -43,20 +58,18 @@ const CampaignEditPage: NextPageWithLayout = () => {
             {/*TODO:*/}
             {/*Thêm các case hiển thị khi không thể edit campaign: đã bắt đầu, đã kết thúc, đã xóa, ...*/}
 
-            {campaign && (
+            {!isLoading && campaign && (
                 <FormPageLayout>
                     <WelcomeBanner
-                        label={`Chỉnh sửa hội sách ${
-                            campaign?.format === CampaignFormats.OFFLINE.id
-                                ? "trực tiếp"
-                                : "trực tuyến"
-                        } 🏪`}
+                        label={getLabel()}
                         className="p-6 sm:p-10"
                     />
                     <CampaignContext.Provider value={campaign}>
-                        {campaign?.format === CampaignFormats.OFFLINE.id ? (
+                        {isOnlyBasicInfoEditable && <BasicCampaignForm/>}
+                        {!isOnlyBasicInfoEditable && campaign?.format === CampaignFormats.OFFLINE.id && (
                             <OfflineCampaignForm action={"UPDATE"}/>
-                        ) : (
+                        )}
+                        {!isOnlyBasicInfoEditable && campaign?.format === CampaignFormats.ONLINE.id && (
                             <OnlineCampaignForm action={"UPDATE"}/>
                         )}
                     </CampaignContext.Provider>

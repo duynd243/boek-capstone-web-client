@@ -4,7 +4,7 @@ import React from "react";
 type Props = {
     children: React.ReactNode;
     href?: string;
-    variant?: "primary" | "secondary" | "tertiary"  ;
+    variant?: "primary" | "secondary";
     onClick?: () => void;
     type?: "button" | "submit" | "reset";
 } & React.HTMLAttributes<HTMLButtonElement> & React.HTMLAttributes<HTMLAnchorElement>;
@@ -12,7 +12,6 @@ type Props = {
 const variantClasses = {
     primary: "m-btn bg-indigo-500 text-white w-full hover:bg-indigo-600",
     secondary: "m-btn bg-white !border-slate-200 !shadow text-slate-600 w-full border bg-slate-50 hover:!border-slate-300",
-    tertiary:  "m-btn bg-indigo-500 text-white w-full hover:bg-indigo-600",
 };
 
 const SidebarButton: React.FC<Props> = (props) => {

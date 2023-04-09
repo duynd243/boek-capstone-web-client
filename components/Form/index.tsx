@@ -8,12 +8,13 @@ type LabelProps = {
     fieldName?: string;
     label: string;
     required?: boolean;
+    textAlignment?: "text-left" | "text-center" | "text-right";
 };
 
 const Label = (props: LabelProps) => {
     return (
         <label
-            className="mb-1 block text-sm font-medium text-gray-600"
+            className={`mb-1 block text-sm font-medium text-gray-600 ${props.textAlignment || "text-left"}`}
             htmlFor={props.fieldName}
         >
             {props.label}
@@ -60,7 +61,7 @@ const Input = <T extends Record<string, any>>({
 
     return (
         <div>
-            <Label fieldName={fieldName} label={label} required={required}  />
+            <Label fieldName={fieldName} label={label} required={required}/>
             {isTextArea ? (
                 <textarea rows={7} {...commonProps} />
             ) : (
@@ -82,7 +83,7 @@ const GroupLabel: React.FC<GroupLabelProps> = ({
                                                }) => {
     return (
         <div>
-            <h3 className="text-lg font-bold leading-6 text-gray-900">
+            <h3 className="text-lg font-medium leading-6 text-gray-900">
                 {label}
                 {required && <span className="text-rose-500"> *</span>}
             </h3>
@@ -98,7 +99,6 @@ type ImageUploadPanelProps = {
     onChange?: (file: File) => boolean;
     onRemove?: () => void;
     label?: string;
-    style?: React.CSSProperties;
 };
 
 const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
@@ -203,15 +203,14 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
 type DateTimeInputFieldProps = {
     value: string;
     onClick?: () => void;
-    id: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 const DateTimeInputField: React.FC<DateTimeInputFieldProps> = ({
                                                                    placeholder,
-                                                                   id,
                                                                    onClick,
                                                                    value,
                                                                    ...rest
                                                                }) => {
+    const id = useId();
     return (
         <div className="relative">
             <input

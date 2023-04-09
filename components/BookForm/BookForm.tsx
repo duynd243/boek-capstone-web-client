@@ -74,8 +74,8 @@ const BookForm = ({ book }: Props) => {
     const updateBookMutation = useMutation((data: any) => {
         return bookService.updateBookByIssuer(data)
     }, {
-        onSuccess: () => {
-            queryClient.invalidateQueries(['books', book?.id]);
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(['issuer_book']);
             router.push('/issuer/books');
         }
     });
@@ -109,8 +109,8 @@ const BookForm = ({ book }: Props) => {
         code: z.string().min(1),
         genreId: z.number(),
         publisherId: z.number(),
-        isbn10: z.string().optional(),
-        isbn13: z.string().optional(),
+        isbn10: z.coerce.string().optional(),
+        isbn13: z.coerce.string().optional(),
         name: z.string().min(1),
         translator: z.string().min(1, "Vui lòng chọn ít nhất 1 dịch giả"),
         imageUrl: z.string(),
@@ -121,9 +121,9 @@ const BookForm = ({ book }: Props) => {
         releasedYear: z.coerce.number(),
         page: z.coerce.number(),
         pdfExtraPrice: z.coerce.number().optional(),
-        pdfTrialUrl: z.string().optional(),
+        pdfTrialUrl: z.string().nullable(),
         audioExtraPrice: z.coerce.number().optional(),
-        audioTrialUrl: z.string().optional(),
+        audioTrialUrl: z.string().nullable(),
         status: z.number(),
         authors: z.array(z.number()).min(1, "Vui lòng chọn ít nhất 1 tác giả"),
         previewFile: z.instanceof(File).optional(),
@@ -236,8 +236,8 @@ const BookForm = ({ book }: Props) => {
             // console.log(JSON.stringify(payload));
             await toast.promise(updateBookMutation.mutateAsync({
                 ...payload,
-                pdfTrialUrl: payload.pdfTrialUrl || null,
-                audioTrialUrl: payload.audioTrialUrl || null,
+                pdfTrialUrl: payload?.pdfTrialUrl && payload?.pdfTrialUrl?.length > 0 ? payload?.pdfTrialUrl : null,
+                audioTrialUrl: payload?.audioTrialUrl && payload?.audioTrialUrl?.length > 0 ? payload?.audioTrialUrl : null,
                 pdfExtraPrice: payload.pdfExtraPrice || null,
                 audioExtraPrice: payload.audioExtraPrice || null,
             }), {

@@ -331,6 +331,38 @@ const AddSellingBookSeriesPage: NextPageWithLayout = () => {
                                 {/*    <div className="text-gray-500 text-sm">Bạn cần chọn định dạng để xem được các mục*/}
                                 {/*        tặng kèm khả dụng.</div>*/}
                                 {/*)}*/}
+                                {/*{selectedFormat ? (availableBonuses?.length > 0 ? availableBonuses.map((format) => (*/}
+                                {/*    <div key={format.id} className="relative flex items-start">*/}
+                                {/*        <div className="flex h-5 items-center">*/}
+                                {/*            <input*/}
+                                {/*                id={`bonus-${format.id}`}*/}
+                                {/*                name="bonus"*/}
+                                {/*                type="checkbox"*/}
+                                {/*                value={format.id}*/}
+                                {/*                onChange={(event => {*/}
+                                {/*                    if (event.target.checked) {*/}
+                                {/*                        handleAddBonus(format.id);*/}
+                                {/*                    } else {*/}
+                                {/*                        handleRemoveBonus(format.id);*/}
+                                {/*                    }*/}
+                                {/*                })*/}
+                                {/*                }*/}
+                                {/*                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"*/}
+                                {/*            />*/}
+                                {/*        </div>*/}
+                                {/*        <div className="ml-3 text-sm">*/}
+                                {/*            <label*/}
+                                {/*                htmlFor={`bonus-${format.id}`}*/}
+                                {/*                className="text-sm font-medium text-gray-600"*/}
+                                {/*            >*/}
+                                {/*                Tất cả sách {format.name} trong series*/}
+                                {/*            </label>*/}
+                                {/*        </div>*/}
+                                {/*    </div>*/}
+                                {/*)) : <div className="text-gray-500 text-sm">Không tìm thấy tặng kèm khả dụng.</div>) : (*/}
+                                {/*    <div className="text-gray-500 text-sm">Bạn cần chọn định dạng để xem được các mục*/}
+                                {/*        tặng kèm khả dụng.</div>*/}
+                                {/*)}*/}
                             </div>
                         </div>
                     </div>

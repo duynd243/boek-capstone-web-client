@@ -5,13 +5,24 @@ import { IBaseRequestParams } from "../types/Request/IBaseRequestParams";
 
 export class GenreService extends BaseService {
     getGenres = async (
-        params?: IBaseRequestParams<IGenre> & { withBooks?: boolean }
+        params?: IBaseRequestParams<IGenre> & { withBooks?: boolean },
     ) => {
         const response = await this.axiosClient.get<IBaseListResponse<IGenre>>(
             "/genres",
             {
                 params,
-            }
+            });
+        return response.data;
+    };
+
+    getChilrenGenres = async (
+        params?: IBaseRequestParams<IGenre> & { withBooks?: boolean },
+    ) => {
+        const response = await this.axiosClient.get<IGenre[]>(
+            "/genres/child-genres",
+            {
+                params,
+            },
         );
         return response.data;
     };
@@ -20,8 +31,7 @@ export class GenreService extends BaseService {
             "/genres/child-genres",
             {
                 params,
-            }
-        );
+            });
         return response.data;
     };
 }

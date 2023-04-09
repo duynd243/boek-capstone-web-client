@@ -213,7 +213,7 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
   }, {
     onSuccess: async () => {
       await queryClient.invalidateQueries(['issuer_product']);
-      await router.push(`/issuer/products`);
+      await router.push(`/issuer/campaigns/${campaign?.id}`);
     }
   });
 
@@ -222,7 +222,7 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
   }, {
     onSuccess: async () => {
       await queryClient.invalidateQueries(['issuer_product']);
-      await router.push(`/issuer/products`);
+      await router.push(`/issuer/campaigns/${campaign?.id}`);
     }
   });
 
