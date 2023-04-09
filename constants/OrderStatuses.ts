@@ -1,44 +1,61 @@
 import { OrderTypes } from "./OrderTypes";
 
-export const OrderStatuses: Record<
-    string,
-    { id: number; displayName: string }
-> = {
-    PROCESSING: {
+export interface IOrderStatus {
+    id: number;
+    displayName: string;
+    labelColor?: string;
+}
+
+export const OrderStatuses = {
+    PAYMENT_PENDING: {
         id: 1,
+        displayName: "Chờ thanh toán",
+        labelColor: "bg-amber-100 text-amber-800",
+    },
+    PROCESSING: {
+        id: 2,
         displayName: "Đang xử lý",
+        labelColor: "bg-amber-100 text-amber-800",
     },
     // Chờ nhận hàng tại campaign (đơn dạng pickup)
     WAITING_RECEIVE: {
-        id: 2,
+        id: 3,
         displayName: "Đợi nhận hàng",
+        labelColor: "bg-green-100 text-green-800",
     },
     SHIPPING: {
-        id: 3,
+        id: 4,
         displayName: "Đang vận chuyển",
+        labelColor: "bg-green-100 text-green-800",
     },
     SHIPPED: {
-        id: 4,
+        id: 5,
         displayName: "Đã giao",
+        labelColor: "bg-green-100 text-green-800",
     },
     // Đã nhận hàng tại campaign (đơn dạng pickup)
     RECEIVED: {
-        id: 5,
+        id: 6,
         displayName: "Đã nhận",
+        labelColor: "bg-green-100 text-green-800",
     },
     CANCELLED: {
-        id: 6,
+        id: 7,
         displayName: "Đã bị hủy",
+        labelColor: "bg-rose-100 text-rose-800",
     },
-};
+} satisfies Record<
+    string,
+    IOrderStatus
+>;
 
-export function getOrderStatusById(id: number) {
+export function getOrderStatusById(id: number | undefined) {
     return Object.values(OrderStatuses).find((status) => status.id === id);
 }
 
 export function getNextUpdateStatus(
     currentStatusId?: number,
-    orderTypeId?: number
+    orderTypeId?: number,
 ) {
     if (!currentStatusId || !orderTypeId) return null;
     if (
@@ -49,7 +66,7 @@ export function getNextUpdateStatus(
     }
     if (
         currentStatusId === OrderStatuses.PROCESSING.id &&
-        orderTypeId === OrderTypes.SHIPPING.id
+        orderTypeId === OrderTypes.DELIVERY.id
     ) {
         return OrderStatuses.SHIPPING;
     }
@@ -61,3 +78,27 @@ export function getNextUpdateStatus(
     }
     return null;
 }
+
+export const PickupOrderTabs = [
+    {
+        id: undefined,
+        displayName: "Tất cả trạng thái",
+    },
+    OrderStatuses.PAYMENT_PENDING,
+    OrderStatuses.PROCESSING,
+    OrderStatuses.WAITING_RECEIVE,
+    OrderStatuses.RECEIVED,
+    OrderStatuses.CANCELLED,
+];
+
+export const DeliveryOrderTabs = [
+    {
+        id: undefined,
+        displayName: "Tất cả trạng thái",
+    },
+    OrderStatuses.PAYMENT_PENDING,
+    OrderStatuses.PROCESSING,
+    OrderStatuses.SHIPPING,
+    OrderStatuses.SHIPPED,
+    OrderStatuses.CANCELLED,
+];

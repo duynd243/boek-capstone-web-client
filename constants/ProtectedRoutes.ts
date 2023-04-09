@@ -1,4 +1,4 @@
-import {Roles} from "./Roles";
+import { Roles } from "./Roles";
 
 export interface IProtectedRoute {
     path: string;
@@ -7,12 +7,16 @@ export interface IProtectedRoute {
 
 export const ProtectedRoutes: IProtectedRoute[] = [
     {
-        path: "/admin2",
+        path: "/admin",
         allowedRoleIDs: [Roles.SYSTEM.id],
     },
     {
-        path: "/issuer2",
+        path: "/issuer",
         allowedRoleIDs: [Roles.ISSUER.id],
+    },
+    {
+        path: "/profile",
+        allowedRoleIDs: [Roles.CUSTOMER.id],
     },
     {
         path: "/protected",

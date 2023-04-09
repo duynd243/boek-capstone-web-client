@@ -28,7 +28,6 @@ const IssuerCampaignDetails: NextPageWithLayout = () => {
         }),
         {
             enabled: !!campaignId,
-            refetchOnWindowFocus: false,
         }
     );
 

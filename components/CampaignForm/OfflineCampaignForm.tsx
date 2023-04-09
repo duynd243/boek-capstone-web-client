@@ -38,6 +38,7 @@ import {
     NonRecurringOfflineCampaignSchema,
     RecurringOfflineCampaignSchema,
 } from "./shared";
+import useCampaign from "../../hooks/useCampaign";
 
 type Props = {
     action: "CREATE" | "UPDATE";

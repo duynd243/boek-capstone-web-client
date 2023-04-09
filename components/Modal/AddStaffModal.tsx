@@ -1,72 +1,156 @@
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import Image from "next/image";
 import React, {useContext, useState} from "react";
 import {AiFillMinusCircle} from "react-icons/ai";
 import {BsSearch} from "react-icons/bs";
 import {useAuth} from "../../context/AuthContext";
 import {CampaignContext} from "../../context/CampaignContext";
-import CampaignStaffService from "../../services/CampaignStaffService";
-import {UserService} from "../../services/UserService";
+import CampaignStaffService, {AddStaffsRequestParams} from "../../services/CampaignStaffService";
 import {IUser} from "../../types/User/IUser";
 import {getAvatarFromName} from "../../utils/helper";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
+import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
+import {toast} from "react-hot-toast";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    currentStaffs: (IUser | undefined)[];
 };
 
-const AddStaffModal: React.FC<Props> = ({currentStaffs, isOpen, onClose}) => {
+const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
     const {loginUser} = useAuth();
     const campaignStaffService = new CampaignStaffService(
         loginUser?.accessToken
     );
+    const queryClient = useQueryClient();
 
     const campaign = useContext(CampaignContext);
     const [search, setSearch] = useState<string>("");
 
     const [selectedStaffs, setSelectedStaffs] = useState<IUser[]>([]);
 
-    const {data: staffs, isLoading} = useQuery(
-        ["staffs", campaign?.id],
-        () => {
-            return new UserService(
-                loginUser?.accessToken
-            ).getUnattendedStaffsByCampaignId(campaign?.id);
-        }
-    );
-    const currentStaffIds = currentStaffs?.map((staff) => staff?.id);
-    const availableStaffs = []
-
     const afterModalClose = () => {
         setSelectedStaffs([]);
         onClose();
     };
+    const {data: staffs, isLoading} = useQuery(
+        ["unattended_staffs", campaign?.id],
+        () => campaignStaffService.getUnattendedStaffsByCampaignId(Number(campaign?.id)), {
+            enabled: isOpen && campaign?.id !== undefined
+        }
+    );
+
+    const addStaffsMutation = useMutation(
+        (params: AddStaffsRequestParams) => campaignStaffService.addStaffs(params), {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries(["campaign_staffs", campaign?.id]);
+                afterModalClose();
+            }
+        }
+    );
+
+    const searchedStaffs = staffs !== null && Array.isArray(staffs) ? staffs?.filter((staff) => {
+        return staff?.name?.toLowerCase().includes(search?.toLowerCase());
+    }) : [];
+
     const handleSelectStaff = (staff: IUser) => {
         setSelectedStaffs([...selectedStaffs, staff]);
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (campaign?.id === undefined) return;
+        if (!campaign?.id) return;
         try {
-            // await toast.promise(
-            //     inviteIssuerMutation.mutateAsync({
-            //         campaignId: campaign?.id,
-            //         Staffs: selectedStaffs?.map((issuer) => issuer?.id),
-            //     }),
-            //     {
-            //         loading: "Đang gửi lời mời",
-            //         success: "Gửi lời mời thành công",
-            //         error: (err) => err?.message || "Gửi lời mời thất bại",
-            //     }
-            // );
+            await toast.promise(
+                addStaffsMutation.mutateAsync({
+                    campaignId: campaign?.id,
+                    staffIds: selectedStaffs
+                        ?.filter((staff) => staff?.id !== undefined)
+                        ?.map((staff) => staff?.id)
+                }),
+                {
+                    loading: "Đang thêm nhân viên",
+                    success: "Thêm nhân viên thành công",
+                    error: (err) => err?.message || "Có lỗi xảy ra"
+                }
+            );
         } catch (error) {
             console.log(error);
         }
     };
+
+    function renderStaffs() {
+        if (isLoading) {
+            return (
+                <div>Loading...</div>
+            )
+        } else {
+            if (staffs && staffs?.length > 0) {
+                if (searchedStaffs?.length > 0) {
+                    return searchedStaffs.map((staff) => {
+                        const isSelected = selectedStaffs?.find(i => i?.id === staff?.id) !== undefined;
+                        return <div
+                            key={staff?.id}
+                            className="flex gap-3 items-center justify-between p-4 border-b border-gray-200"
+                        >
+                            <div className='flex gap-4 flex-1 min-w-0'>
+                                <Image
+                                    width={200}
+                                    height={200}
+                                    className="h-10 w-10 rounded-full object-cover flex-shrink-0"
+                                    src={
+                                        staff?.imageUrl ||
+                                        getAvatarFromName(
+                                            staff?.name
+                                        )
+                                    }
+                                    alt=""
+                                />
+                                <div className='flex-1 min-w-0'>
+                                    <p className="text-sm font-medium text-gray-900 line-clamp-2 break-words">
+                                        {staff?.name}
+                                    </p>
+                                    <p className="text-sm text-gray-500 line-clamp-2 break-words">
+                                        {staff?.email}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className='flex justify-end items-center'>
+                                <button
+                                    onClick={() =>
+                                        handleSelectStaff(staff)
+                                    }
+                                    disabled={isSelected}
+                                    type="button"
+                                    className="text-sm font-medium w-max text-indigo-600 hover:text-indigo-500 disabled:opacity-50"
+                                >
+                                    {isSelected
+                                        ? "Đã chọn"
+                                        : "Chọn"}
+                                </button>
+                            </div>
+                        </div>
+                    })
+
+                } else {
+                    return (
+                        <EmptyState
+                            status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
+                        />
+                    )
+                }
+
+            } else {
+                return (
+                    <EmptyState
+                        status={EMPTY_STATE_TYPE.NO_DATA}
+                        customMessage={"Không có nhân viên nào để thêm"}
+                    />
+                )
+            }
+        }
+    }
 
     return (
         <TransitionModal
@@ -109,9 +193,10 @@ const AddStaffModal: React.FC<Props> = ({currentStaffs, isOpen, onClose}) => {
                     <div className={"relative my-3"}>
                         <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
                         <input
+                            disabled={isLoading}
                             type="text"
-                            placeholder="Tìm kiếm nhà phát hành"
-                            className="h-12 w-full border-0 pl-11 pr-4 text-sm bg-slate-100 rounded text-gray-800 placeholder-gray-400 focus:ring-0"
+                            placeholder="Tìm kiếm nhân viên"
+                            className="h-12 w-full border-0 pl-11 pr-4 text-sm bg-slate-100 rounded text-gray-800 placeholder-gray-400 focus:ring-0 disabled:opacity-50"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -174,129 +259,28 @@ const AddStaffModal: React.FC<Props> = ({currentStaffs, isOpen, onClose}) => {
                     )}
 
                     <div className="overflow-y-scroll h-96">
-                        {!isLoading && staffs ? (
-                            staffs.map((staff) => (
-                                <div
-                                    key={staff.id}
-                                    className="flex items-center justify-between p-4 border-b border-gray-200"
-                                >
-                                    <div className="flex items-center">
-                                        <div className="flex-shrink-0">
-                                            <Image
-                                                width={200}
-                                                height={200}
-                                                className="h-10 w-10 rounded-full object-cover"
-                                                src={
-                                                    staff?.imageUrl ||
-                                                    getAvatarFromName(
-                                                        staff?.name
-                                                    )
-                                                }
-                                                alt=""
-                                            />
-                                        </div>
-                                        <div className="ml-4">
-                                            <div className="text-sm font-medium text-gray-900">
-                                                {staff?.name}
-                                            </div>
-                                            <div className="text-sm text-gray-500">
-                                                {staff?.email}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex-shrink-0">
-                                        <button
-                                            onClick={() => {
-                                                if (staff) {
-                                                    handleSelectStaff(staff);
-                                                }
-                                            }}
-                                            type="button"
-                                            className="relative inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        >
-                                            Thêm
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="flex items-center justify-center p-4 border-b border-gray-200">
-                                <div className="flex items-center">
-                                    Chưa có nhân viên nào
-                                </div>
-                            </div>
-                        )}
+                        {renderStaffs()}
+
                     </div>
-
-                    {/*<div className='mt-4'>*/}
-                    {/*    <div className='flex flex-col'>*/}
-                    {/*        <label htmlFor='email' className='text-sm font-medium text-gray-700'>*/}
-                    {/*            Email*/}
-                    {/*        </label>*/}
-                    {/*        <div className='mt-1'>*/}
-                    {/*            <input*/}
-                    {/*                type='text'*/}
-                    {/*                name='email'*/}
-                    {/*                id='email'*/}
-                    {/*                className='shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md'*/}
-                    {/*            />*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*    <div className='flex flex-col mt-4'>*/}
-                    {/*        <label htmlFor='role' className='text-sm font-medium text-gray-700'>*/}
-                    {/*            Vai trò*/}
-                    {/*        </label>*/}
-                    {/*        <div className='mt-1'>*/}
-                    {/*            <select*/}
-                    {/*                id='role'*/}
-                    {/*                name='role'*/}
-                    {/*                className='shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md'*/}
-                    {/*            >*/}
-                    {/*                <option>Chọn vai trò</option>*/}
-                    {/*                <option>Chủ sở hữu</option>*/}
-                    {/*                <option>Quản trị viên</option>*/}
-                    {/*            </select>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*    <div className='flex flex-col mt-4'>*/}
-                    {/*        <label htmlFor='message' className='text-sm font-medium text-gray-700'>*/}
-                    {/*            Tin nhắn*/}
-                    {/*        </label>*/}
-                    {/*        <div className='mt-1'>*/}
-                    {/*            <textarea*/}
-                    {/*                id='message'*/}
-                    {/*                name='message'*/}
-                    {/*                rows={3}*/}
-                    {/*                className='shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md'*/}
-
-                    {/*            />*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*    <div className='mt-4'>*/}
-                    {/*        <button*/}
-                    {/*            type='button'*/}
-                    {/*            className='m-btn bg-indigo-500 text-white w-full'*/}
-                    {/*        >*/}
-                    {/*            Gửi lời mời*/}
-                    {/*        </button>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
                 </div>
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">
-                        <Modal.SecondaryButton type="button" onClick={onClose}>
+                        <Modal.SecondaryButton
+                            disabled={
+                                addStaffsMutation.isLoading
+                            }
+                            type="button" onClick={onClose}>
                             Đóng
                         </Modal.SecondaryButton>
                         <Modal.PrimaryButton
                             type="submit"
-                            // disabled={
-                            //     selectedStaffs.length === 0 ||
-                            //     inviteIssuerMutation.isLoading
-                            // }
+                            disabled={
+                                selectedStaffs.length === 0 ||
+                                addStaffsMutation.isLoading
+                            }
                         >
-                            Thêm{" "}
-                            {selectedStaffs.length > 0 &&
-                                `(${selectedStaffs.length})`}
+                            {addStaffsMutation.isLoading ?
+                                'Đang thêm...' : `Thêm ${selectedStaffs.length > 0 ? `(${selectedStaffs.length})` : ""}`}
                         </Modal.PrimaryButton>
                     </div>
                 </Modal.Footer>

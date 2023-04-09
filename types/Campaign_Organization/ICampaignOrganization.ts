@@ -11,10 +11,15 @@ export interface ISchedule {
     status?: number;
     statusName?: string;
 }
+
 export interface ICampaignOrganization {
     id: number;
     organizationId?: number;
     campaignId?: number;
     organization?: IOrganization;
+    schedules?: ISchedule[];
+}
+
+export interface ICustomerCampaignOrganization extends IOrganization {
     schedules?: ISchedule[];
 }

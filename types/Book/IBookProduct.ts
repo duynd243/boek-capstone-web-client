@@ -1,19 +1,21 @@
-import {ICampaign} from "../Campaign/ICampaign";
-import {IBook} from "./IBook";
-import {IUser} from "../User/IUser";
+import { ICampaign } from "../Campaign/ICampaign";
+import { IBook } from "./IBook";
+import { IIssuer } from "../User/IUser";
+import { IGenre } from "../Genre/IGenre";
+import { IUnhierarchicalBookProduct } from "./IUnhierarchicalBookProduct";
 
 export interface IBookProductItem {
     id: number;
     parentBookProductId: string;
     bookId: number;
-    format?: number;
-    displayIndex?: number;
-    withPdf?: boolean;
+    format: number;
+    displayIndex: number;
+    withPdf: boolean;
     pdfExtraPrice?: number;
-    displayPdfIndex?: number;
-    withAudio?: boolean;
+    displayPdfIndex: number;
+    withAudio: boolean;
     audioExtraPrice?: number;
-    displayAudioIndex?: number;
+    displayAudioIndex: number;
     book: IBook;
 }
 
@@ -21,6 +23,7 @@ export interface IBookProduct {
     id: string;
     bookId: number;
     genreId?: number;
+    genre?: IGenre;
     campaignId?: number;
     issuerId?: string;
     title?: string;
@@ -50,10 +53,19 @@ export interface IBookProduct {
     onlyAudio?: boolean;
     campaign?: ICampaign;
     book?: IBook;
-    issuer?: {
-        id?: string;
-        description?: string;
-        user?: IUser;
-    };
+    issuer?: IIssuer;
     bookProductItems?: IBookProductItem[];
+}
+
+export interface ICustomerBookProduct extends IBookProduct {
+    otherMobileBookProducts?: {
+        id: string;
+        bookId: number;
+        genreId?: number;
+        campaignId?: number;
+        campaignName?: string;
+        discount?: number;
+        salePrice?: number;
+    }[];
+    unhierarchicalBookProducts?: IUnhierarchicalBookProduct[];
 }

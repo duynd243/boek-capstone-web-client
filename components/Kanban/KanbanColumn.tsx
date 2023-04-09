@@ -30,7 +30,7 @@ const KanbanColumn: React.FC<Props> = ({header, children, columnWidth = 'w-72'})
     return (
         <div className={`flex flex-col flex-shrink-0 ${columnWidth}`}>
             {header}
-            <div ref={ref} className='flex flex-col pb-4 space-y-6 pt-3 mt-1 overflow-auto'>
+            <div ref={ref} className='flex flex-col mt-3 overflow-auto'>
                 {children}
             </div>
         </div>

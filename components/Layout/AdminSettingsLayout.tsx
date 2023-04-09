@@ -6,9 +6,10 @@ import { useAuth } from "../../context/AuthContext";
 
 type Props = {
     children: React.ReactNode;
+    childrenWrapperClassName?: string;
 };
 
-const AdminSettingsLayout = ({ children }: Props) => {
+const AdminSettingsLayout = ({ children, childrenWrapperClassName }: Props) => {
     const router = useRouter();
     const { loginUser } = useAuth();
     const menus = useMemo(() => {
@@ -16,7 +17,7 @@ const AdminSettingsLayout = ({ children }: Props) => {
     }, [loginUser]);
 
     return (
-        <main className="relative ">
+        <main className="relative">
             <div className="mx-auto max-w-6xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
                 <div className="overflow-hidden rounded-lg bg-white shadow">
                     <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
@@ -30,7 +31,7 @@ const AdminSettingsLayout = ({ children }: Props) => {
                                             menu?.path === router.pathname
                                                 ? "border-indigo-500 bg-indigo-50 text-indigo-700 hover:bg-indigo-50 hover:text-indigo-700"
                                                 : "border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900"
-                                        }  group flex items-center border-l-4 px-3 py-2 text-sm font-medium`}
+                                        }  group flex items-center border-l-4 px-3 py-2 text-sm font-medium py-3`}
                                         // aria-current={
                                         //     item.current ? "page" : undefined
                                         // }
@@ -44,6 +45,9 @@ const AdminSettingsLayout = ({ children }: Props) => {
                                         {/*  )}*/}
                                         {/*  aria-hidden="true"*/}
                                         {/*/>*/}
+                                        <div className={"mr-2"}>
+                                            {menu.icon}
+                                        </div>
                                         <span className="truncate">
                                             {menu.name}
                                         </span>
@@ -52,7 +56,7 @@ const AdminSettingsLayout = ({ children }: Props) => {
                             </nav>
                         </aside>
 
-                        <div className="py-6 px-4 sm:p-6 lg:col-span-9">
+                        <div className={childrenWrapperClassName || "py-6 px-4 sm:p-6 lg:col-span-9"}>
                             {children}
                         </div>
                     </div>

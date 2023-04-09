@@ -8,6 +8,7 @@ export interface IBookItem {
     parentBookId?: number;
     bookId: number;
     displayIndex: number;
+    book: IBook;
 }
 
 export interface IBook {

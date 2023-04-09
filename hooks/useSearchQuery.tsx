@@ -8,7 +8,7 @@ function useSearchQuery(queryKey: string, onChange?: () => void) {
 
     useEffect(() => {
         (async () => {
-            if (searchFromUrl !== search) {
+            if (router.isReady && searchFromUrl !== search) {
                 await router.push(
                     {
                         pathname: router.pathname,
@@ -18,14 +18,18 @@ function useSearchQuery(queryKey: string, onChange?: () => void) {
                         },
                     },
                     undefined,
-                    { shallow: true }
+                    { shallow: true },
                 );
-                if (onChange) {
-                    onChange();
-                }
             }
         })();
-    }, [onChange, queryKey, router, search, searchFromUrl]);
+    }, [queryKey, router, search, searchFromUrl]);
+
+
+    useEffect(() => {
+        if (onChange && searchFromUrl !== search) {
+            onChange();
+        }
+    }, [onChange, search, searchFromUrl]);
 
     return {
         search,

@@ -1,6 +1,6 @@
-import React, {memo} from "react";
-import {BsSearch} from "react-icons/bs";
-import {HiOutlineInbox} from "react-icons/hi2";
+import React, { memo } from "react";
+import { BsSearch } from "react-icons/bs";
+import { HiOutlineInbox } from "react-icons/hi2";
 
 export enum EMPTY_STATE_TYPE {
     NO_DATA,
@@ -14,14 +14,14 @@ type Props = {
     searchNotFoundMessage?: string;
 };
 
-const EmptyState: React.FC<Props> = ({status, keyword, customMessage, searchNotFoundMessage}) => {
+const EmptyState: React.FC<Props> = ({ status, keyword, customMessage, searchNotFoundMessage }) => {
     return (
         <div className="flex h-full flex-col items-center justify-center">
             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-slate-100">
                 {status === EMPTY_STATE_TYPE.NO_DATA ? (
-                    <HiOutlineInbox className="h-12 w-12 text-slate-400"/>
+                    <HiOutlineInbox className="h-12 w-12 text-slate-400" />
                 ) : (
-                    <BsSearch className="h-12 w-12 text-slate-400"/>
+                    <BsSearch className="h-12 w-12 text-slate-400" />
                 )}
             </div>
             <div className="mt-4 text-lg font-medium text-slate-600">

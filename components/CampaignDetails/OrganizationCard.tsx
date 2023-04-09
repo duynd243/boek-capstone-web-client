@@ -1,7 +1,7 @@
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
 import React from "react";
-import { BsAlarmFill, BsCalendarWeek, BsFillPinMapFill } from "react-icons/bs";
+import { BsCalendarWeek } from "react-icons/bs";
 import { HiMapPin, HiOutlineChevronDown } from "react-icons/hi2";
 import { ICampaignOrganization } from "../../types/Campaign_Organization/ICampaignOrganization";
 import { getAvatarFromName, getFormattedTime } from "../../utils/helper";
@@ -54,16 +54,19 @@ const ScheduleNode: React.FC<{
 };
 
 const OrganizationCard: React.FC<Props> = ({ campaignOrganization }) => {
+
+
     const schedules = campaignOrganization?.schedules || [];
     const [isShowSchedule, setIsShowSchedule] = React.useState<boolean>(false);
     return (
         <div>
-            <div className="relative flex h-full w-full space-x-4 rounded border border-slate-200 bg-white px-4 py-6 shadow-sm transition duration-300 hover:shadow">
+            <div
+                className="relative flex h-full w-full space-x-4 rounded border border-slate-200 bg-white px-4 py-6 shadow-sm transition duration-300 hover:shadow">
                 <Image
                     src={
                         campaignOrganization?.organization?.imageUrl ||
                         getAvatarFromName(
-                            campaignOrganization?.organization?.name
+                            campaignOrganization?.organization?.name,
                         )
                     }
                     width={500}

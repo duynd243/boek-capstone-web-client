@@ -1,11 +1,11 @@
-import React, {useCallback, useState} from "react";
+import React, { useCallback, useState } from "react";
 import TransitionModal from "./TransitionModal";
-import {DayPicker, DayPickerBase} from "react-day-picker";
+import { DayPicker, DayPickerBase } from "react-day-picker";
 import Modal from "./Modal";
-import {format} from "date-fns";
-import {defaultInputClass} from "../Form";
-import {vi} from "date-fns/locale";
-import {DAY_PICKER_CONTAINER, DAY_PICKER_SELECTED} from "../../constants/TailwindClasses";
+import { format } from "date-fns";
+import { defaultInputClass } from "../Form";
+import { vi } from "date-fns/locale";
+import { DAY_PICKER_CONTAINER, DAY_PICKER_SELECTED } from "../../constants/TailwindClasses";
 
 type Props = {
     title: string;
@@ -15,6 +15,7 @@ type Props = {
     isOpen: boolean;
     onDismiss: () => void;
     onClose: (date: Date | undefined) => void;
+    showTime?: boolean;
 } & DayPickerBase;
 
 const DateTimePickerModal: React.FC<Props> = ({
@@ -25,18 +26,19 @@ const DateTimePickerModal: React.FC<Props> = ({
                                                   value,
                                                   isOpen,
                                                   onClose,
+                                                  showTime = true,
                                                   ...rest
                                               }) => {
     const [date, setDate] = useState<Date | undefined>(value);
     const [time, setTime] = useState<string>(
-        value ? format(value, "HH:mm") : "00:00"
+        value ? format(value, "HH:mm") : "00:00",
     );
 
     const handleClose = useCallback(() => {
         onClose?.(
             date && time
                 ? new Date(`${format(date, "yyyy-MM-dd")}T${time}`)
-                : undefined
+                : undefined,
         );
     }, [date, onClose, time]);
 
@@ -62,7 +64,7 @@ const DateTimePickerModal: React.FC<Props> = ({
             closeOnOverlayClick={false}
         >
             <>
-                <Modal.Header title={title}/>
+                <Modal.Header title={title} />
                 <DayPicker
                     locale={vi}
                     defaultMonth={value}
@@ -73,7 +75,7 @@ const DateTimePickerModal: React.FC<Props> = ({
                     className={DAY_PICKER_CONTAINER}
                     selected={date}
                     onDayClick={setDate}
-                    footer={timePicker}
+                    footer={showTime ? timePicker : undefined}
                 />
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">

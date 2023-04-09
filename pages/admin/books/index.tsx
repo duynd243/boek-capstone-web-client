@@ -19,6 +19,7 @@ import StatusCard from "../../../components/StatusCard";
 import EmptyState, {EMPTY_STATE_TYPE} from "../../../components/EmptyState";
 import TableFooter from "../../../components/Admin/Table/TableFooter";
 import DefaultAvatar from "../../../assets/images/default-avatar.png";
+import Link from "next/link";
 
 const AdminBooksPage: NextPageWithLayout = () => {
 
@@ -79,6 +80,9 @@ const AdminBooksPage: NextPageWithLayout = () => {
                         <TableHeader>Tác giả</TableHeader>
                         <TableHeader>Năm phát hành</TableHeader>
                         <TableHeader textAlignment="text-center">Trạng thái</TableHeader>
+                        <TableHeader>
+                            <span className="sr-only">Edit</span>
+                        </TableHeader>
                     </TableHeading>
                     <TableBody>
                         {bookData?.data?.map((book) => {
@@ -150,6 +154,14 @@ const AdminBooksPage: NextPageWithLayout = () => {
                                         {book?.status ?
                                             <StatusCard label='Đang phát hành'/> :
                                             <StatusCard variant='error' label='Ngưng phát hành'/>}
+                                    </TableData>
+                                    <TableData className="text-right text-sm font-medium">
+                                        <Link
+                                            href={`/admin/books/${book?.id}`}
+                                            className="text-indigo-600 hover:text-indigo-700"
+                                        >
+                                            Chi tiết
+                                        </Link>
                                     </TableData>
                                 </tr>
                             );
