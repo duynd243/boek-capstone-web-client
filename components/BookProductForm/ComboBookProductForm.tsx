@@ -79,9 +79,19 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
   const campaign = useContext(CampaignContext);
 
 
-  function getMinimalCommission(genreId: number) {
-    return campaign?.campaignCommissions?.find(c => c.genreId === genreId)?.minimalCommission || 0;
-  }
+
+ function getMinimalCommission(genreId: number) {
+        return campaign?.campaignCommissions?.find(cc => cc?.genreId === genreId)?.minimalCommission;
+    }
+
+
+  const minimalCommission = campaign?.campaignCommissions?.find(cc => cc?.genreId === product?.genre?.id)?.minimalCommission;
+    // console.log('minimalCommission', minimalCommission);
+    
+
+  // const minimalCommission = campaign?.campaignCommissions?.find(c => c.genreId === genreId)?.minimalCommission || 0;
+  // console.log('minimalCommission');
+  
 
 
 
@@ -145,7 +155,7 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
     title: product?.title,
     saleQuantity: product?.saleQuantity || 0,
     salePrice: product?.salePrice || 0,
-    commission: action === 'update' ? product?.commission : action === 'create-old' ? getMinimalCommission(product?.genreId) : 0,
+    commission: action === 'update' ? product?.commission  : action === 'create-old' ? getMinimalCommission(product?.genre?.id) : 0,
     format: action === 'update' ? product?.format : undefined,
     status: product?.status,
     description: product?.description,
@@ -185,7 +195,9 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
         ...v,
         campaignId: campaign?.id
       }))
-
+      // if (action === 'update' && product?.genreId) {
+      //   setValue('commission', getMinimalCommission(product?.genreId))
+      // }
       if (action === 'create-old' && product?.genreId) {
         setValue('commission', getMinimalCommission(product?.genreId))
       }
@@ -385,6 +397,21 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
     setValue("bookProductItems", []);
 
   }
+  
+
+  // const clearCommission = () => {
+  //   // if (action === 'create-old' &&  product?.genreId && watch("commission") !== undefined && watch("commission") > 0) {
+  //   //   toast("Tất cả phần trăm hoa hồng đã chọn sẽ bị xóa khi bạn chọn lại thể loại sách");
+  //   // }
+  //   if ( watch("genreId") !== undefined && watch("genreId") > 0) {
+  //     toast("Tất cả phần trăm chiết kh đã chọn sẽ bị xóa khi bạn chọn lại thể loại sách");
+  //     if (action === 'update' &&  product?.genreId ) {
+  //     setValue('commission', getMinimalCommission(product?.genreId))
+  //     }
+  //   }
+  // }
+
+
   const selectedgenreId = parentGenresOfCampaign?.find(g => g?.id === watch('genreId'));
   const selectedBookItems = watch("bookProductItems") || [];
 
@@ -454,7 +481,7 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
                   errorMessage={errors.title?.message}
                 />
                 <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                  <div className="sm:col-span-2">
+                  <div className="sm:col-span-3">
                     <Form.Input<FormType>
                       register={register}
                       required={true}
@@ -466,19 +493,7 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
                       errorMessage={errors?.salePrice?.message}
                     />
                   </div>
-                  <div className="sm:col-span-2">
-                    <Form.Input<FormType>
-                      register={register}
-                      required={true}
-                      inputType={'number'}
-                      disabled={editBasicInfoOnly}
-                      placeholder={"Chiết khấu"}
-                      fieldName={"commission"}
-                      label={"Chiết khấu (%)"}
-                      errorMessage={errors?.commission?.message}
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
+                  <div className="sm:col-span-3">
                     <Form.Input<FormType>
                       register={register}
                       required={true}
@@ -581,6 +596,9 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
                   onValueChange={(value) => {
                     if (value) {
                       field.onChange(value.id);
+                      // clearCommission();
+                      setValue('commission', getMinimalCommission(value.id) || 0)
+                      console.log( getMinimalCommission(value.id) || 0)
                       clearAllSelectedBooks();
                       clearAllBonuses();
                       // clear all selected books
@@ -596,6 +614,25 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
           </div>
 
           <Form.Divider />
+          <Form.GroupLabel
+                            label={"Chiết khấu"}
+                            description={"Chiết khấu theo thể loại Combo"}
+                        />
+                        <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                            <div className="sm:col-span-2">
+                                <Form.Input<FormType>
+                                    register={register}
+                                    required={true}
+                                    inputType={'number'}
+                                    placeholder={"Chiết khấu"}
+                                    fieldName={"commission"}
+                                    label={`Chiết khấu tối thiểu từ ${getMinimalCommission(watch('genreId'))} (%)`}
+                                    errorMessage={errors?.commission?.message}
+                                    disabled={!watch("genreId")}
+                                />
+                            </div>
+                        </div>
+                        <Form.Divider />
           <Form.GroupLabel
             label={"Chọn sách combo"}
             description={"Chọn sách combo để bán"}

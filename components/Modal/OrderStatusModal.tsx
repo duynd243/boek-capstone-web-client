@@ -19,7 +19,7 @@ const OrderStatusModal: React.FC<Props> = ({maxWidth, isOpen, order, onClose}) =
     }
 
 
-    const orderType = order?.orderType === 1 ? OrderTypes.PICKUP : OrderTypes.SHIPPING;
+    const orderType =  OrderTypes.SHIPPING;
     const statuses = orderType.availableStatuses.filter((status) => {
         return status.id !== OrderStatuses.CANCELLED.id;
     })

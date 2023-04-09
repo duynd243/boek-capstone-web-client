@@ -9,6 +9,7 @@ export interface ICustomer {
     gender?: boolean;
     point?: number;
     level?: ICustomerLevel;
+    user?: IUser;
 }
 
 export interface IIssuer {

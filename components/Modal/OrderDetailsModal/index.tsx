@@ -44,7 +44,7 @@ function getMockOrder(): IMockOrder {
     const randomBoolean = faker.datatype.boolean();
     // true => pickup
     // false => delivery
-    const pickupStatusIds = OrderTypes.PICKUP.availableStatuses.map(status => status.id);
+    // const pickupStatusIds = OrderTypes.PICKUP.availableStatuses.map(status => status.id);
     const shippingStatusIds = OrderTypes.SHIPPING.availableStatuses.map(status => status.id);
     return {
         id: faker.datatype.uuid(),
@@ -85,7 +85,8 @@ function getMockOrder(): IMockOrder {
         orderType: randomBoolean ? 1 : 2,
 
         // random from array
-        status: randomBoolean ? faker.helpers.arrayElement(pickupStatusIds) : faker.helpers.arrayElement(shippingStatusIds),
+        status: faker.helpers.arrayElement(shippingStatusIds),
+        // status: faker.helpers.arrayElement(shippingStatusIds),
         createdAt: faker.date.past(),
         paymentMethod: faker.datatype.number({min: 1, max: 2}),
     }

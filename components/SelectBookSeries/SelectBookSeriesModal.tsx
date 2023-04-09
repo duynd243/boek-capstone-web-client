@@ -106,9 +106,7 @@ const SelectBookSeriesModal = ({
                                             <div className="mb-1 text-sm font-medium text-gray-900">
                                                 {book?.name}
                                             </div>
-                                            <div className="text-sm font-medium text-gray-500">
-                                                NXB: {book?.publisher?.name}
-                                            </div>
+                                           
                                             <div className="text-sm font-medium text-gray-500">
                                                 Thể loại: {book?.genre?.name}
                                             </div>

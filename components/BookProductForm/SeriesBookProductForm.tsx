@@ -24,6 +24,9 @@ import TableHeader from './../Admin/Table/TableHeader';
 import TableBody from './../Admin/Table/TableBody';
 import TableData from './../Admin/Table/TableData';
 import useEditBookProduct from './useEditBookProduct';
+import { useContext } from 'react';
+import { CampaignContext } from './../../context/CampaignContext';
+
 
 type Props = {
     product: IBookProduct;
@@ -44,8 +47,10 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
     const bookProductService = new BookProductService(loginUser?.accessToken);
 
     // const bookId = router.query.id as string;
-
-
+    const campaign = useContext(CampaignContext);
+    const minimalCommission = campaign
+    ?.campaignCommissions
+    ?.find((c) => c?.genreId === product?.genre?.parentId)?.minimalCommission || 0;
 
 
     const UpdateSeriesBookProductSchema = z.object({
@@ -53,7 +58,7 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
         format: z.number(),
         saleQuantity: z.coerce.number().min(1),
         discount: z.coerce.number().min(0).max(100),
-        commission: z.coerce.number().min(0).max(100),
+        commission: z.coerce.number().min(minimalCommission).max(100),
         status: z.number(),
         bookProductItems: z.array(
             z.object({
@@ -257,7 +262,7 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                             disabled={editBasicInfoOnly}
                             placeholder={"Chiết khấu"}
                             fieldName={"commission"}
-                            label={"Chiết khấu (%)"}
+                            label={`Chiết khấu (tối thiểu phải từ ${minimalCommission}%)`}
                             errorMessage={errors?.commission?.message}
                         />
                         <Form.Input<FormType>

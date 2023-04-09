@@ -18,7 +18,6 @@ const IssuerCampaignDetails: NextPageWithLayout = () => {
     const {loginUser} = useAuth();
     const router = useRouter();
     const campaignService = new CampaignService(loginUser?.accessToken);
-
     const campaignId = router.query.id as string;
 
     const {data: campaign, isFetching, isInitialLoading, isError} = useQuery(

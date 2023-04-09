@@ -602,7 +602,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                     inputType={'number'}
                                     placeholder={"Chiết khấu"}
                                     fieldName={"commission"}
-                                    label={"Chiết khấu (%)"}
+                                    label={"Chiết khấu (%) "}   
                                     errorMessage={errors?.commission?.message}
                                     disabled={!watch("genreId")}
                                 />

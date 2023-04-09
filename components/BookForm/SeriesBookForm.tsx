@@ -35,7 +35,7 @@ import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 import Modal from "../Modal/Modal";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import SelectBookSeriesModal from './../SelectBookSeries/SelectBookSeriesModal';
+import SelectBookModal from './../SelectBookSeries/SelectBookModal';
 import { IoChevronBack } from 'react-icons/io5';
 import { useMutation } from "@tanstack/react-query";
 import { BookService } from './../../services/BookService';
@@ -577,7 +577,7 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
         confirmText={"Xoá"}
       />
 
-      {form.values.genreId && <SelectBookSeriesModal
+      {form.values.genreId && <SelectBookModal
         key={form.values.genreId}
         onItemSelect={b => handleAddBook(b)}
         onClose={() => setShowAddBookModal(false)}

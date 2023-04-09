@@ -1,14 +1,11 @@
-import {useInfiniteQuery} from "@tanstack/react-query";
 import Image from "next/image";
-import React, {useContext, useState} from "react";
+import React, {Fragment, useContext} from "react";
 import {IoArrowForward, IoChevronBack, IoLocationSharp,} from "react-icons/io5";
 import {useAuth} from "../../context/AuthContext";
 import {PostService} from "../../old-services/PostService";
-import {IPostResponse} from "../../old-types/response/IPostResponse";
-import {getFormattedDate} from "../../utils/helper";
+import {getAvatarFromName, getFormattedDate} from "../../utils/helper";
 import ContentHeader from "./ContentHeader";
 import OrganizationCard from "./OrganizationCard";
-import PostCard from "./PostCard";
 import Separator from "./Seperator";
 import StatusLabel from "./StatusLabel";
 // import ParticipationTable from '../Admin/ParticipationTable';
@@ -28,32 +25,31 @@ const MainContent: React.FC = () => {
 
     const campaignOrganizations = campaign?.campaignOrganizations;
 
-    const [postPageSize, setPostPageSize] = useState(4);
 
-    const {
-        data: posts,
-        isFetchingNextPage,
-        fetchNextPage,
-        hasNextPage,
-        isInitialLoading,
-    } = useInfiniteQuery(
-        ["posts", campaign?.id],
-        ({pageParam = 1}) =>
-            postService.getPosts({
-                page: pageParam,
-                campaignId: campaign?.id,
-                size: postPageSize,
-            }),
-        {
-            getNextPageParam: (lastPage) => {
-                const currentPage = lastPage?.metadata?.page;
-                const totalPages = Math.ceil(
-                    lastPage?.metadata?.total / postPageSize
-                );
-                return currentPage < totalPages ? currentPage + 1 : undefined;
-            },
-        }
-    );
+    // const {
+    //     data: posts,
+    //     isFetchingNextPage,
+    //     fetchNextPage,
+    //     hasNextPage,
+    //     isInitialLoading,
+    // } = useInfiniteQuery(
+    //     ["posts", campaign?.id],
+    //     ({pageParam = 1}) =>
+    //         postService.getPosts({
+    //             page: pageParam,
+    //             campaignId: campaign?.id,
+    //             size: postPageSize,
+    //         }),
+    //     {
+    //         getNextPageParam: (lastPage) => {
+    //             const currentPage = lastPage?.metadata?.page;
+    //             const totalPages = Math.ceil(
+    //                 lastPage?.metadata?.total / postPageSize
+    //             );
+    //             return currentPage < totalPages ? currentPage + 1 : undefined;
+    //         },
+    //     }
+    // );
 
     return (
         <div>
@@ -134,33 +130,177 @@ const MainContent: React.FC = () => {
                 <ContentHeader text={"Mô tả hội sách"}/>
                 <p className="mt-2 mb-6 break-words">{campaign?.description}</p>
             </div>
-            <Separator/>
 
             {/*Organizations*/}
-            <div>
-                <ContentHeader
-                    text={`${
-                        campaign?.isRecurring
-                            ? "Tổ chức và lịch trình"
-                            : "Tổ chức"
-                    } (${campaignOrganizations?.length || 0})`}
-                />
-                {campaignOrganizations && campaignOrganizations?.length > 0 ? (
-                    <div className="my-6 space-y-4">
-                        {campaignOrganizations.map((org) => (
-                            <OrganizationCard
-                                campaignOrganization={org}
-                                key={org.id}
-                            />
-                        ))}
+            {campaign?.format === CampaignFormats.OFFLINE.id &&
+                <Fragment>
+                    <Separator/>
+                    <div>
+                        <ContentHeader
+                            text={`${
+                                campaign?.isRecurring
+                                    ? "Tổ chức và lịch trình"
+                                    : "Tổ chức"
+                            } (${campaignOrganizations?.length || 0})`}
+                        />
+                        {campaignOrganizations && campaignOrganizations?.length > 0 && (
+                            <div className="my-6 space-y-4">
+                                {campaignOrganizations.map((org) => (
+                                    <OrganizationCard
+                                        campaignOrganization={org}
+                                        key={org.id}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
-                ) : (
-                    <EmptySection
-                        text={"Sự kiện này chưa có tổ chức nào tham gia"}
+                </Fragment>
+            }
+
+            {/*Commissions*/}
+            <Fragment>
+                <Separator/>
+                <div>
+                    <ContentHeader
+                        text={`Thể loại sách và chiết khấu (${campaign?.campaignCommissions?.length || 0})`}
                     />
-                )}
-            </div>
-            <Separator/>
+                    {campaign?.campaignCommissions && campaign?.campaignCommissions?.length > 0 ? (
+                        <div className="my-6 space-y-4">
+                            {campaign?.campaignCommissions.map((commission) => (
+                                <div
+                                    key={commission?.id}
+                                    className="relative flex h-full w-full space-x-4 rounded border border-slate-200 bg-white px-4 py-6 shadow-sm transition duration-300 hover:shadow">
+                                    <Image
+                                        src={
+                                            getAvatarFromName(
+                                                commission?.genre?.name
+                                            )
+                                        }
+                                        width={500}
+                                        height={500}
+                                        alt=""
+                                        className="rounded-full object-cover h-12 w-12"
+                                    />
+                                    {/*Org Info*/}
+                                    <div
+                                        className={`grow min-w-0`}
+                                    >
+                                        <div className={"mb-1 text-base font-bold text-slate-700"}>
+                                            {commission?.genre?.name}
+                                        </div>
+                                        <div className={"text-sm text-slate-500"}>
+                                            Chiết khấu: <span
+                                            className={"font-semibold"}>{commission?.minimalCommission}%</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <EmptySection
+                            text={""}
+                        />
+                    )}
+                </div>
+            </Fragment>
+
+
+            {campaign?.format === CampaignFormats.ONLINE.id && (
+
+                <Fragment>
+                    <Separator/>
+                    <div>
+                        <ContentHeader
+                            text={`Nhóm đề tài (${campaign?.campaignGroups?.length || 0})`}
+                        />
+                        {campaign?.campaignGroups && campaign?.campaignGroups?.length > 0 ? (
+                            <div className="my-6 space-y-4">
+                                {campaign?.campaignGroups.map((cg) => (
+                                    <div
+                                        key={cg?.id}
+                                        className="relative flex h-full w-full space-x-4 rounded border border-slate-200 bg-white px-4 py-6 shadow-sm transition duration-300 hover:shadow">
+                                        <Image
+                                            src={
+                                                getAvatarFromName(
+                                                    cg?.group?.name
+                                                )
+                                            }
+                                            width={500}
+                                            height={500}
+                                            alt=""
+                                            className="rounded-full object-cover h-12 w-12"
+                                        />
+                                        {/*Org Info*/}
+                                        <div
+                                            className={`grow min-w-0`}
+                                        >
+                                            <div className={"mb-1 text-base font-bold text-slate-700"}>
+                                                {cg?.group?.name}
+                                            </div>
+                                            <div className={"text-sm text-slate-500"}>
+                                                {cg?.group?.description}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <EmptySection
+                                text={"Hội sách này chưa có nhóm đề tài được thêm."}
+                            />
+                        )}
+                    </div>
+
+                    {/*Levels*/}
+
+                    <Separator/>
+                    <div>
+                        <ContentHeader
+                            text={`Cấp độ khách hàng yêu cầu (${campaign?.campaignLevels?.length || 0})`}
+                        />
+                        {campaign?.campaignLevels && campaign?.campaignLevels?.length > 0 ? (
+                            <div className="my-6 space-y-4">
+                                {campaign?.campaignLevels.map((cl) => (
+                                    <div
+                                        key={cl?.id}
+                                        className="relative flex h-full w-full space-x-4 rounded border border-slate-200 bg-white px-4 py-6 shadow-sm transition duration-300 hover:shadow">
+                                        <Image
+                                            src={
+                                                getAvatarFromName(
+                                                    cl?.level?.name, 1
+                                                )
+                                            }
+                                            width={500}
+                                            height={500}
+                                            alt=""
+                                            className="rounded-full object-cover h-12 w-12"
+                                        />
+                                        {/*Org Info*/}
+                                        <div
+                                            className={`grow min-w-0`}
+                                        >
+                                            <div className={"mb-1 text-base font-bold text-slate-700"}>
+                                                {cl?.level?.name}
+                                            </div>
+                                            <div className={"text-sm text-slate-500"}>
+                                                Điểm: <span
+                                                className={"font-semibold"}>{cl?.level?.conditionalPoint}</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <EmptySection
+                                text={"Hội sách này chưa có cấp độ khách hàng yêu cầu."}
+                            />
+                        )}
+                    </div>
+                </Fragment>
+            )}
 
             {/*ParticipationTable*/}
             {/* {loginUser?.role === Roles.SYSTEM.id && (
@@ -168,41 +308,40 @@ const MainContent: React.FC = () => {
             )} */}
 
             {/* Posts */}
-            <div>
-                <ContentHeader
-                    text={`Sách đang được bán (${
-                        posts?.pages[0]?.metadata.total || 0
-                    })`}
-                />
-                {isInitialLoading ? (
-                    <div className={"my-6"}>Đang tải...</div>
-                ) : posts && posts?.pages.length > 0 ? (
-                    <div className="my-6">
-                        <div className="grid grid-cols-12 gap-6">
-                            {posts?.pages?.map((value) =>
-                                value.data.map((post: IPostResponse) => (
-                                    <PostCard data={post} key={post?.id}/>
-                                ))
-                            )}
-                        </div>
-                        {hasNextPage && (
-                            <button
-                                onClick={() => fetchNextPage()}
-                                disabled={isFetchingNextPage}
-                                className="mx-auto mt-4 block rounded bg-indigo-50 px-4 py-2 text-base font-medium text-indigo-500 transition disabled:bg-gray-50 disabled:text-gray-500"
-                            >
-                                {isFetchingNextPage
-                                    ? "Đang tải..."
-                                    : "Xem thêm bài đăng"}
-                            </button>
-                        )}
-                    </div>
-                ) : (
-                    <EmptySection text={"Sự kiện này chưa có bài đăng nào"}/>
-                )}
-            </div>
+            {/*<div>*/}
+            {/*    <ContentHeader*/}
+            {/*        text={`Sách đang được bán (${*/}
+            {/*            posts?.pages[0]?.metadata.total || 0*/}
+            {/*        })`}*/}
+            {/*    />*/}
+            {/*    {isInitialLoading ? (*/}
+            {/*        <div className={"my-6"}>Đang tải...</div>*/}
+            {/*    ) : posts && posts?.pages.length > 0 ? (*/}
+            {/*        <div className="my-6">*/}
+            {/*            <div className="grid grid-cols-12 gap-6">*/}
+            {/*                {posts?.pages?.map((value) =>*/}
+            {/*                    value.data.map((post: IPostResponse) => (*/}
+            {/*                        <PostCard data={post} key={post?.id}/>*/}
+            {/*                    ))*/}
+            {/*                )}*/}
+            {/*            </div>*/}
+            {/*            {hasNextPage && (*/}
+            {/*                <button*/}
+            {/*                    onClick={() => fetchNextPage()}*/}
+            {/*                    disabled={isFetchingNextPage}*/}
+            {/*                    className="mx-auto mt-4 block rounded bg-indigo-50 px-4 py-2 text-base font-medium text-indigo-500 transition disabled:bg-gray-50 disabled:text-gray-500"*/}
+            {/*                >*/}
+            {/*                    {isFetchingNextPage*/}
+            {/*                        ? "Đang tải..."*/}
+            {/*                        : "Xem thêm bài đăng"}*/}
+            {/*                </button>*/}
+            {/*            )}*/}
+            {/*        </div>*/}
+            {/*    ) : (*/}
+            {/*        <EmptySection text={"hội sách này chưa có bài đăng nào"}/>*/}
+            {/*    )}*/}
+            {/*</div>*/}
 
-            <Separator/>
 
             {/*/!* Comments *!/*/}
             {/*<div>*/}
@@ -286,7 +425,7 @@ const MainContent: React.FC = () => {
             {/*/!* Similar Meetups *!/*/}
             {/*{loginUser?.role === Roles.CUSTOMER.id && (*/}
             {/*    <div>*/}
-            {/*        <ContentHeader text={'Các sự kiện liên quan'} />*/}
+            {/*        <ContentHeader text={'Các hội sách liên quan'} />*/}
             {/*    </div>*/}
             {/*)}*/}
         </div>

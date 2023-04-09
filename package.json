@@ -22,6 +22,7 @@
     "date-fns": "^2.29.3",
     "firebase": "^9.17.1",
     "formik": "^2.2.9",
+    "framer-motion": "^10.10.0",
     "multiselect-react-dropdown": "^2.0.25",
     "next": "^13.1.6",
     "qs": "^6.11.1",

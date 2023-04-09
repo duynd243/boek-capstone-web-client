@@ -65,7 +65,7 @@ const IssuerBookProductDetailPage: NextPageWithLayout = () => {
         {product && (
             <FormPageLayout>
                 <WelcomeBanner
-                    label={`Chỉnh sửa ....`}
+                    label={`Chỉnh sửa sách ${product?.title} 📚`}
                     className="p-6 sm:p-10"
                 />
 

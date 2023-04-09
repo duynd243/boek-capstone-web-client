@@ -1,31 +1,19 @@
-import {OrderStatuses} from "./OrderStatuses";
-
-export class OrderTypes {
-    static readonly PICKUP = {
+export const OrderTypes = {
+    DELIVERY: {
         id: 1,
-        displayName: 'Nhận tại hội sách',
-        availableStatuses: [
-            OrderStatuses.PROCESSING,
-            OrderStatuses.WAITING_RECEIVE,
-            OrderStatuses.RECEIVED,
-            OrderStatuses.CANCELLED,
-        ],
-    };
-    static readonly SHIPPING = {
+        displayName: "Đơn giao hàng",
+    },
+    PICKUP: {
         id: 2,
-        displayName: 'Giao hàng',
-        availableStatuses: [
-            OrderStatuses.PROCESSING,
-            OrderStatuses.SHIPPING,
-            OrderStatuses.SHIPPED,
-            OrderStatuses.CANCELLED,
-        ],
-    }
-}
+        displayName: "Đơn tại quầy",
+    },
+} satisfies Record<string, {
+    id: number;
+    displayName: string;
+}>;
 
-
-function getOrderTypeById(id: number) {
+export function getOrderTypeById(id: number) {
     return Object.values(OrderTypes).find(
-        (type) => type.id === id
+        (type) => type.id === id,
     );
 }

@@ -83,8 +83,17 @@ const AddSellingBookSeriesPage: NextPageWithLayout = () => {
     );
     const { data: campaigns } = useQuery(
         ["issuer_campaign", campaignId],
-        () => issuerCampaignService.getCampaignByIdByIssuer(Number(campaignId)),
+        () => issuerCampaignService.getCampaignByIdByIssuer(Number(campaignId)),{
+            onSuccess: (data) => {
+                reset(v=>({
+                    ...v,
+                    commission: data?.campaignCommissions?.find(c=>c.genreId  === book?.genre?.parentId)?.minimalCommission
+                }))
+            }
+        }
     );
+
+    const minimalCommission = campaigns?.campaignCommissions?.find(c => c.genreId === book?.genre?.parentId)?.minimalCommission || 0;
 
     const CreatOddBookSchema = z.object({
         bookId: z.literal(Number(bookId)),
@@ -244,7 +253,7 @@ const AddSellingBookSeriesPage: NextPageWithLayout = () => {
                                 inputType={'number'}
                                 placeholder={"Chiết khấu"}
                                 fieldName={"commission"}
-                                label={"Chiết khấu (%)"}
+                                label={`Chiết khấu (tối thiểu phải từ ${minimalCommission}%)`}
                                 errorMessage={errors?.commission?.message}
                             />
                             <Form.Input<FormType>

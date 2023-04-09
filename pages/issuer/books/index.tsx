@@ -201,7 +201,7 @@ const IssuerBooksPage: NextPageWithLayout = () => {
                     </span>
                   ) : (
                     <span className="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold uppercase leading-5 text-red-800">
-                      Ngưng Phát Hành
+                      Ngừng Phát Hành
                     </span>
                   )}
                 </TableData>

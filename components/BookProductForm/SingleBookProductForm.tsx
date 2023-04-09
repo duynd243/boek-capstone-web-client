@@ -212,7 +212,7 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
                             disabled={editBasicInfoOnly}
                             placeholder={"Chiết khấu"}
                             fieldName={"commission"}
-                            label={"Chiết khấu (%)"}
+                            label={`Chiết khấu (tối thiểu phải từ ${minimalCommission}%)`}
                             errorMessage={errors?.commission?.message}
                         />
                         <Form.Input<FormType>

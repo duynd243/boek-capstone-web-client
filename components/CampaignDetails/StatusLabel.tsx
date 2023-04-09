@@ -1,5 +1,5 @@
 import React from "react";
-import {CampaignStatuses, getCampaignStatusById,} from "../../constants/Statuses";
+import { CampaignStatuses, getCampaignStatusById } from "../../constants/CampaignStatuses";
 
 type Props = {
     statusId?: number;
@@ -29,7 +29,7 @@ const StatusLabel: React.FC<Props> = ({statusId}) => {
             className={`${backgroundColor} ${textColor} inline-flex rounded-full px-3 py-1 text-center text-xs font-medium uppercase`}
         >
             {statusId !== undefined
-                ? getCampaignStatusById(statusId).displayName
+                ? getCampaignStatusById(statusId)?.displayName
                 : "N/A"}
         </div>
     );
