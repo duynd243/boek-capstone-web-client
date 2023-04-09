@@ -53,8 +53,8 @@ export class BookService extends BaseService {
       });
       return response.data;
     };
-  
-  
+
+
     // getBooks$Issuer = async (params?: any) => {
     //   const response = await this.axiosClient.get<
     //     IBaseListResponse<IBook>
@@ -68,15 +68,15 @@ export class BookService extends BaseService {
     //   });
     //   return response.data;
     // };
-  
+
     getBookById$Issuer = async (id: number, params?: any) => {
       const response = await this.axiosClient.get<
         IBook
       >(`/issuer/books/${id}`, { params });
       return response.data;
     };
-  
-  
+
+
     getAddableBooksByIssuer = async (params?: any) => {
       const response = await this.axiosClient.get<
         IBaseListResponse<IBook>

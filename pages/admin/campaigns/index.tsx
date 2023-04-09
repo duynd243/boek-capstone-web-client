@@ -4,7 +4,6 @@ import { NextPageWithLayout } from "../../_app";
 import CampaignListPage from "../../../components/CampaignListPage";
 
 const AdminCampaignsPage: NextPageWithLayout = () => {
-    const { search, setSearch } = useSearchQuery("search", () => setPage(1));
 
     return <CampaignListPage/>
     // const { search, setSearch } = useSearchQuery("search", () => setPage(1));

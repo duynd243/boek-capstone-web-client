@@ -5,7 +5,7 @@ import { IBaseRequestParams } from "../types/Request/IBaseRequestParams";
 
 export class GenreService extends BaseService {
     getGenres = async (
-        params?: IBaseRequestParams<IGenre> & { withBooks?: boolean },
+        params?: IBaseRequestParams<IGenre> & { withBooks?: boolean }
     ) => {
         const response = await this.axiosClient.get<IBaseListResponse<IGenre>>(
             "/genres",

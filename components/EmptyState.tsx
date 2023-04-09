@@ -1,6 +1,6 @@
-import React, {memo} from "react";
-import {BsSearch} from "react-icons/bs";
-import {HiOutlineInbox} from "react-icons/hi2";
+import React, { memo } from "react";
+import { BsSearch } from "react-icons/bs";
+import { HiOutlineInbox } from "react-icons/hi2";
 
 export enum EMPTY_STATE_TYPE {
     NO_DATA,
