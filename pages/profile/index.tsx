@@ -639,7 +639,6 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                 <button
                                     onClick={() => setShowGroupModal(true)}
                                     className="m-btn bg-indigo-500 text-white">
-
                                     Thêm mới
                                 </button>
                             </div>

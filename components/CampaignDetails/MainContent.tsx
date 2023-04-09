@@ -21,6 +21,8 @@ import { ISchedule } from "../../types/Campaign_Organization/ICampaignOrganizati
 import { Tab } from "@headlessui/react";
 import ProductCard from "../ProductCard";
 import CustomerProductCard from "../CustomerProductCard";
+import { Pagination } from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 const MainContent: React.FC = () => {
     const { loginUser } = useAuth();
@@ -400,12 +402,34 @@ const MainContent: React.FC = () => {
                                 <Tab.Panels className={"mt-4"}>
                                     {hierarchicalBookProduct?.subHierarchicalBookProducts && hierarchicalBookProduct?.subHierarchicalBookProducts.map((subHierarchicalBookProduct, index) => {
                                         return <Tab.Panel key={index}>
-                                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                           <Swiper
+                                breakpoints={{
+                                    640: {
+                                        slidesPerView: 2,
+                                    },
+                                    768: {
+                                        slidesPerView: 2.4,
+                                    },
+                                    1024: {
+                                        slidesPerView: 3.2,
+                                    },
+                                    1280: {
+                                        slidesPerView: 4,
+                                    },
+                                }}
+                                spaceBetween={30}
+                                pagination={{
+                                    clickable: true,
+                                }}
+                                modules={[Pagination]}
+                            >
                                                 {subHierarchicalBookProduct?.bookProducts && subHierarchicalBookProduct?.bookProducts.map((bookProduct, index) => {
-                                                    return <CustomerProductCard product={bookProduct}
-                                                                                key={bookProduct?.id} />;
+                                                    return  <SwiperSlide
+                                            className={"!py-10"}
+                                            key={bookProduct?.id}><CustomerProductCard product={bookProduct}
+                                                                                key={bookProduct?.id} /></SwiperSlide>;
                                                 })}
-                                            </div>
+                                           </Swiper>
                                             <div className={"mt-8"}>
                                                 <Link
                                                     href={{
@@ -434,29 +458,52 @@ const MainContent: React.FC = () => {
             }
 
 
+            {/*{customerCampaign?.unhierarchicalBookProducts &&*/}
+            {/*    customerCampaign?.unhierarchicalBookProducts.map((ubp, index) => {*/}
+            {/*        return <Fragment key={index}>*/}
+            {/*            <Separator />*/}
+            {/*            <div>*/}
+            {/*                <ContentHeader*/}
+            {/*                    text={ubp?.title}*/}
+            {/*                />*/}
+            {/*                <Swiper*/}
+            {/*                    breakpoints={{*/}
+            {/*                        640: {*/}
+            {/*                            slidesPerView: 2,*/}
+            {/*                        },*/}
+            {/*                        768: {*/}
+            {/*                            slidesPerView: 2.4,*/}
+            {/*                        },*/}
+            {/*                        1024: {*/}
+            {/*                            slidesPerView: 3.2,*/}
+            {/*                        },*/}
+            {/*                        1280: {*/}
+            {/*                            slidesPerView: 4,*/}
+            {/*                        },*/}
+            {/*                    }}*/}
+            {/*                    spaceBetween={30}*/}
+            {/*                    pagination={{*/}
+            {/*                        clickable: true,*/}
+            {/*                    }}*/}
+            {/*                    modules={[Pagination]}*/}
+            {/*                >*/}
+            {/*                    {ubp?.bookProducts && ubp?.bookProducts.map((bookProduct, index) => {*/}
+            {/*                        return (*/}
+            {/*                            <SwiperSlide*/}
+            {/*                                className={"!py-10"}*/}
+            {/*                                key={bookProduct?.id}>*/}
+            {/*                                123*/}
+            {/*                            </SwiperSlide>*/}
+            {/*                        );*/}
+            {/*                    })}*/}
+            {/*                </Swiper>*/}
+            {/*            </div>*/}
+            {/*        </Fragment>*/}
+            {/*            ;*/}
+            {/*    })*/}
+            {/*}*/}
 
-            {customerCampaign?.unhierarchicalBookProducts &&
-                customerCampaign?.unhierarchicalBookProducts.map((ubp, index) => {
-                    return <Fragment key={index}>
-                        <Separator />
-                        <div>
-                            <ContentHeader
-                                text={ubp?.title}
-                            />
-                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-4">
-                                {ubp?.bookProducts && ubp?.bookProducts.map((bookProduct, index) => {
-                                    return (
-                                        <CustomerProductCard product={bookProduct} key={bookProduct?.id} />
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </Fragment>
-                        ;
-                })
-            }
-
-             {((customerCampaign?.hierarchicalBookProducts && customerCampaign?.hierarchicalBookProducts.length > 0)
+            {((customerCampaign?.hierarchicalBookProducts && customerCampaign?.hierarchicalBookProducts.length > 0)
                 || (customerCampaign?.unhierarchicalBookProducts && customerCampaign?.unhierarchicalBookProducts.length > 0))
                 ? <div className={"mt-8"}>
                     <Link
@@ -482,7 +529,7 @@ const MainContent: React.FC = () => {
                     />
                     <div
                         className="my-6 text-slate-700 border border-slate-200 bg-slate-50 rounded-md p-4">
-                        Boek không chịu trách nhiệm về việc đơn hàng đổi trả sách của khách hàng.
+                        Boek không chịu trách nhiệm về việc đổi trả sách của khách hàng.
                         Xin vui lòng liên hệ
                         với NPH để được hỗ trợ về việc đổi trả sách.
                     </div>
@@ -493,4 +540,3 @@ const MainContent: React.FC = () => {
 };
 
 export default MainContent;
-;

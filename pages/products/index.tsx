@@ -43,7 +43,7 @@ const sortOptions = [
 const CustomerProductsPage: NextPageWithLayout = () => {
     const router = useRouter();
     const [page, setPage] = useState(1);
-
+    const pageSize = 9;
     const {
         onParamsChange,
         issuers,
@@ -92,7 +92,7 @@ const CustomerProductsPage: NextPageWithLayout = () => {
         "Book.PublisherIds": publisherIds,
         "Book.BookAuthors.AuthorIds": authorIds,
         sort: selectedSortOption.value,
-        size: 9,
+        size: pageSize,
         page,
     };
 
@@ -519,7 +519,7 @@ const CustomerProductsPage: NextPageWithLayout = () => {
                             <div className="mt-6 flex justify-end">
                                 <Pagination
                                     currentPage={page}
-                                    pageSize={9}
+                                    pageSize={pageSize}
                                     totalItems={data?.metadata?.total || 0}
                                     onPageChange={p => setPage(p)}
                                     visiblePageButtonLimit={4}

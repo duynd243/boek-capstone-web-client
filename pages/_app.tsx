@@ -11,6 +11,8 @@ import ProtectedRouteWrapper from "../components/ProtectedRouteWrapper";
 import { useRouter } from "next/router";
 import { ProtectedRoutes } from "../constants/ProtectedRoutes";
 import "react-day-picker/dist/style.css";
+import 'swiper/css';
+import "swiper/css/pagination";
 
 const queryClient = new QueryClient();
 

@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import Image from "next/image";
 import { IBookProduct } from "../../types/Book/IBookProduct";
-import { getBookProductStatusById } from "../../constants/BookProductStatuses";
+import { BookProductStatuses, getBookProductStatusById } from "../../constants/BookProductStatuses";
 import { AiFillBook, AiFillFilePdf } from "react-icons/ai";
 import { FaFileAudio } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -10,7 +10,7 @@ import { formatDistance } from "date-fns";
 import { vi } from "date-fns/locale";
 import Link from "next/link";
 import { getSlug } from "../../utils/helper";
-
+import NoImagePlaceholder from "../../assets/images/no-image.png";
 type Props = {
     product: IBookProduct | undefined;
 }
@@ -31,23 +31,31 @@ const CustomerProductCard: React.FC<Props> = ({ product }) => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className={"h-full flex flex-col bg-white"}
+            className={"h-full flex flex-col bg-white rounded-md overflow-hidden"}
             transition={{ duration: 0.4, ease: "easeInOut" }}
             layout>
             <Link
                 href={href}
                 className="relative grow group">
-                <div className="relative w-full h-80 rounded-md overflow-hidden">
+                <div className="relative w-full h-80 overflow-hidden">
                     <Image
                         width={1000}
                         height={1000}
-                        src={product?.imageUrl || ""}
+                        src={product?.imageUrl || NoImagePlaceholder.src}
                         alt=""
                         className="w-full h-full object-center object-cover group-hover:scale-110 transition-all duration-[400ms] ease-in-out" />
                 </div>
+                {product?.status !== BookProductStatuses.Selling.id ?
+                    <div
+                        className={`absolute top-2 left-2 text-center rounded-sm text-white px-2.5 py-1 ${product?.status === BookProductStatuses.OutOfStock.id ? "bg-rose-600" : "bg-gray-600"}`}>
+                        <span className="text-sm font-medium">
+                            {product?.status === BookProductStatuses.OutOfStock.id ? "Hết hàng" : "Ngừng bán"}
+                        </span>
+                    </div>
+                    : null}
 
                 <div
-                    className="absolute top-0 inset-x-0 h-80 rounded-md p-4 flex items-end justify-end overflow-hidden">
+                    className="absolute top-0 inset-x-0 h-80 p-4 flex items-end justify-end overflow-hidden">
                     <div aria-hidden="true"
                          className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black opacity-50"></div>
                     <div className="relative flex flex-col items-end">
@@ -63,7 +71,7 @@ const CustomerProductCard: React.FC<Props> = ({ product }) => {
                     </div>
                 </div>
 
-                <div className="relative p-2">
+                <div className="relative p-4">
                     <h3 className="text-lg font-medium text-gray-900 line-clamp-1 break-words">
                         {product?.title}
                     </h3>
@@ -106,7 +114,7 @@ const CustomerProductCard: React.FC<Props> = ({ product }) => {
                         {/*Discount price*/}
                         {product?.discount && product?.discount > 0 ?
                             <div className="flex justify-end items-center gap-2">
-                                <div className="text-xs font-medium bg-blue-500 text-white rounded-sm py-1 px-1.5">
+                                <div className="text-xs font-medium bg-rose-500 text-white rounded-sm py-1 px-1.5">
                                     -{product?.discount}%
                                 </div>
                                 <p className="text-sm font-medium text-gray-500 line-through">
@@ -129,9 +137,10 @@ const CustomerProductCard: React.FC<Props> = ({ product }) => {
                     </div>
                 </div>
             </Link>
-            <div className="mt-2">
+            <div className="mt-2 p-2">
                 <button
-                    className="relative w-full flex bg-indigo-500 text-white border border-transparent rounded py-2 items-center gap-2 justify-center text-sm font-medium hover:bg-indigo-600">
+                    disabled={product?.status !== BookProductStatuses.Selling.id}
+                    className="relative w-full flex bg-indigo-500 text-white border rounded-md border-transparent py-3 items-center gap-2 justify-center text-sm font-medium hover:bg-indigo-600 disabled:opacity-50">
                     <BsBagPlusFill className={"fill-white"} />
                     Thêm vào giỏ hàng
                 </button>
