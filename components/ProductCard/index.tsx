@@ -31,7 +31,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
             <div className="p-3 flex flex-col justify-between flex-1 min-w-0">
                 <div>
                     <div
-                        className="text-sm font-medium text-slate-800">{product?.title}
+                        className="text-sm font-medium text-slate-800 line-clamp-2 break-words">{product?.title}
                     </div>
                     <div
                         className="mt-2 flex items-center text-sm font-medium text-slate-600">

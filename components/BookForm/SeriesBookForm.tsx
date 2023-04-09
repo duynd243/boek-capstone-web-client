@@ -45,6 +45,7 @@ import { ImageUploadService } from './../../services/ImageUploadService';
 import { isImageFile } from "../../utils/helper";
 import { isValidFileSize } from './../../utils/helper';
 import { IBook } from "../../types/Book/IBook";
+import { BOOK_IMAGE_UPLOAD_CONTAINER } from "../../constants/TailwindClasses";
 
 
 type Props = {
@@ -301,7 +302,9 @@ const SeriesBookForm: React.FC<Props> = ({ formMode }) => {
                 >
                   Ảnh bìa<span className="text-rose-500">*</span>
                 </label>
-                <Form.ImageUploadPanel onChange={(file) => {
+                <Form.ImageUploadPanel
+                    imageClassName={BOOK_IMAGE_UPLOAD_CONTAINER}
+                    onChange={(file) => {
                   if (!isImageFile(file)) {
                     toast.error("Vui lòng tải lên tệp hình ảnh");
                     return false;

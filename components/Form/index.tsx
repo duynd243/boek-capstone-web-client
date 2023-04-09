@@ -1,7 +1,7 @@
 import Image from "next/image";
-import React, {useEffect, useId, useState} from "react";
-import {Path, UseFormRegister} from "react-hook-form";
-import {BsCalendarWeek} from "react-icons/bs";
+import React, { useEffect, useId, useState } from "react";
+import { Path, UseFormRegister } from "react-hook-form";
+import { BsCalendarWeek } from "react-icons/bs";
 import ErrorMessage from "./ErrorMessage";
 
 type LabelProps = {
@@ -61,11 +61,11 @@ const Input = <T extends Record<string, any>>({
 
     return (
         <div>
-            <Label fieldName={fieldName} label={label} required={required}/>
+            <Label fieldName={fieldName} label={label} required={required} />
             {isTextArea ? (
                 <textarea rows={7} {...commonProps} />
             ) : (
-                <input {...commonProps} type={inputType}/>
+                <input {...commonProps} type={inputType} />
             )}
             {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
         </div>
@@ -99,6 +99,7 @@ type ImageUploadPanelProps = {
     onChange?: (file: File) => boolean;
     onRemove?: () => void;
     label?: string;
+    imageClassName?: string;
 };
 
 const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
@@ -106,6 +107,7 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                                                                onChange,
                                                                onRemove,
                                                                defaultImageURL,
+                                                               imageClassName,
                                                            }) => {
 
     const inputId = useId();
@@ -139,10 +141,10 @@ const ImageUploadPanel: React.FC<ImageUploadPanelProps> = ({
                 {imgSrc ? (
                     <Image
                         className={
-                            "mb-4 w-40 rounded-md object-cover object-center"
+                            imageClassName || "mx-auto mb-4 rounded-md object-cover object-center"
                         }
-                        width={500}
-                        height={500}
+                        width={800}
+                        height={800}
                         src={imgSrc}
                         alt={""}
                     />
@@ -227,14 +229,14 @@ const DateTimeInputField: React.FC<DateTimeInputFieldProps> = ({
                 htmlFor={id}
                 className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400"
             >
-                <BsCalendarWeek/>
+                <BsCalendarWeek />
             </label>
         </div>
     );
 };
 
 const Form = {
-    Divider: () => <hr className="my-8 border-t border-gray-200"/>,
+    Divider: () => <hr className="my-8 border-t border-gray-200" />,
     GroupLabel,
     Label,
     Input,

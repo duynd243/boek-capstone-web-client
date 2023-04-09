@@ -47,6 +47,7 @@ import TransitionModal from './../../../../components/Modal/TransitionModal';
 import Modal from './../../../../components/Modal/Modal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ImageUploadService } from './../../../../services/ImageUploadService';
+import { BOOK_IMAGE_UPLOAD_CONTAINER } from "../../../../constants/TailwindClasses";
 
 
 
@@ -277,6 +278,7 @@ const SeriesBookForm = ({ book }: Props) => {
                 name="previewFile"
                 render={({ field }) => (
                     <Form.ImageUploadPanel
+                        imageClassName={BOOK_IMAGE_UPLOAD_CONTAINER}
                         onChange={(file) => {
                             if (!isImageFile(file)) {
                                 toast.error("Vui lòng tải lên tệp hình ảnh");

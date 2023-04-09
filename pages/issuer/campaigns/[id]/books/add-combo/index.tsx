@@ -39,6 +39,7 @@ import { GenreService } from './../../../../../../services/GenreService';
 import { IGenre } from './../../../../../../types/Genre/IGenre';
 import ConfirmModal from './../../../../../../components/Modal/ConfirmModal';
 import { ImageUploadService } from './../../../../../../services/ImageUploadService';
+import { BOOK_IMAGE_UPLOAD_CONTAINER } from "../../../../../../constants/TailwindClasses";
 
 
 
@@ -433,6 +434,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                         name="previewFile"
                                         render={({ field }) => (
                                             <Form.ImageUploadPanel
+                                                imageClassName={BOOK_IMAGE_UPLOAD_CONTAINER}
                                                 onChange={(file) => {
                                                     if (!isImageFile(file)) {
                                                         toast.error("Vui lòng tải lên tệp hình ảnh");
