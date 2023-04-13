@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 export const MAX_FILE_SIZE_IN_MB = 1;
 
 export const message = {
@@ -93,7 +94,7 @@ export const NonRecurringOfflineCampaignSchema = OfflineCampaignSchema.extend({
     campaignOrganizations: z.array(
         CampaignOrganizationSchema.extend({
             schedules: z.array(ScheduleSchema).optional(),
-        })
+        }),
     ),
 });
 
@@ -104,7 +105,7 @@ export const OnlineCampaignSchema = BaseCampaignSchema.extend({
                 groupId: z.number(),
                 groupName: z.string().optional(),
                 groupDescription: z.string().optional(),
-            })
+            }),
         )
         .min(1, "Cần có ít nhất 1 nhóm đề tài được chọn"),
     campaignLevels: z.array(
@@ -112,6 +113,6 @@ export const OnlineCampaignSchema = BaseCampaignSchema.extend({
             levelId: z.number(),
             levelName: z.string().optional(),
             levelRequiredPoint: z.number().optional(),
-        })
+        }),
     ),
 });

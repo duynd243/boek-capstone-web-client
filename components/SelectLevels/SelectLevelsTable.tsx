@@ -14,9 +14,9 @@ type Props = {
 };
 
 const SelectLevelsTable: React.FC<Props> = ({
-    selectedLevels,
-    handleRemoveLevel,
-}) => {
+                                                selectedLevels,
+                                                handleRemoveLevel,
+                                            }) => {
     return (
         <TableWrapper>
             <TableHeading>
@@ -40,7 +40,7 @@ const SelectLevelsTable: React.FC<Props> = ({
                                                 className="h-10 w-10 rounded-full object-cover"
                                                 src={getAvatarFromName(
                                                     level?.name,
-                                                    1
+                                                    1,
                                                 )}
                                                 alt=""
                                             />

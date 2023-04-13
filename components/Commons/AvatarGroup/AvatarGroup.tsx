@@ -33,7 +33,8 @@ const AvatarGroup: React.FC<Props> = ({ avatars, max = 3 }) => {
                     />
                 ))}
             {!showAll && (
-                <div className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-50 bg-slate-200 text-xs font-medium text-gray-500">
+                <div
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-50 bg-slate-200 text-xs font-medium text-gray-500">
                     +{avatars.length - max}
                 </div>
             )}

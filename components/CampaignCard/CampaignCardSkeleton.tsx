@@ -4,11 +4,12 @@ import { GiShop } from "react-icons/gi";
 type Props = {
     horizontalOnly?: boolean;
 }
-const CampaignCardSkeleton: React.FC<Props> = ({horizontalOnly = false}) => {
+const CampaignCardSkeleton: React.FC<Props> = ({ horizontalOnly = false }) => {
     return (
         <div role="status"
-             className={`space-y-8 bg-slate-100 border p-4 rounded animate-pulse ${horizontalOnly? "" : "xl:space-y-0 xl:space-x-8 xl:flex xl:items-center"}`}>
-            <div className={`flex items-center justify-center w-full ${horizontalOnly ? "" : "xl:w-1/3"} h-48 bg-gray-400 rounded`}>
+             className={`space-y-8 bg-slate-100 border p-4 rounded animate-pulse ${horizontalOnly ? "" : "xl:space-y-0 xl:space-x-8 xl:flex xl:items-center"}`}>
+            <div
+                className={`flex items-center justify-center w-full ${horizontalOnly ? "" : "xl:w-1/3"} h-48 bg-gray-400 rounded`}>
                 {/*<svg className="w-12 h-12 text-gray-200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"*/}
                 {/*     fill="currentColor" viewBox="0 0 640 512">*/}
                 {/*    <path*/}

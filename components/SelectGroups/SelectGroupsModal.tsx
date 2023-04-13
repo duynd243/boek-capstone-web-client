@@ -1,15 +1,15 @@
-import React, {useState} from "react";
-import {BsCheckCircle, BsSearch} from "react-icons/bs";
+import React, { useState } from "react";
+import { BsCheckCircle, BsSearch } from "react-icons/bs";
 import Image from "next/image";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 import Modal from "../Modal/Modal";
 import TransitionModal from "../Modal/TransitionModal";
 import useDebounce from "../../hooks/useDebounce";
-import {useQuery} from "@tanstack/react-query";
-import {IGroup} from "../../types/Group/IGroup";
-import {GroupService} from "../../services/GroupService";
-import {useAuth} from "../../context/AuthContext";
-import {getAvatarFromName} from "../../utils/helper";
+import { useQuery } from "@tanstack/react-query";
+import { IGroup } from "../../types/Group/IGroup";
+import { GroupService } from "../../services/GroupService";
+import { useAuth } from "../../context/AuthContext";
+import { getAvatarFromName } from "../../utils/helper";
 
 type Props = {
     isOpen: boolean;
@@ -19,12 +19,12 @@ type Props = {
 };
 
 const SelectGroupsModal: React.FC<Props> = ({
-                                                       isOpen,
-                                                       onClose,
-                                                       selectedGroups,
-                                                       onItemSelect,
-                                                   }) => {
-    const {loginUser} = useAuth();
+                                                isOpen,
+                                                onClose,
+                                                selectedGroups,
+                                                onItemSelect,
+                                            }) => {
+    const { loginUser } = useAuth();
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounce(search, 500);
     const groupService = new GroupService(loginUser?.accessToken);
@@ -34,7 +34,7 @@ const SelectGroupsModal: React.FC<Props> = ({
         onClose();
     };
 
-    const {data: groups, isLoading} = useQuery(
+    const { data: groups, isLoading } = useQuery(
         ["groups", debouncedSearch],
         () =>
             groupService.getGroups({
@@ -42,8 +42,8 @@ const SelectGroupsModal: React.FC<Props> = ({
                 status: true,
             }), {
             keepPreviousData: true,
-            select: (data) => data?.data
-        }
+            select: (data) => data?.data,
+        },
     );
 
     return (
@@ -55,7 +55,7 @@ const SelectGroupsModal: React.FC<Props> = ({
         >
             <div className="overflow-hidden rounded-xl">
                 <div>
-                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Tìm kiếm nhóm"
@@ -68,7 +68,7 @@ const SelectGroupsModal: React.FC<Props> = ({
                     {!isLoading && groups ? (
                         groups?.map((group) => {
                             const isSelected = selectedGroups?.find(
-                                (o) => o?.id === group?.id
+                                (o) => o?.id === group?.id,
                             );
                             return (
                                 <div
@@ -104,7 +104,7 @@ const SelectGroupsModal: React.FC<Props> = ({
 
                                     {isSelected && (
                                         <div className="absolute top-1/2 right-4 -translate-y-1/2 transform">
-                                            <BsCheckCircle className="text-green-500"/>
+                                            <BsCheckCircle className="text-green-500" />
                                         </div>
                                     )}
                                 </div>

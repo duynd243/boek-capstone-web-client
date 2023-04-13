@@ -1,6 +1,6 @@
-import React, {Fragment, ReactElement, useState} from "react";
+import React, { Fragment, ReactElement, useState } from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
-import {NextPageWithLayout} from "../../_app";
+import { NextPageWithLayout } from "../../_app";
 import PageHeading from "../../../components/Admin/PageHeading";
 import SearchForm from "../../../components/Admin/SearchForm";
 import TableWrapper from "../../../components/Admin/Table/TableWrapper";
@@ -9,14 +9,14 @@ import TableHeader from "../../../components/Admin/Table/TableHeader";
 import TableData from "../../../components/Admin/Table/TableData";
 import Image from "next/image";
 import TableBody from "../../../components/Admin/Table/TableBody";
-import {isValidImageSrc} from "../../../utils/helper";
-import {IBook} from "../../../types/Book/IBook";
-import {useAuth} from "../../../context/AuthContext";
-import {useQuery} from "@tanstack/react-query";
-import {BookService} from "../../../services/BookService";
+import { isValidImageSrc } from "../../../utils/helper";
+import { IBook } from "../../../types/Book/IBook";
+import { useAuth } from "../../../context/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { BookService } from "../../../services/BookService";
 import useTableManagementPage from "../../../hooks/useTableManagementPage";
 import StatusCard from "../../../components/StatusCard";
-import EmptyState, {EMPTY_STATE_TYPE} from "../../../components/EmptyState";
+import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import TableFooter from "../../../components/Admin/Table/TableFooter";
 import DefaultAvatar from "../../../assets/images/default-avatar.png";
 import Link from "next/link";
@@ -24,7 +24,7 @@ import Link from "next/link";
 const AdminBooksPage: NextPageWithLayout = () => {
 
 
-    const {loginUser} = useAuth();
+    const { loginUser } = useAuth();
 
     const bookService = new BookService(loginUser?.accessToken);
     const [selectedBook, setSelectedBook] = useState<IBook>();
@@ -44,7 +44,7 @@ const AdminBooksPage: NextPageWithLayout = () => {
         isLoading,
         isFetching,
     } = useQuery(
-        ["books", {search, page, size}],
+        ["books", { search, page, size }],
         () =>
             bookService.getBooks({
                 name: search,
@@ -54,7 +54,7 @@ const AdminBooksPage: NextPageWithLayout = () => {
             }),
         {
             keepPreviousData: true,
-        }
+        },
     );
 
     return (
@@ -89,7 +89,7 @@ const AdminBooksPage: NextPageWithLayout = () => {
                             return (
                                 <tr key={book?.id}>
                                     <TableData className="text-sm font-medium uppercase text-gray-500">
-                                        <div className='w-16 truncate'>
+                                        <div className="w-16 truncate">
                                             {book?.code}
                                         </div>
                                     </TableData>
@@ -152,8 +152,8 @@ const AdminBooksPage: NextPageWithLayout = () => {
                                     </TableData>
                                     <TableData textAlignment="text-center">
                                         {book?.status ?
-                                            <StatusCard label='Đang phát hành'/> :
-                                            <StatusCard variant='error' label='Ngưng phát hành'/>}
+                                            <StatusCard label="Đang phát hành" /> :
+                                            <StatusCard variant="error" label="Ngưng phát hành" />}
                                     </TableData>
                                     <TableData className="text-right text-sm font-medium">
                                         <Link
@@ -173,7 +173,7 @@ const AdminBooksPage: NextPageWithLayout = () => {
                         onSizeChange={onSizeChange}
                         page={page}
                         onPageChange={setPage}
-                        totalPages={bookData?.metadata?.total || 0}
+                        totalElements={bookData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />
                 </TableWrapper>
@@ -184,7 +184,7 @@ const AdminBooksPage: NextPageWithLayout = () => {
                         status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
                     />
                 ) : (
-                    <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}/>
+                    <EmptyState status={EMPTY_STATE_TYPE.NO_DATA} />
                 )}
             </div>)}
         </Fragment>

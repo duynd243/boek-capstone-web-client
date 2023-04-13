@@ -14,9 +14,7 @@ import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import LoadingTopPage from "../../../components/LoadingTopPage";
-import GroupModal, {
-    GroupModalMode,
-} from "../../../components/Modal/GroupModal";
+import GroupModal, { GroupModalMode } from "../../../components/Modal/GroupModal";
 import StatusCard from "../../../components/StatusCard";
 import { useAuth } from "../../../context/AuthContext";
 import useTableManagementPage from "../../../hooks/useTableManagementPage";
@@ -28,7 +26,7 @@ import { NextPageWithLayout } from "../../_app";
 const AdminGroupsPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
     const [selectedGroup, setSelectedGroup] = useState<IGroup | undefined>(
-        undefined
+        undefined,
     );
 
     const groupService = new GroupService(loginUser?.accessToken);
@@ -61,7 +59,7 @@ const AdminGroupsPage: NextPageWithLayout = () => {
             }),
         {
             keepPreviousData: true,
-        }
+        },
     );
 
     if (isLoading) return <LoadingSpinnerWithOverlay />;
@@ -104,7 +102,7 @@ const AdminGroupsPage: NextPageWithLayout = () => {
                                                     height={100}
                                                     className="h-10 w-10 rounded-full object-cover"
                                                     src={getAvatarFromName(
-                                                        group.name
+                                                        group.name,
                                                     )}
                                                     alt=""
                                                 />
@@ -156,7 +154,7 @@ const AdminGroupsPage: NextPageWithLayout = () => {
                         onSizeChange={onSizeChange}
                         page={page}
                         onPageChange={setPage}
-                        totalPages={groupData?.metadata?.total || 0}
+                        totalElements={groupData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />
                 </TableWrapper>

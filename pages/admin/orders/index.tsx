@@ -20,7 +20,6 @@ import { Tab } from "@headlessui/react";
 import Chip from "../../../components/Admin/Chip";
 import Link from "next/link";
 import { OrderTypes } from "../../../constants/OrderTypes";
-import OrderTable from "../../../components/OrderPage/OrderTable";
 
 const OrderTypeTabs = [
     {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 type Props = {
     text: string;
@@ -8,7 +8,7 @@ type Props = {
 
 }
 
-const Heading: React.FC<Props> = ({text, onShowAllClick, showAllButtonVisible = false, children}) => {
+const Heading: React.FC<Props> = ({ text, onShowAllClick, showAllButtonVisible = false, children }) => {
     return (
         <div className="mb-5 flex flex-wrap items-center justify-between gap-1">
             <div className="text-base font-semibold text-slate-800">
@@ -25,7 +25,7 @@ const Heading: React.FC<Props> = ({text, onShowAllClick, showAllButtonVisible = 
                 </>
             )}
         </div>
-    )
-}
+    );
+};
 
-export default Heading
+export default Heading;

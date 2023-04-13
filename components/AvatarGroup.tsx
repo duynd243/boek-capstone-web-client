@@ -1,7 +1,7 @@
-import React, {useMemo} from "react";
-import * as HoverCard from '@radix-ui/react-hover-card';
+import React, { useMemo } from "react";
+import * as HoverCard from "@radix-ui/react-hover-card";
 import Image from "next/image";
-import {isValidImageSrc} from "../utils/helper";
+import { isValidImageSrc } from "../utils/helper";
 import DefaultAvatar from "../assets/images/default-avatar.png";
 
 
@@ -59,7 +59,7 @@ const AvatarGroup: React.FC<Props> = ({
                     <HoverCard.Trigger asChild>
                         <Image
                             title={
-                                hoverElements && hoverElements[index] ? '' : avatar.title || ''
+                                hoverElements && hoverElements[index] ? "" : avatar.title || ""
                             }
                             width={500}
                             height={500}
@@ -75,10 +75,10 @@ const AvatarGroup: React.FC<Props> = ({
                     </HoverCard.Trigger>
                     <HoverCard.Portal>
                         <HoverCard.Content
-                            className={'radix-side-top:animate-slide-up radix-side-bottom:animate-slide-down rounded-lg p-4 pt-0 md:w-full animate-fade-in'}
+                            className={"radix-side-top:animate-slide-up radix-side-bottom:animate-slide-down rounded-lg p-4 pt-0 md:w-full animate-fade-in"}
                             align="center"
                             sideOffset={4}>
-                            <HoverCard.Arrow className="fill-current text-gray-50"/>
+                            <HoverCard.Arrow className="fill-current text-gray-50" />
                             {hoverElements && hoverElements[index]}
                         </HoverCard.Content>
                     </HoverCard.Portal>

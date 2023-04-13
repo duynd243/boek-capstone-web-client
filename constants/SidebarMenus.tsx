@@ -36,10 +36,10 @@ export const ADMIN_SETTINGS_MENUS: ISidebarMenu[] = [
         name: "Hồ sơ",
         path: "/admin/settings/profile",
     },
-    {
-        name: "Cài đặt khác",
-        path: "/admin/settings/other",
-    },
+    // {
+    //     name: "Cài đặt khác",
+    //     path: "/admin/settings/other",
+    // },
 ];
 
 export const ISSUER_SETTINGS_MENUS: ISidebarMenu[] = [
@@ -47,10 +47,10 @@ export const ISSUER_SETTINGS_MENUS: ISidebarMenu[] = [
         name: "Hồ sơ",
         path: "/issuer/settings/profile",
     },
-    {
-        name: "Cài đặt khác",
-        path: "/issuer/settings/other",
-    },
+    // {
+    //     name: "Cài đặt khác",
+    //     path: "/issuer/settings/other",
+    // },
 ];
 
 export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
@@ -60,22 +60,22 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
             {
                 name: "Thống kê",
                 path: "/admin",
-                icon: <BsFillPieChartFill/>,
+                icon: <BsFillPieChartFill />,
             },
             {
                 name: "Hội sách",
                 path: "/admin/campaigns",
-                icon: <GiShop/>,
+                icon: <GiShop />,
             },
             {
                 name: "Tham gia hội sách",
                 path: "/admin/participants",
-                icon: <MdContactMail/>,
+                icon: <MdContactMail />,
             },
             {
                 name: "Sách bán",
                 path: "/admin/products",
-                icon: <MdBook/>,
+                icon: <MdBook />,
             },
             {
                 name: "Đơn hàng",
@@ -95,7 +95,7 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
             {
                 name: "Nhân sự",
                 path: "/admin/personnels",
-                icon: <BsFillBriefcaseFill/>,
+                icon: <BsFillBriefcaseFill />,
             },
         ],
     },
@@ -105,27 +105,27 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
             {
                 name: "Nhà phát hành",
                 path: "/admin/issuers",
-                icon: <BsStack/>,
+                icon: <BsStack />,
             },
             {
                 name: "Kho sách",
                 path: "/admin/books",
-                icon: <ImBook/>,
+                icon: <ImBook />,
             },
             {
                 name: "Nhà xuất bản",
                 path: "/admin/publishers",
-                icon: <BsPrinterFill/>,
+                icon: <BsPrinterFill />,
             },
             {
                 name: "Tác giả",
                 path: "/admin/authors",
-                icon: <BsFillPenFill/>,
+                icon: <BsFillPenFill />,
             },
             {
                 name: "Thể loại sách",
                 path: "/admin/genres",
-                icon: <BsFillTagsFill/>,
+                icon: <BsFillTagsFill />,
             },
         ],
     },
@@ -135,23 +135,23 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
             {
                 name: "Khách hàng",
                 path: "/admin/customers",
-                icon: <BsFillPeopleFill/>,
+                icon: <BsFillPeopleFill />,
             },
             {
                 name: "Tổ chức",
                 path: "/admin/organizations",
-                icon: <BsFillDiagram3Fill/>,
+                icon: <BsFillDiagram3Fill />,
             },
             {
                 name: "Nhóm",
                 path: "/admin/groups",
-                icon: <BsCollectionFill/>,
+                icon: <BsCollectionFill />,
             },
 
             {
                 name: "Cấp độ khách hàng",
                 path: "/admin/levels",
-                icon: <IoMedalSharp/>,
+                icon: <IoMedalSharp />,
             },
         ],
     },
@@ -162,7 +162,7 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
             {
                 name: "Cài đặt",
                 path: "/admin/settings/profile",
-                icon: <BsFillGearFill/>,
+                icon: <BsFillGearFill />,
             },
         ],
     },
@@ -206,7 +206,7 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                         name: "Đơn tại quầy",
                         path: "/issuer/orders/pickup",
                     },
-                ]
+                ],
             },
         ],
     },

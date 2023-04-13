@@ -4,12 +4,12 @@ import TableHeader from "../Admin/Table/TableHeader";
 import TableBody from "../Admin/Table/TableBody";
 import TableData from "../Admin/Table/TableData";
 import Image from "next/image";
-import {getAvatarFromName, getFormatsOfBook} from "../../utils/helper";
+import { getAvatarFromName, getFormatsOfBook } from "../../utils/helper";
 import TableWrapper from "../Admin/Table/TableWrapper";
-import {IBook} from "../../types/Book/IBook";
-import {faker} from "@faker-js/faker/locale/vi";
-import {BookFormats, IBookFormat} from "../../constants/BookFormats";
-import {IBookComboItem} from "../../pages/issuer/campaigns/[id]/books/add-combo";
+import { IBook } from "../../types/Book/IBook";
+import { faker } from "@faker-js/faker/locale/vi";
+import { BookFormats, IBookFormat } from "../../constants/BookFormats";
+import { IBookComboItem } from "../../pages/issuer/campaigns/[id]/books/add-combo";
 
 type Props = {
     onBonusChange: (check: boolean, bookId: number, formatId: number) => void;
@@ -42,7 +42,7 @@ const SelectSellingBookComboTable: React.FC<Props> = ({
                         const formats = getFormatsOfBook(book);
                         const availableBonuses = formats?.filter(
                             (format) =>
-                                format?.id !== selectedFormat?.id && format?.id !== BookFormats.PAPER.id
+                                format?.id !== selectedFormat?.id && format?.id !== BookFormats.PAPER.id,
                         );
 
                         return (
@@ -78,7 +78,7 @@ const SelectSellingBookComboTable: React.FC<Props> = ({
                                                 width={100}
                                                 height={100}
                                                 className="h-10 w-10 rounded-full"
-                                                src={getAvatarFromName('Nhã Nam')}
+                                                src={getAvatarFromName("Nhã Nam")}
                                                 alt=""
                                             />
                                         </div>
@@ -93,7 +93,7 @@ const SelectSellingBookComboTable: React.FC<Props> = ({
                                     textAlignment="text-center"
                                     className="text-sm text-gray-500"
                                 >
-                                    <div className='space-y-4'>
+                                    <div className="space-y-4">
                                         {availableBonuses?.map((bonus) => {
                                             const checked = book?.withPdf && bonus?.id === BookFormats.PDF.id
                                                 || book?.withAudio && bonus?.id === BookFormats.AUDIO.id;
@@ -124,7 +124,7 @@ const SelectSellingBookComboTable: React.FC<Props> = ({
                                                 }).format(faker.datatype.number())}</span>
 
                                                 </label>
-                                            </div>
+                                            </div>;
                                         })}
                                     </div>
                                 </TableData>

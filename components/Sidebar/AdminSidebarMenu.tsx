@@ -47,7 +47,6 @@ const AdminSidebarMenu: React.FC<Props> = ({ data, isActive, activeMenu }) => {
     // }, [data?.subMenus, hasSubMenus, isSubMenuOpen, router.pathname]);
 
 
-
     return (
         <li
             className={`mb-0.5 select-none rounded px-3.5 py-1.5 last:mb-0 ${

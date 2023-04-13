@@ -18,7 +18,7 @@ const SortPanel: React.FC<Props> = ({
                                         showingListLength,
                                         totalListLength,
                                         onSortChange,
-                                        itemName = "kết quả"
+                                        itemName = "kết quả",
                                     }) => {
     return (
         <div

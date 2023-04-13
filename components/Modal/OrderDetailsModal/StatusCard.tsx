@@ -1,32 +1,23 @@
-import React, { Fragment, useContext, useState } from "react";
+import React, { Fragment, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../../context/AuthContext";
-import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { IOrder } from "../../../types/Order/IOrder";
-import { useForm, Controller } from 'react-hook-form';
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from '@hookform/resolvers/zod';
-import { getNextUpdateStatus, getOrderStatusById, OrderStatuses } from './../../../constants/OrderStatuses';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { getNextUpdateStatus, getOrderStatusById, OrderStatuses } from "./../../../constants/OrderStatuses";
 import Image from "next/image";
-import { getFormattedTime } from './../../../utils/helper';
+import { getFormattedTime } from "./../../../utils/helper";
 import Form from "../../Form";
-import SidebarButton from './../../CampaignDetails/SidebarButton';
-import ConfirmModal from './../ConfirmModal';
-import { OrderService } from './../../../services/OrderService';
-import Link from 'next/link';
-import { IoChevronBack } from 'react-icons/io5';
-import { useRouter } from 'next/router';
+import SidebarButton from "./../../CampaignDetails/SidebarButton";
+import ConfirmModal from "./../ConfirmModal";
+import { OrderService } from "./../../../services/OrderService";
+import Link from "next/link";
+import { IoChevronBack } from "react-icons/io5";
+import { useRouter } from "next/router";
 import { ICampaignOrganization } from "../../../types/Campaign_Organization/ICampaignOrganization";
-import { HiMapPin, HiOutlineChevronDown } from "react-icons/hi2";
-import EmptySection from './../../CampaignDetails/EmptySection';
-import { CampaignContext } from './../../../context/CampaignContext';
-import OrganizationCard from './../../CampaignDetails/OrganizationCard';
-import { CampaignService } from './../../../services/CampaignService';
-import { useQuery } from "@tanstack/react-query";
-import ContentHeader from './../../CampaignDetails/ContentHeader';
-import SelectBox from './../../SelectBox/index';
-import useAddress from './../../../hooks/useAddress';
-import Index from './../../../pages/index';
+import SelectBox from "./../../SelectBox/index";
 
 
 type Props = {
@@ -59,31 +50,31 @@ const StatusCard: React.FC<Props> = ({ order, campaignOrganization }) => {
                         value: item,
                     };
                 }) || [];
-            }
-        }
-    )
+            },
+        },
+    );
 
     const updateOrderStatusMutation = useMutation(async (payload: any) => {
-        if (showConfirmAdressModal) return orderService.updatePickUpOrderAdress(payload);
-        if (!updateStatus) return orderService.updateCancelOrderStatus(payload);
-        // if (showConfirmAdressModal) return orderService.updatePickUpOrderAdress(payload);
-        const nextStatus = getNextUpdateStatus(order?.status, order?.type);
+            if (showConfirmAdressModal) return orderService.updatePickUpOrderAdress(payload);
+            if (!updateStatus) return orderService.updateCancelOrderStatus(payload);
+            // if (showConfirmAdressModal) return orderService.updatePickUpOrderAdress(payload);
+            const nextStatus = getNextUpdateStatus(order?.status, order?.type);
 
 
-        switch (nextStatus) {
-            case OrderStatuses.SHIPPING:
-                return orderService.updateOrderToShippingStatus(payload);
-                break;
-            case OrderStatuses.SHIPPED:
-                return orderService.updateShippingToShippedStatus(payload);
-                break;
-            case OrderStatuses.WAITING_RECEIVE:
-                return orderService.updatePickUpOrderToShippingStatus(payload);
-                break;
+            switch (nextStatus) {
+                case OrderStatuses.SHIPPING:
+                    return orderService.updateOrderToShippingStatus(payload);
+                    break;
+                case OrderStatuses.SHIPPED:
+                    return orderService.updateShippingToShippedStatus(payload);
+                    break;
+                case OrderStatuses.WAITING_RECEIVE:
+                    return orderService.updatePickUpOrderToShippingStatus(payload);
+                    break;
+            }
+
+            return Promise.reject("Không thể cập nhật trạng thái đơn hàng");
         }
-
-        return Promise.reject("Không thể cập nhật trạng thái đơn hàng");
-    }
         , {
             onSuccess: async () => {
                 await queryClient.invalidateQueries(["order"]);
@@ -154,10 +145,10 @@ const StatusCard: React.FC<Props> = ({ order, campaignOrganization }) => {
                 </div>
                 <div className="flex items-center">
                     <Image src={order?.customer?.user?.imageUrl || ""}
-                        alt={""}
-                        className={"rounded-full w-12 h-12 object-cover flex-shrink-0"}
-                        width={500}
-                        height={500} />
+                           alt={""}
+                           className={"rounded-full w-12 h-12 object-cover flex-shrink-0"}
+                           width={500}
+                           height={500} />
                     <div className="ml-3">
                         <h1 className="font-medium text-slate-800">
                             {order?.customer?.user?.name} đã thêm đơn hàng này vào hội sách {order?.campaign?.name}
@@ -172,9 +163,10 @@ const StatusCard: React.FC<Props> = ({ order, campaignOrganization }) => {
                 <div className="bg-slate-50 rounded text-sm text-slate-600 mb-6 px-3 py-2 border border-slate-200">
                     📝 {order?.note || "Không có ghi chú"}
                 </div>
-                {order?.type === 2 && <div className="bg-slate-50 rounded text-sm text-slate-600 mb-6 px-3 py-2 border border-slate-200">
-                    📝 {order?.address || "Chưa có địa chỉ nhận hàng"}
-                </div>}
+                {order?.type === 2 &&
+                    <div className="bg-slate-50 rounded text-sm text-slate-600 mb-6 px-3 py-2 border border-slate-200">
+                        📝 {order?.address || "Chưa có địa chỉ nhận hàng"}
+                    </div>}
 
 
                 {order?.status !== OrderStatuses.CANCELLED.id &&
@@ -187,9 +179,9 @@ const StatusCard: React.FC<Props> = ({ order, campaignOrganization }) => {
                             label={"Ghi chú"} />
 
                     </div>}
-                {order?.type === 2 &&  order?.status !== OrderStatuses.SHIPPED.id &&
+                {order?.type === 2 && order?.status !== OrderStatuses.SHIPPED.id &&
                     <Fragment>
-                            <Form.Label label={"Địa chỉ nhận hàng"} />
+                        <Form.Label label={"Địa chỉ nhận hàng"} />
                         <Controller
                             control={control}
                             name="address"
@@ -212,26 +204,29 @@ const StatusCard: React.FC<Props> = ({ order, campaignOrganization }) => {
             <Fragment>
                 <div className="p-6 bg-gray-50 space-y-2">
 
-                    {order?.status !== OrderStatuses.CANCELLED.id && order?.status === OrderStatuses.WAITING_RECEIVE.id && order?.status !== OrderStatuses.SHIPPED.id && <SidebarButton
-                        onClick={() => {
-                            setShowConfirmAdressModal(true);
-                          
-                        }}
-                    >
-
-                        Cập nhập địa chỉ
-                    </SidebarButton>}
-
-                    <div className="md:flex space-y-2 md:space-y-0 items-center gap-2  md:flex-row-reverse">
-                        {order?.status !== OrderStatuses.CANCELLED.id && order?.status !== OrderStatuses.WAITING_RECEIVE.id && order?.status !== OrderStatuses.SHIPPED.id && <SidebarButton
+                    {order?.status !== OrderStatuses.CANCELLED.id && order?.status === OrderStatuses.WAITING_RECEIVE.id && order?.status !== OrderStatuses.SHIPPED.id &&
+                        <SidebarButton
                             onClick={() => {
-                                setShowConfirmModal(true);
-                                setUpdateStatus(true);
+                                setShowConfirmAdressModal(true);
+
                             }}
                         >
 
-                            Chuyển sang {getNextUpdateStatus(order?.status, order?.type)?.displayName?.toLowerCase()}
+                            Cập nhập địa chỉ
                         </SidebarButton>}
+
+                    <div className="md:flex space-y-2 md:space-y-0 items-center gap-2  md:flex-row-reverse">
+                        {order?.status !== OrderStatuses.CANCELLED.id && order?.status !== OrderStatuses.WAITING_RECEIVE.id && order?.status !== OrderStatuses.SHIPPED.id &&
+                            <SidebarButton
+                                onClick={() => {
+                                    setShowConfirmModal(true);
+                                    setUpdateStatus(true);
+                                }}
+                            >
+
+                                Chuyển
+                                sang {getNextUpdateStatus(order?.status, order?.type)?.displayName?.toLowerCase()}
+                            </SidebarButton>}
 
                         {order?.status === OrderStatuses.PROCESSING.id && <SidebarButton
                             onClick={() => {
@@ -255,7 +250,7 @@ const StatusCard: React.FC<Props> = ({ order, campaignOrganization }) => {
                     confirmText={updateStatus ? "Chấp nhận" : "Xác nhận huỷ"}
                 />
                 <ConfirmModal
-                    color={ "indigo"}
+                    color={"indigo"}
                     //disableButtons={false}
                     isOpen={showConfirmAdressModal}
                     onClose={() => setShowConfirmAdressModal(false)}

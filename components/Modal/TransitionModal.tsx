@@ -1,5 +1,5 @@
-import React, {ComponentProps, Fragment} from "react";
-import {Dialog, Transition} from "@headlessui/react";
+import React, { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 
 type Props = {
     maxWidth?: string;
@@ -42,7 +42,7 @@ const TransitionModal: React.FC<Props> = ({
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-black bg-opacity-60"/>
+                    <div className="fixed inset-0 bg-black bg-opacity-60" />
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-y-auto">

@@ -1,23 +1,23 @@
-import {useMutation} from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import {useRouter} from "next/router";
-import React, {Fragment, useContext} from "react";
-import {Controller, useForm,} from "react-hook-form";
-import {toast} from "react-hot-toast";
-import {z} from "zod";
-import {useAuth} from "../../context/AuthContext";
-import {CampaignContext} from "../../context/CampaignContext";
-import {CampaignService} from "../../services/CampaignService";
-import {ImageUploadService} from "../../services/ImageUploadService";
-import {isImageFile, isValidFileSize,} from "../../utils/helper";
+import { useRouter } from "next/router";
+import React, { Fragment, useContext } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { z } from "zod";
+import { useAuth } from "../../context/AuthContext";
+import { CampaignContext } from "../../context/CampaignContext";
+import { CampaignService } from "../../services/CampaignService";
+import { ImageUploadService } from "../../services/ImageUploadService";
+import { isImageFile, isValidFileSize } from "../../utils/helper";
 import Form from "../Form";
 import ErrorMessage from "../Form/ErrorMessage";
-import {MAX_FILE_SIZE_IN_MB, message,} from "./shared";
-import {zodResolver} from "@hookform/resolvers/zod";
+import { MAX_FILE_SIZE_IN_MB, message } from "./shared";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 
 const BasicCampaignForm: React.FC = () => {
-    const {loginUser} = useAuth();
+    const { loginUser } = useAuth();
 
     const campaign = useContext(CampaignContext);
 
@@ -26,7 +26,7 @@ const BasicCampaignForm: React.FC = () => {
     const router = useRouter();
 
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
 
 
@@ -36,7 +36,7 @@ const BasicCampaignForm: React.FC = () => {
         description: z.string(),
         imageUrl: z.string(),
         previewFile: z.any().optional(),
-    })
+    });
 
     type BasicCampaignFormType = Partial<z.infer<typeof BasicCampaignFormSchema>>;
 
@@ -51,7 +51,7 @@ const BasicCampaignForm: React.FC = () => {
         control,
         handleSubmit,
         watch,
-        formState: {errors, isSubmitting},
+        formState: { errors, isSubmitting },
     } = useForm<BasicCampaignFormType>({
         resolver: zodResolver(BasicCampaignFormSchema),
         defaultValues: {
@@ -59,12 +59,12 @@ const BasicCampaignForm: React.FC = () => {
             name: campaign?.name,
             description: campaign?.description,
             imageUrl: campaign?.imageUrl,
-        }
+        },
     });
 
 
     const onSubmit = async (data: BasicCampaignFormType) => {
-        console.log('here')
+        console.log("here");
         if (data.previewFile) {
             try {
                 await toast.promise(
@@ -78,7 +78,7 @@ const BasicCampaignForm: React.FC = () => {
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -169,7 +169,7 @@ const BasicCampaignForm: React.FC = () => {
                         label={"Mô tả"}
                         errorMessage={errors.description?.message}
                     />
-                    <Form.Label label={"Ảnh bìa"} required={true}/>
+                    <Form.Label label={"Ảnh bìa"} required={true} />
                     <div>
                         <Controller
                             rules={{
@@ -177,25 +177,25 @@ const BasicCampaignForm: React.FC = () => {
                             }}
                             control={control}
                             name={"previewFile"}
-                            render={({field, fieldState}) => (
+                            render={({ field, fieldState }) => (
                                 <Form.ImageUploadPanel
                                     defaultImageURL={watch("imageUrl")}
                                     label={`PNG, JPG, GIF tối đa ${MAX_FILE_SIZE_IN_MB}MB`}
                                     onChange={(file) => {
                                         if (!isImageFile(file)) {
                                             toast.error(
-                                                message.NOT_IMAGE_TYPE
+                                                message.NOT_IMAGE_TYPE,
                                             );
                                             return false;
                                         }
                                         if (
                                             !isValidFileSize(
                                                 file,
-                                                MAX_FILE_SIZE_IN_MB
+                                                MAX_FILE_SIZE_IN_MB,
                                             )
                                         ) {
                                             toast.error(
-                                                message.INVALID_IMAGE_SIZE
+                                                message.INVALID_IMAGE_SIZE,
                                             );
                                             return false;
                                         }
@@ -220,7 +220,7 @@ const BasicCampaignForm: React.FC = () => {
                     </div>
                 </div>
 
-                <Form.Divider/>
+                <Form.Divider />
                 <div className="flex justify-end gap-4">
                     <Link
                         href={"/admin/campaigns"}

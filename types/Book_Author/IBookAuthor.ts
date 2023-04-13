@@ -1,4 +1,4 @@
-import {IAuthor} from "../Author/IAuthor";
+import { IAuthor } from "../Author/IAuthor";
 
 export interface IBookAuthor {
     id: number;

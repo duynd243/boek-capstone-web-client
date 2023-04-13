@@ -1,15 +1,14 @@
-import React from 'react'
+import React from "react";
 import Image from "next/image";
-import {faker} from "@faker-js/faker/locale/vi";
-import {IMockOrderItem} from "./index";
+import { IMockOrderItem } from "./index";
 
 type Props = {
     orderItem: IMockOrderItem
 }
 
-const OrderItem: React.FC<Props> = ({orderItem}) => {
+const OrderItem: React.FC<Props> = ({ orderItem }) => {
     return (
-        <div className='border-b border-slate-200 space-y-3 py-3 sm:space-y-0 sm:flex items-center justify-between'>
+        <div className="border-b border-slate-200 space-y-3 py-3 sm:space-y-0 sm:flex items-center justify-between">
             <div className="flex items-center">
                 <div
                     className="mr-2 block shrink-0 xl:mr-4"
@@ -49,7 +48,7 @@ const OrderItem: React.FC<Props> = ({orderItem}) => {
                 }).format(orderItem.price * orderItem.quantity)}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default OrderItem
+export default OrderItem;

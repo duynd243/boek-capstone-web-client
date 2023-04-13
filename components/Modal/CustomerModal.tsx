@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
 import { z } from "zod";
 import { useAuth } from "../../context/AuthContext";
 import useAddress from "../../hooks/useAddress";
@@ -13,11 +12,7 @@ import { IDistrict } from "../../types/Address/IDistrict";
 import { IProvince } from "../../types/Address/IProvince";
 import { IWard } from "../../types/Address/IWard";
 import { IUser } from "../../types/User/IUser";
-import {
-    isImageFile,
-    isValidFileSize,
-    VIETNAMESE_PHONE_REGEX,
-} from "../../utils/helper";
+import { isImageFile, isValidFileSize, VIETNAMESE_PHONE_REGEX } from "../../utils/helper";
 import ErrorMessage from "../Form/ErrorMessage";
 import SelectBox from "../SelectBox";
 import SelectProfilePicture from "../SelectProfilePicture";
@@ -34,12 +29,12 @@ type Props = {
 };
 
 const CustomerModal: React.FC<Props> = ({
-    afterLeave,
-    maxWidth,
-    isOpen,
-    onClose,
-    customer,
-}) => {
+                                            afterLeave,
+                                            maxWidth,
+                                            isOpen,
+                                            onClose,
+                                            customer,
+                                        }) => {
     const { loginUser } = useAuth();
     const userService = new UserService(loginUser?.accessToken);
     const imageService = new ImageUploadService(loginUser?.accessToken);
@@ -54,11 +49,11 @@ const CustomerModal: React.FC<Props> = ({
                 await queryClient.invalidateQueries(["customers"]);
                 onClose();
             },
-        }
+        },
     );
 
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
 
     const UpdateCustomerSchema = z.object({
@@ -150,7 +145,7 @@ const CustomerModal: React.FC<Props> = ({
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -174,7 +169,7 @@ const CustomerModal: React.FC<Props> = ({
                     error: (error) => {
                         return error?.message || "Cập nhật khách hàng thất bại";
                     },
-                }
+                },
             );
         } catch (error) {
             console.log(error);
@@ -206,13 +201,13 @@ const CustomerModal: React.FC<Props> = ({
                                 onChange={(file) => {
                                     if (!isImageFile(file)) {
                                         toast.error(
-                                            "Tệp tải lên phải có định dạng ảnh"
+                                            "Tệp tải lên phải có định dạng ảnh",
                                         );
                                         return false;
                                     }
                                     if (!isValidFileSize(file, 1)) {
                                         toast.error(
-                                            "Kích thước ảnh đại diện không được vượt quá 1MB"
+                                            "Kích thước ảnh đại diện không được vượt quá 1MB",
                                         );
                                         return false;
                                     }
@@ -281,11 +276,11 @@ const CustomerModal: React.FC<Props> = ({
                                         field.onChange(p.code);
                                         setValue(
                                             "addressRequest.districtCode" as any,
-                                            undefined
+                                            undefined,
                                         );
                                         setValue(
                                             "addressRequest.wardCode" as any,
-                                            undefined
+                                            undefined,
                                         );
                                         handleProvinceChange(p);
                                     }}
@@ -316,7 +311,7 @@ const CustomerModal: React.FC<Props> = ({
                                         field.onChange(d.code);
                                         setValue(
                                             "addressRequest.wardCode" as any,
-                                            undefined
+                                            undefined,
                                         );
                                         handleDistrictChange(d);
                                     }}

@@ -13,9 +13,7 @@ import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import LoadingTopPage from "../../../components/LoadingTopPage";
-import LevelModal, {
-    LevelModalMode,
-} from "../../../components/Modal/LevelModal";
+import LevelModal, { LevelModalMode } from "../../../components/Modal/LevelModal";
 import StatusCard from "../../../components/StatusCard";
 import { useAuth } from "../../../context/AuthContext";
 import useTableManagementPage from "../../../hooks/useTableManagementPage";
@@ -27,7 +25,7 @@ const AdminLevelsPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
     const levelService = new LevelService(loginUser?.accessToken);
     const [selectedLevel, setSelectedLevel] = useState<ILevel | undefined>(
-        undefined
+        undefined,
     );
 
     const {
@@ -59,7 +57,7 @@ const AdminLevelsPage: NextPageWithLayout = () => {
             }),
         {
             keepPreviousData: true,
-        }
+        },
     );
     if (isLoading) return <LoadingSpinnerWithOverlay />;
     return (
@@ -115,7 +113,8 @@ const AdminLevelsPage: NextPageWithLayout = () => {
                                         />
                                     )}
                                 </TableData>
-                                <TableData className="text-right text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                                <TableData
+                                    className="text-right text-sm font-medium text-indigo-600 hover:text-indigo-700">
                                     <button
                                         onClick={() => {
                                             setSelectedLevel(level);
@@ -134,7 +133,7 @@ const AdminLevelsPage: NextPageWithLayout = () => {
                         onSizeChange={onSizeChange}
                         page={page}
                         onPageChange={(page) => setPage(page)}
-                        totalPages={levelData?.metadata?.total || 0}
+                        totalElements={levelData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />
                 </TableWrapper>

@@ -1,14 +1,14 @@
 import Image from "next/image";
-import React, {useEffect, useId} from "react";
-import {Controller, useFormContext} from "react-hook-form";
-import {toast} from "react-hot-toast";
-import {z} from "zod";
+import React, { useEffect, useId } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { z } from "zod";
 import DefaultAvatar from "../../assets/images/default-avatar.png";
 import useAddress from "../../hooks/useAddress";
-import {IDistrict} from "../../types/Address/IDistrict";
-import {IProvince} from "../../types/Address/IProvince";
-import {IWard} from "../../types/Address/IWard";
-import {isImageFile, isValidFileSize, VIETNAMESE_PHONE_REGEX,} from "../../utils/helper";
+import { IDistrict } from "../../types/Address/IDistrict";
+import { IProvince } from "../../types/Address/IProvince";
+import { IWard } from "../../types/Address/IWard";
+import { isImageFile, isValidFileSize, VIETNAMESE_PHONE_REGEX } from "../../utils/helper";
 import Form from "../Form";
 import ErrorMessage from "../Form/ErrorMessage";
 import SelectBox from "../SelectBox";
@@ -50,7 +50,7 @@ export type UpdateProfileFormType = Partial<
     z.infer<typeof UpdateProfileSchema>
 >;
 
-const AdminProfileForm = ({onSubmit}: Props) => {
+const AdminProfileForm = ({ onSubmit }: Props) => {
 
     const inputId = useId();
     const {
@@ -59,7 +59,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
         register,
         setValue,
         watch,
-        formState: {errors, isDirty, isSubmitting},
+        formState: { errors, isDirty, isSubmitting },
     } = useFormContext<UpdateProfileFormType>();
 
     const {
@@ -132,7 +132,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                 </div>
 
                 <div className="flex-grow mt-0 lg:flex-shrink-0 lg:flex-grow-0">
-                    <Form.Label textAlignment='text-center' label="Ảnh đại diện"/>
+                    <Form.Label textAlignment="text-center" label="Ảnh đại diện" />
 
                     <div className="relative mt-4 overflow-hidden rounded-full w-fit">
                         <Image
@@ -145,7 +145,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                         <Controller
                             name="previewFile"
                             control={control}
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <label
                                     htmlFor={inputId}
                                     className="absolute inset-0 flex h-full w-full items-center justify-center bg-black bg-opacity-75 text-sm font-medium text-white opacity-0 focus-within:opacity-100 hover:opacity-100"
@@ -163,13 +163,13 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                                             if (!file) return;
                                             if (!isImageFile(file)) {
                                                 toast.error(
-                                                    "Tệp tải lên phải có định dạng ảnh"
+                                                    "Tệp tải lên phải có định dạng ảnh",
                                                 );
                                                 return;
                                             }
                                             if (!isValidFileSize(file, 1)) {
                                                 toast.error(
-                                                    "Kích thước ảnh đại diện không được vượt quá 1MB"
+                                                    "Kích thước ảnh đại diện không được vượt quá 1MB",
                                                 );
                                                 return;
                                             }
@@ -177,7 +177,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                                             field.onChange(file);
                                             if (previewImage) {
                                                 URL.revokeObjectURL(
-                                                    previewImage
+                                                    previewImage,
                                                 );
                                             }
                                         }}
@@ -195,11 +195,11 @@ const AdminProfileForm = ({onSubmit}: Props) => {
 
             <div className="mt-6 grid sm:grid-cols-2 gap-6">
                 <div>
-                    <Form.Label label="Tỉnh / Thành phố"/>
+                    <Form.Label label="Tỉnh / Thành phố" />
                     <Controller
                         control={control}
                         name="addressRequest.provinceCode"
-                        render={({field}) => (
+                        render={({ field }) => (
                             <SelectBox<IProvince>
                                 value={selectedProvince}
                                 placeholder={provincesLoading ? "Đang tải..." : "Chọn tỉnh / thành phố"}
@@ -213,11 +213,11 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                                     field.onChange(p.code);
                                     setValue(
                                         "addressRequest.districtCode" as any,
-                                        undefined
+                                        undefined,
                                     );
                                     setValue(
                                         "addressRequest.wardCode" as any,
-                                        undefined
+                                        undefined,
                                     );
                                     handleProvinceChange(p);
                                 }}
@@ -232,11 +232,11 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                     </ErrorMessage>
                 </div>
                 <div>
-                    <Form.Label label="Quận / Huyện"/>
+                    <Form.Label label="Quận / Huyện" />
                     <Controller
                         control={control}
                         name="addressRequest.districtCode"
-                        render={({field}) => (
+                        render={({ field }) => (
                             <SelectBox<IDistrict>
                                 value={selectedDistrict}
                                 placeholder={districtsLoading ? "Đang tải..." : "Chọn quận / huyện"}
@@ -249,7 +249,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                                     field.onChange(d.code);
                                     setValue(
                                         "addressRequest.wardCode" as any,
-                                        undefined
+                                        undefined,
                                     );
                                     handleDistrictChange(d);
                                 }}
@@ -265,11 +265,11 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                     </ErrorMessage>
                 </div>
                 <div>
-                    <Form.Label label="Phường / Xã"/>
+                    <Form.Label label="Phường / Xã" />
                     <Controller
                         control={control}
                         name="addressRequest.wardCode"
-                        render={({field}) => (
+                        render={({ field }) => (
                             <SelectBox<IWard>
                                 value={selectedWard}
                                 placeholder={wardsLoading ? "Đang tải..." : "Chọn phường / xã"}
@@ -310,7 +310,7 @@ const AdminProfileForm = ({onSubmit}: Props) => {
                     errorMessage={errors.phone?.message}
                 />
             </div>
-            <Form.Divider/>
+            <Form.Divider />
             <div className="flex justify-end">
                 <button
                     disabled={isSubmitting}

@@ -19,7 +19,7 @@ const ComboBookProductDetails: React.FC<Props> = ({ product }) => {
     return (
         <BookProductContext.Provider value={product}>
             <AdminBookProductDetailsLayout>
-                <StatusCard/>
+                <StatusCard />
                 <Form.Divider />
                 <MainSection />
                 <Form.Divider />

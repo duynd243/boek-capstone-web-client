@@ -1,24 +1,23 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
-import { Fragment, ReactElement } from 'react';
-import EmptyState, { EMPTY_STATE_TYPE } from '../../../../../../components/EmptyState';
+import { Fragment, ReactElement } from "react";
+import EmptyState, { EMPTY_STATE_TYPE } from "../../../../../../components/EmptyState";
 import AdminLayout from "../../../../../../components/Layout/AdminLayout";
-import { useAuth } from '../../../../../../context/AuthContext';
-import { BookProductService } from '../../../../../../services/BookProductService';
-import { CampaignService } from '../../../../../../services/CampaignService';
+import { useAuth } from "../../../../../../context/AuthContext";
+import { BookProductService } from "../../../../../../services/BookProductService";
+import { CampaignService } from "../../../../../../services/CampaignService";
 import { NextPageWithLayout } from "../../../../../_app";
-import LoadingSpinnerWithOverlay from './../../../../../../components/LoadingSpinnerWithOverlay';
-import FormPageLayout from './../../../../../../components/Layout/FormPageLayout';
-import WelcomeBanner from './../../../../../../components/WelcomBanner/index';
-import { CampaignContext } from './../../../../../../context/CampaignContext';
-import ComboBookProductForm from './../../../../../../components/BookProductForm/ComboBookProductForm';
-
+import LoadingSpinnerWithOverlay from "./../../../../../../components/LoadingSpinnerWithOverlay";
+import FormPageLayout from "./../../../../../../components/Layout/FormPageLayout";
+import WelcomeBanner from "./../../../../../../components/WelcomBanner/index";
+import { CampaignContext } from "./../../../../../../context/CampaignContext";
+import ComboBookProductForm from "./../../../../../../components/BookProductForm/ComboBookProductForm";
 
 
 const AddOldComboPage: NextPageWithLayout = () => {
     const router = useRouter();
-    const productId = router.query['book-id'];
-    const campaignId = router.query['id'];
+    const productId = router.query["book-id"];
+    const campaignId = router.query["id"];
     const { loginUser } = useAuth();
     const bookProductService = new BookProductService(loginUser?.accessToken);
     const campaignService = new CampaignService(loginUser?.accessToken);
@@ -28,7 +27,7 @@ const AddOldComboPage: NextPageWithLayout = () => {
         () => bookProductService.getBookProductByIdByIssuer(productId as string),
         {
             enabled: !!productId,
-        }
+        },
     );
 
     const { data: campaign } = useQuery(
@@ -57,10 +56,8 @@ const AddOldComboPage: NextPageWithLayout = () => {
 
                 <CampaignContext.Provider value={campaign}>
 
-                    <ComboBookProductForm action='create-old' product={product} />
+                    <ComboBookProductForm action="create-old" product={product} />
                 </CampaignContext.Provider>
-
-
 
 
                 {/* <CampaignContext.Provider value={campaign}>
@@ -72,11 +69,11 @@ const AddOldComboPage: NextPageWithLayout = () => {
             </CampaignContext.Provider> */}
             </FormPageLayout>
         )}
-    </Fragment>
-}
+    </Fragment>;
+};
 
 AddOldComboPage.getLayout = function getLayout(page: ReactElement) {
     return <AdminLayout>{page}</AdminLayout>;
 };
 
-export default AddOldComboPage
+export default AddOldComboPage;

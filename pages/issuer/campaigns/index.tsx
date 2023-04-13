@@ -4,7 +4,7 @@ import { NextPageWithLayout } from "../../_app";
 import CampaignListPage from "../../../components/CampaignListPage";
 
 const IssuerCampaignsPage: NextPageWithLayout = () => {
-    return <CampaignListPage/>
+    return <CampaignListPage />;
     // const {search, setSearch} = useSearchQuery("search", () => setPage(1));
     //
     // const [size, setSize] = useState<number>(6);

@@ -3,10 +3,10 @@ import { NextPageWithLayout } from "../../_app";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 
 const AdminCampaignsPage: NextPageWithLayout = () => {
-  return <p></p>;
+    return <p></p>;
 };
 
 AdminCampaignsPage.getLayout = function getLayout(page: ReactElement) {
-  return <AdminLayout>{page}</AdminLayout>;
+    return <AdminLayout>{page}</AdminLayout>;
 };
 export default AdminCampaignsPage;

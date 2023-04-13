@@ -1,6 +1,6 @@
 export interface IOrganization {
-  id?: number;
-  name?: string;
-  address?: string;
-  phoneNumber?: string;
+    id?: number;
+    name?: string;
+    address?: string;
+    phoneNumber?: string;
 }

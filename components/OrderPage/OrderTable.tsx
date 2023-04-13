@@ -128,7 +128,7 @@ const OrderTable: React.FC<Props> = ({
                 onSizeChange={onSizeChange}
                 page={page}
                 onPageChange={(page) => setPage(page)}
-                totalPages={orderData?.metadata?.total || 0}
+                totalElements={orderData?.metadata?.total || 0}
                 pageSizeOptions={pageSizeOptions}
             />}
         </TableWrapper>

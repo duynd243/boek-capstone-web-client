@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { faker } from "@faker-js/faker/locale/vi";
-import { OrderTypes } from "../../../constants/OrderTypes";
 import OrderItem from "./OrderItem";
 import { getNextUpdateStatus, getOrderStatusById, OrderStatuses } from "../../../constants/OrderStatuses";
 import { useAuth } from "../../../context/AuthContext";

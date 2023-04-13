@@ -18,9 +18,6 @@ import NoImagePlaceholder from "../../../../assets/images/no-image.png";
 import { BsBagPlusFill } from "react-icons/bs";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper";
-import { BookProductStatuses } from "../../../../constants/BookProductStatuses";
-import { formatDistance } from "date-fns";
-import { vi } from "date-fns/locale";
 import { motion } from "framer-motion";
 
 const BonusFormatCard = (
@@ -100,6 +97,10 @@ const ProductDetailsPage: NextPageWithLayout = () => {
         }, {
             label: "Dịch giả",
             value: product?.book?.translator,
+        },
+        {
+            label: "Ngôn ngữ",
+            value: product?.book?.language,
         },
     ];
 

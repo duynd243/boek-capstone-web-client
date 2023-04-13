@@ -1,8 +1,8 @@
-import React from 'react'
-import {IMockOrder} from "./OrderDetailsModal";
+import React from "react";
+import { IMockOrder } from "./OrderDetailsModal";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
-import {useFormik} from "formik";
+import { useFormik } from "formik";
 
 type Props = {
     maxWidth?: string;
@@ -11,18 +11,16 @@ type Props = {
     order?: IMockOrder;
 }
 
-const CancelOrderModal: React.FC<Props> = ({maxWidth, isOpen, order, onClose}) => {
+const CancelOrderModal: React.FC<Props> = ({ maxWidth, isOpen, order, onClose }) => {
     const handleOnClose = () => {
         onClose();
-    }
+    };
     const form = useFormik({
-        initialValues: {
-
-        },
+        initialValues: {},
         onSubmit: (values) => {
 
-        }
-    })
+        },
+    });
     return (
         <TransitionModal
             maxWidth={maxWidth}
@@ -33,7 +31,7 @@ const CancelOrderModal: React.FC<Props> = ({maxWidth, isOpen, order, onClose}) =
             <form onSubmit={() => {
             }}>
                 <Modal.Header
-                    title={'Huỷ đơn hàng'}
+                    title={"Huỷ đơn hàng"}
                     onClose={handleOnClose}
                     showCloseButton={true}
                 />
@@ -46,12 +44,12 @@ const CancelOrderModal: React.FC<Props> = ({maxWidth, isOpen, order, onClose}) =
                         fieldName="personnelAddress"
                         label="Lý do huỷ"
                     /> */}
-                {/* I want to code add description input */}
-                <input
-              type="text"
-              placeholder="Nhập lý do huỷ đơn hàng"
-              className="h-12 w-full border-0 pl-11 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:ring-0"
-            />
+                    {/* I want to code add description input */}
+                    <input
+                        type="text"
+                        placeholder="Nhập lý do huỷ đơn hàng"
+                        className="h-12 w-full border-0 pl-11 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:ring-0"
+                    />
                 </div>
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">
@@ -75,7 +73,7 @@ const CancelOrderModal: React.FC<Props> = ({maxWidth, isOpen, order, onClose}) =
                 </Modal.Footer>
             </form>
         </TransitionModal>
-    )
-}
+    );
+};
 
-export default CancelOrderModal
+export default CancelOrderModal;

@@ -1,4 +1,4 @@
-import {AxiosInstance} from "axios";
+import { AxiosInstance } from "axios";
 import getAxiosClient from "./axiosClient";
 
 export class BaseService {

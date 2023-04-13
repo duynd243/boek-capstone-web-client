@@ -654,10 +654,11 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                             />
                                             <span className={"mt-4 text-center font-medium"}>{group?.group?.name}</span>
 
-                                             <div
+                                            <div
                                                 className={"flex items-center text-gray-500 gap-2 justify-center mt-4"}>
                                                 <BiUser />
-                                                <span className={"text-gray-500 text-sm text-center"}>{group?.total} người tham gia nhóm</span>
+                                                <span
+                                                    className={"text-gray-500 text-sm text-center"}>{group?.total} người tham gia nhóm</span>
                                             </div>
 
                                             {/*Unfollow button*/}

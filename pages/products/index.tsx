@@ -25,13 +25,10 @@ import ExpandableList from "../../components/ExpandableList";
 import FilterSection from "../../components/CustomerSearchWithFilterPage/FilterSection";
 import useCustomerSearchWithFilterPage from "../../components/CustomerSearchWithFilterPage/hook";
 import FilterSidebar from "../../components/CustomerSearchWithFilterPage/FilterSidebar";
-import {
-    getNumberArrayFromQueryKey,
-    getSortedArray,
-    getStringArrayFromQueryKey,
-} from "../../components/CustomerSearchWithFilterPage/utils";
+import { getSortedArray } from "../../components/CustomerSearchWithFilterPage/utils";
 import SortPanel from "../../components/CustomerSearchWithFilterPage/SortPanel";
 import { GenreService } from "../../services/GenreService";
+import { getNumberArrayFromQueryKey, getStringArrayFromQueryKey } from "../../utils/query-helper";
 
 const sortOptions = [
     { name: "Mới nhất", value: "CreatedDate desc" },

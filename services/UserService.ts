@@ -31,13 +31,13 @@ export class UserService extends BaseService {
 
     // admin
     getUsersByAdmin = async (
-        params?: IBaseRequestParams<IUser> & { withAddressDetail?: boolean }
+        params?: IBaseRequestParams<IUser> & { withAddressDetail?: boolean },
     ) => {
         const response = await this.axiosClient.get<IBaseListResponse<IUser>>(
             "/admin/users",
             {
                 params,
-            }
+            },
         );
         return response.data;
     };
@@ -45,7 +45,7 @@ export class UserService extends BaseService {
     updateUserByAdmin = async (user: IUser) => {
         const response = await this.axiosClient.put<IUser>(
             `/admin/users`,
-            user
+            user,
         );
         return response.data;
     };
@@ -53,7 +53,7 @@ export class UserService extends BaseService {
     createUserByAdmin = async (user: CreateUserParams) => {
         const response = await this.axiosClient.post<IUser>(
             `/admin/users`,
-            user
+            user,
         );
         return response.data;
     };

@@ -1,10 +1,9 @@
-import {OrderPickUpStatuses} from "./OrderPickUpStatuses";
-import {OrderStatuses} from "./OrderStatuses";
+import { OrderPickUpStatuses } from "./OrderPickUpStatuses";
 
 export class OrderPickUpTypes {
     static readonly PICKUP = {
         id: 1,
-        displayName: 'Nhận tại hội sách',
+        displayName: "Nhận tại hội sách",
         availableStatuses: [
             OrderPickUpStatuses.PROCESSING,
             OrderPickUpStatuses.WAITING_RECEIVE,
@@ -14,19 +13,19 @@ export class OrderPickUpTypes {
     };
     static readonly SHIPPING = {
         id: 2,
-        displayName: 'Giao hàng',
+        displayName: "Giao hàng",
         availableStatuses: [
             OrderPickUpStatuses.PROCESSING,
             OrderPickUpStatuses.SHIPPING,
             OrderPickUpStatuses.SHIPPED,
             OrderPickUpStatuses.CANCELLED,
         ],
-    }
+    };
 }
 
 
 function getOrderTypeById(id: number) {
     return Object.values(OrderPickUpTypes).find(
-        (type) => type.id === id
+        (type) => type.id === id,
     );
 }

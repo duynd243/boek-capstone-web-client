@@ -1,34 +1,29 @@
-
-import { ReactElement } from 'react';
-import { useRouter } from 'next/router';
-import { useQuery } from '@tanstack/react-query';
-import { Fragment } from 'react';
-import LoadingSpinnerWithOverlay from './../../../components/LoadingSpinnerWithOverlay';
-import EmptyState, { EMPTY_STATE_TYPE } from '../../../components/EmptyState';
-import FormPageLayout from './../../../components/Layout/FormPageLayout';
-import WelcomeBanner from './../../../components/WelcomBanner/index';
-import { useAuth } from '../../../context/AuthContext';
-import { NextPageWithLayout } from '../../_app';
-import { BookProductService } from '../../../services/BookProductService';
-import AdminLayout from './../../../components/Layout/AdminLayout';
-import { BookTypes } from '../../../constants/BookTypes';
-import SingleBookProductForm from './../../../components/BookProductForm/SingleBookProductForm';
-import ComboBookProductForm from '../../../components/BookProductForm/ComboBookProductForm';
-import SeriesBookProductForm from './../../../components/BookProductForm/SeriesBookProductForm';
-import { CampaignService } from '../../../services/CampaignService';
-import { CampaignContext } from '../../../context/CampaignContext';
-import { BookProductStatuses } from '../../../constants/BookProductStatuses';
-import { CampaignStatuses} from '../../../constants/CampaignStatuses';
-import { useMutation } from '@tanstack/react-query';
-
-
+import { Fragment, ReactElement } from "react";
+import { useRouter } from "next/router";
+import { useQuery } from "@tanstack/react-query";
+import LoadingSpinnerWithOverlay from "./../../../components/LoadingSpinnerWithOverlay";
+import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
+import FormPageLayout from "./../../../components/Layout/FormPageLayout";
+import WelcomeBanner from "./../../../components/WelcomBanner/index";
+import { useAuth } from "../../../context/AuthContext";
+import { NextPageWithLayout } from "../../_app";
+import { BookProductService } from "../../../services/BookProductService";
+import AdminLayout from "./../../../components/Layout/AdminLayout";
+import { BookTypes } from "../../../constants/BookTypes";
+import SingleBookProductForm from "./../../../components/BookProductForm/SingleBookProductForm";
+import ComboBookProductForm from "../../../components/BookProductForm/ComboBookProductForm";
+import SeriesBookProductForm from "./../../../components/BookProductForm/SeriesBookProductForm";
+import { CampaignService } from "../../../services/CampaignService";
+import { CampaignContext } from "../../../context/CampaignContext";
+import { BookProductStatuses } from "../../../constants/BookProductStatuses";
+import { CampaignStatuses } from "../../../constants/CampaignStatuses";
 
 
 const IssuerBookProductDetailPage: NextPageWithLayout = () => {
 
 
     const router = useRouter();
-    const productId = router.query['product-id'];
+    const productId = router.query["product-id"];
     const { loginUser } = useAuth();
     const bookProductService = new BookProductService(loginUser?.accessToken);
     const campaignService = new CampaignService(loginUser?.accessToken);
@@ -38,7 +33,7 @@ const IssuerBookProductDetailPage: NextPageWithLayout = () => {
         () => bookProductService.getBookProductByIdByIssuer(productId as string),
         {
             enabled: !!productId,
-        }
+        },
     );
 
     const { data: campaign } = useQuery(
@@ -47,7 +42,6 @@ const IssuerBookProductDetailPage: NextPageWithLayout = () => {
     );
 
 
-    
     const editBasicInfoOnly = product?.status === BookProductStatuses.Selling.id && campaign?.status === CampaignStatuses.STARTING.id;
 
 
@@ -75,14 +69,12 @@ const IssuerBookProductDetailPage: NextPageWithLayout = () => {
                         <SingleBookProductForm editBasicInfoOnly={editBasicInfoOnly} product={product} />
                     )}
                     {product?.type === BookTypes.Combo.id && (
-                        <ComboBookProductForm editBasicInfoOnly={editBasicInfoOnly} action='update' product={product} />
+                        <ComboBookProductForm editBasicInfoOnly={editBasicInfoOnly} action="update" product={product} />
                     )}
                     {product?.type === BookTypes.Series.id && (
                         <SeriesBookProductForm editBasicInfoOnly={editBasicInfoOnly} product={product} />
                     )}
                 </CampaignContext.Provider>
-
-
 
 
                 {/* <CampaignContext.Provider value={campaign}>
@@ -94,10 +86,10 @@ const IssuerBookProductDetailPage: NextPageWithLayout = () => {
             </CampaignContext.Provider> */}
             </FormPageLayout>
         )}
-    </Fragment>
-}
+    </Fragment>;
+};
 IssuerBookProductDetailPage.getLayout = function getLayout(page: ReactElement) {
     return <AdminLayout>{page}</AdminLayout>;
 };
 
-export default IssuerBookProductDetailPage
+export default IssuerBookProductDetailPage;

@@ -19,9 +19,7 @@ import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import LoadingTopPage from "../../../components/LoadingTopPage";
-import PersonnelModal, {
-    PersonnelModalMode,
-} from "../../../components/Modal/PersonnelModal";
+import PersonnelModal, { PersonnelModalMode } from "../../../components/Modal/PersonnelModal";
 import StatusCard from "../../../components/StatusCard";
 import { Roles } from "../../../constants/Roles";
 import { useAuth } from "../../../context/AuthContext";
@@ -90,7 +88,7 @@ const AdminPersonnelsPage: NextPageWithLayout = () => {
             }),
         {
             keepPreviousData: true,
-        }
+        },
     );
 
     if (isLoading) return <LoadingSpinnerWithOverlay />;
@@ -179,13 +177,15 @@ const AdminPersonnelsPage: NextPageWithLayout = () => {
                                                 />
                                             </div>
                                             <div className="ml-4">
-                                                <div className="text-sm font-medium flex items-center gap-2 text-gray-900">
+                                                <div
+                                                    className="text-sm font-medium flex items-center gap-2 text-gray-900">
                                                     {person?.id ===
                                                         loginUser?.id && (
-                                                        <div className="text-white text-xs font-medium px-3.5 py-1 rounded-sm bg-indigo-500 uppercase">
-                                                            Bạn
-                                                        </div>
-                                                    )}
+                                                            <div
+                                                                className="text-white text-xs font-medium px-3.5 py-1 rounded-sm bg-indigo-500 uppercase">
+                                                                Bạn
+                                                            </div>
+                                                        )}
                                                     {person?.name}
                                                 </div>
                                                 <div className="text-sm text-gray-500">
@@ -208,22 +208,23 @@ const AdminPersonnelsPage: NextPageWithLayout = () => {
                                     </TableData>
 
                                     <TableData textAlignment="text-center">
-                                        <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase leading-5 text-slate-600">
+                                        <span
+                                            className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase leading-5 text-slate-600">
                                             {person?.role ===
                                                 Roles.SYSTEM.id && (
-                                                <>
-                                                    <BsShieldFillCheck />
-                                                    Quản trị viên
-                                                </>
-                                            )}
+                                                    <>
+                                                        <BsShieldFillCheck />
+                                                        Quản trị viên
+                                                    </>
+                                                )}
 
                                             {person?.role ===
                                                 Roles.STAFF.id && (
-                                                <>
-                                                    <BsFillBriefcaseFill />
-                                                    Nhân viên
-                                                </>
-                                            )}
+                                                    <>
+                                                        <BsFillBriefcaseFill />
+                                                        Nhân viên
+                                                    </>
+                                                )}
                                         </span>
                                     </TableData>
                                     <TableData textAlignment="text-center">
@@ -251,7 +252,7 @@ const AdminPersonnelsPage: NextPageWithLayout = () => {
                                             <button
                                                 onClick={() => {
                                                     setSelectedPersonnel(
-                                                        person
+                                                        person,
                                                     );
                                                     setShowUpdateModal(true);
                                                 }}
@@ -271,7 +272,7 @@ const AdminPersonnelsPage: NextPageWithLayout = () => {
                         onSizeChange={onSizeChange}
                         page={page}
                         onPageChange={setPage}
-                        totalPages={userData?.metadata?.total || 0}
+                        totalElements={userData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />
                 </TableWrapper>

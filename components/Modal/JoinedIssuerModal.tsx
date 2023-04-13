@@ -1,11 +1,11 @@
-import React, {Fragment, useState} from 'react'
-import {BsSearch} from "react-icons/bs";
+import React, { Fragment, useState } from "react";
+import { BsSearch } from "react-icons/bs";
 import Image from "next/image";
-import {getAvatarFromName} from "../../utils/helper";
+import { getAvatarFromName } from "../../utils/helper";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
-import {IUser} from "../../types/User/IUser";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
+import { IUser } from "../../types/User/IUser";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 
 type Props = {
     isOpen: boolean;
@@ -13,7 +13,7 @@ type Props = {
     joinedIssuers: (IUser | undefined)[];
 }
 
-const JoinedIssuerModal: React.FC<Props> = ({isOpen, onClose, joinedIssuers}) => {
+const JoinedIssuerModal: React.FC<Props> = ({ isOpen, onClose, joinedIssuers }) => {
     const [search, setSearch] = useState("");
     const searchedIssuers = joinedIssuers.filter((issuer) => {
         return issuer?.name?.toLowerCase().includes(search.toLowerCase());
@@ -57,7 +57,7 @@ const JoinedIssuerModal: React.FC<Props> = ({isOpen, onClose, joinedIssuers}) =>
                     </div>
 
                     <div className={"relative my-3"}>
-                        <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                        <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Tìm kiếm nhà phát hành"
@@ -83,7 +83,7 @@ const JoinedIssuerModal: React.FC<Props> = ({isOpen, onClose, joinedIssuers}) =>
                                                 src={
                                                     issuer?.imageUrl ||
                                                     getAvatarFromName(
-                                                        issuer?.name
+                                                        issuer?.name,
                                                     )
                                                 }
                                                 alt=""
@@ -118,7 +118,7 @@ const JoinedIssuerModal: React.FC<Props> = ({isOpen, onClose, joinedIssuers}) =>
                 </Modal.Footer>
             </Fragment>
         </TransitionModal>
-    )
-}
+    );
+};
 
-export default JoinedIssuerModal
+export default JoinedIssuerModal;

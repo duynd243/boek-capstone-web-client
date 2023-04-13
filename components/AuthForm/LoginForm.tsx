@@ -1,15 +1,15 @@
 import React from "react";
 import * as Yup from "yup";
-import {useFormik} from "formik";
-import {inputClass} from "../Layout/LoginSignUpLayout";
-import SocialLoginButton, {ActionTypes, AuthProviders,} from "./SocialLoginButton";
+import { useFormik } from "formik";
+import { inputClass } from "../Layout/LoginSignUpLayout";
+import SocialLoginButton, { ActionTypes, AuthProviders } from "./SocialLoginButton";
 import Link from "next/link";
-import {useAuth} from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 type Props = {};
 
 const LoginForm: React.FC<Props> = () => {
-    const {handleGoogleSignIn} = useAuth();
+    const { handleGoogleSignIn } = useAuth();
     const form = useFormik({
         initialValues: {
             email: "",

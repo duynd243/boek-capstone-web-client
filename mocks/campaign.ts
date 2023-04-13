@@ -899,7 +899,7 @@ export const mockCampaigns = {
 };
 
 export const mockAvatarGroup = new Array(
-    faker.datatype.number({ min: 3, max: 10 })
+    faker.datatype.number({ min: 3, max: 10 }),
 )
     .fill(0)
     .map((_, i) => {

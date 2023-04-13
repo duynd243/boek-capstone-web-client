@@ -59,7 +59,7 @@ export class GroupService extends BaseService {
                 params,
             },
         );
-         if (response.status === 204) {
+        if (response.status === 204) {
             return null;
         }
         return response.data;

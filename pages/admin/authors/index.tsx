@@ -61,7 +61,7 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
             }),
         {
             keepPreviousData: true,
-        }
+        },
     );
 
     const deleteAuthorMutation = useMutation(
@@ -75,7 +75,7 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
                 setSelectedAuthor(undefined);
                 setPage(1);
             },
-        }
+        },
     );
 
     const handleDeleteAuthor = useCallback(async () => {
@@ -86,7 +86,7 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
                     loading: "Đang xoá tác giả",
                     success: "Xoá tác giả thành công",
                     error: (err) => err?.message || "Xoá tác giả thất bại",
-                }
+                },
             );
         }
     }, [deleteAuthorMutation, selectedAuthor?.id]);
@@ -128,7 +128,7 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
                                                 height={100}
                                                 className="h-10 w-10 rounded-full object-cover"
                                                 src={author?.imageUrl || getAvatarFromName(
-                                                    author?.name
+                                                    author?.name,
                                                 )}
                                                 alt=""
                                             />
@@ -175,7 +175,7 @@ const AdminAuthorsPage: NextPageWithLayout = () => {
                         onSizeChange={onSizeChange}
                         page={page}
                         onPageChange={(page) => setPage(page)}
-                        totalPages={authorData?.metadata?.total || 0}
+                        totalElements={authorData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />
                 </TableWrapper>

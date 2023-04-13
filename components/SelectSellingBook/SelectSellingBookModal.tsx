@@ -1,11 +1,11 @@
-import React, {useState} from 'react'
-import {fakeBookSeries} from "../../pages/admin/books";
-import {BsSearch} from "react-icons/bs";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
+import React, { useState } from "react";
+import { fakeBookSeries } from "../../pages/admin/books";
+import { BsSearch } from "react-icons/bs";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 import Modal from "../Modal/Modal";
 import TransitionModal from "../Modal/TransitionModal";
 import Image from "next/image";
-import {faker} from "@faker-js/faker/locale/vi";
+import { faker } from "@faker-js/faker/locale/vi";
 import Link from "next/link";
 
 type Props = {
@@ -14,10 +14,10 @@ type Props = {
     onItemSelect: (organization: typeof fakeBookSeries[number]) => void;
 };
 const SelectSellingBookModal: React.FC<Props> = ({
-                                                           isOpen,
-                                                           onClose,
-                                                           onItemSelect
-                                                       }) => {
+                                                     isOpen,
+                                                     onClose,
+                                                     onItemSelect,
+                                                 }) => {
 
     const [search, setSearch] = useState<string>("");
 
@@ -32,7 +32,7 @@ const SelectSellingBookModal: React.FC<Props> = ({
         >
             <div className="overflow-hidden rounded-xl">
                 <div>
-                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Tìm kiếm sách series"
@@ -115,7 +115,7 @@ const SelectSellingBookModal: React.FC<Props> = ({
                 </Modal.Footer>
             </div>
         </TransitionModal>
-    )
-}
+    );
+};
 
-export default SelectSellingBookModal
+export default SelectSellingBookModal;

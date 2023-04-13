@@ -1,4 +1,3 @@
-
 type Props = {
     variant?: "success" | "error" | "warning" | "info";
     customColor?: string;
@@ -9,12 +8,12 @@ const StatusCard = ({ variant = "success", customColor, label }: Props) => {
     let color = customColor
         ? customColor
         : variant === "success"
-        ? "green"
-        : variant === "error"
-        ? "red"
-        : variant === "warning"
-        ? "yellow"
-        : "blue";
+            ? "green"
+            : variant === "error"
+                ? "red"
+                : variant === "warning"
+                    ? "yellow"
+                    : "blue";
 
     return (
         <span

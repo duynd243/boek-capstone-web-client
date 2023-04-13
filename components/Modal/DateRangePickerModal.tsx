@@ -1,10 +1,10 @@
-import React, {useState} from 'react'
+import React, { useState } from "react";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
-import {DateRange, DayPicker} from "react-day-picker";
-import {vi} from "date-fns/locale";
-import {GrPowerReset} from "react-icons/gr";
-import {DAY_PICKER_CONTAINER, DAY_PICKER_SELECTED} from "../../constants/TailwindClasses";
+import { DateRange, DayPicker } from "react-day-picker";
+import { vi } from "date-fns/locale";
+import { GrPowerReset } from "react-icons/gr";
+import { DAY_PICKER_CONTAINER, DAY_PICKER_SELECTED } from "../../constants/TailwindClasses";
 
 type Props = {
     title: string,
@@ -19,15 +19,15 @@ const DateRangePickerModal: React.FC<Props> = ({
                                                    isOpen,
                                                    value,
                                                    onDismiss,
-                                                   onClose
+                                                   onClose,
                                                }) => {
     const [selected, setSelected] = useState<DateRange | undefined>(value);
     const footer = <button
         onClick={() => setSelected(undefined)}
-        className={'flex gap-2 m-btn w-full bg-slate-200'}>
-        <GrPowerReset/>
+        className={"flex gap-2 m-btn w-full bg-slate-200"}>
+        <GrPowerReset />
         <span>Đặt lại</span>
-    </button>
+    </button>;
 
     return (
         <TransitionModal
@@ -37,9 +37,9 @@ const DateRangePickerModal: React.FC<Props> = ({
             closeOnOverlayClick={false}
         >
             <>
-                <Modal.Header title={title}/>
+                <Modal.Header title={title} />
                 <DayPicker
-                    mode={'range'}
+                    mode={"range"}
                     locale={vi}
                     defaultMonth={selected?.from}
                     modifiersClassNames={{
@@ -62,8 +62,8 @@ const DateRangePickerModal: React.FC<Props> = ({
                         </button>
                         <button
                             onClick={() => {
-                                console.log(selected)
-                                onClose(selected)
+                                console.log(selected);
+                                onClose(selected);
                             }}
                             className="m-btn bg-indigo-600 text-white hover:bg-indigo-700"
                         >
@@ -73,7 +73,7 @@ const DateRangePickerModal: React.FC<Props> = ({
                 </Modal.Footer>
             </>
         </TransitionModal>
-    )
-}
+    );
+};
 
-export default DateRangePickerModal
+export default DateRangePickerModal;

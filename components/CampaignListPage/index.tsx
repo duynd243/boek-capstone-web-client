@@ -49,17 +49,21 @@ const IssuerCampaignOptions = [
 const CampaignListPage: React.FC<Props> = ({}) => {
 
     const { loginUser } = useAuth();
-    const { search, setSearch } = useSearchQuery("search", () => setPage(1));
 
     const [size, setSize] = useState<number>(6);
+
     const [page, setPage] = useState<number>(1);
+
+    const { searchFromQuery, onSearchChange } = useSearchQuery("search", () => {
+        setPage(1);
+    });
     const [selectedFormatTab, setSelectedFormatTab] = useState<typeof CampaignFormatTabs[number]>(CampaignFormatTabs[0]);
     const [selectedStatusTab, setSelectedStatusTab] = useState<typeof CampaignStatusTabs[number]>(CampaignStatusTabs[0]);
     const [selectedIssuerCampaignOption, setSelectedIssuerCampaignOption] = useState<typeof IssuerCampaignOptions[number]>(IssuerCampaignOptions[0]);
     const campaignService = new CampaignService(loginUser?.accessToken);
 
     const queryParams = {
-        name: search,
+        name: searchFromQuery,
         page,
         size,
         status: selectedStatusTab.id || undefined,
@@ -123,15 +127,15 @@ const CampaignListPage: React.FC<Props> = ({}) => {
                     </Fragment>
                 );
             } else {
-                return <div className="py-24">{search ?
+                return <div className="py-24">{searchFromQuery ?
                     <EmptyState
-                        keyword={search}
+                        keyword={searchFromQuery}
                         searchNotFoundMessage="Hãy thử tìm kiếm với từ khóa hoặc bộ lọc khác"
                         status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
                     />
                     :
                     <EmptyState
-                        keyword={search}
+                        keyword={searchFromQuery}
                         customMessage={"Không có hội sách nào"}
                         status={EMPTY_STATE_TYPE.NO_DATA}
                     />
@@ -160,8 +164,8 @@ const CampaignListPage: React.FC<Props> = ({}) => {
             <PageHeading label="Hội sách">
                 <SearchForm
                     placeholder="Tìm kiếm hội sách"
-                    value={search}
-                    onSearchSubmit={(value) => setSearch(value)}
+                    value={searchFromQuery}
+                    onSearchSubmit={onSearchChange}
                 />
                 {loginUser?.role === Roles.SYSTEM.id && <Menu as={"div"} className={"relative"}>
                     <Menu.Button as={"div"}>

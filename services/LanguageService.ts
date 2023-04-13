@@ -6,7 +6,7 @@ export class LanguageService extends BaseService {
             "/languages",
             {
                 params,
-            }
+            },
         );
         return response.data;
     };

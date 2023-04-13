@@ -5,7 +5,7 @@ import { IBaseRequestParams } from "../types/Request/IBaseRequestParams";
 
 export class GenreService extends BaseService {
     getGenres = async (
-        params?: IBaseRequestParams<IGenre> & { withBooks?: boolean }
+        params?: any,
     ) => {
         const response = await this.axiosClient.get<IBaseListResponse<IGenre>>(
             "/genres",
@@ -32,6 +32,12 @@ export class GenreService extends BaseService {
             {
                 params,
             });
+        return response.data;
+    };
+
+
+    getGenreById = async (id: number) => {
+        const response = await this.axiosClient.get<IGenre>(`/genres/${id}`);
         return response.data;
     };
 }

@@ -1,12 +1,12 @@
-import {Transition} from "@headlessui/react";
+import { Transition } from "@headlessui/react";
 import Image from "next/image";
 import React from "react";
-import {useFieldArray, useFormContext} from "react-hook-form";
-import {BsFillCalendarPlusFill} from "react-icons/bs";
-import {RiDeleteBin7Fill} from "react-icons/ri";
-import {z} from "zod";
-import {getAvatarFromName} from "../../utils/helper";
-import {CampaignOrganizationSchema, RecurringOfflineCampaignSchema,} from "../CampaignForm/shared";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import { BsFillCalendarPlusFill } from "react-icons/bs";
+import { RiDeleteBin7Fill } from "react-icons/ri";
+import { z } from "zod";
+import { getAvatarFromName } from "../../utils/helper";
+import { CampaignOrganizationSchema, RecurringOfflineCampaignSchema } from "../CampaignForm/shared";
 import ErrorMessage from "../Form/ErrorMessage";
 import ScheduleCard from "./ScheduleCard";
 
@@ -26,10 +26,10 @@ const CampaignOrganizationCard: React.FC<Props> = ({
     type FormType = z.infer<typeof RecurringOfflineCampaignSchema>;
     const {
         control,
-        formState: {errors},
+        formState: { errors },
     } = useFormContext<FormType>();
 
-    const {fields, append, remove} = useFieldArray({
+    const { fields, append, remove } = useFieldArray({
         control,
         name: `campaignOrganizations.[${index}].schedules` as `campaignOrganizations.[0].schedules`,
     });
@@ -46,7 +46,7 @@ const CampaignOrganizationCard: React.FC<Props> = ({
                             src={
                                 campaignOrganization?.organizationImageUrl ||
                                 getAvatarFromName(
-                                    campaignOrganization?.organizationName
+                                    campaignOrganization?.organizationName,
                                 )
                             }
                             alt={""}
@@ -83,7 +83,7 @@ const CampaignOrganizationCard: React.FC<Props> = ({
                                 "bg-indigo-500 p-3 text-white rounded-full"
                             }
                         >
-                            <BsFillCalendarPlusFill size={18}/>
+                            <BsFillCalendarPlusFill size={18} />
                         </button>
                     </div>
                 </div>

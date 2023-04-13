@@ -1,27 +1,27 @@
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {format} from "date-fns";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
-import {useRouter} from "next/router";
-import React, {Fragment, useContext, useEffect, useState} from "react";
-import {Controller, FormProvider, useFieldArray, useForm,} from "react-hook-form";
-import {toast} from "react-hot-toast";
-import {z} from "zod";
-import {useAuth} from "../../context/AuthContext";
-import {CampaignContext} from "../../context/CampaignContext";
-import {CampaignService} from "../../services/CampaignService";
-import {ImageUploadService} from "../../services/ImageUploadService";
-import {IGroup} from "../../types/Group/IGroup";
-import {ILevel} from "../../types/Level/ILevel";
-import {getAvatarFromName, isImageFile, isValidFileSize,} from "../../utils/helper";
+import { useRouter } from "next/router";
+import React, { Fragment, useContext, useEffect, useState } from "react";
+import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { z } from "zod";
+import { useAuth } from "../../context/AuthContext";
+import { CampaignContext } from "../../context/CampaignContext";
+import { CampaignService } from "../../services/CampaignService";
+import { ImageUploadService } from "../../services/ImageUploadService";
+import { IGroup } from "../../types/Group/IGroup";
+import { ILevel } from "../../types/Level/ILevel";
+import { getAvatarFromName, isImageFile, isValidFileSize } from "../../utils/helper";
 import CreateButton from "../Admin/CreateButton";
 import TableBody from "../Admin/Table/TableBody";
 import TableData from "../Admin/Table/TableData";
 import TableHeader from "../Admin/Table/TableHeader";
 import TableHeading from "../Admin/Table/TableHeading";
 import TableWrapper from "../Admin/Table/TableWrapper";
-import Form, {defaultInputClass} from "../Form";
+import Form, { defaultInputClass } from "../Form";
 import ErrorMessage from "../Form/ErrorMessage";
 import DateTimePickerModal from "../Modal/DateTimePickerModal";
 import SelectCommissionsModal from "../SelectCommissions/SelectCommissionsModal";
@@ -29,20 +29,20 @@ import SelectGroupsModal from "../SelectGroups/SelectGroupsModal";
 import SelectGroupsTable from "../SelectGroups/SelectGroupsTable";
 import SelectLevelsModal from "../SelectLevels/SelectLevelsModal";
 import SelectLevelsTable from "../SelectLevels/SelectLevelsTable";
-import {MAX_FILE_SIZE_IN_MB, message, OnlineCampaignSchema} from "./shared";
+import { MAX_FILE_SIZE_IN_MB, message, OnlineCampaignSchema } from "./shared";
 
 type Props = {
     action: "CREATE" | "UPDATE";
 };
 
-const OnlineCampaignForm: React.FC<Props> = ({action}) => {
-    const {loginUser} = useAuth();
+const OnlineCampaignForm: React.FC<Props> = ({ action }) => {
+    const { loginUser } = useAuth();
     const imageService = new ImageUploadService(loginUser?.accessToken);
     const campaignService = new CampaignService(loginUser?.accessToken);
     const router = useRouter();
     const queryClient = useQueryClient();
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
 
     const createOnlineCampaignMutation = useMutation(
@@ -51,10 +51,10 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
             onSuccess: (data) => {
                 router.push({
                     pathname: "/admin/campaigns/[id]",
-                    query: {id: data.id},
+                    query: { id: data.id },
                 });
             },
-        }
+        },
     );
 
     const updateOnlineCampaignMutation = useMutation(
@@ -64,10 +64,10 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                 queryClient.invalidateQueries(["admin_campaign", [data.id]]);
                 router.push({
                     pathname: "/admin/campaigns/[id]",
-                    query: {id: data.id},
+                    query: { id: data.id },
                 });
             },
-        }
+        },
     );
     const campaign = useContext(CampaignContext);
     const PreviewFileSchema = z.object({
@@ -80,7 +80,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                         (file) => file instanceof File && isImageFile(file),
                         {
                             message: "Ảnh bìa không được để trống",
-                        }
+                        },
                     ),
     });
 
@@ -91,7 +91,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
         {
             message: "Thời gian kết thúc phải sau thời gian bắt đầu",
             path: ["endDate"],
-        }
+        },
     );
     type FormType = Partial<z.infer<typeof FormSchema>>;
 
@@ -112,7 +112,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
         control,
         handleSubmit,
         watch,
-        formState: {errors, isSubmitting},
+        formState: { errors, isSubmitting },
     } = formMethods;
 
     useEffect(() => {
@@ -205,7 +205,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -228,7 +228,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                         error: (error) => {
                             return error?.message || "Tạo hội sách thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -254,7 +254,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                 error?.message || "Cập nhật hội sách thất bại"
                             );
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -318,30 +318,30 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                             label={"Mô tả"}
                             errorMessage={errors.description?.message}
                         />
-                        <Form.Label label={"Ảnh bìa"} required={true}/>
+                        <Form.Label label={"Ảnh bìa"} required={true} />
                         <div>
                             <Controller
                                 control={control}
                                 name={"previewFile"}
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <Form.ImageUploadPanel
                                         defaultImageURL={watch("imageUrl")}
                                         label={`PNG, JPG, GIF tối đa ${MAX_FILE_SIZE_IN_MB}MB`}
                                         onChange={(file) => {
                                             if (!isImageFile(file)) {
                                                 toast.error(
-                                                    message.NOT_IMAGE_TYPE
+                                                    message.NOT_IMAGE_TYPE,
                                                 );
                                                 return false;
                                             }
                                             if (
                                                 !isValidFileSize(
                                                     file,
-                                                    MAX_FILE_SIZE_IN_MB
+                                                    MAX_FILE_SIZE_IN_MB,
                                                 )
                                             ) {
                                                 toast.error(
-                                                    message.INVALID_IMAGE_SIZE
+                                                    message.INVALID_IMAGE_SIZE,
                                                 );
                                                 return false;
                                             }
@@ -365,7 +365,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                             )}
                         </div>
                     </div>
-                    <Form.Divider/>
+                    <Form.Divider />
                     <Form.GroupLabel
                         label={"Thời gian"}
                         description={"Thời gian tổ chức hội sách"}
@@ -380,7 +380,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                 <Controller
                                     control={control}
                                     name="startDate"
-                                    render={({field}) => {
+                                    render={({ field }) => {
                                         return (
                                             <>
                                                 <DateTimePickerModal
@@ -391,17 +391,17 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                                     isOpen={showStartDatePicker}
                                                     onDismiss={() =>
                                                         setShowStartDatePicker(
-                                                            false
+                                                            false,
                                                         )
                                                     }
                                                     onClose={(date) => {
                                                         if (date) {
                                                             field.onChange(
-                                                                date
+                                                                date,
                                                             );
                                                         }
                                                         setShowStartDatePicker(
-                                                            false
+                                                            false,
                                                         );
                                                     }}
                                                 />
@@ -412,13 +412,13 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                                         field.value
                                                             ? format(
                                                                 field.value,
-                                                                "dd/MM/yyyy hh:mm a"
+                                                                "dd/MM/yyyy hh:mm a",
                                                             )
                                                             : ""
                                                     }
                                                     onClick={() =>
                                                         setShowStartDatePicker(
-                                                            true
+                                                            true,
                                                         )
                                                     }
                                                 />
@@ -440,7 +440,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                 <Controller
                                     control={control}
                                     name="endDate"
-                                    render={({field}) => {
+                                    render={({ field }) => {
                                         console.log(field);
                                         return (
                                             <>
@@ -452,20 +452,20 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                                     isOpen={showEndDatePicker}
                                                     onDismiss={() =>
                                                         setShowEndDatePicker(
-                                                            false
+                                                            false,
                                                         )
                                                     }
                                                     onClose={(date) => {
                                                         if (date) {
                                                             field.onChange(
-                                                                date
+                                                                date,
                                                             );
                                                             console.log(
-                                                                watch("endDate")
+                                                                watch("endDate"),
                                                             );
                                                         }
                                                         setShowEndDatePicker(
-                                                            false
+                                                            false,
                                                         );
                                                     }}
                                                 />
@@ -475,13 +475,13 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                                         field.value
                                                             ? format(
                                                                 field.value,
-                                                                "dd/MM/yyyy hh:mm a"
+                                                                "dd/MM/yyyy hh:mm a",
                                                             )
                                                             : ""
                                                     }
                                                     onClick={() =>
                                                         setShowEndDatePicker(
-                                                            true
+                                                            true,
                                                         )
                                                     }
                                                 />
@@ -498,7 +498,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                         </div>
                     </div>
 
-                    <Form.Divider/>
+                    <Form.Divider />
                     <Form.GroupLabel
                         label={"Nhóm đề tài"}
                         description={"Các nhóm đề tài của hội sách này"}
@@ -546,7 +546,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                         </div>
                     </div>
 
-                    <Form.Divider/>
+                    <Form.Divider />
                     <Form.GroupLabel
                         label={"Cấp độ khách hàng yêu cầu"}
                         description={"Giới hạn cấp độ khách hàng tham gia"}
@@ -591,7 +591,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                         </div>
                     </div>
 
-                    <Form.Divider/>
+                    <Form.Divider />
                     <Form.GroupLabel
                         required={true}
                         label="Thể loại và chiết khấu"
@@ -655,7 +655,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                                                         }
                                                                         className="h-10 w-10 rounded-full object-cover"
                                                                         src={getAvatarFromName(
-                                                                            commission?.genreName
+                                                                            commission?.genreName,
                                                                         )}
                                                                         alt=""
                                                                     />
@@ -673,7 +673,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                                             <input
                                                                 type={"number"}
                                                                 {...register(
-                                                                    `campaignCommissions.[${index}].minimalCommission` as `campaignCommissions.${number}.minimalCommission`
+                                                                    `campaignCommissions.[${index}].minimalCommission` as `campaignCommissions.${number}.minimalCommission`,
                                                                 )}
                                                                 className={
                                                                     defaultInputClass
@@ -684,7 +684,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                                             <button
                                                                 onClick={() =>
                                                                     removeCommission(
-                                                                        index
+                                                                        index,
                                                                     )
                                                                 }
                                                                 className="text-rose-600 hover:text-rose-800"
@@ -715,7 +715,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                                                     )}
                                                 </Fragment>
                                             );
-                                        }
+                                        },
                                     )
                                 ) : (
                                     <tr>
@@ -736,7 +736,7 @@ const OnlineCampaignForm: React.FC<Props> = ({action}) => {
                             </ErrorMessage>
                         )}
                     </div>
-                    <Form.Divider/>
+                    <Form.Divider />
                     <div className="flex justify-end gap-4">
                         <Link
                             href={"/admin/campaigns"}

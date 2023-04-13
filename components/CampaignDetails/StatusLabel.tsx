@@ -5,7 +5,7 @@ type Props = {
     statusId?: number;
 };
 
-const StatusLabel: React.FC<Props> = ({statusId}) => {
+const StatusLabel: React.FC<Props> = ({ statusId }) => {
     let backgroundColor = "bg-green-100";
     let textColor = "text-green-800";
     const status = getCampaignStatusById(statusId || 0);

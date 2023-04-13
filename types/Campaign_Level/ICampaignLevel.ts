@@ -1,4 +1,5 @@
-import { ILevel } from './../Level/ILevel';
+import { ILevel } from "./../Level/ILevel";
+
 export interface ICampaignLevel {
     id: number;
     campaignId?: number;

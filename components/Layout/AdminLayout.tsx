@@ -20,7 +20,7 @@ type Props = {
 
 const AdminLayout: React.FC<Props> = ({ children, containerClassName, bgClassName }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-    const {loginUser} = useAuth();
+    const { loginUser } = useAuth();
     const commonProps = {
         isSidebarOpen,
         setIsSidebarOpen,
@@ -42,8 +42,6 @@ const AdminLayout: React.FC<Props> = ({ children, containerClassName, bgClassNam
             } else if (NotificationType === NotificationTypes.ParticipantRequest.id) {
                 viewUrl = "/participants?tab=request";
             }
-
-
 
 
             toast.custom((t) => (
@@ -96,16 +94,16 @@ const AdminLayout: React.FC<Props> = ({ children, containerClassName, bgClassNam
                 duration: 10000,
             });
 
-            await queryClient.invalidateQueries(['admin_participants']);
-            await queryClient.invalidateQueries(['issuer_participants']);
+            await queryClient.invalidateQueries(["admin_participants"]);
+            await queryClient.invalidateQueries(["issuer_participants"]);
 
-            await queryClient.invalidateQueries(['admin_products']);
-            await queryClient.invalidateQueries(['issuer_products']);
+            await queryClient.invalidateQueries(["admin_products"]);
+            await queryClient.invalidateQueries(["issuer_products"]);
 
 
-            await queryClient.invalidateQueries(['issuer_campaign']);
+            await queryClient.invalidateQueries(["issuer_campaign"]);
 
-            await queryClient.invalidateQueries(['campaigns']);
+            await queryClient.invalidateQueries(["campaigns"]);
         },
         []);
 

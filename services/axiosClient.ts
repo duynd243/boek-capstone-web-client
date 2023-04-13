@@ -6,7 +6,7 @@ const getAxiosClient = (
     customURL?: string,
 ): AxiosInstance => {
     const axiosClient = axios.create({
-        
+
         baseURL: customURL ?? process.env.NEXT_PUBLIC_API_URL,
     });
     axiosClient.interceptors.request.use((config) => {

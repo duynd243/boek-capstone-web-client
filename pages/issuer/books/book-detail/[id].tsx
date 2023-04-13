@@ -1,31 +1,17 @@
 import { useAuth } from "../../../../context/AuthContext";
 import { NextPageWithLayout } from "../../../_app";
-import { useRouter } from 'next/router';
-import { BookService } from './../../../../services/BookService';
-import AdminLayout from './../../../../components/Layout/AdminLayout';
-import { ReactElement } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Fragment } from 'react';
-import Link from "next/link";
-import { IoChevronBack } from 'react-icons/io5';
-import { useFormik } from 'formik';
+import { useRouter } from "next/router";
+import { BookService } from "./../../../../services/BookService";
+import AdminLayout from "./../../../../components/Layout/AdminLayout";
+import { ReactElement, useEffect, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useFormik } from "formik";
 import * as Yup from "yup";
-import { toast } from 'react-hot-toast';
-import { useState } from 'react';
-import Image from "next/image";
-import CreateButton from "../../../../components/Admin/CreateButton";
-import ErrorMessage from './../../../../components/Form/ErrorMessage';
-import { useEffect } from 'react';
-import { IAuthor } from './../../../../types/Author/IAuthor';
-import { useMutation } from '@tanstack/react-query';
-import FormPageLayout from './../../../../components/Layout/FormPageLayout';
-import WelcomeBanner from './../../../../components/WelcomBanner/index';
-import { useForm } from 'react-hook-form';
-import { z } from "zod";
-import { zodResolver } from '@hookform/resolvers/zod';
-import Form from "../../../../components/Form";
-import BookForm from './../../../../components/BookForm/BookForm';
-
+import { toast } from "react-hot-toast";
+import { IAuthor } from "./../../../../types/Author/IAuthor";
+import FormPageLayout from "./../../../../components/Layout/FormPageLayout";
+import WelcomeBanner from "./../../../../components/WelcomBanner/index";
+import BookForm from "./../../../../components/BookForm/BookForm";
 
 
 const BookDetails: NextPageWithLayout = () => {
@@ -37,13 +23,13 @@ const BookDetails: NextPageWithLayout = () => {
     const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
     const { data: book, isLoading } = useQuery(
         ["issuer_book", bookId],
-        () => bookService.getBookById$Issuer(Number(bookId), {withCampaigns: true, withAllowChangingGenre: true}),
+        () => bookService.getBookById$Issuer(Number(bookId), { withCampaigns: true, withAllowChangingGenre: true }),
         {
             staleTime: Infinity,
             cacheTime: Infinity,
             retry: false,
-            enabled: !!bookId
-        }
+            enabled: !!bookId,
+        },
     );
     // const { data: book, isLoading } = useQuery(
     //     ["issuer_book", bookId],
@@ -80,7 +66,7 @@ const BookDetails: NextPageWithLayout = () => {
         }
     }, [book]);
     const updateBookMutation = useMutation(
-        (values: any) => bookService.updateBookByIssuer(values)
+        (values: any) => bookService.updateBookByIssuer(values),
     );
     const form = useFormik({
         initialValues: {
@@ -116,6 +102,7 @@ const BookDetails: NextPageWithLayout = () => {
             };
 
             console.log(payload);
+
             // console.log(JSON.stringify(payload, null, 2));
 
             async function updateBookWithToast(promise: Promise<any>) {
@@ -126,13 +113,14 @@ const BookDetails: NextPageWithLayout = () => {
                             router.push(`/issuer/books`);
 
                         }
-                        return "cập nhập sách lẻ thành công"
+                        return "cập nhập sách lẻ thành công";
                     },
                     error: (error) => {
                         return error?.message || "Cập nhập sách lẻ thất bại";
                     },
-                })
+                });
             }
+
             // await updateBookWithToast(updateBookMutation.mutateAsync(payload));
         },
     });

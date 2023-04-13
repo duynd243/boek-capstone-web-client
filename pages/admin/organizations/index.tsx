@@ -16,9 +16,7 @@ import AdminLayout from "../../../components/Layout/AdminLayout";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import LoadingTopPage from "../../../components/LoadingTopPage";
 import ConfirmModal from "../../../components/Modal/ConfirmModal";
-import OrganizationModal, {
-    OrganizationModalMode,
-} from "../../../components/Modal/OrganizationModal";
+import OrganizationModal, { OrganizationModalMode } from "../../../components/Modal/OrganizationModal";
 import { useAuth } from "../../../context/AuthContext";
 import useTableManagementPage from "../../../hooks/useTableManagementPage";
 import { OrganizationService } from "../../../services/OrganizationService";
@@ -57,7 +55,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
             onSettled: () => {
                 setShowDeleteModal(false);
             },
-        }
+        },
     );
 
     const {
@@ -74,7 +72,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
             }),
         {
             keepPreviousData: true,
-        }
+        },
     );
 
     const handleDeleteOrganization = useCallback(async () => {
@@ -85,7 +83,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                     loading: "Đang xoá tổ chức",
                     success: "Xoá tổ chức thành công",
                     error: (err) => err?.message || "Xoá tổ chức thất bại",
-                }
+                },
             );
         }
     }, [deleteOrganizationMutation, selectedOrg?.id]);
@@ -130,7 +128,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                                                     src={
                                                         org?.imageUrl ||
                                                         getAvatarFromName(
-                                                            org?.name
+                                                            org?.name,
                                                         )
                                                     }
                                                     alt={org?.name || ""}
@@ -182,7 +180,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                         onSizeChange={onSizeChange}
                         page={page}
                         onPageChange={setPage}
-                        totalPages={orgData?.metadata?.total || 0}
+                        totalElements={orgData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />
                 </TableWrapper>

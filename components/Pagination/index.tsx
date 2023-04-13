@@ -11,12 +11,12 @@ type Props = {
 };
 
 const Pagination: React.FC<Props> = ({
-    totalItems,
-    pageSize,
-    currentPage,
-    onPageChange,
-    visiblePageButtonLimit,
-}) => {
+                                         totalItems,
+                                         pageSize,
+                                         currentPage,
+                                         onPageChange,
+                                         visiblePageButtonLimit,
+                                     }) => {
     const totalPages = Math.ceil(totalItems / pageSize);
     const start = currentPage - (visiblePageButtonLimit - 1) / 2;
     const end = currentPage + (visiblePageButtonLimit - 1) / 2;

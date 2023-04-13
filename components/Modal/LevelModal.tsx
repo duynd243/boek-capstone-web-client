@@ -1,18 +1,13 @@
 import React, { useCallback } from "react";
 import TransitionModal from "./TransitionModal";
 import Modal from "./Modal";
-import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
 import ToggleButton from "../ToggleButton";
 import { ILevel } from "../../types/Level/ILevel";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../../context/AuthContext";
-import {
-    CreateLevelParams,
-    LevelService,
-    UpdateLevelParams,
-} from "../../services/LevelService";
+import { CreateLevelParams, LevelService, UpdateLevelParams } from "../../services/LevelService";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
@@ -31,13 +26,13 @@ type Props = {
 };
 
 const LevelModal: React.FC<Props> = ({
-    maxWidth,
-    action,
-    isOpen,
-    onClose,
-    level,
-    afterLeave,
-}) => {
+                                         maxWidth,
+                                         action,
+                                         isOpen,
+                                         onClose,
+                                         level,
+                                         afterLeave,
+                                     }) => {
     const { loginUser } = useAuth();
     const levelService = new LevelService(loginUser?.accessToken);
     const queryClient = useQueryClient();
@@ -81,7 +76,7 @@ const LevelModal: React.FC<Props> = ({
         resolver: zodResolver(
             action === LevelModalMode.CREATE
                 ? CreateLevelSchema
-                : UpdateLevelSchema
+                : UpdateLevelSchema,
         ),
         defaultValues,
     });
@@ -102,12 +97,12 @@ const LevelModal: React.FC<Props> = ({
 
     const createLevelMutation = useMutation(
         (level: CreateLevelParams) => levelService.createLevel(level),
-        commonMutationOptions
+        commonMutationOptions,
     );
 
     const updateLevelMutation = useMutation(
         (level: UpdateLevelParams) => levelService.updateLevel(level),
-        commonMutationOptions
+        commonMutationOptions,
     );
 
     const onSubmit = async (values: FormType) => {
@@ -139,7 +134,7 @@ const LevelModal: React.FC<Props> = ({
                             success: "Cập nhật cấp độ thành công",
                             error: (err) =>
                                 err?.message || "Cập nhật cấp độ thất bại",
-                        }
+                        },
                     );
                 } catch (error) {
                     console.log(error);
@@ -238,8 +233,8 @@ const LevelModal: React.FC<Props> = ({
                                     ? "Đang thêm..."
                                     : "Thêm"
                                 : isSubmitting
-                                ? "Đang lưu..."
-                                : "Cập nhật"}
+                                    ? "Đang lưu..."
+                                    : "Cập nhật"}
                         </Modal.PrimaryButton>
                     </div>
                 </Modal.Footer>

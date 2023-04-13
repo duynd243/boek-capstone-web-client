@@ -1,27 +1,24 @@
-import React, {Fragment, ReactElement, useState} from "react";
-import {NextPageWithLayout} from "../../_app";
+import React, { Fragment, ReactElement, useState } from "react";
+import { NextPageWithLayout } from "../../_app";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import PageHeading from "../../../components/Admin/PageHeading";
-import {ImBoxAdd, ImTruck} from "react-icons/im";
 import Image from "next/image";
-import {vi} from "date-fns/locale";
-import {format} from "date-fns";
+import { vi } from "date-fns/locale";
+import { format } from "date-fns";
 import TableWrapper from "../../../components/Admin/Table/TableWrapper";
 import TableHeading from "../../../components/Admin/Table/TableHeading";
 import TableHeader from "../../../components/Admin/Table/TableHeader";
 import TableBody from "../../../components/Admin/Table/TableBody";
 import TableData from "../../../components/Admin/Table/TableData";
-import OrderPickUpDetailsModal, {IMockOrder, mockOrders} from "../../../components/Modal/OrderPickUpDetailsModal";
-import {OrderTypes} from "../../../constants/OrderTypes";
-import {getOrderPickUpStatusById, OrderPickUpStatuses} from "../../../constants/OrderPickUpStatuses";
-import {FiMoreHorizontal} from "react-icons/fi";
-import {Menu, Tab} from "@headlessui/react";
-import {MdBlock, MdEdit, MdSort} from "react-icons/md";
+import OrderPickUpDetailsModal, { IMockOrder, mockOrders } from "../../../components/Modal/OrderPickUpDetailsModal";
+import { getOrderPickUpStatusById, OrderPickUpStatuses } from "../../../constants/OrderPickUpStatuses";
+import { Tab } from "@headlessui/react";
+import { MdBlock, MdEdit, MdSort } from "react-icons/md";
 import OrderStatusPickUpModal from "../../../components/Modal/OrderStatusPickUpModal";
 import CancelOrderModal from "../../../components/Modal/CancelOrderModal";
 import Form from "../../../components/Form";
 import Chip from "../../../components/Admin/Chip";
-import {DateRange} from "react-day-picker";
+import { DateRange } from "react-day-picker";
 
 const OrderTypeTabs = [
     {
@@ -48,7 +45,7 @@ const OrderStatusTabs = [
         name: "Đang xử lý",
         displayName: "Đang xử lý",
     },
-    {   
+    {
         id: OrderPickUpStatuses.WAITING_RECEIVE,
         name: "Đang chờ nhận",
         displayName: "Đang chờ nhận",
@@ -71,33 +68,33 @@ const IssuerOrdersPickUpPage: NextPageWithLayout = () => {
 
         const OrderActions = [
             {
-                icon: <MdSort className={'text-indigo-700'}/>,
+                icon: <MdSort className={"text-indigo-700"} />,
                 label: "Chi tiết",
                 onClick: (order: IMockOrder) => {
                     setShowDetails(true);
                     setSelectedOrder(order);
-                }
+                },
             }, {
-                icon: <MdEdit className={'text-indigo-700'}/>,
+                icon: <MdEdit className={"text-indigo-700"} />,
                 label: "Câp nhật trạng thái",
                 onClick: (order: IMockOrder) => {
                     setShowUpdateStatusModal(true);
                     setSelectedOrder(order);
-                }
+                },
             }, {
-                icon: <MdBlock className={'text-rose-600'}/>,
+                icon: <MdBlock className={"text-rose-600"} />,
                 label: "Huỷ đơn hàng",
                 isDanger: true,
                 onClick: (order: IMockOrder) => {
                     setShowCancelModal(true);
                     setSelectedOrder(order);
-                }
-            }
-        ]
+                },
+            },
+        ];
         return (
             <Fragment>
                 <PageHeading label="Đơn nhận tại quầy"></PageHeading>
-                <div className='bg-white px-4 rounded mb-2'>
+                <div className="bg-white px-4 rounded mb-2">
                     <Tab.Group>
                         <div className="border-b pt-2 border-gray-200 flex items-center justify-between">
                             <ul className="flex flex-wrap gap-2">
@@ -110,7 +107,7 @@ const IssuerOrdersPickUpPage: NextPageWithLayout = () => {
                                         key={tab.name}
                                     >
                                         <div
-                                            className='cursor-pointer ui-selected:border-indigo-500 ui-selected:text-indigo-600 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm'>
+                                            className="cursor-pointer ui-selected:border-indigo-500 ui-selected:text-indigo-600 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
                                             {tab.displayName}
                                         </div>
                                     </Tab>
@@ -118,9 +115,9 @@ const IssuerOrdersPickUpPage: NextPageWithLayout = () => {
                             </ul>
                             <Form.DateTimeInputField
                                 onClick={() => setShowDateRangeModal(true)}
-                                placeholder='Từ ngày - Đến ngày'
-                                value={dateRange && dateRange?.from && dateRange?.to ? `${format(dateRange.from, 'dd/MM/yyyy')} - ${format(dateRange.to, 'dd/MM/yyyy')}` : ''}
-                                id={'213'}
+                                placeholder="Từ ngày - Đến ngày"
+                                value={dateRange && dateRange?.from && dateRange?.to ? `${format(dateRange.from, "dd/MM/yyyy")} - ${format(dateRange.to, "dd/MM/yyyy")}` : ""}
+                                id={"213"}
                             />
                         </div>
                     </Tab.Group>
@@ -136,8 +133,8 @@ const IssuerOrdersPickUpPage: NextPageWithLayout = () => {
                                         className={"focus:outline-none"}
                                         key={tab.name}
                                     >
-                                        {({selected}) => {
-                                            console.log(tab.statusColor)
+                                        {({ selected }) => {
+                                            console.log(tab.statusColor);
                                             return (
                                                 <Chip active={selected}>
                                                     {tab?.statusColor && (
@@ -200,7 +197,7 @@ const IssuerOrdersPickUpPage: NextPageWithLayout = () => {
                                         {format(
                                             order.createdAt,
                                             "eeee, dd/MM/yyyy",
-                                            {locale: vi}
+                                            { locale: vi },
                                         )}
                                     </TableData>
 
@@ -287,14 +284,14 @@ const IssuerOrdersPickUpPage: NextPageWithLayout = () => {
                 </TableWrapper>
 
                 <OrderPickUpDetailsModal isOpen={showDetails}
-                                   order={selectedOrder}
-                                   onClose={() => setShowDetails(false)}
-                                   afterLeave={() => selectedOrder && setSelectedOrder(undefined)}
+                                         order={selectedOrder}
+                                         onClose={() => setShowDetails(false)}
+                                         afterLeave={() => selectedOrder && setSelectedOrder(undefined)}
                 />
 
                 <OrderStatusPickUpModal isOpen={showUpdateStatusModal}
-                                  onClose={() => setShowUpdateStatusModal(false)}
-                                  order={selectedOrder}/>
+                                        onClose={() => setShowUpdateStatusModal(false)}
+                                        order={selectedOrder} />
 
                 <CancelOrderModal isOpen={showCancelModal}
                                   onClose={() => setShowCancelModal(false)}

@@ -1,14 +1,7 @@
-import React, {
-    Fragment,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
-} from "react";
+import React, { ReactElement, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
-import { ReactElement } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import CreateButton from "../../../../components/Admin/CreateButton";
@@ -20,35 +13,26 @@ import { useAuth } from "../../../../context/AuthContext";
 import { BookService } from "../../../../services/BookService";
 import { IBook } from "../../../../types/Book/IBook";
 import { NextPageWithLayout } from "../../../_app";
-import { BsEmojiSmileFill } from 'react-icons/bs';
-import { BsEmojiFrownFill } from 'react-icons/bs';
-import ToggleButton from './../../../../components/ToggleButton';
-import ErrorMessage from './../../../../components/Form/ErrorMessage';
-import SelectBox from './../../../../components/SelectBox/index';
-import { IGenre } from './../../../../types/Genre/IGenre';
-import { GenreService } from './../../../../services/GenreService';
-import TableWrapper from './../../../../components/Admin/Table/TableWrapper';
-import TableHeading from './../../../../components/Admin/Table/TableHeading';
-import TableHeader from './../../../../components/Admin/Table/TableHeader';
-import TableBody from './../../../../components/Admin/Table/TableBody';
-import TableData from './../../../../components/Admin/Table/TableData';
+import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
+import ToggleButton from "./../../../../components/ToggleButton";
+import ErrorMessage from "./../../../../components/Form/ErrorMessage";
+import SelectBox from "./../../../../components/SelectBox/index";
+import { IGenre } from "./../../../../types/Genre/IGenre";
+import { GenreService } from "./../../../../services/GenreService";
+import TableWrapper from "./../../../../components/Admin/Table/TableWrapper";
+import TableHeading from "./../../../../components/Admin/Table/TableHeading";
+import TableHeader from "./../../../../components/Admin/Table/TableHeader";
+import TableBody from "./../../../../components/Admin/Table/TableBody";
+import TableData from "./../../../../components/Admin/Table/TableData";
 import Image from "next/image";
-import { useCreateComboStore } from "../../../../stores/CreateComboStore";
-import { ICreateComboStore } from './../../../../stores/CreateComboStore';
-import { shallow } from 'zustand/shallow';
-import { getAvatarFromName, getIntersectedArray, isImageFile, isValidFileSize } from './../../../../utils/helper';
-import Link from 'next/link';
-import ConfirmModal from './../../../../components/Modal/ConfirmModal';
-import SelectBookSeriesModal from './../../../../components/SelectBookSeries/SelectBookSeriesModal';
-import { toast } from 'react-hot-toast';
-import { useStore } from 'zustand';
-import { IoChevronBack } from 'react-icons/io5';
-import TransitionModal from './../../../../components/Modal/TransitionModal';
-import Modal from './../../../../components/Modal/Modal';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ImageUploadService } from './../../../../services/ImageUploadService';
+import { isImageFile, isValidFileSize } from "./../../../../utils/helper";
+import Link from "next/link";
+import ConfirmModal from "./../../../../components/Modal/ConfirmModal";
+import SelectBookSeriesModal from "./../../../../components/SelectBookSeries/SelectBookSeriesModal";
+import { toast } from "react-hot-toast";
+import { IoChevronBack } from "react-icons/io5";
+import { ImageUploadService } from "./../../../../services/ImageUploadService";
 import { BOOK_IMAGE_UPLOAD_CONTAINER } from "../../../../constants/TailwindClasses";
-
 
 
 type Props = {
@@ -65,17 +49,17 @@ const SeriesBookForm = ({ book }: Props) => {
     const [showConfirmDisabledModal, setshowConfirmDisabledModal] = React.useState(false);
     const imageService = new ImageUploadService(loginUser?.accessToken);
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
     const bookService = new BookService(loginUser?.accessToken);
 
     const updateSeriesBookMutation = useMutation((data: any) => {
-        return bookService.updateSeriesBookByIssuer(data)
+        return bookService.updateSeriesBookByIssuer(data);
     }, {
         onSuccess: async () => {
-            await queryClient.invalidateQueries(['book']);
-            router.push('/issuer/books');
-        }
+            await queryClient.invalidateQueries(["book"]);
+            router.push("/issuer/books");
+        },
     });
 
 
@@ -93,7 +77,7 @@ const SeriesBookForm = ({ book }: Props) => {
         releasedYear: z.coerce.number(),
         status: z.number(),
         updateBookItems: z.array(
-            z.object({ bookId: z.number(), displayIndex: z.number() })
+            z.object({ bookId: z.number(), displayIndex: z.number() }),
         ).min(2),
         previewFile: z.instanceof(File).optional(),
     });
@@ -110,10 +94,8 @@ const SeriesBookForm = ({ book }: Props) => {
         Partial<IBook> | null
     >(null);
 
-    const { data: genres } = useQuery(['genres'], () =>
-        genreService.getChildGenres({
-
-        })
+    const { data: genres } = useQuery(["genres"], () =>
+        genreService.getChildGenres({}),
     );
     const [showModal, setShowModal] = React.useState(false);
 
@@ -176,7 +158,7 @@ const SeriesBookForm = ({ book }: Props) => {
                     bookId: book.id as number,
                     displayIndex: index,
                 })) || [],
-        }
+        },
     });
 
     const handleAddBook = (book: IBook) => {
@@ -241,7 +223,7 @@ const SeriesBookForm = ({ book }: Props) => {
                 },
                 error: (err) => err?.message || "Cập nhật sách thất bại",
             });
-            console.log(payload)
+            console.log(payload);
         } catch (error) {
             console.log(error);
             return;
@@ -267,101 +249,101 @@ const SeriesBookForm = ({ book }: Props) => {
             <div className="mt-3 space-y-4">
                 <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                     <div className="sm:col-span-2">
-                    <label
-                                htmlFor="cover-photo"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Ảnh bìa<span className="text-rose-500">*</span>
-                            </label>
-                            <Controller
-                control={control}
-                name="previewFile"
-                render={({ field }) => (
-                    <Form.ImageUploadPanel
-                        imageClassName={BOOK_IMAGE_UPLOAD_CONTAINER}
-                        onChange={(file) => {
-                            if (!isImageFile(file)) {
-                                toast.error("Vui lòng tải lên tệp hình ảnh");
-                                return false;
-                            }
-                            // check file size
-                            if (!isValidFileSize(file, 1)) {
-                                toast.error("Kích thước tệp tối đa là 1MB");
-                                return false;
-                            }
+                        <label
+                            htmlFor="cover-photo"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Ảnh bìa<span className="text-rose-500">*</span>
+                        </label>
+                        <Controller
+                            control={control}
+                            name="previewFile"
+                            render={({ field }) => (
+                                <Form.ImageUploadPanel
+                                    imageClassName={BOOK_IMAGE_UPLOAD_CONTAINER}
+                                    onChange={(file) => {
+                                        if (!isImageFile(file)) {
+                                            toast.error("Vui lòng tải lên tệp hình ảnh");
+                                            return false;
+                                        }
+                                        // check file size
+                                        if (!isValidFileSize(file, 1)) {
+                                            toast.error("Kích thước tệp tối đa là 1MB");
+                                            return false;
+                                        }
 
-                            field.onChange(file)
-                            return true;
-                        }}
-                        defaultImageURL={book?.imageUrl} />
-                )}
-            />
+                                        field.onChange(file);
+                                        return true;
+                                    }}
+                                    defaultImageURL={book?.imageUrl} />
+                            )}
+                        />
                     </div>
                     <div className="sm:col-span-4">
-                    <Form.Input<FormType>
-                    placeholder={"Nhập tên sách series"}
-                    register={register}
-                    fieldName={"name"}
-                    label="Tên sách series"
-                    required={true}
-                    errorMessage={errors.name?.message}
-                />
-                 <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                 <div className="sm:col-span-2">
-                 <Form.Input<FormType>
-                        placeholder={"Nhập mã sách series"}
-                        register={register}
-                        fieldName={"code"}
-                        label="Mã series"
-                        required={true}
-                        errorMessage={errors.code?.message}
-                    />
-                    </div>
-                    <div className="sm:col-span-2">
-                    <Form.Input<FormType>
-                        placeholder={"Nhập ISBN10"}
-                        register={register}
-                        fieldName={"isbn10"}
-                        label="ISBN10"
-                        errorMessage={errors.isbn10?.message}
-                    />
-                    </div>
-                    <div className="sm:col-span-2">
-                    <Form.Input<FormType>
-                        placeholder={"Nhập ISBN13"}
-                        register={register}
-                        fieldName={"isbn13"}
-                        label="ISBN13"
-                        errorMessage={errors.isbn13?.message}
-                    />
-                    </div>
-                    <div className="sm:col-span-3">
-                    <Form.Input<FormType>
-                        inputType={"number"}
-                        placeholder={"Nhập năm phát hành"}
-                        required={true}
-                        register={register}
-                        fieldName={"releasedYear"}
-                        label="Năm phát hành"
-                        errorMessage={errors.releasedYear?.message}
-                    />
-                    </div>
-                    <div className="sm:col-span-3">
-                    <Form.Input<FormType>
-                        inputType={"number"}
-                        placeholder={"Nhập giá bìa"}
-                        required={true}
-                        register={register}
-                        fieldName={"coverPrice"}
-                        label="Giá bìa (đ)"
-                        errorMessage={errors.coverPrice?.message}
-                    />
+                        <Form.Input<FormType>
+                            placeholder={"Nhập tên sách series"}
+                            register={register}
+                            fieldName={"name"}
+                            label="Tên sách series"
+                            required={true}
+                            errorMessage={errors.name?.message}
+                        />
+                        <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                            <div className="sm:col-span-2">
+                                <Form.Input<FormType>
+                                    placeholder={"Nhập mã sách series"}
+                                    register={register}
+                                    fieldName={"code"}
+                                    label="Mã series"
+                                    required={true}
+                                    errorMessage={errors.code?.message}
+                                />
+                            </div>
+                            <div className="sm:col-span-2">
+                                <Form.Input<FormType>
+                                    placeholder={"Nhập ISBN10"}
+                                    register={register}
+                                    fieldName={"isbn10"}
+                                    label="ISBN10"
+                                    errorMessage={errors.isbn10?.message}
+                                />
+                            </div>
+                            <div className="sm:col-span-2">
+                                <Form.Input<FormType>
+                                    placeholder={"Nhập ISBN13"}
+                                    register={register}
+                                    fieldName={"isbn13"}
+                                    label="ISBN13"
+                                    errorMessage={errors.isbn13?.message}
+                                />
+                            </div>
+                            <div className="sm:col-span-3">
+                                <Form.Input<FormType>
+                                    inputType={"number"}
+                                    placeholder={"Nhập năm phát hành"}
+                                    required={true}
+                                    register={register}
+                                    fieldName={"releasedYear"}
+                                    label="Năm phát hành"
+                                    errorMessage={errors.releasedYear?.message}
+                                />
+                            </div>
+                            <div className="sm:col-span-3">
+                                <Form.Input<FormType>
+                                    inputType={"number"}
+                                    placeholder={"Nhập giá bìa"}
+                                    required={true}
+                                    register={register}
+                                    fieldName={"coverPrice"}
+                                    label="Giá bìa (đ)"
+                                    errorMessage={errors.coverPrice?.message}
+                                />
+                            </div>
                         </div>
-                 </div>
                     </div>
                 </div>
             </div>
-            
+
             <div className="mt-3 space-y-4">
                 <Form.Divider />
                 <Form.GroupLabel
@@ -378,9 +360,9 @@ const SeriesBookForm = ({ book }: Props) => {
                                 value={
                                     genres?.find((g) => g.id === field.value) || null
                                 }
-                                displayKey='name'
+                                displayKey="name"
                                 dataSource={genres}
-                                placeholder='Chọn thể loại'
+                                placeholder="Chọn thể loại"
                                 onValueChange={(p) => {
                                     field.onChange(p.id);
                                 }}
@@ -435,7 +417,8 @@ const SeriesBookForm = ({ book }: Props) => {
                                                         src={book.imageUrl || ""}
                                                         alt=""
                                                     />
-                                                    <div className="max-w-56 overflow-hidden text-ellipsis text-sm font-medium text-gray-900">
+                                                    <div
+                                                        className="max-w-56 overflow-hidden text-ellipsis text-sm font-medium text-gray-900">
                                                         {book.name}
                                                     </div>
                                                 </div>
@@ -526,8 +509,8 @@ const SeriesBookForm = ({ book }: Props) => {
                                 <div>
                                     <div
                                         className={`${field.value ? "bg-green-500" : "bg-rose-500"
-                                            } flex w-fit items-center gap-2 rounded px-2.5 py-1 text-sm text-white transition`}
-                                    // onClick={() => field.onChange(!field.value ? 1 : 0)}
+                                        } flex w-fit items-center gap-2 rounded px-2.5 py-1 text-sm text-white transition`}
+                                        // onClick={() => field.onChange(!field.value ? 1 : 0)}
                                     >
                                         {field.value ? (
                                             <>
@@ -552,10 +535,11 @@ const SeriesBookForm = ({ book }: Props) => {
                                             // }
                                             if (field.value === 1 && true) {
                                                 setshowConfirmDisabledModal(true);
+                                            } else {
+                                                field.onChange(field.value === 1 ? 0 : 1);
                                             }
-                                            else { field.onChange(field.value === 1 ? 0 : 1) }
                                         }}
-                                    // field.onChange(field.value === 1 ? 0 : 1)}
+                                        // field.onChange(field.value === 1 ? 0 : 1)}
                                     />
                                 </div>
                             </div>
@@ -564,15 +548,15 @@ const SeriesBookForm = ({ book }: Props) => {
                 </div>
 
                 <Form.Divider />
-                <div className='flex justify-end gap-4'>
+                <div className="flex justify-end gap-4">
                     <Link
-                        href={'books'}
+                        href={"books"}
                         className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200">
                         Huỷ
                     </Link>
                     <button type="submit"
-                        disabled={isSubmitting}
-                        className="m-btn text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50">
+                            disabled={isSubmitting}
+                            className="m-btn text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50">
                         Lưu
                     </button>
                 </div>
@@ -638,7 +622,7 @@ const UpdateSeriesBookPage: NextPageWithLayout = () => {
         () => bookService.getBookById$Issuer(Number(id)),
         {
             enabled: !!id,
-        }
+        },
     );
 
     console.log(id);

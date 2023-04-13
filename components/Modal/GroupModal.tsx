@@ -5,11 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
 import { useAuth } from "../../context/AuthContext";
-import {
-    CreateGroupParams,
-    GroupService,
-    UpdateGroupParams,
-} from "../../services/GroupService";
+import { CreateGroupParams, GroupService, UpdateGroupParams } from "../../services/GroupService";
 import { IGroup } from "../../types/Group/IGroup";
 import ToggleButton from "../ToggleButton";
 import Modal from "./Modal";
@@ -30,13 +26,13 @@ type Props = {
 };
 
 const GroupModal: React.FC<Props> = ({
-    maxWidth,
-    action,
-    isOpen,
-    onClose,
-    afterLeave,
-    group,
-}) => {
+                                         maxWidth,
+                                         action,
+                                         isOpen,
+                                         onClose,
+                                         afterLeave,
+                                         group,
+                                     }) => {
     const BaseGroupSchema = z.object({
         name: z
             .string()
@@ -72,7 +68,7 @@ const GroupModal: React.FC<Props> = ({
         resolver: zodResolver(
             action === GroupModalMode.CREATE
                 ? BaseGroupSchema
-                : UpdateGroupSchema
+                : UpdateGroupSchema,
         ),
         defaultValues,
     });
@@ -108,7 +104,7 @@ const GroupModal: React.FC<Props> = ({
                             success: "Thêm nhóm thành công",
                             error: (error) =>
                                 error?.message || "Thêm nhóm thất bại",
-                        }
+                        },
                     );
                 } catch (error) {
                     return;
@@ -124,7 +120,7 @@ const GroupModal: React.FC<Props> = ({
                             success: "Cập nhật nhóm thành công",
                             error: (error) =>
                                 error?.message || "Cập nhật nhóm thất bại",
-                        }
+                        },
                     );
                 } catch (error) {
                     return;

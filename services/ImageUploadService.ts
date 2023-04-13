@@ -1,4 +1,4 @@
-import {BaseService} from "./BaseService";
+import { BaseService } from "./BaseService";
 
 export class ImageUploadService extends BaseService {
     uploadImage = async (file: File) => {

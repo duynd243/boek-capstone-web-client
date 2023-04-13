@@ -1,25 +1,25 @@
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import React, {useContext, useState} from "react";
-import {toast} from "react-hot-toast";
-import {useAuth} from "../../context/AuthContext";
-import {CampaignContext} from "../../context/CampaignContext";
-import {InviteIssuerParams, ParticipantService,} from "../../services/ParticipantService";
-import {IUser} from "../../types/User/IUser";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { useContext, useState } from "react";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
+import { CampaignContext } from "../../context/CampaignContext";
+import { InviteIssuerParams, ParticipantService } from "../../services/ParticipantService";
+import { IUser } from "../../types/User/IUser";
 import TransitionModal from "./TransitionModal";
-import {BsSearch} from "react-icons/bs";
-import {AiFillMinusCircle} from "react-icons/ai";
-import {getAvatarFromName} from "../../utils/helper";
+import { BsSearch } from "react-icons/bs";
+import { AiFillMinusCircle } from "react-icons/ai";
+import { getAvatarFromName } from "../../utils/helper";
 import Image from "next/image";
 import Modal from "./Modal";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
 };
 
-const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
-    const {loginUser} = useAuth();
+const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
+    const { loginUser } = useAuth();
     const campaign = useContext(CampaignContext);
     const queryClient = useQueryClient();
     const participantService = new ParticipantService(loginUser?.accessToken);
@@ -30,13 +30,13 @@ const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
                 await queryClient.invalidateQueries(["admin_campaign", campaign?.id]);
                 await queryClient.invalidateQueries(["unparticipated-issuers", campaign?.id]);
                 onClose();
-            }
-        }
+            },
+        },
     );
     const [search, setSearch] = useState<string>("");
     const [selectedIssuers, setSelectedIssuers] = useState<IUser[]>([]);
 
-    const {data: issuers, isLoading} = useQuery(
+    const { data: issuers, isLoading } = useQuery(
         ["unparticipated-issuers", campaign?.id],
         () => {
             if (campaign?.id === undefined) return [];
@@ -69,7 +69,7 @@ const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
                     loading: "Đang gửi lời mời",
                     success: "Gửi lời mời thành công",
                     error: (err) => err?.message || "Gửi lời mời thất bại",
-                }
+                },
             );
         } catch (error) {
             console.log(error);
@@ -115,7 +115,7 @@ const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
                     </div>
 
                     <div className={"relative my-3"}>
-                        <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                        <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Tìm kiếm nhà phát hành"
@@ -145,25 +145,25 @@ const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
                                                         setSelectedIssuers(
                                                             selectedIssuers.filter(
                                                                 (
-                                                                    selectedIssuer
+                                                                    selectedIssuer,
                                                                 ) =>
                                                                     selectedIssuer?.id !==
-                                                                    issuer?.id
-                                                            )
+                                                                    issuer?.id,
+                                                            ),
                                                         )
                                                     }
                                                     type="button"
                                                     className="relative mt-2 mr-2"
                                                 >
                                                     <AiFillMinusCircle
-                                                        className="h-4 w-4 text-red-500 hover:text-red-700"/>
+                                                        className="h-4 w-4 text-red-500 hover:text-red-700" />
                                                 </button>
                                             </div>
                                             <Image
                                                 src={
                                                     issuer?.imageUrl ||
                                                     getAvatarFromName(
-                                                        issuer?.name
+                                                        issuer?.name,
                                                     )
                                                 }
                                                 alt={""}
@@ -189,7 +189,7 @@ const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
                                         key={issuer.id}
                                         className="flex gap-3 items-center justify-between p-4 border-b border-gray-200"
                                     >
-                                        <div className='flex gap-4 flex-1 min-w-0'>
+                                        <div className="flex gap-4 flex-1 min-w-0">
                                             <Image
                                                 width={200}
                                                 height={200}
@@ -197,12 +197,12 @@ const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
                                                 src={
                                                     issuer?.imageUrl ||
                                                     getAvatarFromName(
-                                                        issuer?.name
+                                                        issuer?.name,
                                                     )
                                                 }
                                                 alt=""
                                             />
-                                            <div className='flex-1 min-w-0'>
+                                            <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium text-gray-900 line-clamp-2 break-words">
                                                     {issuer?.name}
                                                 </p>
@@ -211,7 +211,7 @@ const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className='flex justify-end items-center'>
+                                        <div className="flex justify-end items-center">
                                             <button
                                                 onClick={() =>
                                                     handleSelectIssuer(issuer)
@@ -225,7 +225,7 @@ const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
                                                     : "Chọn"}
                                             </button>
                                         </div>
-                                    </div>
+                                    </div>;
                                 })
                             ) :
                             issuers && issuers?.length > 0 ? (
@@ -257,7 +257,7 @@ const InviteIssuerModal: React.FC<Props> = ({isOpen, onClose}) => {
                             }
                         >
                             {inviteIssuerMutation.isLoading ?
-                                'Đang gửi...' : `Gửi lời mời ${selectedIssuers.length > 0 ? `(${selectedIssuers.length})` : ""}`}
+                                "Đang gửi..." : `Gửi lời mời ${selectedIssuers.length > 0 ? `(${selectedIssuers.length})` : ""}`}
                         </Modal.PrimaryButton>
                     </div>
                 </Modal.Footer>

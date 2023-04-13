@@ -45,7 +45,8 @@ export const ProfilePicture = () => {
                 />
             </div>
             <div className="ml-5 rounded-md shadow-sm">
-                <div className="group relative flex items-center justify-center rounded-md border border-gray-300 py-2 px-3 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:bg-gray-50">
+                <div
+                    className="group relative flex items-center justify-center rounded-md border border-gray-300 py-2 px-3 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:bg-gray-50">
                     <label
                         htmlFor="mobile-user-photo"
                         className="pointer-events-none relative text-sm font-medium leading-4 text-gray-700"
@@ -87,7 +88,7 @@ const Settings: NextPageWithLayout = () => {
                                             item.current
                                                 ? "border-indigo-500 bg-indigo-50 text-indigo-700 hover:bg-indigo-50 hover:text-indigo-700"
                                                 : "border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900",
-                                            "group flex items-center border-l-4 px-3 py-2 text-sm font-medium"
+                                            "group flex items-center border-l-4 px-3 py-2 text-sm font-medium",
                                         )}
                                         // aria-current={
                                         //     item.current ? "page" : undefined

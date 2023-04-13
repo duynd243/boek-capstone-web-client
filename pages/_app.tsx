@@ -6,12 +6,12 @@ import { Toaster, ToasterProps } from "react-hot-toast";
 import { initFirebaseApp } from "../old-services/initFirebase";
 import { Fragment, ReactElement, ReactNode, useMemo } from "react";
 import { NextPage } from "next";
-import { AuthContextProvider, useAuth } from "../context/AuthContext";
+import { AuthContextProvider } from "../context/AuthContext";
 import ProtectedRouteWrapper from "../components/ProtectedRouteWrapper";
 import { useRouter } from "next/router";
 import { ProtectedRoutes } from "../constants/ProtectedRoutes";
 import "react-day-picker/dist/style.css";
-import 'swiper/css';
+import "swiper/css";
 import "swiper/css/pagination";
 
 const queryClient = new QueryClient();
@@ -51,13 +51,13 @@ export default function App({ Component, pageProps }: CustomAppProps) {
         <QueryClientProvider client={queryClient}>
 
             <AuthContextProvider>
-                    {isProtectedRoute ? (
-                        <ProtectedRouteWrapper routeData={isProtectedRoute}>
-                            {component}
-                        </ProtectedRouteWrapper>
-                    ) : (
-                        <Fragment>{component}</Fragment>
-                    )}
+                {isProtectedRoute ? (
+                    <ProtectedRouteWrapper routeData={isProtectedRoute}>
+                        {component}
+                    </ProtectedRouteWrapper>
+                ) : (
+                    <Fragment>{component}</Fragment>
+                )}
             </AuthContextProvider>
             <Toaster {...toasterConfig} />
             <ReactQueryDevtools initialIsOpen={false} />

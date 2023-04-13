@@ -1,8 +1,8 @@
-import React, {Fragment, useState} from "react";
-import {defaultInputClass} from "../Form";
-import {HiCheckCircle} from "react-icons/hi2";
-import {Combobox, Transition} from "@headlessui/react";
-import {BiChevronDown} from "react-icons/bi";
+import React, { Fragment, useState } from "react";
+import { defaultInputClass } from "../Form";
+import { HiCheckCircle } from "react-icons/hi2";
+import { Combobox, Transition } from "@headlessui/react";
+import { BiChevronDown } from "react-icons/bi";
 
 type Props<T> = {
     placeholder: string;
@@ -14,13 +14,13 @@ type Props<T> = {
 };
 
 const MultipleSelectBox = <T extends Record<string, any>>({
-                                                      placeholder,
-                                                      value,
-                                                      onValueChange,
-                                                      dataSource,
-                                                      displayKey,
-                                                      searchable = true,
-                                                  }: Props<T>) => {
+                                                              placeholder,
+                                                              value,
+                                                              onValueChange,
+                                                              dataSource,
+                                                              displayKey,
+                                                              searchable = true,
+                                                          }: Props<T>) => {
     const [search, setSearch] = useState("");
 
     const searchedOptions = dataSource?.filter((option) => {
@@ -34,11 +34,11 @@ const MultipleSelectBox = <T extends Record<string, any>>({
                     <Combobox.Input
                         readOnly={!searchable}
                         placeholder={placeholder}
-                        className={`${defaultInputClass} ${searchable ? '' : 'cursor-pointer pointer-events-none'} truncate`}
+                        className={`${defaultInputClass} ${searchable ? "" : "cursor-pointer pointer-events-none"} truncate`}
                         displayValue={(value: T) => value?.[displayKey] ?? ""}
                         onChange={(e) => setSearch(e.target.value)}
                     />
-                    <div className='absolute inset-y-0 right-0 flex items-center pr-2'>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-2">
                         <BiChevronDown
                             className="h-5 w-5 text-gray-400 transition duration-200 ui-open:rotate-180"
                             aria-hidden="true"
@@ -62,12 +62,12 @@ const MultipleSelectBox = <T extends Record<string, any>>({
                                     key={index}
                                     value={option}
                                 >
-                                    {({selected}) => (
+                                    {({ selected }) => (
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm">{option?.[displayKey]}</span>
                                             {selected && (
                                                 <HiCheckCircle
-                                                    className="fill-indigo-600 text-lg ui-active:fill-white"/>
+                                                    className="fill-indigo-600 text-lg ui-active:fill-white" />
                                             )}
                                         </div>
                                     )}

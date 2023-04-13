@@ -1,27 +1,27 @@
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import React, {useContext, useState} from "react";
-import {AiFillMinusCircle} from "react-icons/ai";
-import {BsSearch} from "react-icons/bs";
-import {useAuth} from "../../context/AuthContext";
-import {CampaignContext} from "../../context/CampaignContext";
-import CampaignStaffService, {AddStaffsRequestParams} from "../../services/CampaignStaffService";
-import {IUser} from "../../types/User/IUser";
-import {getAvatarFromName} from "../../utils/helper";
+import React, { useContext, useState } from "react";
+import { AiFillMinusCircle } from "react-icons/ai";
+import { BsSearch } from "react-icons/bs";
+import { useAuth } from "../../context/AuthContext";
+import { CampaignContext } from "../../context/CampaignContext";
+import CampaignStaffService, { AddStaffsRequestParams } from "../../services/CampaignStaffService";
+import { IUser } from "../../types/User/IUser";
+import { getAvatarFromName } from "../../utils/helper";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
-import {toast} from "react-hot-toast";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
+import { toast } from "react-hot-toast";
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
 };
 
-const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
-    const {loginUser} = useAuth();
+const AddStaffModal: React.FC<Props> = ({ isOpen, onClose }) => {
+    const { loginUser } = useAuth();
     const campaignStaffService = new CampaignStaffService(
-        loginUser?.accessToken
+        loginUser?.accessToken,
     );
     const queryClient = useQueryClient();
 
@@ -34,11 +34,11 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
         setSelectedStaffs([]);
         onClose();
     };
-    const {data: staffs, isLoading} = useQuery(
+    const { data: staffs, isLoading } = useQuery(
         ["unattended_staffs", campaign?.id],
         () => campaignStaffService.getUnattendedStaffsByCampaignId(Number(campaign?.id)), {
-            enabled: isOpen && campaign?.id !== undefined
-        }
+            enabled: isOpen && campaign?.id !== undefined,
+        },
     );
 
     const addStaffsMutation = useMutation(
@@ -46,8 +46,8 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
             onSuccess: async () => {
                 await queryClient.invalidateQueries(["campaign_staffs", campaign?.id]);
                 afterModalClose();
-            }
-        }
+            },
+        },
     );
 
     const searchedStaffs = staffs !== null && Array.isArray(staffs) ? staffs?.filter((staff) => {
@@ -67,13 +67,13 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
                     campaignId: campaign?.id,
                     staffIds: selectedStaffs
                         ?.filter((staff) => staff?.id !== undefined)
-                        ?.map((staff) => staff?.id)
+                        ?.map((staff) => staff?.id),
                 }),
                 {
                     loading: "Đang thêm nhân viên",
                     success: "Thêm nhân viên thành công",
-                    error: (err) => err?.message || "Có lỗi xảy ra"
-                }
+                    error: (err) => err?.message || "Có lỗi xảy ra",
+                },
             );
         } catch (error) {
             console.log(error);
@@ -84,7 +84,7 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
         if (isLoading) {
             return (
                 <div>Loading...</div>
-            )
+            );
         } else {
             if (staffs && staffs?.length > 0) {
                 if (searchedStaffs?.length > 0) {
@@ -94,7 +94,7 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
                             key={staff?.id}
                             className="flex gap-3 items-center justify-between p-4 border-b border-gray-200"
                         >
-                            <div className='flex gap-4 flex-1 min-w-0'>
+                            <div className="flex gap-4 flex-1 min-w-0">
                                 <Image
                                     width={200}
                                     height={200}
@@ -102,12 +102,12 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
                                     src={
                                         staff?.imageUrl ||
                                         getAvatarFromName(
-                                            staff?.name
+                                            staff?.name,
                                         )
                                     }
                                     alt=""
                                 />
-                                <div className='flex-1 min-w-0'>
+                                <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-gray-900 line-clamp-2 break-words">
                                         {staff?.name}
                                     </p>
@@ -116,7 +116,7 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
                                     </p>
                                 </div>
                             </div>
-                            <div className='flex justify-end items-center'>
+                            <div className="flex justify-end items-center">
                                 <button
                                     onClick={() =>
                                         handleSelectStaff(staff)
@@ -130,15 +130,15 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
                                         : "Chọn"}
                                 </button>
                             </div>
-                        </div>
-                    })
+                        </div>;
+                    });
 
                 } else {
                     return (
                         <EmptyState
                             status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
                         />
-                    )
+                    );
                 }
 
             } else {
@@ -147,7 +147,7 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
                         status={EMPTY_STATE_TYPE.NO_DATA}
                         customMessage={"Không có nhân viên nào để thêm"}
                     />
-                )
+                );
             }
         }
     }
@@ -191,7 +191,7 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
                     </div>
 
                     <div className={"relative my-3"}>
-                        <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                        <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                         <input
                             disabled={isLoading}
                             type="text"
@@ -222,25 +222,25 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
                                                         setSelectedStaffs(
                                                             selectedStaffs.filter(
                                                                 (
-                                                                    selectedIssuer
+                                                                    selectedIssuer,
                                                                 ) =>
                                                                     selectedIssuer?.id !==
-                                                                    issuer?.id
-                                                            )
+                                                                    issuer?.id,
+                                                            ),
                                                         )
                                                     }
                                                     type="button"
                                                     className="relative mt-2 mr-2"
                                                 >
                                                     <AiFillMinusCircle
-                                                        className="h-4 w-4 text-red-500 hover:text-red-700"/>
+                                                        className="h-4 w-4 text-red-500 hover:text-red-700" />
                                                 </button>
                                             </div>
                                             <Image
                                                 src={
                                                     issuer?.imageUrl ||
                                                     getAvatarFromName(
-                                                        issuer?.name
+                                                        issuer?.name,
                                                     )
                                                 }
                                                 alt={""}
@@ -280,7 +280,7 @@ const AddStaffModal: React.FC<Props> = ({isOpen, onClose}) => {
                             }
                         >
                             {addStaffsMutation.isLoading ?
-                                'Đang thêm...' : `Thêm ${selectedStaffs.length > 0 ? `(${selectedStaffs.length})` : ""}`}
+                                "Đang thêm..." : `Thêm ${selectedStaffs.length > 0 ? `(${selectedStaffs.length})` : ""}`}
                         </Modal.PrimaryButton>
                     </div>
                 </Modal.Footer>

@@ -21,8 +21,6 @@ import { ISchedule } from "../../types/Campaign_Organization/ICampaignOrganizati
 import { Tab } from "@headlessui/react";
 import ProductCard from "../ProductCard";
 import CustomerProductCard from "../CustomerProductCard";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination } from "swiper";
 
 const MainContent: React.FC = () => {
     const { loginUser } = useAuth();
@@ -81,7 +79,7 @@ const MainContent: React.FC = () => {
 
 
     return (
-        <div className={'max-w-screen-md'}>
+        <div className={"max-w-screen-md"}>
             <div className="mb-6">
                 <button
                     className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
@@ -448,9 +446,9 @@ const MainContent: React.FC = () => {
                             <div className={"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-6"}>
                                 {ubp?.bookProducts && ubp?.bookProducts.map((bookProduct, index) => {
                                     return (
-                                         <CustomerProductCard
-                                             key={bookProduct?.id}
-                                             product={bookProduct} />
+                                        <CustomerProductCard
+                                            key={bookProduct?.id}
+                                            product={bookProduct} />
                                     );
                                 })}
                             </div>

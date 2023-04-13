@@ -6,7 +6,7 @@ type Props = {
     className?: string;
 };
 
-const PageHeading: React.FC<Props> = ({label, children, className}) => {
+const PageHeading: React.FC<Props> = ({ label, children, className }) => {
     return (
         <div className={`mb-8 sm:flex sm:items-center sm:justify-between ${className}`}>
             {/* Left: Title */}

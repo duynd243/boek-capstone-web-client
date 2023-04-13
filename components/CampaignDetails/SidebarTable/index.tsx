@@ -6,4 +6,4 @@ export const SidebarTable = {
     Heading: Heading,
     Content: Content,
     SkeletonItem: SkeletonItem,
-}
+};

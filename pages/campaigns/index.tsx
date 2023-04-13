@@ -9,11 +9,7 @@ import SortPanel from "../../components/CustomerSearchWithFilterPage/SortPanel";
 import { CampaignService } from "../../services/CampaignService";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import {
-    getNumberArrayFromQueryKey,
-    getSortedArray,
-    getStringArrayFromQueryKey,
-} from "../../components/CustomerSearchWithFilterPage/utils";
+import { getSortedArray } from "../../components/CustomerSearchWithFilterPage/utils";
 import { AddressService } from "../../services/AddressService";
 import useCustomerSearchWithFilterPage from "../../components/CustomerSearchWithFilterPage/hook";
 import { OrganizationService } from "../../services/OrganizationService";
@@ -27,6 +23,7 @@ import Image from "next/image";
 import { getAvatarFromName } from "../../utils/helper";
 import { CampaignFormats } from "../../constants/CampaignFormats";
 import { HiLocationMarker, HiOutlineStatusOnline } from "react-icons/hi";
+import { getNumberArrayFromQueryKey, getStringArrayFromQueryKey } from "../../utils/query-helper";
 
 const sortOptions = [
     { name: "Mới nhất", value: "CreatedDate desc" },
@@ -341,7 +338,7 @@ const CustomerCampaignsPage: NextPageWithLayout = () => {
                                 setSelectedSortOption(value);
                                 setPage(1);
                             }}
-                            itemName={'hội sách'}
+                            itemName={"hội sách"}
                         />
 
                         {!campaignsLoading && data?.data.length === 0 && (
