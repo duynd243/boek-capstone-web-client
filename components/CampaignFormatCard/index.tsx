@@ -1,5 +1,5 @@
 import React from "react";
-import {CheckmarkIcon} from "react-hot-toast";
+import { CheckmarkIcon } from "react-hot-toast";
 
 type Props = {
     id: number;
@@ -36,7 +36,7 @@ const CampaignFormatCard: React.FC<Props> = ({
             {/* Card footer */}
             {checked && (
                 <div className="absolute top-2 right-2">
-                    <CheckmarkIcon className="h-5 w-5 text-indigo-400"/>
+                    <CheckmarkIcon className="h-5 w-5 text-indigo-400" />
                 </div>
             )}
         </div>

@@ -17,11 +17,11 @@ type Props = {
 };
 
 const SelectOrganizationsModal: React.FC<Props> = ({
-    isOpen,
-    onClose,
-    selectedOrganizations,
-    onItemSelect,
-}) => {
+                                                       isOpen,
+                                                       onClose,
+                                                       selectedOrganizations,
+                                                       onItemSelect,
+                                                   }) => {
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounce(search, 500);
     const organizationService = new OrganizationService();
@@ -40,7 +40,7 @@ const SelectOrganizationsModal: React.FC<Props> = ({
         {
             keepPreviousData: true,
             select: (data) => data.data,
-        }
+        },
     );
 
     return (
@@ -65,7 +65,7 @@ const SelectOrganizationsModal: React.FC<Props> = ({
                     {!isLoading && organizations ? (
                         organizations?.map((org) => {
                             const isSelected = selectedOrganizations?.find(
-                                (o) => o?.id === org?.id
+                                (o) => o?.id === org?.id,
                             );
                             return (
                                 <div

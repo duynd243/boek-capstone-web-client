@@ -1,17 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
-import { Fragment, ReactElement, useMemo, useState } from 'react';
+import { Fragment, ReactElement, useMemo, useState } from "react";
 import { GiBookCover } from "react-icons/gi";
-import { IoChevronBack } from 'react-icons/io5';
+import { IoChevronBack } from "react-icons/io5";
 import AdminLayout from "../../../../../../components/Layout/AdminLayout";
 import SelectBookSeriesModal from "../../../../../../components/SelectBookSeries/SelectBookSeriesModal";
-import { useAuth } from '../../../../../../context/AuthContext';
-import { CampaignService } from '../../../../../../services/CampaignService';
+import { useAuth } from "../../../../../../context/AuthContext";
+import { CampaignService } from "../../../../../../services/CampaignService";
 import { NextPageWithLayout } from "../../../../../_app";
 
 const SelectBookPage: NextPageWithLayout = () => {
     const router = useRouter();
-    const {loginUser} = useAuth();
+    const { loginUser } = useAuth();
     const campaignService = new CampaignService(loginUser?.accessToken);
 
     const [showModal, setShowModal] = useState(false);
@@ -24,15 +24,15 @@ const SelectBookPage: NextPageWithLayout = () => {
         () => campaignService.getCampaignByIdByIssuer(Number(campaignId)),
         {
             enabled: !!campaignId,
-        }
+        },
     );
 
     const genreIds = useMemo(() => campaign?.campaignCommissions?.map(c => c.genre?.id) || [], [campaign]);
 
     return (
         <Fragment>
-            <div className='mx-auto max-w-6xl overflow-hidden rounded-md bg-white p-3'>
-            <div className="mb-6">
+            <div className="mx-auto max-w-6xl overflow-hidden rounded-md bg-white p-3">
+                <div className="mb-6">
                     <button
                         className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
                         onClick={() => router.back()}
@@ -62,7 +62,7 @@ const SelectBookPage: NextPageWithLayout = () => {
                 }} /> */}
             <SelectBookSeriesModal
                 campaignId={Number(campaignId)}
-                isOpen={showModal} 
+                isOpen={showModal}
                 onClose={() => setShowModal(false)}
                 genreIds={genreIds}
                 isSeries={false}
@@ -71,11 +71,11 @@ const SelectBookPage: NextPageWithLayout = () => {
                 }} />
 
         </Fragment>
-    )
-}
+    );
+};
 
 SelectBookPage.getLayout = function getLayout(page: ReactElement) {
     return <AdminLayout>{page}</AdminLayout>;
 };
 
-export default SelectBookPage
+export default SelectBookPage;

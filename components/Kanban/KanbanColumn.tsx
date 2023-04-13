@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 type Props = {
     header?: React.ReactNode
@@ -6,7 +6,7 @@ type Props = {
     columnWidth?: string
 }
 
-const KanbanColumn: React.FC<Props> = ({header, children, columnWidth = 'w-72'}) => {
+const KanbanColumn: React.FC<Props> = ({ header, children, columnWidth = "w-72" }) => {
     const ref = React.useRef<HTMLDivElement>(null);
 
     // React.useEffect(() => {
@@ -30,11 +30,11 @@ const KanbanColumn: React.FC<Props> = ({header, children, columnWidth = 'w-72'})
     return (
         <div className={`flex flex-col flex-shrink-0 ${columnWidth}`}>
             {header}
-            <div ref={ref} className='flex flex-col mt-3 overflow-auto'>
+            <div ref={ref} className="flex flex-col mt-3 overflow-auto">
                 {children}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default KanbanColumn
+export default KanbanColumn;

@@ -1,17 +1,15 @@
-import React, {useState} from "react";
-import {BsCheckCircle, BsSearch} from "react-icons/bs";
+import React, { useState } from "react";
+import { BsCheckCircle, BsSearch } from "react-icons/bs";
 import Image from "next/image";
-import EmptyState, {EMPTY_STATE_TYPE} from "../EmptyState";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 import Modal from "../Modal/Modal";
 import TransitionModal from "../Modal/TransitionModal";
 import useDebounce from "../../hooks/useDebounce";
-import {useQuery} from "@tanstack/react-query";
-import {IGroup} from "../../types/Group/IGroup";
-import {GroupService} from "../../services/GroupService";
-import {useAuth} from "../../context/AuthContext";
-import {getAvatarFromName} from "../../utils/helper";
-import { IAuthor } from './../../types/Author/IAuthor';
-import { AuthorService } from './../../old-services/AuthorService';
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
+import { getAvatarFromName } from "../../utils/helper";
+import { IAuthor } from "./../../types/Author/IAuthor";
+import { AuthorService } from "./../../old-services/AuthorService";
 
 type Props = {
     isOpen: boolean;
@@ -21,12 +19,12 @@ type Props = {
 };
 
 const SelectAuthorModal: React.FC<Props> = ({
-                                                       isOpen,
-                                                       onClose,
-                                                       selectedAuthors,
-                                                       onItemSelect,
-                                                   }) => {
-    const {loginUser} = useAuth();
+                                                isOpen,
+                                                onClose,
+                                                selectedAuthors,
+                                                onItemSelect,
+                                            }) => {
+    const { loginUser } = useAuth();
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounce(search, 500);
     const authorService = new AuthorService();
@@ -36,7 +34,7 @@ const SelectAuthorModal: React.FC<Props> = ({
         onClose();
     };
 
-    const {data: authors, isLoading} = useQuery(
+    const { data: authors, isLoading } = useQuery(
         ["authors", debouncedSearch],
         () =>
             authorService.getAuthors({
@@ -44,8 +42,8 @@ const SelectAuthorModal: React.FC<Props> = ({
                 status: true,
             }), {
             keepPreviousData: true,
-            select: (data) => data?.data
-        }
+            select: (data) => data?.data,
+        },
     );
 
     return (
@@ -57,7 +55,7 @@ const SelectAuthorModal: React.FC<Props> = ({
         >
             <div className="overflow-hidden rounded-xl">
                 <div>
-                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                    <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Tìm kiếm tác giả"
@@ -70,7 +68,7 @@ const SelectAuthorModal: React.FC<Props> = ({
                     {!isLoading && authors ? (
                         authors?.map((author) => {
                             const isSelected = selectedAuthors?.find(
-                                (o) => o?.id === author?.id
+                                (o) => o?.id === author?.id,
                             );
                             return (
                                 <div
@@ -106,7 +104,7 @@ const SelectAuthorModal: React.FC<Props> = ({
 
                                     {isSelected && (
                                         <div className="absolute top-1/2 right-4 -translate-y-1/2 transform">
-                                            <BsCheckCircle className="text-green-500"/>
+                                            <BsCheckCircle className="text-green-500" />
                                         </div>
                                     )}
                                 </div>

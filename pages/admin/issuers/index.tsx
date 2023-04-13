@@ -1,4 +1,3 @@
-import { faker } from "@faker-js/faker/locale/vi";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Fragment, ReactElement, useState } from "react";
@@ -16,9 +15,7 @@ import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import LoadingTopPage from "../../../components/LoadingTopPage";
-import IssuerModal, {
-    IssuerModalMode,
-} from "../../../components/Modal/IssuerModal";
+import IssuerModal, { IssuerModalMode } from "../../../components/Modal/IssuerModal";
 import StatusCard from "../../../components/StatusCard";
 import { Roles } from "../../../constants/Roles";
 import { useAuth } from "../../../context/AuthContext";
@@ -32,7 +29,7 @@ const AdminIssuersPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
     const userService = new UserService(loginUser?.accessToken);
     const [selectedIssuer, setSelectedIssuer] = useState<IUser | undefined>(
-        undefined
+        undefined,
     );
 
     const {
@@ -65,7 +62,7 @@ const AdminIssuersPage: NextPageWithLayout = () => {
             }),
         {
             keepPreviousData: true,
-        }
+        },
     );
 
     if (isLoading) return <LoadingSpinnerWithOverlay />;
@@ -115,7 +112,7 @@ const AdminIssuersPage: NextPageWithLayout = () => {
                                                     src={
                                                         issuer?.imageUrl &&
                                                         isValidImageSrc(
-                                                            issuer?.imageUrl
+                                                            issuer?.imageUrl,
                                                         )
                                                             ? issuer?.imageUrl
                                                             : DefaultAvatar.src
@@ -185,7 +182,7 @@ const AdminIssuersPage: NextPageWithLayout = () => {
                         onSizeChange={onSizeChange}
                         page={page}
                         onPageChange={(page) => setPage(page)}
-                        totalPages={issuerData?.metadata?.total || 0}
+                        totalElements={issuerData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />
                 </TableWrapper>

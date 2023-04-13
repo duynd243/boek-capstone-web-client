@@ -1,11 +1,11 @@
 import React from "react";
-import {CampaignFormats, getCampaignFormatById,} from "../../constants/CampaignFormats";
+import { CampaignFormats, getCampaignFormatById } from "../../constants/CampaignFormats";
 
 type Props = {
     formatId?: number;
 };
 
-const FormatCard = ({formatId}: Props) => {
+const FormatCard = ({ formatId }: Props) => {
     let iconFill = "";
     let borderColor = "";
     let textColor = "text-slate-600";

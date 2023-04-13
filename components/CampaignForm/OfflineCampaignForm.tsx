@@ -1,23 +1,23 @@
-import {Transition} from "@headlessui/react";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useMutation} from "@tanstack/react-query";
-import {format} from "date-fns";
+import { Transition } from "@headlessui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
-import {useRouter} from "next/router";
-import React, {Fragment, useContext, useEffect, useState} from "react";
-import {Controller, FormProvider, useFieldArray, useForm,} from "react-hook-form";
-import {toast} from "react-hot-toast";
-import {z} from "zod";
-import {useAuth} from "../../context/AuthContext";
-import {CampaignContext} from "../../context/CampaignContext";
+import { useRouter } from "next/router";
+import React, { Fragment, useContext, useEffect, useState } from "react";
+import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { z } from "zod";
+import { useAuth } from "../../context/AuthContext";
+import { CampaignContext } from "../../context/CampaignContext";
 import useAddress from "../../hooks/useAddress";
-import {CampaignService} from "../../services/CampaignService";
-import {ImageUploadService} from "../../services/ImageUploadService";
-import {IDistrict} from "../../types/Address/IDistrict";
-import {IProvince} from "../../types/Address/IProvince";
-import {IWard} from "../../types/Address/IWard";
-import {getAvatarFromName, isImageFile, isValidFileSize,} from "../../utils/helper";
+import { CampaignService } from "../../services/CampaignService";
+import { ImageUploadService } from "../../services/ImageUploadService";
+import { IDistrict } from "../../types/Address/IDistrict";
+import { IProvince } from "../../types/Address/IProvince";
+import { IWard } from "../../types/Address/IWard";
+import { getAvatarFromName, isImageFile, isValidFileSize } from "../../utils/helper";
 import CreateButton from "../Admin/CreateButton";
 import TableBody from "../Admin/Table/TableBody";
 import TableData from "../Admin/Table/TableData";
@@ -25,7 +25,7 @@ import TableHeader from "../Admin/Table/TableHeader";
 import TableHeading from "../Admin/Table/TableHeading";
 import TableWrapper from "../Admin/Table/TableWrapper";
 import CampaignOrganizationCard from "../CampaignSchedule/CampaignOrganizationCard";
-import Form, {defaultInputClass} from "../Form";
+import Form, { defaultInputClass } from "../Form";
 import ErrorMessage from "../Form/ErrorMessage";
 import DateTimePickerModal from "../Modal/DateTimePickerModal";
 import SelectBox from "../SelectBox";
@@ -38,7 +38,6 @@ import {
     NonRecurringOfflineCampaignSchema,
     RecurringOfflineCampaignSchema,
 } from "./shared";
-import useCampaign from "../../hooks/useCampaign";
 
 type Props = {
     action: "CREATE" | "UPDATE";
@@ -53,8 +52,8 @@ export type OfflineCampaignFormType = Partial<
     z.infer<typeof OfflineCampaignFormSchema>
 >;
 
-const OfflineCampaignForm: React.FC<Props> = ({action}) => {
-    const {loginUser} = useAuth();
+const OfflineCampaignForm: React.FC<Props> = ({ action }) => {
+    const { loginUser } = useAuth();
 
     const campaign = useContext(CampaignContext);
 
@@ -63,7 +62,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
     const router = useRouter();
 
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
 
     const createOfflineCampaignMutation = useMutation(
@@ -72,10 +71,10 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
             onSuccess: async (data) => {
                 await router.push({
                     pathname: "/admin/campaigns/[id]",
-                    query: {id: data.id},
+                    query: { id: data.id },
                 });
             },
-        }
+        },
     );
 
     const updateOfflineCampaignMutation = useMutation(
@@ -84,10 +83,10 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
             onSuccess: async (data) => {
                 await router.push({
                     pathname: "/admin/campaigns/[id]",
-                    query: {id: data.id},
+                    query: { id: data.id },
                 });
             },
-        }
+        },
     );
 
     const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -121,7 +120,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                         (file) => file instanceof File && isImageFile(file),
                         {
                             message: "Ảnh bìa không được để trống",
-                        }
+                        },
                     ),
     });
 
@@ -136,8 +135,8 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                 {
                     message: "Thời gian kết thúc phải sau thời gian bắt đầu",
                     path: ["endDate"],
-                }
-            )
+                },
+            ),
             //     .refine(
             //     (data) => {
             //         // at least two schedules
@@ -169,7 +168,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
         control,
         handleSubmit,
         watch,
-        formState: {errors, isSubmitting},
+        formState: { errors, isSubmitting },
     } = formMethods;
 
     useEffect(() => {
@@ -259,7 +258,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
     const selectedCommissions = watch("campaignCommissions") || [];
 
     const onSubmit = async (data: OfflineCampaignFormType) => {
-        console.log('here')
+        console.log("here");
         if (data.previewFile) {
             try {
                 await toast.promise(
@@ -273,13 +272,13 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
             }
         }
-        if (action === 'CREATE') {
+        if (action === "CREATE") {
             try {
                 const payload = FinalSchema.parse(data);
                 await toast.promise(
@@ -292,14 +291,14 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                         error: (error) => {
                             return error?.message || "Tạo hội sách thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
             }
         }
 
-        if (action === 'UPDATE') {
+        if (action === "UPDATE") {
             try {
                 const payload = FinalSchema.parse(data);
                 await toast.promise(
@@ -315,7 +314,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                         error: (error) => {
                             return error?.message || "Cập nhật hội sách thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -365,7 +364,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                             label={"Mô tả"}
                             errorMessage={errors.description?.message}
                         />
-                        <Form.Label label={"Ảnh bìa"} required={true}/>
+                        <Form.Label label={"Ảnh bìa"} required={true} />
                         <div>
                             <Controller
                                 rules={{
@@ -373,25 +372,25 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                 }}
                                 control={control}
                                 name={"previewFile"}
-                                render={({field, fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <Form.ImageUploadPanel
                                         defaultImageURL={watch("imageUrl")}
                                         label={`PNG, JPG, GIF tối đa ${MAX_FILE_SIZE_IN_MB}MB`}
                                         onChange={(file) => {
                                             if (!isImageFile(file)) {
                                                 toast.error(
-                                                    message.NOT_IMAGE_TYPE
+                                                    message.NOT_IMAGE_TYPE,
                                                 );
                                                 return false;
                                             }
                                             if (
                                                 !isValidFileSize(
                                                     file,
-                                                    MAX_FILE_SIZE_IN_MB
+                                                    MAX_FILE_SIZE_IN_MB,
                                                 )
                                             ) {
                                                 toast.error(
-                                                    message.INVALID_IMAGE_SIZE
+                                                    message.INVALID_IMAGE_SIZE,
                                                 );
                                                 return false;
                                             }
@@ -415,7 +414,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                             )}
                         </div>
                     </div>
-                    <Form.Divider/>
+                    <Form.Divider />
                     <Form.GroupLabel
                         label={"Thời gian và địa điểm"}
                         description={"Thời gian và địa điểm tổ chức hội sách"}
@@ -430,7 +429,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                 <Controller
                                     control={control}
                                     name="startDate"
-                                    render={({field}) => {
+                                    render={({ field }) => {
                                         return (
                                             <>
                                                 <DateTimePickerModal
@@ -441,17 +440,17 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                     isOpen={showStartDatePicker}
                                                     onDismiss={() =>
                                                         setShowStartDatePicker(
-                                                            false
+                                                            false,
                                                         )
                                                     }
                                                     onClose={(date) => {
                                                         if (date) {
                                                             field.onChange(
-                                                                date
+                                                                date,
                                                             );
                                                         }
                                                         setShowStartDatePicker(
-                                                            false
+                                                            false,
                                                         );
                                                     }}
                                                 />
@@ -462,13 +461,13 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                         field.value
                                                             ? format(
                                                                 field.value,
-                                                                "dd/MM/yyyy hh:mm a"
+                                                                "dd/MM/yyyy hh:mm a",
                                                             )
                                                             : ""
                                                     }
                                                     onClick={() =>
                                                         setShowStartDatePicker(
-                                                            true
+                                                            true,
                                                         )
                                                     }
                                                 />
@@ -491,7 +490,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                 <Controller
                                     control={control}
                                     name="endDate"
-                                    render={({field}) => {
+                                    render={({ field }) => {
                                         console.log(field);
                                         return (
                                             <>
@@ -503,20 +502,20 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                     isOpen={showEndDatePicker}
                                                     onDismiss={() =>
                                                         setShowEndDatePicker(
-                                                            false
+                                                            false,
                                                         )
                                                     }
                                                     onClose={(date) => {
                                                         if (date) {
                                                             field.onChange(
-                                                                date
+                                                                date,
                                                             );
                                                             console.log(
-                                                                watch("endDate")
+                                                                watch("endDate"),
                                                             );
                                                         }
                                                         setShowEndDatePicker(
-                                                            false
+                                                            false,
                                                         );
                                                     }}
                                                 />
@@ -526,13 +525,13 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                         field.value
                                                             ? format(
                                                                 field.value,
-                                                                "dd/MM/yyyy hh:mm a"
+                                                                "dd/MM/yyyy hh:mm a",
                                                             )
                                                             : ""
                                                     }
                                                     onClick={() =>
                                                         setShowEndDatePicker(
-                                                            true
+                                                            true,
                                                         )
                                                     }
                                                 />
@@ -570,7 +569,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                 <Controller
                                     control={control}
                                     name="addressRequest.provinceCode"
-                                    render={({field}) => {
+                                    render={({ field }) => {
                                         return (
                                             <SelectBox<IProvince>
                                                 value={selectedProvince}
@@ -579,7 +578,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                     if (
                                                         p.code ===
                                                         watch(
-                                                            "addressRequest.provinceCode"
+                                                            "addressRequest.provinceCode",
                                                         )
                                                     )
                                                         return;
@@ -587,11 +586,11 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                     field.onChange(p.code);
                                                     setValue(
                                                         "addressRequest.districtCode" as any,
-                                                        undefined
+                                                        undefined,
                                                     );
                                                     setValue(
                                                         "addressRequest.wardCode" as any,
-                                                        undefined
+                                                        undefined,
                                                     );
                                                     handleProvinceChange(p);
                                                 }}
@@ -618,7 +617,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                 <Controller
                                     control={control}
                                     name="addressRequest.districtCode"
-                                    render={({field}) => {
+                                    render={({ field }) => {
                                         return (
                                             <SelectBox<IDistrict>
                                                 value={selectedDistrict}
@@ -627,14 +626,14 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                     if (
                                                         d.code ===
                                                         watch(
-                                                            "addressRequest.districtCode"
+                                                            "addressRequest.districtCode",
                                                         )
                                                     )
                                                         return;
                                                     field.onChange(d.code);
                                                     setValue(
                                                         "addressRequest.wardCode" as any,
-                                                        undefined
+                                                        undefined,
                                                     );
                                                     handleDistrictChange(d);
                                                 }}
@@ -661,7 +660,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                 <Controller
                                     control={control}
                                     name="addressRequest.wardCode"
-                                    render={({field}) => {
+                                    render={({ field }) => {
                                         return (
                                             <SelectBox<IWard>
                                                 value={selectedWard}
@@ -670,7 +669,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                     if (
                                                         w.code ===
                                                         watch(
-                                                            "addressRequest.wardCode"
+                                                            "addressRequest.wardCode",
                                                         )
                                                     )
                                                         return;
@@ -695,7 +694,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                         </div>
                     </div>
 
-                    <Form.Divider/>
+                    <Form.Divider />
                     <Form.GroupLabel
                         label={"Các tổ chức và chuỗi hội sách"}
                         description={
@@ -723,14 +722,14 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                 return {
                                                     id: o.organizationId,
                                                 };
-                                            }
+                                            },
                                         ) || []
                                     }
                                     onItemSelect={(o) => {
                                         const index = watch(
-                                            "campaignOrganizations"
+                                            "campaignOrganizations",
                                         )?.findIndex(
-                                            (c) => c.organizationId === o.id
+                                            (c) => c.organizationId === o.id,
                                         );
                                         if (index !== -1) return;
                                         appendOrganization({
@@ -758,10 +757,10 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                         }
                                         handleRemoveOrganization={(org) => {
                                             const index = watch(
-                                                "campaignOrganizations"
+                                                "campaignOrganizations",
                                             )?.findIndex(
                                                 (c) =>
-                                                    c.organizationId === org.id
+                                                    c.organizationId === org.id,
                                             );
                                             if (index === -1) return;
                                             removeOrganization(index);
@@ -793,11 +792,11 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                             key={org?.id}
                                             onRemove={() => {
                                                 const index = watch(
-                                                    "campaignOrganizations"
+                                                    "campaignOrganizations",
                                                 )?.findIndex(
                                                     (c) =>
                                                         c.organizationId ===
-                                                        org.id
+                                                        org.id,
                                                 );
                                                 if (index === -1) return;
                                                 removeOrganization(index);
@@ -822,7 +821,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                         </ErrorMessage>
                     </div>
 
-                    <Form.Divider/>
+                    <Form.Divider />
                     <Form.GroupLabel
                         required={true}
                         label="Thể loại và chiết khấu"
@@ -884,7 +883,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                                         }
                                                                         className="h-10 w-10 rounded-full object-cover"
                                                                         src={getAvatarFromName(
-                                                                            commission?.genreName
+                                                                            commission?.genreName,
                                                                         )}
                                                                         alt=""
                                                                     />
@@ -902,7 +901,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                             <input
                                                                 type={"number"}
                                                                 {...register(
-                                                                    `campaignCommissions.[${index}].minimalCommission` as `campaignCommissions.${number}.minimalCommission`
+                                                                    `campaignCommissions.[${index}].minimalCommission` as `campaignCommissions.${number}.minimalCommission`,
                                                                 )}
                                                                 className={
                                                                     defaultInputClass
@@ -913,7 +912,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                             <button
                                                                 onClick={() =>
                                                                     removeCommission(
-                                                                        index
+                                                                        index,
                                                                     )
                                                                 }
                                                                 className="text-rose-600 hover:text-rose-800"
@@ -944,7 +943,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                                                     )}
                                                 </Fragment>
                                             );
-                                        }
+                                        },
                                     )
                                 ) : (
                                     <tr>
@@ -965,7 +964,7 @@ const OfflineCampaignForm: React.FC<Props> = ({action}) => {
                             </ErrorMessage>
                         )}
                     </div>
-                    <Form.Divider/>
+                    <Form.Divider />
                     <div className="flex justify-end gap-4">
                         <Link
                             href={"/admin/campaigns"}

@@ -1,24 +1,24 @@
-import React, {Fragment, useState} from 'react'
-import {useAuth} from "../../context/AuthContext";
+import React, { Fragment, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 import LoginSignUpLayout from "../../components/Layout/LoginSignUpLayout";
-import {NextPageWithLayout} from "../_app";
+import { NextPageWithLayout } from "../_app";
 import Form from "../../components/Form";
-import {Controller, useForm} from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import SelectBox from "../../components/SelectBox";
-import {IProvince} from "../../types/Address/IProvince";
+import { IProvince } from "../../types/Address/IProvince";
 import ErrorMessage from "../../components/Form/ErrorMessage";
-import {IDistrict} from "../../types/Address/IDistrict";
-import {IWard} from "../../types/Address/IWard";
+import { IDistrict } from "../../types/Address/IDistrict";
+import { IWard } from "../../types/Address/IWard";
 import useAddress from "../../hooks/useAddress";
-import {z} from "zod";
+import { z } from "zod";
 import Image from "next/image";
-import {BsSearch} from "react-icons/bs";
-import {useQuery} from "@tanstack/react-query";
-import {OrganizationService} from "../../services/OrganizationService";
-import {IoPeople} from "react-icons/io5";
-import {AiFillShop} from "react-icons/ai";
-import {GroupService} from "../../services/GroupService";
-import {getAvatarFromName} from "../../utils/helper";
+import { BsSearch } from "react-icons/bs";
+import { useQuery } from "@tanstack/react-query";
+import { OrganizationService } from "../../services/OrganizationService";
+import { IoPeople } from "react-icons/io5";
+import { AiFillShop } from "react-icons/ai";
+import { GroupService } from "../../services/GroupService";
+import { getAvatarFromName } from "../../utils/helper";
 
 const formSteps = [
     {
@@ -29,32 +29,32 @@ const formSteps = [
         title: "Tổ chức mà bạn thuộc về 🏢",
     }, {
         title: "Chọn nhóm đề tài 📚",
-    }
-]
+    },
+];
 
-const StepNumber = ({step, isActive}: { step: number, isActive: boolean }) => {
+const StepNumber = ({ step, isActive }: { step: number, isActive: boolean }) => {
     return <li>
         <button
             className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold ${isActive ? "bg-indigo-500 text-white" : "bg-slate-100 text-slate-500"}`}
         >
             {step}
         </button>
-    </li>
-}
+    </li>;
+};
 
 const genderOptions = {
     MALE: {
         label: "Nam",
-        value: true
+        value: true,
     },
     FEMALE: {
         label: "Nữ",
-        value: false
-    }
-} satisfies Record<string, { label: string, value: boolean }>
+        value: false,
+    },
+} satisfies Record<string, { label: string, value: boolean }>;
 
 const CompleteProfilePage: NextPageWithLayout = () => {
-    const {user, cancelCreateUser} = useAuth();
+    const { user, cancelCreateUser } = useAuth();
     const orgService = new OrganizationService();
     const groupService = new GroupService();
     const {
@@ -65,7 +65,7 @@ const CompleteProfilePage: NextPageWithLayout = () => {
         ["organizations"],
         () =>
             orgService.getOrganizations({
-                name: '',
+                name: "",
                 size: 1000,
                 withCustomers: true,
                 withCampaigns: true,
@@ -78,7 +78,7 @@ const CompleteProfilePage: NextPageWithLayout = () => {
         ["groups"],
         () =>
             groupService.getGroups({
-                name: '',
+                name: "",
                 size: 1000,
                 withCustomers: true,
                 withCampaigns: true,
@@ -111,23 +111,23 @@ const CompleteProfilePage: NextPageWithLayout = () => {
             detail: z.string(),
             provinceCode: z.number(),
             districtCode: z.number(),
-            wardCode: z.number()
+            wardCode: z.number(),
         }),
         dob: z.string(),
         phone: z.string(),
         organizationIds: z.array(z.number()),
-        groupIds: z.array(z.number())
-    })
+        groupIds: z.array(z.number()),
+    });
 
     type FormType = Partial<z.infer<typeof FormSchema>>;
 
 
-    const {register, control, watch, setValue, handleSubmit, formState: {errors, isValid}} = useForm<FormType>({
+    const { register, control, watch, setValue, handleSubmit, formState: { errors, isValid } } = useForm<FormType>({
         defaultValues: {
             name: user?.displayName || "",
             phone: user?.phoneNumber || "",
             gender: true,
-        }
+        },
     });
 
     return (
@@ -142,7 +142,7 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                              aria-hidden="true"></div>
                         <ul className="relative flex justify-between w-full">
                             {formSteps.map((s, i) => (
-                                <StepNumber key={i} step={i + 1} isActive={i + 1 <= step}/>
+                                <StepNumber key={i} step={i + 1} isActive={i + 1 <= step} />
                             ))}
                         </ul>
                     </div>
@@ -151,25 +151,25 @@ const CompleteProfilePage: NextPageWithLayout = () => {
 
             <form>
                 {step === 1 &&
-                    <div className='space-y-4'>
+                    <div className="space-y-4">
                         <Form.Input<FormType>
                             required={true}
                             register={register}
-                            fieldName={'name'}
-                            placeholder={'Nhập họ và tên'}
-                            label={'Họ và tên'}/>
+                            fieldName={"name"}
+                            placeholder={"Nhập họ và tên"}
+                            label={"Họ và tên"} />
                         <Form.Input<FormType>
                             required={true}
                             register={register}
-                            fieldName={'phone'}
-                            placeholder={'Nhập số điện thoại'}
-                            label={'Số điện thoại'}/>
+                            fieldName={"phone"}
+                            placeholder={"Nhập số điện thoại"}
+                            label={"Số điện thoại"} />
                         <div>
                             <Form.Label
-                                label='Sinh nhật'
+                                label="Sinh nhật"
                                 required={true}
                             />
-                            <Form.DateTimeInputField placeholder='dd/mm/yyyy' value={''}/>
+                            <Form.DateTimeInputField placeholder="dd/mm/yyyy" value={""} />
                         </div>
 
                         <div>
@@ -180,13 +180,13 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                             <Controller
                                 control={control}
                                 name="gender"
-                                render={({field}) => {
+                                render={({ field }) => {
                                     return (
                                         <SelectBox<{
                                             label: string;
                                             value: boolean;
                                         }>
-                                            value={watch('gender') ? genderOptions.MALE : genderOptions.FEMALE}
+                                            value={watch("gender") ? genderOptions.MALE : genderOptions.FEMALE}
                                             placeholder="Giới tính"
                                             onValueChange={(g) => {
                                                 field.onChange(g.value);
@@ -204,13 +204,13 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                 }
 
                 {step === 2 &&
-                    <div className='space-y-4'>
+                    <div className="space-y-4">
                         <Form.Input<FormType>
                             required={true}
                             register={register}
-                            fieldName={'address.detail'}
-                            placeholder={'Nhập địa chỉ'}
-                            label={'Địa chỉ'}/>
+                            fieldName={"address.detail"}
+                            placeholder={"Nhập địa chỉ"}
+                            label={"Địa chỉ"} />
                         {/*Tỉnh*/}
                         <div>
                             <Form.Label
@@ -220,7 +220,7 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                             <Controller
                                 control={control}
                                 name="address.provinceCode"
-                                render={({field}) => {
+                                render={({ field }) => {
                                     return (
                                         <SelectBox<IProvince>
                                             value={selectedProvince}
@@ -230,7 +230,7 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                                                 if (
                                                     p.code ===
                                                     watch(
-                                                        "address.provinceCode"
+                                                        "address.provinceCode",
                                                     )
                                                 )
                                                     return;
@@ -238,11 +238,11 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                                                 field.onChange(p.code);
                                                 setValue(
                                                     "address.districtCode" as any,
-                                                    undefined
+                                                    undefined,
                                                 );
                                                 setValue(
                                                     "address.wardCode" as any,
-                                                    undefined
+                                                    undefined,
                                                 );
                                                 handleProvinceChange(p);
                                             }}
@@ -271,7 +271,7 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                                 control={control}
                                 disabled={districtsLoading}
                                 name="address.districtCode"
-                                render={({field}) => {
+                                render={({ field }) => {
                                     return (
                                         <SelectBox<IDistrict>
                                             value={selectedDistrict}
@@ -280,14 +280,14 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                                                 if (
                                                     d.code ===
                                                     watch(
-                                                        "address.districtCode"
+                                                        "address.districtCode",
                                                     )
                                                 )
                                                     return;
                                                 field.onChange(d.code);
                                                 setValue(
                                                     "address.wardCode" as any,
-                                                    undefined
+                                                    undefined,
                                                 );
                                                 handleDistrictChange(d);
                                             }}
@@ -315,7 +315,7 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                             <Controller
                                 control={control}
                                 name="address.wardCode"
-                                render={({field}) => {
+                                render={({ field }) => {
                                     return (
                                         <SelectBox<IWard>
                                             disabled={wardsLoading}
@@ -325,7 +325,7 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                                                 if (
                                                     w.code ===
                                                     watch(
-                                                        "address.wardCode"
+                                                        "address.wardCode",
                                                     )
                                                 )
                                                     return;
@@ -351,8 +351,8 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                 }
                 {step === 3 &&
                     <div className="relative rounded overflow-hidden bg-white shadow">
-                        <div className='overflow-hidden'>
-                            <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                        <div className="overflow-hidden">
+                            <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm"
@@ -362,27 +362,27 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                         </div>
                         <div className="max-h-72 overflow-y-auto">
                             {orgData?.data?.map((org, i) => (
-                                <div key={org?.id} className='flex hover:bg-gray-50 bg-white border-b py-4 px-6'>
-                                    <Image src={org?.imageUrl || ''}
-                                           alt=''
-                                           className='rounded-full w-10 h-10 object-cover'
+                                <div key={org?.id} className="flex hover:bg-gray-50 bg-white border-b py-4 px-6">
+                                    <Image src={org?.imageUrl || ""}
+                                           alt=""
+                                           className="rounded-full w-10 h-10 object-cover"
                                            width={200}
-                                           height={200}/>
+                                           height={200} />
                                     <div className="ml-4 space-y-1.5 flex-1">
                                         <div className="text-sm font-medium text-gray-900">{org?.name}</div>
-                                        <div className='flex flex-col gap-2'>
-                                            <div className='flex items-center text-sm text-gray-600'>
-                                                <AiFillShop/>
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex items-center text-sm text-gray-600">
+                                                <AiFillShop />
                                                 <span className="ml-1">{org?.campaigns?.length} hội sách</span>
                                             </div>
-                                            <div className='flex items-center text-sm text-gray-600'>
-                                                <IoPeople/>
+                                            <div className="flex items-center text-sm text-gray-600">
+                                                <IoPeople />
                                                 <span className="ml-1">{org?.customers?.length} khách hàng thuộc về tổ chức</span>
                                             </div>
                                         </div>
                                     </div>
                                     <input type="checkbox"
-                                           className="self-center rounded-full w-4 h-4 border border-slate-200 bg-gray-100"/>
+                                           className="self-center rounded-full w-4 h-4 border border-slate-200 bg-gray-100" />
                                 </div>
                             ))}
                         </div>
@@ -391,8 +391,8 @@ const CompleteProfilePage: NextPageWithLayout = () => {
 
                 {step === 4 &&
                     <div className="relative rounded overflow-hidden bg-white shadow">
-                        <div className='overflow-hidden'>
-                            <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400"/>
+                        <div className="overflow-hidden">
+                            <BsSearch className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm"
@@ -402,27 +402,27 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                         </div>
                         <div className="max-h-72 overflow-y-auto">
                             {groupData?.data?.map((group, i) => (
-                                <div key={group?.id} className='flex bg-white border-b py-4 px-6'>
+                                <div key={group?.id} className="flex bg-white border-b py-4 px-6">
                                     <Image src={getAvatarFromName(group?.name, 1)}
-                                           alt=''
-                                           className='rounded-full w-10 h-10 object-cover'
+                                           alt=""
+                                           className="rounded-full w-10 h-10 object-cover"
                                            width={200}
-                                           height={200}/>
+                                           height={200} />
                                     <div className="ml-4 space-y-1.5 flex-1">
                                         <div className="text-sm font-medium text-gray-900">{group?.name}</div>
-                                        <div className='flex flex-col gap-2'>
-                                            <div className='flex items-center text-sm text-gray-600'>
-                                                <AiFillShop/>
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex items-center text-sm text-gray-600">
+                                                <AiFillShop />
                                                 <span className="ml-1">{group?.campaigns?.length} hội sách</span>
                                             </div>
-                                            <div className='flex items-center text-sm text-gray-600'>
-                                                <IoPeople/>
+                                            <div className="flex items-center text-sm text-gray-600">
+                                                <IoPeople />
                                                 <span className="ml-1">{group?.customers?.length} người chọn nhóm</span>
                                             </div>
                                         </div>
                                     </div>
                                     <input type="checkbox"
-                                           className="self-center rounded-full w-4 h-4 border border-slate-200 bg-gray-100"/>
+                                           className="self-center rounded-full w-4 h-4 border border-slate-200 bg-gray-100" />
                                 </div>
                             ))}
                         </div>
@@ -431,21 +431,21 @@ const CompleteProfilePage: NextPageWithLayout = () => {
 
 
                 <div className="flex items-center justify-between mt-8">
-                    <button type='button'
+                    <button type="button"
                             disabled={step === 1}
                             onClick={() => {
                                 if (step > 1) {
-                                    setStep(step - 1)
+                                    setStep(step - 1);
                                 }
                             }}
                             className="text-sm text-slate-600">&lt;- Quay lại
                     </button>
-                    <button type='button' onClick={() => {
+                    <button type="button" onClick={() => {
                         if (step < formSteps.length && isValid) {
-                            setStep(step + 1)
+                            setStep(step + 1);
                         }
                     }} className="m-btn bg-indigo-500 hover:bg-indigo-600 text-white ml-auto">
-                        {step === formSteps.length ? 'Tạo tài khoản' : 'Tiếp theo ->'}
+                        {step === formSteps.length ? "Tạo tài khoản" : "Tiếp theo ->"}
                     </button>
                 </div>
 
@@ -461,12 +461,12 @@ const CompleteProfilePage: NextPageWithLayout = () => {
             </div>
             <pre>{JSON.stringify(watch(), null, 2)}</pre>
         </Fragment>
-    )
-}
+    );
+};
 
 CompleteProfilePage.getLayout = (page) =>
     <LoginSignUpLayout
-        childrenWrapperClass='mx-auto w-full max-w-lg px-4 py-8'>{page}</LoginSignUpLayout>
+        childrenWrapperClass="mx-auto w-full max-w-lg px-4 py-8">{page}</LoginSignUpLayout>
 ;
 
-export default CompleteProfilePage
+export default CompleteProfilePage;

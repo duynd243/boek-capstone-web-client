@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { Roles } from "../../constants/Roles";
 import { UserService } from "../../services/UserService";
-import { GenreService } from "../../services/GenreService";
 
 export default function useCustomerSearchWithFilterPage(
     setPage: (page: number) => void,

@@ -1,9 +1,9 @@
 export const CampaignStaffStatuses = {
-    Attended : {
+    Attended: {
         id: 1,
         displayName: "Đang tham gia",
     },
-    Unattended : {
+    Unattended: {
         id: 2,
         displayName: "Không tham gia",
     },

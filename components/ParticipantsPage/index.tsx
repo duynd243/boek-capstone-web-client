@@ -11,7 +11,6 @@ import Kanban from "../Kanban";
 import ParticipantColumn from "../ParticipantColumn";
 import SelectBox from "../SelectBox";
 import { Roles } from "../../constants/Roles";
-import { toast } from "react-hot-toast";
 
 type Props = {}
 
@@ -23,8 +22,8 @@ const ParticipantsPage: React.FC<Props> = ({}) => {
     );
 
     useEffect(() => {
-        if(urlTab === 'request') {
-           setSelectedFlowTab(ParticipantFlowTabs[1])
+        if (urlTab === "request") {
+            setSelectedFlowTab(ParticipantFlowTabs[1]);
         }
     }, [urlTab]);
 

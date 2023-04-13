@@ -1,46 +1,41 @@
-import React, { Fragment, ReactElement, useMemo, useState } from 'react'
+import React, { Fragment, ReactElement, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../../../../_app";
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "../../../../../../components/Layout/AdminLayout";
 import { useRouter } from "next/router";
 import FormPageLayout from "../../../../../../components/Layout/FormPageLayout";
 import WelcomeBanner from "../../../../../../components/WelcomBanner";
-import { FormikProvider, useFormik } from "formik";
 import Form from "../../../../../../components/Form";
-import * as Yup from "yup";
 import SelectBox from "../../../../../../components/SelectBox";
 import ErrorMessage from "../../../../../../components/Form/ErrorMessage";
-import { getFormatsOfBook, getIntersectedFormatOfBooks, isImageFile } from "../../../../../../utils/helper";
+import { isImageFile } from "../../../../../../utils/helper";
 import CreateButton from "../../../../../../components/Admin/CreateButton";
 import { toast } from "react-hot-toast";
 import SelectSellingBookComboModal
     from "../../../../../../components/SelectSellingBookCombo/SelectSellingBookComboModal";
 import { IBook } from "../../../../../../types/Book/IBook";
-import SelectSellingBookComboTable
-    from "../../../../../../components/SelectSellingBookCombo/SelectSellingBookComboTable";
 import { BookFormats, IBookFormat } from "../../../../../../constants/BookFormats";
-import { useAuth } from '../../../../../../context/AuthContext';
-import { BookService } from './../../../../../../services/BookService';
-import { BookProductService } from './../../../../../../services/BookProductService';
-import { CampaignService } from './../../../../../../services/CampaignService';
-import { any, z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { getBookProductsFormatOptions, isValidFileSize } from './../../../../../../utils/helper';
-import { useForm, Controller } from 'react-hook-form';
-import { getBookFormatById } from './../../../../../../constants/BookFormats';
-import { IoChevronBack } from 'react-icons/io5';
-import TableWrapper from './../../../../../../components/Admin/Table/TableWrapper';
-import TableHeading from './../../../../../../components/Admin/Table/TableHeading';
-import TableBody from './../../../../../../components/Admin/Table/TableBody';
-import TableData from './../../../../../../components/Admin/Table/TableData';
+import { useAuth } from "../../../../../../context/AuthContext";
+import { BookService } from "./../../../../../../services/BookService";
+import { BookProductService } from "./../../../../../../services/BookProductService";
+import { CampaignService } from "./../../../../../../services/CampaignService";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { getBookProductsFormatOptions, isValidFileSize } from "./../../../../../../utils/helper";
+import { Controller, useForm } from "react-hook-form";
+import { getBookFormatById } from "./../../../../../../constants/BookFormats";
+import { IoChevronBack } from "react-icons/io5";
+import TableWrapper from "./../../../../../../components/Admin/Table/TableWrapper";
+import TableHeading from "./../../../../../../components/Admin/Table/TableHeading";
+import TableBody from "./../../../../../../components/Admin/Table/TableBody";
+import TableData from "./../../../../../../components/Admin/Table/TableData";
 import Image from "next/image";
 import TableHeader from "../../../../../../components/Admin/Table/TableHeader";
-import { GenreService } from './../../../../../../services/GenreService';
-import { IGenre } from './../../../../../../types/Genre/IGenre';
-import ConfirmModal from './../../../../../../components/Modal/ConfirmModal';
-import { ImageUploadService } from './../../../../../../services/ImageUploadService';
+import { GenreService } from "./../../../../../../services/GenreService";
+import { IGenre } from "./../../../../../../types/Genre/IGenre";
+import ConfirmModal from "./../../../../../../components/Modal/ConfirmModal";
+import { ImageUploadService } from "./../../../../../../services/ImageUploadService";
 import { BOOK_IMAGE_UPLOAD_CONTAINER } from "../../../../../../constants/TailwindClasses";
-
 
 
 // const MAX_FILE_SIZE_IN_MB = 1;
@@ -64,7 +59,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
     const queryClient = useQueryClient();
     const router = useRouter();
-    const bookId = router.query['book-id'];
+    const bookId = router.query["book-id"];
 
     const campaignId = router.query.id as string;
 
@@ -73,13 +68,13 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
     const genreService = new GenreService();
     const imageService = new ImageUploadService(loginUser?.accessToken);
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
 
 
     // const bookOdd = randomBooks.find(b => b.id === Number(bookId));
     const issuerCampaignService = new CampaignService(
-        loginUser?.accessToken
+        loginUser?.accessToken,
     );
     // const bookId = router.query.id as string;
 
@@ -89,7 +84,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
         () => bookService.getBooks$Issuer({ withCampaigns: true }),
         {
             refetchOnWindowFocus: false,
-        }
+        },
     );
 
 
@@ -104,18 +99,17 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
     const { data: childGenres } = useQuery(
         ["child-genres", campaignId],
         () => genreService.getChildGenres({
-            status: true
+            status: true,
         }), {
-        select: (data) => {
-            return data?.filter(g => {
-                return parentGenresOfCampaign?.findIndex(p => p?.id === g.parentId) !== -1
-            })
-        }
-    },
+            select: (data) => {
+                return data?.filter(g => {
+                    return parentGenresOfCampaign?.findIndex(p => p?.id === g.parentId) !== -1;
+                });
+            },
+        },
     );
 
-    console.log("childGenres", childGenres)
-
+    console.log("childGenres", childGenres);
 
 
     const defaultValues: FormType = {
@@ -124,7 +118,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
         commission: 0,
         salePrice: 0,
         description: book?.description,
-        bookProductItems: []
+        bookProductItems: [],
     };
 
     const CreatComboBookSchema = z.object({
@@ -153,28 +147,34 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                 audioExtraPrice: z.coerce.number().optional(),
 
                 code: z.string().optional(),
-                imageUrl: z.string().optional()
-            })
-        )
+                imageUrl: z.string().optional(),
+            }),
+        ),
     });
-    const { register, reset, watch, control, setValue, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormType>({
+    const {
+        register,
+        reset,
+        watch,
+        control,
+        setValue,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<FormType>({
         resolver: zodResolver(CreatComboBookSchema),
         defaultValues,
     });
 
 
-
     type FormType = Partial<z.infer<typeof CreatComboBookSchema>>;
 
 
-
     const createComboBookMutation = useMutation((data: any) => {
-        return bookProductService.createComboBookProductByIssuer(data)
+        return bookProductService.createComboBookProductByIssuer(data);
     }, {
         onSuccess: () => {
-            queryClient.invalidateQueries(['books', book?.id]);
+            queryClient.invalidateQueries(["books", book?.id]);
             router.push(`/issuer/campaigns/${campaignId}`);
-        }
+        },
     });
     const onSubmit = async (data: FormType) => {
 
@@ -211,8 +211,8 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                         displayIndex: index,
                         displayPdfIndex: index,
                         displayAudioIndex: index,
-                    }
-                })
+                    };
+                }),
             }), {
                 loading: "Đang thêm sách",
                 success: () => {
@@ -220,16 +220,16 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                 },
                 error: (err) => err?.message || "Thêm sách thất bại",
             });
-            console.log(payload)
+            console.log(payload);
         } catch (error) {
             console.log(error);
             return;
         }
-    }
+    };
 
 
     const availableFormats = getBookProductsFormatOptions(book, campaigns?.format);
-    const selectedFormat = getBookFormatById(watch('format'));
+    const selectedFormat = getBookFormatById(watch("format"));
 
     const availableBonuses = availableFormats.filter((format) => format.id !== selectedFormat?.id && format.id !== BookFormats.PAPER.id);
     console.log(errors);
@@ -242,19 +242,19 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                 ...i,
                 withAudio: false,
                 withPdf: false,
-            }
+            };
         }));
-    }
+    };
 
     const clearAllSelectedBooks = () => {
         if (watch("bookProductItems") !== undefined && watch("bookProductItems")?.length > 0) {
             toast("Tất cả sách đã chọn sẽ bị xóa khi bạn chọn lại thể loại sách");
         }
         setValue("bookProductItems", []);
-    }
+    };
 
 
-    const selectedgenreId = parentGenresOfCampaign?.find(g => g?.id === watch('genreId'));
+    const selectedgenreId = parentGenresOfCampaign?.find(g => g?.id === watch("genreId"));
 
     const handleAddBookItem = (book: IBook) => {
         const currentBookProductItems = [...watch("bookProductItems") || []];
@@ -270,25 +270,25 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
             audioExtraPrice: book?.audioExtraPrice,
             code: book?.code,
             imageUrl: book?.imageUrl,
-            coverPrice: book?.coverPrice
+            coverPrice: book?.coverPrice,
         };
         setValue("bookProductItems", [...currentBookProductItems, newBookProductItem]);
-        setShowAddBookModal(false)
-    }
+        setShowAddBookModal(false);
+    };
 
     const handleDeleteBook = (book: Partial<IBook> & { bookId?: number }) => {
         const currentBookProductItems = [...watch("bookProductItems") || []];
         const newBookProductItems = currentBookProductItems.filter(i => i.bookId !== book?.bookId);
         setValue("bookProductItems", newBookProductItems);
-        setToDeleteBook(null)
-    }
+        setToDeleteBook(null);
+    };
 
 
     const selectedBookItems = watch("bookProductItems") || [];
 
 
     function getMinimalCommission(genreId: number) {
-        return campaigns?.campaignCommissions?.find(c=>c.genreId  === genreId)?.minimalCommission || 0;
+        return campaigns?.campaignCommissions?.find(c => c.genreId === genreId)?.minimalCommission || 0;
     }
 
 
@@ -446,7 +446,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                                         return false;
                                                     }
 
-                                                    field.onChange(file)
+                                                    field.onChange(file);
                                                     return true;
                                                 }}
                                                 defaultImageURL={book?.imageUrl} />
@@ -469,7 +469,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                             <Form.Input<FormType>
                                                 register={register}
                                                 required={true}
-                                                inputType={'number'}
+                                                inputType={"number"}
                                                 placeholder={"Giá bán"}
                                                 fieldName={"salePrice"}
                                                 label={"Giá bán (đ) "}
@@ -480,7 +480,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                             <Form.Input<FormType>
                                                 register={register}
                                                 required={true}
-                                                inputType={'number'}
+                                                inputType={"number"}
                                                 placeholder={"Số lượng"}
                                                 fieldName={"saleQuantity"}
                                                 label={"Số lượng"}
@@ -509,7 +509,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                             onValueChange={(value) => {
                                                 if (value) {
                                                     field.onChange(value.id);
-                                                    clearAllBonuses()
+                                                    clearAllBonuses();
                                                 }
                                             }}
                                             dataSource={availableFormats}
@@ -565,7 +565,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                             label={"Thể loại"}
                             description={"Thể loại chung cho các sách được chọn vào combo"}
                         />
-                        <div className='mt-3 '>
+                        <div className="mt-3 ">
                             <Form.Label required={true} label={"Thể loại combo"} />
                             <Controller
                                 control={control}
@@ -577,7 +577,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                         onValueChange={(value) => {
                                             if (value) {
                                                 field.onChange(value.id);
-                                                setValue('commission', getMinimalCommission(value.id))
+                                                setValue("commission", getMinimalCommission(value.id));
                                                 clearAllSelectedBooks();
                                                 clearAllBonuses();
                                                 // clear all selected books
@@ -601,10 +601,10 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                 <Form.Input<FormType>
                                     register={register}
                                     required={true}
-                                    inputType={'number'}
+                                    inputType={"number"}
                                     placeholder={"Chiết khấu"}
                                     fieldName={"commission"}
-                                    label={"Chiết khấu (%) "}   
+                                    label={"Chiết khấu (%) "}
                                     errorMessage={errors?.commission?.message}
                                     disabled={!watch("genreId")}
                                 />
@@ -639,7 +639,8 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                             selectedBookItems?.map((book, index) => {
                                                 return (
                                                     <tr key={index}>
-                                                        <TableData className="text-sm font-medium uppercase text-gray-500">
+                                                        <TableData
+                                                            className="text-sm font-medium uppercase text-gray-500">
                                                             {book?.code}
                                                         </TableData>
                                                         <TableData className="max-w-72">
@@ -687,47 +688,50 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                                                 <>
 
                                                                     {availableBonuses?.length > 0 ? availableBonuses?.map((format) => {
-                                                                        const registerName = format.id === BookFormats.PDF.id ?
-                                                                            `bookProductItems.${index}.withPdf` as const :
-                                                                            `bookProductItems.${index}.withAudio` as const;
-                                                                        const extraPrice = format.id === BookFormats.PDF.id ?
-                                                                            book?.book?.pdfExtraPrice : book?.book?.audioExtraPrice
+                                                                            const registerName = format.id === BookFormats.PDF.id ?
+                                                                                `bookProductItems.${index}.withPdf` as const :
+                                                                                `bookProductItems.${index}.withAudio` as const;
+                                                                            const extraPrice = format.id === BookFormats.PDF.id ?
+                                                                                book?.book?.pdfExtraPrice : book?.book?.audioExtraPrice;
 
-                                                                        return (
-                                                                            <div
-                                                                                key={format.id}
-                                                                                className="relative flex items-center gap-2">
-                                                                                <input
-                                                                                    id={`bonus-${format.id}-b${book.id}`}
-                                                                                    type="checkbox"
-                                                                                    {...register(registerName)}
-                                                                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                                                                />
-                                                                                <label
-                                                                                    htmlFor={`bonus-${format.id}-b${book.id}`}
-                                                                                    className="text-sm font-medium text-gray-600"
-                                                                                >
-                                                                                    {format.displayName} - <span
+                                                                            return (
+                                                                                <div
+                                                                                    key={format.id}
+                                                                                    className="relative flex items-center gap-2">
+                                                                                    <input
+                                                                                        id={`bonus-${format.id}-b${book.id}`}
+                                                                                        type="checkbox"
+                                                                                        {...register(registerName)}
+                                                                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                                                    />
+                                                                                    <label
+                                                                                        htmlFor={`bonus-${format.id}-b${book.id}`}
+                                                                                        className="text-sm font-medium text-gray-600"
+                                                                                    >
+                                                                                        {format.displayName} - <span
                                                                                         className="text-emerald-600 font-medium">
                                                                                         {new Intl.NumberFormat("vi-VN", {
                                                                                             style: "currency",
                                                                                             currency: "VND",
                                                                                         }).format(extraPrice)}</span>
 
-                                                                                </label>
-                                                                            </div>
-                                                                        )
-                                                                    })
-                                                                        : <div className="text-gray-500 text-sm">-</div>}
+                                                                                    </label>
+                                                                                </div>
+                                                                            );
+                                                                        })
+                                                                        :
+                                                                        <div className="text-gray-500 text-sm">-</div>}
                                                                 </>
                                                             }
 
-                                                            {!watch("format") && <div>Bạn cần chọn định dạng để xem được các mục tặng kèm khả dụng.</div>}
+                                                            {!watch("format") &&
+                                                                <div>Bạn cần chọn định dạng để xem được các mục tặng kèm
+                                                                    khả dụng.</div>}
 
                                                         </TableData>
                                                         <TableData>
                                                             <button
-                                                                type='button'
+                                                                type="button"
                                                                 onClick={() => {
                                                                     setToDeleteBook(book);
                                                                     setShowDeleteModal(true);
@@ -773,7 +777,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                             errorMessage={errors.description?.message}
                         />
                         <Form.Divider />
-                        <div className='flex justify-end gap-4'>
+                        <div className="flex justify-end gap-4">
                             <button className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200">
                                 Hủy
                             </button>
@@ -788,10 +792,10 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
             <SelectSellingBookComboModal
                 isOpen={showAddBookModal}
                 onClose={() => setShowAddBookModal(false)}
-                genreId={watch('genreId')}
+                genreId={watch("genreId")}
                 selectedBooks={selectedBookItems}
                 onItemSelect={(b) => {
-                    handleAddBookItem(b)
+                    handleAddBookItem(b);
                 }} />
 
             <ConfirmModal
@@ -809,11 +813,11 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                 confirmText={"Xoá"}
             />
         </Fragment>
-    )
-}
+    );
+};
 
 AddSellingBookComboPage.getLayout = function getLayout(page: ReactElement) {
     return <AdminLayout>{page}</AdminLayout>;
 };
 
-export default AddSellingBookComboPage
+export default AddSellingBookComboPage;

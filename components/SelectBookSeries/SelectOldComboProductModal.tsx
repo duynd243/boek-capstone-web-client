@@ -1,18 +1,16 @@
-import React from 'react'
-import { IBook } from './../../types/Book/IBook';
-import TransitionModal from './../Modal/TransitionModal';
-import { BsSearch } from 'react-icons/bs';
-import useDebounce from './../../hooks/useDebounce';
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '../../context/AuthContext';
-import { BookService } from './../../services/BookService';
-import Modal from './../Modal/Modal';
-import Link from 'next/link';
-import Image from 'next/image';
-import EmptyState, { EMPTY_STATE_TYPE } from '../EmptyState';
-import { BookProductService } from './../../services/BookProductService';
-import { IBookProduct } from '../../types/Book/IBookProduct';
+import React, { useState } from "react";
+import TransitionModal from "./../Modal/TransitionModal";
+import { BsSearch } from "react-icons/bs";
+import useDebounce from "./../../hooks/useDebounce";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
+import { BookService } from "./../../services/BookService";
+import Modal from "./../Modal/Modal";
+import Link from "next/link";
+import Image from "next/image";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
+import { BookProductService } from "./../../services/BookProductService";
+import { IBookProduct } from "../../types/Book/IBookProduct";
 
 type Props = {
     campaignId: number;
@@ -24,15 +22,15 @@ type Props = {
 }
 
 const SelectOldComboProductModal = ({
-    isOpen,
-    onClose,
-    onItemSelect,
-    genreIds,
-    selectedBooks,
-    campaignId,
-}: Props) => {
- 
-    console.log(genreIds)
+                                        isOpen,
+                                        onClose,
+                                        onItemSelect,
+                                        genreIds,
+                                        selectedBooks,
+                                        campaignId,
+                                    }: Props) => {
+
+    console.log(genreIds);
     const { loginUser } = useAuth();
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search, 500);
@@ -44,10 +42,8 @@ const SelectOldComboProductModal = ({
             name: debouncedSearch,
             genreIds: genreIds,
             CurrentCampaignId: campaignId,
-        })
+        }),
     );
-
-
 
 
     return (
@@ -72,7 +68,7 @@ const SelectOldComboProductModal = ({
                     {books && books?.length > 0 ? (
                         books?.map((book, index) => {
                             const isSelected = selectedBooks?.find(
-                                (item) => item.id === book.id
+                                (item) => item.id === book.id,
                             );
                             return (
                                 <div
@@ -83,9 +79,9 @@ const SelectOldComboProductModal = ({
                                     }}
                                     key={index}
                                     className={`relative flex justify-between border-b border-gray-300 p-4 pr-12 ${isSelected
-                                            ? "cursor-not-allowed bg-slate-100"
-                                            : "cursor-pointer"
-                                        }`}
+                                        ? "cursor-not-allowed bg-slate-100"
+                                        : "cursor-pointer"
+                                    }`}
                                 >
                                     <div className="flex gap-4">
                                         <Image
@@ -96,8 +92,9 @@ const SelectOldComboProductModal = ({
                                             alt=""
                                         />
                                         <div>
-                                            <div className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
-                                            {book?.genre?.name}
+                                            <div
+                                                className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
+                                                {book?.genre?.name}
                                             </div>
                                             <div className="mb-1 text-sm font-medium text-gray-900">
                                                 {book?.title}
@@ -145,7 +142,7 @@ const SelectOldComboProductModal = ({
                 </Modal.Footer>
             </div>
         </TransitionModal>
-    )
-}
+    );
+};
 
-export default SelectOldComboProductModal
+export default SelectOldComboProductModal;

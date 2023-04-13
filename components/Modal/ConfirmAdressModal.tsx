@@ -1,6 +1,6 @@
-import React, {Fragment} from "react";
+import React, { Fragment } from "react";
 import Modal from "./Modal";
-import {HiExclamationCircle} from "react-icons/hi2";
+import { HiExclamationCircle } from "react-icons/hi2";
 import TransitionModal from "./TransitionModal";
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
     confirmText: string;
     cancelText?: string;
     color?: string;
-    children?: React.ReactNode; 
+    children?: React.ReactNode;
 };
 
 const ConfirmAdressModal: React.FC<Props> = (props) => {
@@ -23,7 +23,7 @@ const ConfirmAdressModal: React.FC<Props> = (props) => {
     return (
         <TransitionModal closeOnOverlayClick={false} {...props}>
             <Fragment>
-                <Modal.Header title={props.title}/>
+                <Modal.Header title={props.title} />
                 <div className="flex items-center gap-3 p-5">
                     <p className="text-base font-medium text-slate-800">
                         {props.children}
@@ -31,7 +31,7 @@ const ConfirmAdressModal: React.FC<Props> = (props) => {
                 </div>
                 <div className="flex items-center gap-3 p-5">
                     <div className={`rounded-full p-1.5 ${iconBgColor}`}>
-                        <HiExclamationCircle className={`text-3xl ${iconColor}`}/>
+                        <HiExclamationCircle className={`text-3xl ${iconColor}`} />
                     </div>
                     <p className="text-base font-medium text-slate-800">
                         {props.content}

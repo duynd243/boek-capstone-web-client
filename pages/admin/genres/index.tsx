@@ -10,9 +10,7 @@ import TableHeader from "../../../components/Admin/Table/TableHeader";
 import TableBody from "../../../components/Admin/Table/TableBody";
 import TableWrapper from "../../../components/Admin/Table/TableWrapper";
 import TableData from "../../../components/Admin/Table/TableData";
-import CategoryModal, {
-    CategoryModalMode,
-} from "../../../components/Modal/CategoryModal";
+import CategoryModal, { CategoryModalMode } from "../../../components/Modal/CategoryModal";
 import { IGenre } from "../../../types/Genre/IGenre";
 import useTableManagementPage from "../../../hooks/useTableManagementPage";
 import { useQuery } from "@tanstack/react-query";
@@ -20,61 +18,11 @@ import { useAuth } from "../../../context/AuthContext";
 import { GenreService } from "../../../services/GenreService";
 import LoadingTopPage from "../../../components/LoadingTopPage";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
+import TableRowSkeleton from "../../../components/Admin/Table/TableRowSkeleton";
+import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
+import StatusCard from "../../../components/StatusCard";
+import TableFooter from "../../../components/Admin/Table/TableFooter";
 
-export const bookCategories = [
-    {
-        id: 1,
-        name: "Văn học",
-        percentages: 10,
-        genres: [
-            {
-                id: 1,
-                name: "Tiểu thuyết",
-            },
-            {
-                id: 2,
-                name: "Truyện ngắn",
-            },
-        ],
-        status: true,
-    },
-    {
-        id: 2,
-        name: "Kinh tế",
-        percentages: 2,
-        genres: [
-            {
-                id: 1,
-                name: "Kinh tế chính trị",
-            },
-            {
-                id: 2,
-                name: "Kinh tế xã hội",
-            },
-            {
-                id: 3,
-                name: "Kinh tế kinh doanh",
-            },
-        ],
-        status: false,
-    },
-    {
-        id: 3,
-        name: "Khoa học",
-        percentages: 5,
-        genres: [
-            {
-                id: 1,
-                name: "Khoa học tự nhiên",
-            },
-            {
-                id: 2,
-                name: "Khoa học xã hội",
-            },
-        ],
-        status: true,
-    },
-];
 
 const AdminCategoriesPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
@@ -96,9 +44,10 @@ const AdminCategoriesPage: NextPageWithLayout = () => {
     } = useTableManagementPage();
 
     const {
-        data: userData,
+        data: genreData,
         isLoading,
         isFetching,
+        isInitialLoading,
     } = useQuery(
         ["genres", { search, page, size }],
         () =>
@@ -106,11 +55,12 @@ const AdminCategoriesPage: NextPageWithLayout = () => {
                 name: search,
                 page,
                 size,
+                isParentGenre: true,
                 withBooks: false,
             }),
         {
             keepPreviousData: true,
-        }
+        },
     );
 
     if (isLoading) return <LoadingSpinnerWithOverlay />;
@@ -128,12 +78,7 @@ const AdminCategoriesPage: NextPageWithLayout = () => {
             <TableWrapper>
                 <TableHeading>
                     <TableHeader>Tên thể loại</TableHeader>
-                    <TableHeader textAlignment="text-center">
-                        Số lượng chủ đề
-                    </TableHeader>
-                    <TableHeader textAlignment="text-center">
-                        Mức chiết khấu
-                    </TableHeader>
+
                     <TableHeader textAlignment="text-center">
                         Trạng thái
                     </TableHeader>
@@ -142,53 +87,66 @@ const AdminCategoriesPage: NextPageWithLayout = () => {
                     </TableHeader>
                 </TableHeading>
                 <TableBody>
-                    {bookCategories.map((category) => (
-                        <tr key={category.id}>
-                            <TableData className="text-sm font-medium">
-                                {category.name}
-                            </TableData>
-                            <TableData
-                                textAlignment="text-center"
-                                className="text-sm"
-                            >
-                                {category.genres.length}
-                            </TableData>
-                            <TableData
-                                textAlignment="text-center"
-                                className="text-sm"
-                            >
-                                {category.percentages}%
-                            </TableData>
-                            <TableData textAlignment="text-center">
-                                {category.status ? (
-                                    <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold uppercase leading-5 text-green-800">
-                                        Hoạt động
-                                    </span>
-                                ) : (
-                                    <span className="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold uppercase leading-5 text-red-800">
-                                        Bị vô hiệu hóa
-                                    </span>
-                                )}
-                            </TableData>
-                            <TableData className="text-right text-sm font-medium text-indigo-600 hover:text-indigo-700">
-                                <button
-                                    onClick={() => {
-                                        setSelectedGenre(category);
-                                        setShowUpdateModal(true);
-                                    }}
-                                >
-                                    Chỉnh sửa
-                                </button>
-                                <Link
-                                    href={`/admin/genres/${category.id}/child-genres`}
-                                    className="block"
-                                >
-                                    Xem
-                                </Link>
-                            </TableData>
-                        </tr>
-                    ))}
+                    {isInitialLoading
+                        ? new Array(8).fill(0).map((_, index) => (
+                            <TableRowSkeleton numberOfColumns={3} key={index} />
+                        ))
+                        : genreData?.data && genreData?.data?.length > 0 ?
+                            genreData?.data?.map((genre) => {
+
+                                return (
+                                    <tr key={genre?.id}>
+                                        <TableData className="text-sm font-medium">
+                                            {genre?.name}
+                                        </TableData>
+                                        <TableData textAlignment="text-center">
+                                            {genre?.status ? (
+                                                <StatusCard
+                                                    label="Hoạt động"
+                                                    variant="success"
+                                                />
+                                            ) : (
+                                                <StatusCard
+                                                    label="Bị vô hiệu hóa"
+                                                    variant="error"
+                                                />
+                                            )}
+                                        </TableData>
+                                        <TableData
+                                            className="text-right text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedGenre(genre);
+                                                    setShowUpdateModal(true);
+                                                }}
+                                            >
+                                                Chỉnh sửa
+                                            </button>
+                                            <Link
+                                                href={`/admin/genres/${genre.id}/child-genres`}
+                                                className="block"
+                                            >
+                                                Xem
+                                            </Link>
+                                        </TableData>
+                                    </tr>
+                                );
+                            })
+                            : <td colSpan={3} className="py-12">
+                                {search ? <EmptyState status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND} /> :
+                                    <EmptyState status={EMPTY_STATE_TYPE.NO_DATA} />}
+                            </td>
+                    }
                 </TableBody>
+                {genreData?.data && genreData?.data?.length > 0 && <TableFooter
+                    colSpan={10}
+                    size={size}
+                    onSizeChange={onSizeChange}
+                    page={page}
+                    onPageChange={setPage}
+                    totalElements={genreData?.metadata?.total || 0}
+                    pageSizeOptions={pageSizeOptions}
+                />}
             </TableWrapper>
 
             <CategoryModal

@@ -4,10 +4,10 @@ import React, { ReactElement } from "react";
 import { NextPageWithLayout } from "../_app";
 
 const Page: NextPageWithLayout = () => {
-  return <p>Issuer Dashboard</p>;
+    return <p>Issuer Dashboard</p>;
 };
 Page.getLayout = function getLayout(page: ReactElement) {
-  return <AdminLayout>{page}</AdminLayout>;
+    return <AdminLayout>{page}</AdminLayout>;
 };
 
 export default Page;

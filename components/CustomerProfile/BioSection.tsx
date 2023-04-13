@@ -1,5 +1,5 @@
 import React from "react";
-import { RiCake2Line, RiMailLine, RiMapPin2Line, RiUserAddLine } from "react-icons/ri";
+import { RiCake2Line, RiMailLine, RiUserAddLine } from "react-icons/ri";
 import { getFormattedTime } from "../../utils/helper";
 import { ICustomer } from "../../types/User/IUser";
 

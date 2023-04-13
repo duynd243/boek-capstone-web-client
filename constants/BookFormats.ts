@@ -10,7 +10,7 @@ export class BookFormats {
         id: 1,
         displayName: "Sách giấy",
         border: "border border-slate-300",
-        bg: 'bg-slate-100',
+        bg: "bg-slate-100",
     };
     static readonly PDF: IBookFormat = {
         id: 2,
@@ -19,7 +19,7 @@ export class BookFormats {
     static readonly AUDIO: IBookFormat = {
         id: 3,
         displayName: "Sách Audio",
-    }
+    };
 }
 
 export function getBookFormatById(id: number | undefined): IBookFormat | undefined {

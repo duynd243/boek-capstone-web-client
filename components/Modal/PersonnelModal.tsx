@@ -10,20 +10,12 @@ import { Roles } from "../../constants/Roles";
 import { useAuth } from "../../context/AuthContext";
 import useAddress from "../../hooks/useAddress";
 import { ImageUploadService } from "../../services/ImageUploadService";
-import {
-    CreateUserParams,
-    UpdateUserParams,
-    UserService,
-} from "../../services/UserService";
+import { CreateUserParams, UpdateUserParams, UserService } from "../../services/UserService";
 import { IDistrict } from "../../types/Address/IDistrict";
 import { IProvince } from "../../types/Address/IProvince";
 import { IWard } from "../../types/Address/IWard";
 import { IUser } from "../../types/User/IUser";
-import {
-    isImageFile,
-    isValidFileSize,
-    VIETNAMESE_PHONE_REGEX,
-} from "../../utils/helper";
+import { isImageFile, isValidFileSize, VIETNAMESE_PHONE_REGEX } from "../../utils/helper";
 import ErrorMessage from "../Form/ErrorMessage";
 import SelectBox from "../SelectBox";
 import SelectProfilePicture from "../SelectProfilePicture";
@@ -59,13 +51,13 @@ const roleOptions = [
 ];
 
 const PersonnelModal: React.FC<Props> = ({
-    maxWidth,
-    action,
-    isOpen,
-    onClose,
-    afterLeave,
-    personnel,
-}) => {
+                                             maxWidth,
+                                             action,
+                                             isOpen,
+                                             onClose,
+                                             afterLeave,
+                                             personnel,
+                                         }) => {
     console.log(personnel, roleOptions);
     const {
         provinces,
@@ -148,7 +140,7 @@ const PersonnelModal: React.FC<Props> = ({
         resolver: zodResolver(
             action === PersonnelModalMode.CREATE
                 ? BasePersonnelSchema
-                : UpdatePersonnelSchema
+                : UpdatePersonnelSchema,
         ),
         defaultValues,
     });
@@ -173,7 +165,7 @@ const PersonnelModal: React.FC<Props> = ({
     }, commonMutationOptions);
 
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
     const onSubmit = async (data: FormType) => {
         if (data.previewFile) {
@@ -189,7 +181,7 @@ const PersonnelModal: React.FC<Props> = ({
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -212,7 +204,7 @@ const PersonnelModal: React.FC<Props> = ({
                                     error?.message || "Thêm nhân sự thất bại"
                                 );
                             },
-                        }
+                        },
                     );
                 } catch (error) {
                     return;
@@ -234,7 +226,7 @@ const PersonnelModal: React.FC<Props> = ({
                                     "Cập nhật nhân sự thất bại"
                                 );
                             },
-                        }
+                        },
                     );
                 } catch (error) {
                     return;
@@ -278,13 +270,13 @@ const PersonnelModal: React.FC<Props> = ({
                                         onChange={(file) => {
                                             if (!isImageFile(file)) {
                                                 toast.error(
-                                                    "Tệp tải lên phải có định dạng ảnh"
+                                                    "Tệp tải lên phải có định dạng ảnh",
                                                 );
                                                 return false;
                                             }
                                             if (!isValidFileSize(file, 1)) {
                                                 toast.error(
-                                                    "Kích thước ảnh đại diện không được vượt quá 1MB"
+                                                    "Kích thước ảnh đại diện không được vượt quá 1MB",
                                                 );
                                                 return false;
                                             }
@@ -354,7 +346,7 @@ const PersonnelModal: React.FC<Props> = ({
                                                 if (
                                                     p.code ===
                                                     watch(
-                                                        "addressRequest.provinceCode"
+                                                        "addressRequest.provinceCode",
                                                     )
                                                 )
                                                     return;
@@ -362,11 +354,11 @@ const PersonnelModal: React.FC<Props> = ({
                                                 field.onChange(p.code);
                                                 setValue(
                                                     "addressRequest.districtCode" as any,
-                                                    undefined
+                                                    undefined,
                                                 );
                                                 setValue(
                                                     "addressRequest.wardCode" as any,
-                                                    undefined
+                                                    undefined,
                                                 );
                                                 handleProvinceChange(p);
                                             }}
@@ -398,14 +390,14 @@ const PersonnelModal: React.FC<Props> = ({
                                                 if (
                                                     d.code ===
                                                     watch(
-                                                        "addressRequest.districtCode"
+                                                        "addressRequest.districtCode",
                                                     )
                                                 )
                                                     return;
                                                 field.onChange(d.code);
                                                 setValue(
                                                     "addressRequest.wardCode" as any,
-                                                    undefined
+                                                    undefined,
                                                 );
                                                 handleDistrictChange(d);
                                             }}
@@ -438,7 +430,7 @@ const PersonnelModal: React.FC<Props> = ({
                                                 if (
                                                     w.code ===
                                                     watch(
-                                                        "addressRequest.wardCode"
+                                                        "addressRequest.wardCode",
                                                     )
                                                 )
                                                     return;

@@ -1,16 +1,10 @@
-import React, {memo, useMemo} from "react";
-import {
-    MdFirstPage,
-    MdLastPage,
-    MdNavigateBefore,
-    MdNavigateNext,
-} from "react-icons/md";
-import {IPaginationMetaData} from "../../../old-types/IBaseListResponse";
+import React, { memo, useMemo } from "react";
+import { MdFirstPage, MdLastPage, MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 
 type Props = {
     colSpan: number;
     size: number;
-    totalPages: number;
+    totalElements: number;
     onSizeChange: (size: number) => void;
     page: number;
     onPageChange: (page: number) => void;
@@ -22,7 +16,7 @@ const TableFooter: React.FC<Props> = ({
                                           colSpan,
                                           size,
                                           onSizeChange,
-                                          totalPages,
+                                          totalElements,
                                           page,
                                           onPageChange,
                                           pageSizeOptions,
@@ -31,13 +25,13 @@ const TableFooter: React.FC<Props> = ({
         onSizeChange(parseInt(e.target.value));
     };
     const lastPage = useMemo(
-        () => Math.ceil(totalPages ? totalPages / size : 0),
-        [totalPages, size]
+        () => Math.ceil(totalElements ? totalElements / size : 0),
+        [totalElements, size],
     );
     const fromItem = useMemo(() => (page - 1) * size + 1, [page, size]);
     const toItem = useMemo(
-        () => Math.min(page * size, totalPages),
-        [page, size, totalPages]
+        () => Math.min(page * size, totalElements),
+        [page, size, totalElements],
     );
 
     return (
@@ -62,7 +56,7 @@ const TableFooter: React.FC<Props> = ({
                     </div>
                     <div className="flex items-center">
               <span className="mr-2">
-                {fromItem}-{toItem} / {totalPages}
+                {fromItem}-{toItem} / {totalElements}
               </span>
                         <button
                             title="Trang đầu"
@@ -71,7 +65,7 @@ const TableFooter: React.FC<Props> = ({
                             disabled={page === 1}
                         >
                             <span className="sr-only">First Page</span>
-                            <MdFirstPage size={22}/>
+                            <MdFirstPage size={22} />
                         </button>
                         <button
                             title="Trang trước"
@@ -80,7 +74,7 @@ const TableFooter: React.FC<Props> = ({
                             disabled={page === 1}
                         >
                             <span className="sr-only">Previous</span>
-                            <MdNavigateBefore size={22}/>
+                            <MdNavigateBefore size={22} />
                         </button>
                         <span className="mx-3">Trang {page}</span>
                         <button
@@ -90,7 +84,7 @@ const TableFooter: React.FC<Props> = ({
                             disabled={page === lastPage}
                         >
                             <span className="sr-only">Next</span>
-                            <MdNavigateNext size={22}/>
+                            <MdNavigateNext size={22} />
                         </button>
                         <button
                             title="Trang cuối"
@@ -99,7 +93,7 @@ const TableFooter: React.FC<Props> = ({
                             disabled={page === lastPage}
                         >
                             <span className="sr-only">Last Page</span>
-                            <MdLastPage size={22}/>
+                            <MdLastPage size={22} />
                         </button>
                     </div>
                 </div>

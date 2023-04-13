@@ -8,11 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IAuthor } from "../../types/Author/IAuthor";
 import { toast } from "react-hot-toast";
-import {
-    AuthorService,
-    CreateAuthorParams,
-    UpdateAuthorParams,
-} from "../../services/AuthorService";
+import { AuthorService, CreateAuthorParams, UpdateAuthorParams } from "../../services/AuthorService";
 import SelectProfilePicture from "../SelectProfilePicture";
 import { isImageFile, isValidFileSize } from "../../utils/helper";
 import { ImageUploadService } from "../../services/ImageUploadService";
@@ -32,19 +28,19 @@ type Props = {
 };
 
 const AuthorModal: React.FC<Props> = ({
-    maxWidth,
-    action,
-    isOpen,
-    onClose,
-    afterLeave,
-    author,
-}) => {
+                                          maxWidth,
+                                          action,
+                                          isOpen,
+                                          onClose,
+                                          afterLeave,
+                                          author,
+                                      }) => {
     const { loginUser } = useAuth();
     const queryClient = useQueryClient();
     const authorService = new AuthorService(loginUser?.accessToken);
     const imageService = new ImageUploadService(loginUser?.accessToken);
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
 
     const commonMutationOptions = {
@@ -56,12 +52,12 @@ const AuthorModal: React.FC<Props> = ({
 
     const updateAuthorMutation = useMutation(
         (payload: UpdateAuthorParams) => authorService.updateAuthor(payload),
-        commonMutationOptions
+        commonMutationOptions,
     );
 
     const createAuthorMutation = useMutation(
         (payload: CreateAuthorParams) => authorService.createAuthor(payload),
-        commonMutationOptions
+        commonMutationOptions,
     );
 
     const BaseAuthorSchema = z.object({
@@ -103,7 +99,7 @@ const AuthorModal: React.FC<Props> = ({
         resolver: zodResolver(
             action === AuthorModalMode.UPDATE
                 ? UpdateAuthorSchema
-                : BaseAuthorSchema
+                : BaseAuthorSchema,
         ),
         defaultValues,
     });
@@ -121,7 +117,7 @@ const AuthorModal: React.FC<Props> = ({
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -139,7 +135,7 @@ const AuthorModal: React.FC<Props> = ({
                             success: () => "Thêm tác giả thành công",
                             error: (error) =>
                                 error?.message || "Thêm tác giả thất bại",
-                        }
+                        },
                     );
                 } catch (error) {
                     return;
@@ -154,7 +150,7 @@ const AuthorModal: React.FC<Props> = ({
                             loading: "Đang cập nhật tác giả",
                             success: () => "Cập nhật tác giả thành công",
                             error: (error) => error?.message,
-                        }
+                        },
                     );
                 } catch (error) {
                     return;
@@ -198,13 +194,13 @@ const AuthorModal: React.FC<Props> = ({
                                 onChange={(file) => {
                                     if (!isImageFile(file)) {
                                         toast.error(
-                                            "Tệp tải lên phải có định dạng ảnh"
+                                            "Tệp tải lên phải có định dạng ảnh",
                                         );
                                         return false;
                                     }
                                     if (!isValidFileSize(file, 1)) {
                                         toast.error(
-                                            "Kích thước ảnh đại diện không được vượt quá 1MB"
+                                            "Kích thước ảnh đại diện không được vượt quá 1MB",
                                         );
                                         return false;
                                     }

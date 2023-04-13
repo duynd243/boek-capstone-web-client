@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Fragment, ReactElement, useState } from "react";
 import DefaultAvatar from "../../../assets/images/default-avatar.png";
@@ -27,7 +27,7 @@ const AdminCustomersPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
     const userService = new UserService(loginUser?.accessToken);
     const [selectedCustomer, setSelectedCustomer] = useState<IUser | undefined>(
-        undefined
+        undefined,
     );
 
     const {
@@ -58,7 +58,7 @@ const AdminCustomersPage: NextPageWithLayout = () => {
             }),
         {
             keepPreviousData: true,
-        }
+        },
     );
 
     if (isLoading) return <LoadingSpinnerWithOverlay />;
@@ -173,7 +173,7 @@ const AdminCustomersPage: NextPageWithLayout = () => {
                         onSizeChange={onSizeChange}
                         page={page}
                         onPageChange={setPage}
-                        totalPages={userData?.metadata?.total || 0}
+                        totalElements={userData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />
                 </TableWrapper>

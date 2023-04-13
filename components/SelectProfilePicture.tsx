@@ -1,7 +1,7 @@
-import React, {useEffect, useId, useState} from "react";
+import React, { useEffect, useId, useState } from "react";
 import DefaultAvatar from "../assets/images/default-avatar.png";
 import Image from "next/image";
-import {isValidImageSrc} from "../utils/helper";
+import { isValidImageSrc } from "../utils/helper";
 
 type Props = {
     defaultImageURL?: string;

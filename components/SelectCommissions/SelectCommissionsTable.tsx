@@ -14,16 +14,16 @@ import { defaultInputClass } from "../Form";
 type fType = z.infer<typeof BaseCampaignSchema>;
 
 type Props = {
-    fieldArray:  UseFieldArrayReturn<fType>;
+    fieldArray: UseFieldArrayReturn<fType>;
 };
 
-const SelectCommissionsTable: React.FC<Props> = ({fieldArray}) => {
+const SelectCommissionsTable: React.FC<Props> = ({ fieldArray }) => {
 
     // const {ContinuousOfflineCampaignSchema} = useOfflineCampaignForm({});
     // type FormType = z.infer<typeof ContinuousOfflineCampaignSchema>;
-    const {control, register, formState: {errors}} = useFormContext<fType>();
+    const { control, register, formState: { errors } } = useFormContext<fType>();
 
-    const {fields, append, remove} = fieldArray;
+    const { fields, append, remove } = fieldArray;
     //     control,
     //     name: 'campaignCommissions',
     // });
@@ -62,11 +62,11 @@ const SelectCommissionsTable: React.FC<Props> = ({fieldArray}) => {
                                         </div>
                                     </div>
                                 </TableData>
-                                <TableData className='max-w-[100px]'>
+                                <TableData className="max-w-[100px]">
                                     <input
-                                        type={'number'}
+                                        type={"number"}
                                         {...register(`campaignCommissions.[${index}].minimalCommission` as `campaignCommissions.${number}.minimalCommission`)}
-                                        className={defaultInputClass}/>
+                                        className={defaultInputClass} />
                                 </TableData>
                                 <TableData className="text-right text-sm font-medium">
                                     <button
@@ -80,13 +80,13 @@ const SelectCommissionsTable: React.FC<Props> = ({fieldArray}) => {
                             {errors?.campaignCommissions?.[index]?.minimalCommission &&
                                 <tr>
                                     <td colSpan={3}
-                                        className='text-rose-500 bg-rose-50 p-2 text-center py-2 px-3 text-sm font-medium transition duration-150 ease-in-out'>
+                                        className="text-rose-500 bg-rose-50 p-2 text-center py-2 px-3 text-sm font-medium transition duration-150 ease-in-out">
                                         {errors?.campaignCommissions?.[index]?.minimalCommission?.message}
                                     </td>
                                 </tr>
                             }
                         </Fragment>
-                    )
+                    );
 
                 }) : <tr>
                     <TableData

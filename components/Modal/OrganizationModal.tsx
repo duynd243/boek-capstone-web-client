@@ -12,16 +12,10 @@ import {
     UpdateOrganizationParams,
 } from "../../services/OrganizationService";
 import { IOrganization } from "../../types/Organization/IOrganization";
-import {
-    isImageFile,
-    isValidFileSize,
-    VIETNAMESE_PHONE_REGEX,
-} from "../../utils/helper";
+import { isImageFile, isValidFileSize, VIETNAMESE_PHONE_REGEX } from "../../utils/helper";
 import SelectProfilePicture from "../SelectProfilePicture";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
-
-import { CgSpinnerAlt } from "react-icons/cg";
 
 export enum OrganizationModalMode {
     CREATE,
@@ -38,13 +32,13 @@ type Props = {
 };
 
 const OrganizationModal: React.FC<Props> = ({
-    maxWidth,
-    action,
-    isOpen,
-    onClose,
-    organization,
-    afterLeave,
-}) => {
+                                                maxWidth,
+                                                action,
+                                                isOpen,
+                                                onClose,
+                                                organization,
+                                                afterLeave,
+                                            }) => {
     const { loginUser } = useAuth();
     const queryClient = useQueryClient();
     const orgService = new OrganizationService(loginUser?.accessToken);
@@ -59,14 +53,14 @@ const OrganizationModal: React.FC<Props> = ({
 
     const createMutation = useMutation(
         (data: CreateOrganizationParams) => orgService.createOrganization(data),
-        commonMutationOptions
+        commonMutationOptions,
     );
     const updateMutation = useMutation(
         (data: UpdateOrganizationParams) => orgService.updateOrganization(data),
-        commonMutationOptions
+        commonMutationOptions,
     );
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
 
     const BaseOrganizationSchema = z.object({
@@ -111,7 +105,7 @@ const OrganizationModal: React.FC<Props> = ({
         resolver: zodResolver(
             action === OrganizationModalMode.UPDATE
                 ? UpdateOrganizationSchema
-                : BaseOrganizationSchema
+                : BaseOrganizationSchema,
         ),
         defaultValues,
     });
@@ -155,7 +149,7 @@ const OrganizationModal: React.FC<Props> = ({
                                 "Đã có lỗi xảy ra khi tải ảnh lên"
                             );
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -176,7 +170,7 @@ const OrganizationModal: React.FC<Props> = ({
                                     "Đã có lỗi xảy ra khi tạo tổ chức"
                                 );
                             },
-                        }
+                        },
                     );
                 } catch (error) {
                     return;
@@ -196,7 +190,7 @@ const OrganizationModal: React.FC<Props> = ({
                                     "Đã có lỗi xảy ra khi cập nhật tổ chức"
                                 );
                             },
-                        }
+                        },
                     );
                 } catch (error) {
                     return;
@@ -237,13 +231,13 @@ const OrganizationModal: React.FC<Props> = ({
                                 onChange={(file) => {
                                     if (!isImageFile(file)) {
                                         toast.error(
-                                            "Tệp tải lên phải có định dạng ảnh"
+                                            "Tệp tải lên phải có định dạng ảnh",
                                         );
                                         return false;
                                     }
                                     if (!isValidFileSize(file, 1)) {
                                         toast.error(
-                                            "Kích thước ảnh đại diện không được vượt quá 1MB"
+                                            "Kích thước ảnh đại diện không được vượt quá 1MB",
                                         );
                                         return false;
                                     }

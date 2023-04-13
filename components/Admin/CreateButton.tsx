@@ -1,6 +1,6 @@
-import React, {memo} from "react";
+import React, { memo } from "react";
 import Link from "next/link";
-import {IoAdd} from "react-icons/io5";
+import { IoAdd } from "react-icons/io5";
 
 type Props = {
     href?: string;
@@ -9,7 +9,7 @@ type Props = {
     className?: string;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-const CreateButton: React.FC<Props> = ({label, onClick, href, className, ...rest}) => {
+const CreateButton: React.FC<Props> = ({ label, onClick, href, className, ...rest }) => {
     const commonProps = {
         className: `m-btn gap-1 bg-indigo-500 text-white hover:bg-indigo-600 ${className} disabled:opacity-50 disabled:cursor-not-allowed`,
         ...rest,
@@ -17,7 +17,7 @@ const CreateButton: React.FC<Props> = ({label, onClick, href, className, ...rest
 
     const children = (
         <>
-            <IoAdd size={16}/>
+            <IoAdd size={16} />
             <span className="hidden sm:block">{label}</span>
         </>
     );
@@ -26,7 +26,7 @@ const CreateButton: React.FC<Props> = ({label, onClick, href, className, ...rest
             {children}
         </Link>
     ) : (
-        <button type='button' onClick={onClick} {...commonProps}>
+        <button type="button" onClick={onClick} {...commonProps}>
             {children}
         </button>
     );

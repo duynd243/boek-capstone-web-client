@@ -105,8 +105,8 @@ const FollowGroupModal: React.FC<Props> = ({ isOpen, followedGroupIds, onClose }
                                             <div className="mb-1 text-sm font-medium text-gray-900">
                                                 {group?.name}
                                             </div>
-                                             <div className='flex items-center text-sm text-gray-600'>
-                                                <IoPeople/>
+                                            <div className="flex items-center text-sm text-gray-600">
+                                                <IoPeople />
                                                 <span className="ml-1">{group?.customers?.length} người chọn nhóm</span>
                                             </div>
                                         </div>

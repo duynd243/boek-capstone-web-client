@@ -218,7 +218,7 @@ const IssuerBooksPage: NextPageWithLayout = () => {
                         onSizeChange={onSizeChange}
                         page={page}
                         onPageChange={(page) => setPage(page)}
-                        totalPages={issuerData?.metadata?.total || 0}
+                        totalElements={issuerData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />
                 </TableWrapper>

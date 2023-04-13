@@ -4,7 +4,7 @@ import LoginForm from "../components/AuthForm/LoginForm";
 import { NextPageWithLayout } from "./_app";
 
 const Login: NextPageWithLayout = () => {
-  return <LoginForm />;
+    return <LoginForm />;
 };
 
 Login.getLayout = (page) => <LoginSignUpLayout>{page}</LoginSignUpLayout>;

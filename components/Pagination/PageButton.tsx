@@ -12,8 +12,8 @@ const PageButton = ({ isActive, value, onClick, disabled }: Props) => {
     let colorClass = isActive
         ? "text-white bg-indigo-500"
         : onClick
-        ? "text-slate-600 bg-white hover:bg-indigo-100"
-        : "text-slate-600 bg-white";
+            ? "text-slate-600 bg-white hover:bg-indigo-100"
+            : "text-slate-600 bg-white";
     let cursorClass =
         isActive || !onClick ? "cursor-default" : "cursor-pointer";
     return (

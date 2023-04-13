@@ -1,16 +1,15 @@
-import React from 'react'
-import { IBook } from './../../types/Book/IBook';
-import TransitionModal from './../Modal/TransitionModal';
-import { BsSearch } from 'react-icons/bs';
-import useDebounce from './../../hooks/useDebounce';
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '../../context/AuthContext';
-import { BookService } from './../../services/BookService';
-import Modal from './../Modal/Modal';
-import Link from 'next/link';
-import Image from 'next/image';
-import EmptyState, { EMPTY_STATE_TYPE } from '../EmptyState';
+import React, { useState } from "react";
+import { IBook } from "./../../types/Book/IBook";
+import TransitionModal from "./../Modal/TransitionModal";
+import { BsSearch } from "react-icons/bs";
+import useDebounce from "./../../hooks/useDebounce";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
+import { BookService } from "./../../services/BookService";
+import Modal from "./../Modal/Modal";
+import Link from "next/link";
+import Image from "next/image";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 
 type Props = {
     isOpen: boolean;
@@ -21,13 +20,13 @@ type Props = {
 }
 
 const SelectBookModal = ({
-    isOpen,
-    onClose,
-    onItemSelect,
-    genreId,
-    selectedBooks,
-}: Props) => {
-    const {loginUser} = useAuth();
+                             isOpen,
+                             onClose,
+                             onItemSelect,
+                             genreId,
+                             selectedBooks,
+                         }: Props) => {
+    const { loginUser } = useAuth();
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search, 500);
     const bookService = new BookService(loginUser?.accessToken);
@@ -37,10 +36,8 @@ const SelectBookModal = ({
             name: debouncedSearch,
             genreId: genreId,
             isSeries: false,
-        })
+        }),
     );
-
-
 
 
     return (
@@ -65,7 +62,7 @@ const SelectBookModal = ({
                     {books?.data && books?.data.length > 0 ? (
                         books?.data.map((book, index) => {
                             const isSelected = selectedBooks?.find(
-                                (item) => item.id === book.id
+                                (item) => item.id === book.id,
                             );
                             return (
                                 <div
@@ -90,7 +87,8 @@ const SelectBookModal = ({
                                             alt=""
                                         />
                                         <div>
-                                            <div className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
+                                            <div
+                                                className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
                                                 {book?.code}
                                             </div>
                                             <div className="mb-1 text-sm font-medium text-gray-900">
@@ -139,7 +137,7 @@ const SelectBookModal = ({
                 </Modal.Footer>
             </div>
         </TransitionModal>
-    )
-}
+    );
+};
 
-export default SelectBookModal
+export default SelectBookModal;

@@ -1,4 +1,3 @@
-
 export interface IBasePaginationRequestParams {
     page?: number;
     size?: number;

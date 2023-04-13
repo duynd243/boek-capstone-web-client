@@ -14,9 +14,9 @@ type Props = {
 };
 
 const SelectGroupsTable: React.FC<Props> = ({
-    selectedAuthors,
-    handleRemoveAuthor,
-}) => {
+                                                selectedAuthors,
+                                                handleRemoveAuthor,
+                                            }) => {
     return (
         <TableWrapper>
             <TableHeading>

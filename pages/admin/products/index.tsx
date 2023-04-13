@@ -311,7 +311,7 @@ const AdminBookProductsPage: NextPageWithLayout = () => {
                         onSizeChange={onSizeChange}
                         page={page}
                         onPageChange={setPage}
-                        totalPages={productData?.metadata?.total || 0}
+                        totalElements={productData?.metadata?.total || 0}
                         pageSizeOptions={pageSizeOptions}
                     />}
                 </TableWrapper>

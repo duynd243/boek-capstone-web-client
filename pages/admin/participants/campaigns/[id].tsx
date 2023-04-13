@@ -1,7 +1,7 @@
-import {Tab} from "@headlessui/react";
-import {useQuery} from "@tanstack/react-query";
-import {useRouter} from "next/router";
-import {Fragment, ReactElement, useState} from "react";
+import { Tab } from "@headlessui/react";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/router";
+import { Fragment, ReactElement, useState } from "react";
 import Chip from "../../../../components/Admin/Chip";
 import CreateButton from "../../../../components/Admin/CreateButton";
 import PageHeading from "../../../../components/Admin/PageHeading";
@@ -9,12 +9,12 @@ import FormatCard from "../../../../components/CampaignCard/FormatCard";
 import StatusLabel from "../../../../components/CampaignDetails/StatusLabel";
 import AdminLayout from "../../../../components/Layout/AdminLayout";
 import Index from "../../../../components/ParticipantCard";
-import {CampaignStatuses} from "../../../../constants/CampaignStatuses";
-import {ParticipantStatuses} from "../../../../constants/ParticipantStatuses";
-import {useAuth} from "../../../../context/AuthContext";
-import {CampaignService} from "../../../../services/CampaignService";
-import {NextPageWithLayout} from "../../../_app";
-import {ParticipantService} from "../../../../services/ParticipantService";
+import { CampaignStatuses } from "../../../../constants/CampaignStatuses";
+import { ParticipantStatuses } from "../../../../constants/ParticipantStatuses";
+import { useAuth } from "../../../../context/AuthContext";
+import { CampaignService } from "../../../../services/CampaignService";
+import { NextPageWithLayout } from "../../../_app";
+import { ParticipantService } from "../../../../services/ParticipantService";
 
 const ParticipantFlowTabs = [
     {
@@ -39,28 +39,28 @@ const ParticipantFlowTabs = [
 ];
 
 const CampaignParticipants: NextPageWithLayout = () => {
-    const {loginUser} = useAuth();
+    const { loginUser } = useAuth();
     const router = useRouter();
     const campaignService = new CampaignService(loginUser?.accessToken);
     const participantService = new ParticipantService(loginUser?.accessToken);
     const campaignId = router.query.id as string;
 
-    const {data: campaign, isLoading} = useQuery(
+    const { data: campaign, isLoading } = useQuery(
         ["admin_campaign", campaignId],
         () => campaignService.getCampaignByIdByAdmin(Number(campaignId)),
         {
             enabled: !!campaignId,
-        }
+        },
     );
     const [selectedFlowTab, setSelectedFlowTab] = useState(
-        ParticipantFlowTabs[0]
+        ParticipantFlowTabs[0],
     );
 
     const [selectedStatusTab, setSelectedStatusTab] = useState(
-        ParticipantFlowTabs[0].statusTabs[0].id
+        ParticipantFlowTabs[0].statusTabs[0].id,
     );
 
-    console.log(selectedFlowTab.displayName)
+    console.log(selectedFlowTab.displayName);
 
     const participants =
         campaign?.participants?.filter((p) => p.status === selectedStatusTab) ||
@@ -69,7 +69,7 @@ const CampaignParticipants: NextPageWithLayout = () => {
     const [size, setSize] = useState<number>(1000);
     const [page, setPage] = useState<number>(1);
 
-    const {data: participantsData, isLoading: isParticipantsLoading} = useQuery(
+    const { data: participantsData, isLoading: isParticipantsLoading } = useQuery(
         ["admin_participants", campaignId, page, size, selectedStatusTab],
         () => participantService.getParticipantsByAdmin({
             campaignId: Number(campaignId),
@@ -81,16 +81,16 @@ const CampaignParticipants: NextPageWithLayout = () => {
 
     return (
         <Fragment>
-            <PageHeading label="Quản lý yêu cầu / lời mời tham gia hội sách"/>
+            <PageHeading label="Quản lý yêu cầu / lời mời tham gia hội sách" />
 
             <div className="bg-white my-6 p-4 flex border rounded items-center">
-                <FormatCard formatId={campaign?.format}/>
+                <FormatCard formatId={campaign?.format} />
                 <div className="flex-1 ml-4">
                     <h3 className="text-lg font-medium text-gray-900">
                         {campaign?.name}
                     </h3>
                 </div>
-                <StatusLabel statusId={campaign?.status}/>
+                <StatusLabel statusId={campaign?.status} />
                 {campaign?.status === CampaignStatuses.NOT_STARTED.id && (
                     <div className="ml-4">
                         <CreateButton
@@ -134,7 +134,7 @@ const CampaignParticipants: NextPageWithLayout = () => {
                                     className={"focus:outline-none"}
                                     key={tab.displayName}
                                 >
-                                    {({selected}) => {
+                                    {({ selected }) => {
                                         return (
                                             <Chip active={selected}>
                                                 {/* {tab?.statusColor && (
@@ -153,7 +153,7 @@ const CampaignParticipants: NextPageWithLayout = () => {
                 </Tab.Group>
                 <div className="grid md:grid-cols-2 gap-4 pb-6">
                     {participantsData && participantsData?.data?.map((p) => (
-                        <Index showCampaignInfo={false} key={p.id} participant={p}/>
+                        <Index showCampaignInfo={false} key={p.id} participant={p} />
                     ))}
                 </div>
             </div>

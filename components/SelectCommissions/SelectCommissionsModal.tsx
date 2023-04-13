@@ -9,7 +9,6 @@ import { IGenre } from "../../types/Genre/IGenre";
 import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
 import Image from "next/image";
 import { getAvatarFromName } from "../../utils/helper";
-import { z } from "zod";
 
 type Props = {
     isOpen: boolean;
@@ -19,11 +18,11 @@ type Props = {
 };
 
 const SelectCommissionsModal: React.FC<Props> = ({
-    isOpen,
-    onClose,
-    selectedGenres,
-    onItemSelect,
-}) => {
+                                                     isOpen,
+                                                     onClose,
+                                                     selectedGenres,
+                                                     onItemSelect,
+                                                 }) => {
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounce(search, 500);
     const genreService = new GenreService();
@@ -46,7 +45,7 @@ const SelectCommissionsModal: React.FC<Props> = ({
             keepPreviousData: true,
             select: (data) =>
                 data?.data?.filter((genre) => genre?.parentId === null),
-        }
+        },
     );
 
     return (
@@ -71,7 +70,7 @@ const SelectCommissionsModal: React.FC<Props> = ({
                     {!isLoading && genres ? (
                         genres?.map((genre) => {
                             const isSelected = selectedGenres?.find(
-                                (g) => g?.id === genre?.id
+                                (g) => g?.id === genre?.id,
                             );
                             return (
                                 <div

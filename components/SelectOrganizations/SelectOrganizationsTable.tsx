@@ -4,9 +4,9 @@ import TableHeader from "../Admin/Table/TableHeader";
 import TableBody from "../Admin/Table/TableBody";
 import TableData from "../Admin/Table/TableData";
 import Image from "next/image";
-import {getAvatarFromName} from "../../utils/helper";
+import { getAvatarFromName } from "../../utils/helper";
 import TableWrapper from "../Admin/Table/TableWrapper";
-import {IOrganization} from "../../types/Organization/IOrganization";
+import { IOrganization } from "../../types/Organization/IOrganization";
 
 type Props = {
     selectedOrganizations: IOrganization[];

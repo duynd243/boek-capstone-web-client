@@ -1,22 +1,22 @@
-import {IParticipant} from "../../types/Participant/IParticipant";
-import {useAuth} from "../../context/AuthContext";
-import {Roles} from "../../constants/Roles";
-import {ParticipantStatuses} from "../../constants/ParticipantStatuses";
-import React, {useContext, useState} from "react";
+import { IParticipant } from "../../types/Participant/IParticipant";
+import { useAuth } from "../../context/AuthContext";
+import { Roles } from "../../constants/Roles";
+import { ParticipantStatuses } from "../../constants/ParticipantStatuses";
+import React, { useContext, useState } from "react";
 import ConfirmModal from "../Modal/ConfirmModal";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {ParticipantService} from "../../services/ParticipantService";
-import {toast} from "react-hot-toast";
-import {CampaignContext} from "../../context/CampaignContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ParticipantService } from "../../services/ParticipantService";
+import { toast } from "react-hot-toast";
+import { CampaignContext } from "../../context/CampaignContext";
 
 type ParticipantButton = {
     title: string;
     onClick: () => void;
-    type: 'primary' | 'secondary' | 'danger';
+    type: "primary" | "secondary" | "danger";
 }
 
 function useParticipantCard(participant: IParticipant | undefined) {
-    const {loginUser} = useAuth();
+    const { loginUser } = useAuth();
     let Buttons: ParticipantButton[] = [];
     let Modals: React.ReactElement[] = [];
 
@@ -26,14 +26,14 @@ function useParticipantCard(participant: IParticipant | undefined) {
 
     const commonOptions = {
         onSuccess: async () => {
-            await queryClient.invalidateQueries(['admin_participants']);
-            await queryClient.invalidateQueries(['issuer_participants']);
-            await queryClient.invalidateQueries(['admin_campaigns']);
-            await queryClient.invalidateQueries(['admin_campaign']);
-            await queryClient.invalidateQueries(['issuer_campaigns']);
-            await queryClient.invalidateQueries(['issuer_campaign']);
-        }
-    }
+            await queryClient.invalidateQueries(["admin_participants"]);
+            await queryClient.invalidateQueries(["issuer_participants"]);
+            await queryClient.invalidateQueries(["admin_campaigns"]);
+            await queryClient.invalidateQueries(["admin_campaign"]);
+            await queryClient.invalidateQueries(["issuer_campaigns"]);
+            await queryClient.invalidateQueries(["issuer_campaign"]);
+        },
+    };
 
 
     const participantService = new ParticipantService(loginUser?.accessToken);
@@ -64,67 +64,67 @@ function useParticipantCard(participant: IParticipant | undefined) {
     const handleCancelInvitation = async () => {
         if (!participant) return;
         await toast.promise(cancelInvitationMutation.mutateAsync(participant.id), {
-            loading: 'Đang hủy lời mời',
+            loading: "Đang hủy lời mời",
             success: () => {
-                return 'Hủy lời mời thành công';
+                return "Hủy lời mời thành công";
             },
-            error: 'Hủy lời mời thất bại',
+            error: "Hủy lời mời thất bại",
         });
         setShowCancelInvitationModal(false);
-    }
+    };
 
     const handleAcceptInvitation = async () => {
         if (!participant) return;
         await toast.promise(acceptInvitationMutation.mutateAsync(participant.id), {
-            loading: 'Đang xử lý',
+            loading: "Đang xử lý",
             success: () => {
 
-                return 'Chấp nhận lời mời thành công';
+                return "Chấp nhận lời mời thành công";
             },
-            error: 'Đã có lỗi xảy ra',
+            error: "Đã có lỗi xảy ra",
         });
         setShowAcceptInvitationModal(false);
-    }
+    };
 
 
     const handleRejectInvitation = async () => {
         if (!participant) return;
         await toast.promise(rejectInvitationMutation.mutateAsync(participant.id), {
-            loading: 'Đang xử lý',
+            loading: "Đang xử lý",
             success: () => {
 
-                return 'Từ chối lời mời thành công';
+                return "Từ chối lời mời thành công";
             },
-            error: 'Đã có lỗi xảy ra',
+            error: "Đã có lỗi xảy ra",
         });
         setShowRejectInvitationModal(false);
-    }
+    };
 
     const handleRejectRequest = async () => {
         if (!participant) return;
         await toast.promise(rejectRequestMutation.mutateAsync(participant.id), {
-            loading: 'Đang xử lý',
+            loading: "Đang xử lý",
             success: () => {
 
-                return 'Từ chối yêu cầu thành công';
+                return "Từ chối yêu cầu thành công";
             },
-            error: 'Đã có lỗi xảy ra',
+            error: "Đã có lỗi xảy ra",
         });
         setShowRejectRequestModal(false);
-    }
+    };
 
     const handleAcceptRequest = async () => {
         if (!participant) return;
         await toast.promise(acceptRequestMutation.mutateAsync(participant.id), {
-            loading: 'Đang xử lý',
+            loading: "Đang xử lý",
             success: () => {
 
-                return 'Chấp nhận yêu cầu thành công';
+                return "Chấp nhận yêu cầu thành công";
             },
-            error: 'Đã có lỗi xảy ra',
+            error: "Đã có lỗi xảy ra",
         });
         setShowAcceptRequestModal(false);
-    }
+    };
 
     //Issuer
     const [showRejectInvitationModal, setShowRejectInvitationModal] = useState(false);
@@ -135,7 +135,7 @@ function useParticipantCard(participant: IParticipant | undefined) {
     const [showAcceptRequestModal, setShowAcceptRequestModal] = useState(false);
 
 
-    const campaignName = participant?.campaign?.name || campaign?.name || 'hội sách';
+    const campaignName = participant?.campaign?.name || campaign?.name || "hội sách";
 
 
     const CancelInvitationModal = <ConfirmModal
@@ -144,7 +144,7 @@ function useParticipantCard(participant: IParticipant | undefined) {
         onConfirm={handleCancelInvitation}
         confirmText="Xác nhận hủy"
         title="Hủy lời mời tham gia"
-        content={`Bạn có chắc chắn muốn hủy lời mời tham gia đối với nhà phát hành ${participant?.issuer?.user?.name}?`}/>
+        content={`Bạn có chắc chắn muốn hủy lời mời tham gia đối với nhà phát hành ${participant?.issuer?.user?.name}?`} />;
 
     const RejectInvitationModal = <ConfirmModal
         isOpen={showRejectInvitationModal}
@@ -152,16 +152,16 @@ function useParticipantCard(participant: IParticipant | undefined) {
         onConfirm={handleRejectInvitation}
         confirmText="Xác nhận từ chối"
         title="Từ chối lời mời tham gia"
-        content={`Bạn có chắc chắn muốn từ chối lời mời tham gia hội sách ${campaignName}?`}/>
+        content={`Bạn có chắc chắn muốn từ chối lời mời tham gia hội sách ${campaignName}?`} />;
 
     const AcceptInvitationModal = <ConfirmModal
         isOpen={showAcceptInvitationModal}
-        color={'indigo'}
+        color={"indigo"}
         onClose={() => setShowAcceptInvitationModal(false)}
         onConfirm={handleAcceptInvitation}
         confirmText="Chấp nhận"
         title="Chấp nhận lời mời tham gia"
-        content={`Bạn có chắc chắn muốn chấp nhận lời mời tham gia hội sách ${campaignName}?`}/>
+        content={`Bạn có chắc chắn muốn chấp nhận lời mời tham gia hội sách ${campaignName}?`} />;
 
     const RejectRequestModal = <ConfirmModal
         isOpen={showRejectRequestModal}
@@ -169,42 +169,42 @@ function useParticipantCard(participant: IParticipant | undefined) {
         onConfirm={handleRejectRequest}
         confirmText="Xác nhận từ chối"
         title="Từ chối yêu cầu tham gia"
-        content={`Bạn có chắc chắn muốn từ chối yêu cầu tham gia hội sách ${campaignName} từ nhà phát hành ${participant?.issuer?.user?.name}?`}/>
+        content={`Bạn có chắc chắn muốn từ chối yêu cầu tham gia hội sách ${campaignName} từ nhà phát hành ${participant?.issuer?.user?.name}?`} />;
 
     const AcceptRequestModal = <ConfirmModal
         isOpen={showAcceptRequestModal}
-        color={'indigo'}
+        color={"indigo"}
         onClose={() => setShowAcceptRequestModal(false)}
         onConfirm={handleAcceptRequest}
         confirmText="Chấp nhận"
         title="Chấp nhận yêu cầu tham gia"
-        content={`Bạn có chắc chắn muốn chấp nhận yêu cầu tham gia hội sách ${campaignName} từ nhà phát hành ${participant?.issuer?.user?.name}?`}/>
+        content={`Bạn có chắc chắn muốn chấp nhận yêu cầu tham gia hội sách ${campaignName} từ nhà phát hành ${participant?.issuer?.user?.name}?`} />;
 
 
     if (participant?.status === ParticipantStatuses.PendingInvitation.id) {
         if (loginUser?.role === Roles.ISSUER.id) {
             Buttons.push({
-                title: 'Từ chối',
+                title: "Từ chối",
                 onClick: () => {
                     setShowRejectInvitationModal(true);
                 },
-                type: 'danger',
+                type: "danger",
             });
             Buttons.push({
-                title: 'Chấp nhận',
+                title: "Chấp nhận",
                 onClick: () => {
                     setShowAcceptInvitationModal(true);
                 },
-                type: 'primary'
+                type: "primary",
             });
             Modals.push(RejectInvitationModal, AcceptInvitationModal);
         } else if (loginUser?.role === Roles.SYSTEM.id) {
             Buttons.push({
-                title: 'Hủy lời mời',
+                title: "Hủy lời mời",
                 onClick: () => {
                     setShowCancelInvitationModal(true);
                 },
-                type: 'danger'
+                type: "danger",
             });
             Modals.push(CancelInvitationModal);
         }
@@ -213,18 +213,18 @@ function useParticipantCard(participant: IParticipant | undefined) {
         && loginUser?.role === Roles.SYSTEM.id
     ) {
         Buttons.push({
-            title: 'Từ chối',
+            title: "Từ chối",
             onClick: () => {
                 setShowRejectRequestModal(true);
             },
-            type: 'danger',
+            type: "danger",
         });
         Buttons.push({
-            title: 'Chấp nhận',
+            title: "Chấp nhận",
             onClick: () => {
                 setShowAcceptRequestModal(true);
             },
-            type: 'primary'
+            type: "primary",
         });
         Modals.push(RejectRequestModal, AcceptRequestModal);
     }

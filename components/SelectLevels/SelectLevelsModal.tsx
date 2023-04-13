@@ -19,11 +19,11 @@ type Props = {
 };
 
 const SelectLevelsModal: React.FC<Props> = ({
-    isOpen,
-    onClose,
-    selectedLevels,
-    onItemSelect,
-}) => {
+                                                isOpen,
+                                                onClose,
+                                                selectedLevels,
+                                                onItemSelect,
+                                            }) => {
     const { loginUser } = useAuth();
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounce(search, 500);
@@ -44,7 +44,7 @@ const SelectLevelsModal: React.FC<Props> = ({
         {
             keepPreviousData: true,
             select: (data) => data?.data,
-        }
+        },
     );
 
     return (
@@ -69,7 +69,7 @@ const SelectLevelsModal: React.FC<Props> = ({
                     {!isLoading && levels ? (
                         levels?.map((level) => {
                             const isSelected = selectedLevels?.find(
-                                (l) => l?.id === level?.id
+                                (l) => l?.id === level?.id,
                             );
                             return (
                                 <div
@@ -92,7 +92,7 @@ const SelectLevelsModal: React.FC<Props> = ({
                                             className="h-16 w-16 object-cover"
                                             src={getAvatarFromName(
                                                 level?.name,
-                                                1
+                                                1,
                                             )}
                                             alt=""
                                         />

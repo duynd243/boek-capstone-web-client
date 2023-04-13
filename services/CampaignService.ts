@@ -91,13 +91,13 @@ export class CampaignService extends BaseService {
 
     getCampaignByIdByIssuer = async (
         id: number,
-        params?: IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean }
+        params?: IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean },
     ) => {
         const response = await this.axiosClient.get<ICampaign>(
             `/issuer/campaigns/${id}`,
             {
                 params,
-            }
+            },
         );
         return response.data;
     };

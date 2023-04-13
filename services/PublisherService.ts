@@ -31,11 +31,11 @@ export class PublisherService extends BaseService {
             return newResponse.data.data;
         }
         return data;
-    }
+    };
 
     deletePublisher = async (id: number) => {
         const response = await this.axiosClient.delete<IPublisher>(
-            `/admin/publishers/${id}`
+            `/admin/publishers/${id}`,
         );
         return response.data;
     };
@@ -43,7 +43,7 @@ export class PublisherService extends BaseService {
     createPublisher = async (data: CreatePublisherParams) => {
         const response = await this.axiosClient.post<IPublisher>(
             "/admin/publishers",
-            data
+            data,
         );
         return response.data;
     };
@@ -51,7 +51,7 @@ export class PublisherService extends BaseService {
     updatePublisher = async (data: UpdatePublisherParams) => {
         const response = await this.axiosClient.put<IPublisher>(
             "/admin/publishers",
-            data
+            data,
         );
         return response.data;
     };

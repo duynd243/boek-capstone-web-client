@@ -5,7 +5,6 @@ import { getOrderStatusById } from "../../../constants/OrderStatuses";
 import { IOrder } from "../../../types/Order/IOrder";
 import { getFormattedTime } from "../../../utils/helper";
 import { OrderTypes } from "../../../constants/OrderTypes";
-import { getOrderPaymentMethodById } from "../../../constants/OrderPaymentMethods";
 import DefaultAvatar from "../../../assets/images/default-avatar.png";
 
 type Props = {

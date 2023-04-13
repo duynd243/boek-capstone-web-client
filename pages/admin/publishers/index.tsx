@@ -1,12 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import {
-    Fragment,
-    ReactElement,
-    useCallback,
-    useEffect,
-    useState,
-} from "react";
+import { Fragment, ReactElement, useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
 import CreateButton from "../../../components/Admin/CreateButton";
 import PageHeading from "../../../components/Admin/PageHeading";
@@ -22,9 +16,7 @@ import AdminLayout from "../../../components/Layout/AdminLayout";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import LoadingTopPage from "../../../components/LoadingTopPage";
 import ConfirmModal from "../../../components/Modal/ConfirmModal";
-import PublisherModal, {
-    PublisherModalMode,
-} from "../../../components/Modal/PublisherModal";
+import PublisherModal, { PublisherModalMode } from "../../../components/Modal/PublisherModal";
 import { useAuth } from "../../../context/AuthContext";
 import useTableManagementPage from "../../../hooks/useTableManagementPage";
 import { PublisherService } from "../../../services/PublisherService";
@@ -68,7 +60,7 @@ const AdminPublishersPage: NextPageWithLayout = () => {
             }),
         {
             keepPreviousData: true,
-        }
+        },
     );
 
     const deletePublisherMutation = useMutation(
@@ -82,7 +74,7 @@ const AdminPublishersPage: NextPageWithLayout = () => {
                 setSelectedPublisher(undefined);
                 setPage(1);
             },
-        }
+        },
     );
 
     const handleDeletePublisher = useCallback(async () => {
@@ -93,7 +85,7 @@ const AdminPublishersPage: NextPageWithLayout = () => {
                     loading: "Đang xoá nhà xuất bản",
                     success: "Xoá nhà xuất bản thành công",
                     error: (err) => err?.message || "Xoá nhà xuất bản thất bại",
-                }
+                },
             );
         }
     }, [deletePublisherMutation, selectedPublisher?.id]);
@@ -188,7 +180,7 @@ const AdminPublishersPage: NextPageWithLayout = () => {
                         size={size}
                         onPageChange={setPage}
                         page={page}
-                        totalPages={publisherData?.metadata?.total || 0}
+                        totalElements={publisherData?.metadata?.total || 0}
                         onSizeChange={onSizeChange}
                         pageSizeOptions={pageSizeOptions}
                     />
@@ -211,7 +203,7 @@ const AdminPublishersPage: NextPageWithLayout = () => {
                 onClose={() => setShowCreateModal(false)}
                 isOpen={showCreateModal}
             />
-            
+
             {selectedPublisher && (
                 <PublisherModal
                     action={PublisherModalMode.UPDATE}

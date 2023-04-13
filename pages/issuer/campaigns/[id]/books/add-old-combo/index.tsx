@@ -1,18 +1,13 @@
-import React, { Fragment, ReactElement, useState } from 'react'
+import React, { Fragment, ReactElement, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../../../../_app";
 import AdminLayout from "../../../../../../components/Layout/AdminLayout";
 import { useRouter } from "next/router";
 import { GiBookmarklet } from "react-icons/gi";
-import SelectSellingBookSeriesModal
-    from "../../../../../../components/SelectSellingBookSeries/SelectSellingBookSeriesModal";
-import SelectBookSeriesProductModal from "../../../../../../components/SelectBookSeries/SelectBookSeriesProductModal";
-import { IoChevronBack } from 'react-icons/io5';
-import SelectOldComboProductModal from './../../../../../../components/SelectBookSeries/SelectOldComboProductModal';
-import { useAuth } from '../../../../../../context/AuthContext';
-import { CampaignService } from '../../../../../../services/CampaignService';
-import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
-
+import { IoChevronBack } from "react-icons/io5";
+import SelectOldComboProductModal from "./../../../../../../components/SelectBookSeries/SelectOldComboProductModal";
+import { useAuth } from "../../../../../../context/AuthContext";
+import { CampaignService } from "../../../../../../services/CampaignService";
+import { useQuery } from "@tanstack/react-query";
 
 
 const SelectOldComboBookPage: NextPageWithLayout = () => {
@@ -29,13 +24,13 @@ const SelectOldComboBookPage: NextPageWithLayout = () => {
         () => campaignService.getCampaignByIdByIssuer(Number(campaignId)),
         {
             enabled: !!campaignId,
-        }
+        },
     );
 
     const genreIds = useMemo(() => campaign?.campaignCommissions?.map(c => c.genre?.id) || [], [campaign]);
     return (
         <Fragment>
-            <div className='mx-auto max-w-6xl overflow-hidden rounded-md bg-white p-3'>
+            <div className="mx-auto max-w-6xl overflow-hidden rounded-md bg-white p-3">
                 <div className="mb-6">
                     <button
                         className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
@@ -68,11 +63,11 @@ const SelectOldComboBookPage: NextPageWithLayout = () => {
                     router.push(`/issuer/campaigns/${campaignId}/books/add-old-combo/${bp?.id}`);
                 }} />}
         </Fragment>
-    )
-}
+    );
+};
 
 SelectOldComboBookPage.getLayout = function getLayout(page: ReactElement) {
     return <AdminLayout>{page}</AdminLayout>;
 };
 
-export default SelectOldComboBookPage
+export default SelectOldComboBookPage;

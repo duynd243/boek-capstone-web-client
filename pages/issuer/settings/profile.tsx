@@ -1,12 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Fragment, ReactElement, useEffect, useMemo } from "react";
+import { ReactElement } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import AdminProfileForm, {
-    UpdateProfileFormType,
-    UpdateProfileSchema,
-} from "../../../components/AdminProfileForm";
+import AdminProfileForm, { UpdateProfileFormType, UpdateProfileSchema } from "../../../components/AdminProfileForm";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import AdminSettingsLayout from "../../../components/Layout/AdminSettingsLayout";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
@@ -59,11 +56,11 @@ const AdminProfilePage = () => {
 
     const formMethods = useForm<UpdateProfileFormType>({
         resolver: zodResolver(UpdateProfileSchema),
-        defaultValues: getDefaultValue(profile as { id: string; description?: string | undefined; user: IUser; } ),
+        defaultValues: getDefaultValue(profile as { id: string; description?: string | undefined; user: IUser; }),
     });
 
     const updateProfileMutation = useMutation(
-        (data:  {
+        (data: {
             description?: string,
             user: UpdateUserParams,
         }) => {
@@ -75,11 +72,11 @@ const AdminProfilePage = () => {
                 // reinitialize the form with the new data
                 //formMethods.reset(defaultValues);
             },
-        }
+        },
     );
 
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
 
     const onSubmit = async (data: UpdateProfileFormType) => {
@@ -98,7 +95,7 @@ const AdminProfilePage = () => {
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -111,7 +108,7 @@ const AdminProfilePage = () => {
                 description: payload.description,
                 user: {
                     ...payload,
-                }
+                },
             }), {
                 loading: "Đang cập nhật",
                 success: () => {

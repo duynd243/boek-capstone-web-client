@@ -1,11 +1,11 @@
-import React, {ReactElement} from "react";
+import React, { ReactElement } from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
-import {NextPageWithLayout} from "../../_app";
+import { NextPageWithLayout } from "../../_app";
 import ParticipantsPage from "../../../components/ParticipantsPage";
 
 const AdminParticipantsPage: NextPageWithLayout = () => {
     return (
-        <ParticipantsPage/>
+        <ParticipantsPage />
     );
 };
 

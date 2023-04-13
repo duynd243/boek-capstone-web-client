@@ -1,43 +1,32 @@
-import React from 'react'
-import { IBook } from './../../types/Book/IBook';
-import { z } from 'zod';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Form from '../Form';
-import { Controller } from 'react-hook-form';
-import { isImageFile } from '../../utils/helper';
-import { isValidFileSize } from './../../utils/helper';
-import { toast } from 'react-hot-toast';
-import Link from 'next/link';
-import { useAuth } from '../../context/AuthContext';
-import { LanguageService } from './../../services/LanguageService';
-import { GenreService } from './../../services/GenreService';
-import { AuthorService } from './../../old-services/AuthorService';
-import { BookService } from './../../services/BookService';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import SelectBox from './../SelectBox/index';
-import { IPublisher } from './../../types/Publisher/IPublisher';
-import { PublisherService } from './../../services/PublisherService';
-import { IGenre } from './../../types/Genre/IGenre';
-import CreateButton from '../Admin/CreateButton';
-import SelectAuthorModal from './../SelectAuthor/SelectAuthorModal';
-import SelectAuthorTable from './../SelectAuthor/SelectAuthorTable';
-import { ImageUploadService } from './../../services/ImageUploadService';
-import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/router';
-import { BsEmojiSmileFill } from 'react-icons/bs';
-import { BsEmojiFrownFill } from 'react-icons/bs';
-import ToggleButton from './../ToggleButton';
-import { IoChevronBack } from 'react-icons/io5';
-import TableWrapper from './../Admin/Table/TableWrapper';
-import TableHeading from './../Admin/Table/TableHeading';
-import TableBody from './../Admin/Table/TableBody';
-import TableData from './../Admin/Table/TableData';
-import TableHeader from './../Admin/Table/TableHeader';
-import { useState } from 'react';
-import Modal from './../Modal/Modal';
-import TransitionModal from './../Modal/TransitionModal';
-import ConfirmModal from './../Modal/ConfirmModal';
+import React from "react";
+import { IBook } from "./../../types/Book/IBook";
+import { z } from "zod";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Form from "../Form";
+import { isImageFile } from "../../utils/helper";
+import { isValidFileSize } from "./../../utils/helper";
+import { toast } from "react-hot-toast";
+import Link from "next/link";
+import { useAuth } from "../../context/AuthContext";
+import { LanguageService } from "./../../services/LanguageService";
+import { GenreService } from "./../../services/GenreService";
+import { AuthorService } from "./../../old-services/AuthorService";
+import { BookService } from "./../../services/BookService";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import SelectBox from "./../SelectBox/index";
+import { IPublisher } from "./../../types/Publisher/IPublisher";
+import { PublisherService } from "./../../services/PublisherService";
+import { IGenre } from "./../../types/Genre/IGenre";
+import CreateButton from "../Admin/CreateButton";
+import SelectAuthorModal from "./../SelectAuthor/SelectAuthorModal";
+import SelectAuthorTable from "./../SelectAuthor/SelectAuthorTable";
+import { ImageUploadService } from "./../../services/ImageUploadService";
+import { useRouter } from "next/router";
+import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
+import ToggleButton from "./../ToggleButton";
+import { IoChevronBack } from "react-icons/io5";
+import ConfirmModal from "./../Modal/ConfirmModal";
 import { BOOK_IMAGE_UPLOAD_CONTAINER } from "../../constants/TailwindClasses";
 
 type Props = {
@@ -53,7 +42,7 @@ const BookForm = ({ book }: Props) => {
     const [showSelectAuthorModal, setShowSelectAuthorModal] = React.useState(false);
     const imageService = new ImageUploadService(loginUser?.accessToken);
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
 
 
@@ -73,37 +62,35 @@ const BookForm = ({ book }: Props) => {
         setShowModal(false);
     };
     const updateBookMutation = useMutation((data: any) => {
-        return bookService.updateBookByIssuer(data)
+        return bookService.updateBookByIssuer(data);
     }, {
         onSuccess: async () => {
-            await queryClient.invalidateQueries(['issuer_book']);
-            await queryClient.invalidateQueries(['issuer_books']);
-            await router.push('/issuer/books');
-        }
+            await queryClient.invalidateQueries(["issuer_book"]);
+            await queryClient.invalidateQueries(["issuer_books"]);
+            await router.push("/issuer/books");
+        },
     });
 
-    const { data: books } = useQuery(['books'], () =>
+    const { data: books } = useQuery(["books"], () =>
         bookService.getBooks$Issuer({
             size: 1000,
-        })
+        }),
     );
-    const { data: publishers } = useQuery(['publisher'], () =>
+    const { data: publishers } = useQuery(["publisher"], () =>
         publisherService.getPublishers({
             size: 1000,
-        })
+        }),
     );
-    const { data: authors } = useQuery(['authors'], () =>
+    const { data: authors } = useQuery(["authors"], () =>
         authorService.getAuthors({
             size: 1000,
-        })
+        }),
     );
-    const { data: languages } = useQuery(['languages'], () =>
-        languageService.getLanguages()
+    const { data: languages } = useQuery(["languages"], () =>
+        languageService.getLanguages(),
     );
-    const { data: genres } = useQuery(['genres'], () =>
-        genreService.getChildGenres({
-
-        })
+    const { data: genres } = useQuery(["genres"], () =>
+        genreService.getChildGenres({}),
     );
 
     const UpdateBookSchema = z.object({
@@ -136,30 +123,28 @@ const BookForm = ({ book }: Props) => {
 
 
     const languageOptions = languages?.map((language) => ({
-        value: language
+        value: language,
     }));
 
     const statusOptions = book?.status === 1 ? [
         {
             value: 1,
-            label: 'Đang phát hành'
+            label: "Đang phát hành",
         },
         {
             value: 0,
-            label: 'Ngừng phát hành'
-        }
+            label: "Ngừng phát hành",
+        },
     ] : [
         {
             value: 0,
-            label: 'Ngừng phát hành'
+            label: "Ngừng phát hành",
         },
         {
             value: 1,
-            label: 'Đang phát hành'
-        }
+            label: "Đang phát hành",
+        },
     ];
-
-
 
 
     type FormType = Partial<z.infer<typeof UpdateBookSchema>>;
@@ -198,12 +183,12 @@ const BookForm = ({ book }: Props) => {
     const { fields: authorFields, append: appendAuthor } = useFieldArray<FormType>({
         control,
         name: "authors" as never,
-    })
+    });
 
     const handleRemoveAuthor = (authorId: number) => {
         const newAuthorFields = watch("authors")?.filter((id) => id !== authorId);
         setValue("authors", newAuthorFields);
-    }
+    };
 
 
     const selectedAuthor = authors?.data?.filter((author) => watch("authors")?.includes(author.id));
@@ -249,12 +234,12 @@ const BookForm = ({ book }: Props) => {
                 },
                 error: (err) => err?.message || "Cập nhật sách thất bại",
             });
-            console.log(payload)
+            console.log(payload);
         } catch (error) {
             console.log(error);
             return;
         }
-    }
+    };
 
     console.log(errors);
 
@@ -302,7 +287,7 @@ const BookForm = ({ book }: Props) => {
                                                 return false;
                                             }
 
-                                            field.onChange(file)
+                                            field.onChange(file);
                                             return true;
                                         }}
                                         defaultImageURL={book?.imageUrl}
@@ -378,12 +363,12 @@ const BookForm = ({ book }: Props) => {
                                             }>
                                                 value={
                                                     field.value ? {
-                                                        value: field.value
+                                                        value: field.value,
                                                     } : null
                                                 }
-                                                displayKey='value'
+                                                displayKey="value"
                                                 dataSource={languageOptions}
-                                                placeholder='Chọn ngôn ngữ'
+                                                placeholder="Chọn ngôn ngữ"
                                                 onValueChange={(l) => {
                                                     field.onChange(l.value);
                                                 }}
@@ -421,9 +406,9 @@ const BookForm = ({ book }: Props) => {
                                                 value={
                                                     publishers?.data?.find((p) => p.id === field.value) || null
                                                 }
-                                                displayKey='name'
+                                                displayKey="name"
                                                 dataSource={publishers?.data}
-                                                placeholder='Chọn nhà xuất bản'
+                                                placeholder="Chọn nhà xuất bản"
                                                 onValueChange={(p) => {
                                                     field.onChange(p.id);
                                                 }}
@@ -434,7 +419,7 @@ const BookForm = ({ book }: Props) => {
                                 <div className="sm:col-span-3">
                                     <Form.Label label="Thể loại" required={true} />
                                     <Controller
-                                        
+
                                         control={control}
                                         name="genreId"
                                         render={({ field }) => (
@@ -443,9 +428,9 @@ const BookForm = ({ book }: Props) => {
                                                 value={
                                                     genres?.find((g) => g.id === field.value) || null
                                                 }
-                                                displayKey='name'
+                                                displayKey="name"
                                                 dataSource={genres}
-                                                placeholder='Chọn thể loại'
+                                                placeholder="Chọn thể loại"
                                                 onValueChange={(p) => {
                                                     field.onChange(p.id);
                                                 }}
@@ -503,7 +488,7 @@ const BookForm = ({ book }: Props) => {
                 <Form.Divider />
                 <Form.GroupLabel label="Định dạng" />
                 <div className="mt-3 space-y-4">
-                    <div className='grid sm:grid-cols-2 gap-y-6 gap-x-4'>
+                    <div className="grid sm:grid-cols-2 gap-y-6 gap-x-4">
                         <Form.Input<FormType>
                             label={"Link PDF Trial"}
                             register={register}
@@ -555,8 +540,8 @@ const BookForm = ({ book }: Props) => {
                                 <div>
                                     <div
                                         className={`${field.value ? "bg-green-500" : "bg-rose-500"
-                                            } flex w-fit items-center gap-2 rounded px-2.5 py-1 text-sm text-white transition`}
-                                    // onClick={() => field.onChange(!field.value ? 1 : 0)}
+                                        } flex w-fit items-center gap-2 rounded px-2.5 py-1 text-sm text-white transition`}
+                                        // onClick={() => field.onChange(!field.value ? 1 : 0)}
                                     >
                                         {field.value ? (
                                             <>
@@ -581,10 +566,11 @@ const BookForm = ({ book }: Props) => {
                                             // }
                                             if (field.value === 1 && true) {
                                                 setshowConfirmDisabledModal(true);
+                                            } else {
+                                                field.onChange(field.value === 1 ? 0 : 1);
                                             }
-                                            else { field.onChange(field.value === 1 ? 0 : 1) }
                                         }}
-                                    // field.onChange(field.value === 1 ? 0 : 1)}
+                                        // field.onChange(field.value === 1 ? 0 : 1)}
                                     />
                                 </div>
                             </div>
@@ -593,15 +579,15 @@ const BookForm = ({ book }: Props) => {
                 </div>
 
                 <Form.Divider />
-                <div className='flex justify-end gap-4'>
+                <div className="flex justify-end gap-4">
                     <Link
-                        href={'/issuer/books'}
+                        href={"/issuer/books"}
                         className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200">
                         Huỷ
                     </Link>
                     <button type="submit"
-                        disabled={isSubmitting}
-                        className="m-btn text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50">
+                            disabled={isSubmitting}
+                            className="m-btn text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50">
                         Lưu
                     </button>
                 </div>
@@ -638,13 +624,13 @@ const BookForm = ({ book }: Props) => {
                     </div>
                 </ConfirmModal>
 
-            </form >
+            </form>
             {/* <pre>{JSON.stringify(watch(), null, 2)}</pre> */}
         </>
-    )
+    );
 
-}
+};
 
 
-export default BookForm
+export default BookForm;
 

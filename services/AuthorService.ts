@@ -14,14 +14,32 @@ export class AuthorService extends BaseService {
             "/authors",
             {
                 params,
-            }
+            },
         );
+        return response.data;
+    };
+
+    getAllAuthors = async (
+        params?: IBaseRequestParams<IAuthor>,
+    ) => {
+        const response = await this.getAuthors(params);
+
+        const { data, metadata: { total } } = response;
+        if (data.length < total) {
+            const newParams = {
+                ...params,
+                page: params?.page || 1,
+                size: total,
+            };
+            const newResponse = await this.getAuthors(newParams);
+            return newResponse.data;
+        }
         return response.data;
     };
 
     deleteAuthor = async (id: number) => {
         const response = await this.axiosClient.delete<IAuthor>(
-            `/admin/authors/${id}`
+            `/admin/authors/${id}`,
         );
         return response.data;
     };
@@ -29,7 +47,7 @@ export class AuthorService extends BaseService {
     createAuthor = async (data: CreateAuthorParams) => {
         const response = await this.axiosClient.post<IAuthor>(
             "/admin/authors",
-            data
+            data,
         );
         return response.data;
     };
@@ -37,7 +55,7 @@ export class AuthorService extends BaseService {
     updateAuthor = async (data: UpdateAuthorParams) => {
         const response = await this.axiosClient.put<IAuthor>(
             "/admin/authors",
-            data
+            data,
         );
         return response.data;
     };

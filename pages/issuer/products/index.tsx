@@ -1,4 +1,4 @@
-import React, { Fragment, ReactElement, useState } from 'react'
+import React, { Fragment, ReactElement, useState } from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { NextPageWithLayout } from "../../_app";
 import PageHeading from "../../../components/Admin/PageHeading";
@@ -8,7 +8,6 @@ import { Tab } from "@headlessui/react";
 import { BookProductStatuses, getBookProductStatusById } from "../../../constants/BookProductStatuses";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../../context/AuthContext";
-import { BookService } from "../../../services/BookService";
 import Chip from "../../../components/Admin/Chip";
 import TableWrapper from "../../../components/Admin/Table/TableWrapper";
 import TableHeading from "../../../components/Admin/Table/TableHeading";
@@ -16,29 +15,26 @@ import TableHeader from "../../../components/Admin/Table/TableHeader";
 import TableBody from "../../../components/Admin/Table/TableBody";
 import TableData from "../../../components/Admin/Table/TableData";
 import Image from "next/image";
-import { isValidImageSrc } from "../../../utils/helper";
-import DefaultAvatar from "../../../assets/images/default-avatar.png";
-import StatusCard from "../../../components/StatusCard";
 import TableFooter from "../../../components/Admin/Table/TableFooter";
 import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import Link from "next/link";
-import { BookProductService } from './../../../services/BookProductService';
+import { BookProductService } from "./../../../services/BookProductService";
 import { getBookTypeById } from "../../../constants/BookTypes";
-import { useRouter } from 'next/router';
-import { CampaignStatuses } from '../../../constants/CampaignStatuses copy';
-import SelectBox from '../../../components/SelectBox';
-import { ICampaign } from '../../../types/Campaign/ICampaign';
-import { Roles } from '../../../constants/Roles';
-import { CampaignService } from '../../../services/CampaignService';
+import { useRouter } from "next/router";
+import { CampaignStatuses } from "../../../constants/CampaignStatuses copy";
+import SelectBox from "../../../components/SelectBox";
+import { ICampaign } from "../../../types/Campaign/ICampaign";
+import { Roles } from "../../../constants/Roles";
+import { CampaignService } from "../../../services/CampaignService";
 
 const BookProductTabs = [
     BookProductStatuses.Pending,
     BookProductStatuses.Rejected,
     BookProductStatuses.Selling,
     {
-        id: 'Stopped',
+        id: "Stopped",
         displayName: "Ngừng bán",
-    }
+    },
 ];
 const NotSaleStatusTabs = [
     BookProductStatuses.NotSale,
@@ -47,12 +43,12 @@ const NotSaleStatusTabs = [
     BookProductStatuses.NotSaleDueEndDate,
     BookProductStatuses.NotSaleDuePostponedCampaign,
     BookProductStatuses.Unreleased,
-]
+];
 const IssuerBookProductsPage: NextPageWithLayout = () => {
     const router = useRouter();
     const { loginUser } = useAuth();
     const bookProductService = new BookProductService(loginUser?.accessToken);
-    
+
     const campaignIdFromUrl = router.query["campaign"] as string;
     const [campaignId, setCampaignId] = useState<number | null>(Number(campaignIdFromUrl) || null);
 
@@ -86,12 +82,12 @@ const IssuerBookProductsPage: NextPageWithLayout = () => {
     const handleStatusChange = (tab: typeof BookProductTabs[number]) => {
         setStatus(tab.id);
         setPage(1);
-    }
+    };
 
     const handleNotSaleStatusChange = (tab: typeof NotSaleStatusTabs[number]) => {
         setNotSaleStatus(tab.id);
         setPage(1);
-    }
+    };
 
     const params = {
         title: search,
@@ -113,7 +109,7 @@ const IssuerBookProductsPage: NextPageWithLayout = () => {
             bookProductService.getBookProductsByIssuer(params),
         {
             keepPreviousData: true,
-        }
+        },
     );
     return (
         <Fragment>
@@ -210,11 +206,11 @@ const IssuerBookProductsPage: NextPageWithLayout = () => {
                         <TableHeading>
                             <TableHeader>Tên sách</TableHeader>
                             <TableHeader>Giá bán</TableHeader>
-                            <TableHeader  textAlignment="text-center">Hội sách</TableHeader>
+                            <TableHeader textAlignment="text-center">Hội sách</TableHeader>
 
                             <TableHeader>Loại sách</TableHeader>
                             <TableHeader>Trạng thái</TableHeader>
-                            <TableHeader  textAlignment="text-center">
+                            <TableHeader textAlignment="text-center">
                                 <span className="sr-only">Edit</span>
                             </TableHeader>
                         </TableHeading>
@@ -248,25 +244,25 @@ const IssuerBookProductsPage: NextPageWithLayout = () => {
                                             }).format(book?.salePrice || 0)}
                                         </TableData>
 
-                                        <TableData 
-                                         textAlignment="text-center"
-                                        className="text-sm text-gray-700 font-medium">
+                                        <TableData
+                                            textAlignment="text-center"
+                                            className="text-sm text-gray-700 font-medium">
                                             <Link href={`campaigns/${book?.campaignId}`}>
                                                 {book?.campaign?.name || "-"}
                                             </Link>
                                         </TableData>
 
-                                        <TableData 
-                                         textAlignment="text-center"
-                                        className="text-sm text-gray-600">
+                                        <TableData
+                                            textAlignment="text-center"
+                                            className="text-sm text-gray-600">
                                             <div
-                                                className='w-fit px-3 py-2 flex items-center justify-center rounded-full border bg-gray-50'>
+                                                className="w-fit px-3 py-2 flex items-center justify-center rounded-full border bg-gray-50">
                                                 {bookType?.icon} {bookType?.displayName}
                                             </div>
                                         </TableData>
-                                        <TableData 
-                                         textAlignment="text-center"
-                                        className="text-sm">
+                                        <TableData
+                                            textAlignment="text-center"
+                                            className="text-sm">
                                             <span
                                                 className={`w-fit flex items-center h-6 px-3 text-xs font-semibold ${bookStatus?.label?.classNames}`}>
                                                 {bookStatus?.commonDisplayName || bookStatus?.displayName}
@@ -295,7 +291,7 @@ const IssuerBookProductsPage: NextPageWithLayout = () => {
                             onSizeChange={onSizeChange}
                             page={page}
                             onPageChange={setPage}
-                            totalPages={productData?.metadata?.total || 0}
+                            totalElements={productData?.metadata?.total || 0}
                             pageSizeOptions={pageSizeOptions}
                         />
                     </TableWrapper>
@@ -307,16 +303,16 @@ const IssuerBookProductsPage: NextPageWithLayout = () => {
                         />
                     ) : (
                         <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}
-                            customMessage={"Không có sách nào ở trạng thái này"}
+                                    customMessage={"Không có sách nào ở trạng thái này"}
                         />
                     )}
                 </div>)}
             </div>
         </Fragment>
-    )
-}
+    );
+};
 IssuerBookProductsPage.getLayout = function getLayout(page: ReactElement) {
     return <AdminLayout>{page}</AdminLayout>;
 };
 
-export default IssuerBookProductsPage
+export default IssuerBookProductsPage;

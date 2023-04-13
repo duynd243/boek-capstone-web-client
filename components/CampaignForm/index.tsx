@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { FormikValues } from "formik/dist/types";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { Fragment, memo, useState } from 'react';
+import React, { Fragment, memo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { CampaignFormats } from "../../constants/CampaignFormats";
 import { CampaignPrivacies } from "../../constants/CampaignPrivacies";
@@ -38,8 +38,8 @@ type Props = {
     formikForm: FormikValues;
 }
 
-const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
-    const {loginUser} = useAuth();
+const CampaignForm: React.FC<Props> = ({ formikForm: form, action }) => {
+    const { loginUser } = useAuth();
     const router = useRouter();
 
     // Services
@@ -249,17 +249,17 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
             genreId: genre?.id,
             genreName: genre?.name,
             commission: 0,
-        }
-        form.setFieldValue('campaignCommissions', [...form.values.campaignCommissions, newCommission]);
+        };
+        form.setFieldValue("campaignCommissions", [...form.values.campaignCommissions, newCommission]);
         setShowCommissionModal(false);
-    }
+    };
 
     // Organization callbacks
 
     const handleAddOrg = (org: IOrganization) => {
         form.setFieldValue(
             "organizations",
-            [...form.values.organizations, org]
+            [...form.values.organizations, org],
         );
         setShowSelectOrgModal(false);
     };
@@ -267,7 +267,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
     const handleRemoveOrg = (org: IOrganization) => {
         form.setFieldValue(
             "organizations",
-            form.values.organizations.filter((o: IOrganization) => o?.id !== org?.id)
+            form.values.organizations.filter((o: IOrganization) => o?.id !== org?.id),
         );
     };
 
@@ -276,25 +276,24 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
     const handleAddGroup = (group: IGroup) => {
         form.setFieldValue(
             "groups",
-            [...form.values.groups, group]
+            [...form.values.groups, group],
         );
         setShowSelectGroupModal(false);
     };
 
 
-
     const handleRemoveGroup = (group: IGroup) => {
         form.setFieldValue(
             "groups",
-            form.values.groups.filter((g: IGroup) => g?.id !== group?.id)
+            form.values.groups.filter((g: IGroup) => g?.id !== group?.id),
         );
     };
 
     const chosenFormatId = Number(form.values.format);
     const isOnlineRequired =
-        chosenFormatId === CampaignFormats.ONLINE.id
+        chosenFormatId === CampaignFormats.ONLINE.id;
     const isOfflineRequired =
-        chosenFormatId === CampaignFormats.OFFLINE.id
+        chosenFormatId === CampaignFormats.OFFLINE.id;
 
     return (
         <Fragment>
@@ -321,7 +320,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                         fieldName={"description"}
                         label={"Mô tả"}
                     />
-                    <Form.Label label={"Ảnh bìa"} required={true}/>
+                    <Form.Label label={"Ảnh bìa"} required={true} />
                     <Form.ImageUploadPanel
                         defaultImageURL={action === CampaignFormAction.UPDATE ? form.values.imageUrl : null}
                         label={`PNG, JPG, GIF tối đa ${MAX_FILE_SIZE_IN_MB}MB`}
@@ -332,7 +331,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                         <ErrorMessage>{form.errors.previewImage}</ErrorMessage>
                     )}
 
-                    <Form.Label label={"Hình thức tổ chức"} required={true}/>
+                    <Form.Label label={"Hình thức tổ chức"} required={true} />
                     <RadioGroup
                         disabled={action === CampaignFormAction.UPDATE}
                         value={form.values.format}
@@ -346,7 +345,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                     >
                         {Object.values(CampaignFormats).map((format) => (
                             <RadioGroup.Option key={format.id} value={format.id}>
-                                {({checked}) => (
+                                {({ checked }) => (
                                     <CampaignFormatCard
                                         id={format.id}
                                         icon={format.icon}
@@ -364,7 +363,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                         <ErrorMessage>{form.errors.format}</ErrorMessage>
                     )}
                 </div>
-                <Form.Divider/>
+                <Form.Divider />
                 <Form.GroupLabel
                     label={"Thời gian và địa điểm"}
                     description={"Thời gian và địa điểm tổ chức hội sách"}
@@ -385,7 +384,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                                         form.values.startOnlineDate
                                             ? format(
                                                 Number(form.values.startOnlineDate),
-                                                "dd/MM/yyyy hh:mm a"
+                                                "dd/MM/yyyy hh:mm a",
                                             )
                                             : ""
                                     }
@@ -410,7 +409,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                                         form.values.endOnlineDate
                                             ? format(
                                                 Number(form.values.endOnlineDate),
-                                                "dd/MM/yyyy hh:mm a"
+                                                "dd/MM/yyyy hh:mm a",
                                             )
                                             : ""
                                     }
@@ -436,7 +435,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                                         form.values.startOfflineDate
                                             ? format(
                                                 Number(form.values.startOfflineDate),
-                                                "dd/MM/yyyy hh:mm a"
+                                                "dd/MM/yyyy hh:mm a",
                                             )
                                             : ""
                                     }
@@ -461,7 +460,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                                         form.values.endOfflineDate
                                             ? format(
                                                 Number(form.values.endOfflineDate),
-                                                "dd/MM/yyyy hh:mm a"
+                                                "dd/MM/yyyy hh:mm a",
                                             )
                                             : ""
                                     }
@@ -487,7 +486,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                 )}
 
 
-                <Form.Divider/>
+                <Form.Divider />
                 <Form.GroupLabel
                     label={"Đối tượng của hội sách"}
                     description={"Các đối tượng mà hội sách này nhắm đến"}
@@ -495,7 +494,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
 
                 <div className="mt-3 space-y-4">
                     <div>
-                        <Form.Label label={"Tổ chức"} required={true}/>
+                        <Form.Label label={"Tổ chức"} required={true} />
                         <div className="mb-4 flex justify-end gap-4">
                             <CreateButton
                                 label={"Thêm tổ chức"}
@@ -514,7 +513,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                     </div>
 
                     <div>
-                        <Form.Label label={"Nhóm"}/>
+                        <Form.Label label={"Nhóm"} />
                         <div className="mb-4 flex justify-end gap-4">
                             <CreateButton
                                 label={"Thêm nhóm"}
@@ -532,7 +531,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                         )}
                     </div>
                     <div>
-                        <Form.Label label={"Quyền riêng tư"} required={true}/>
+                        <Form.Label label={"Quyền riêng tư"} required={true} />
                         <div className="mt-3 grid gap-3 sm:grid-cols-2">
                             {campaignPrivacies.map((privacy) => (
                                 <div key={privacy.id} className="relative flex items-start">
@@ -565,10 +564,10 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                     </div>
                 </div>
 
-                <Form.Divider/>
-                <Form.GroupLabel label='Thể loại và chiết khấu'
-                                 description='Thể loại sách và chiết khấu mà hội sách này áp dụng'/>
-                <div className='mt-3'><Form.Label label={"Thể loại"} required={true}/>
+                <Form.Divider />
+                <Form.GroupLabel label="Thể loại và chiết khấu"
+                                 description="Thể loại sách và chiết khấu mà hội sách này áp dụng" />
+                <div className="mt-3"><Form.Label label={"Thể loại"} required={true} />
                     <div className="mb-4 flex justify-end gap-4">
                         <CreateButton
                             label={"Thêm"}
@@ -577,15 +576,15 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                             }}
                         />
                     </div>
-                    <SelectCommissionsTable formikForm={form} field={'campaignCommissions'}/>
+                    <SelectCommissionsTable formikForm={form} field={"campaignCommissions"} />
                     {form.errors.campaignCommissions && !Array.isArray(form.errors.campaignCommissions) && form.touched.campaignCommissions && (
                         <ErrorMessage>{form.errors.campaignCommissions}</ErrorMessage>
                     )}</div>
 
-                <Form.Divider/>
-                <div className='flex justify-end gap-4'>
+                <Form.Divider />
+                <div className="flex justify-end gap-4">
                     <Link
-                        href={'/admin/campaigns'}
+                        href={"/admin/campaigns"}
                         className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200">
                         Huỷ
                     </Link>
@@ -593,8 +592,8 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                             disabled={form.isSubmitting}
                             className="m-btn text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50">
                         {form.isSubmitting ?
-                            (action === CampaignFormAction.UPDATE ? 'Đang cập nhật' : 'Đang tạo...') :
-                            (action === CampaignFormAction.UPDATE ? 'Cập nhật' : 'Tạo hội sách')}
+                            (action === CampaignFormAction.UPDATE ? "Đang cập nhật" : "Đang tạo...") :
+                            (action === CampaignFormAction.UPDATE ? "Cập nhật" : "Tạo hội sách")}
                     </button>
                 </div>
             </form>
@@ -618,7 +617,7 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
                 isOpen={showCommissionModal}
                 onClose={() => setShowCommissionModal(false)}
                 selectedCommissions={form.values.campaignCommissions}
-                onItemSelect={handleAddCommission}/>
+                onItemSelect={handleAddCommission} />
 
             <DateTimePickerModal
                 onDismiss={() => setShowStartOnlinePicker(false)}
@@ -665,6 +664,6 @@ const CampaignForm: React.FC<Props> = ({formikForm: form, action}) => {
             />
         </Fragment>
     );
-}
+};
 
-export default memo(CampaignForm)
+export default memo(CampaignForm);

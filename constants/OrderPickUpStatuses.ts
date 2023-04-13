@@ -38,7 +38,7 @@ export function getOrderPickUpStatusById(id: number) {
 
 export function getNextPickUpUpdateStatus(
     currentStatusId?: number,
-    orderTypeId?: number
+    orderTypeId?: number,
 ) {
     if (!currentStatusId || !orderTypeId) return null;
 

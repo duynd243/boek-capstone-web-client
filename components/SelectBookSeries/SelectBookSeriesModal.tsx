@@ -1,19 +1,16 @@
-import React from 'react'
-import { IBook } from './../../types/Book/IBook';
-import TransitionModal from './../Modal/TransitionModal';
-import { BsSearch } from 'react-icons/bs';
-import useDebounce from './../../hooks/useDebounce';
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '../../context/AuthContext';
-import { BookService } from './../../services/BookService';
-import Modal from './../Modal/Modal';
-import Link from 'next/link';
-import Image from 'next/image';
-import EmptyState, { EMPTY_STATE_TYPE } from '../EmptyState';
-import { BookProductService } from './../../services/BookProductService';
-import { IBookProduct } from '../../types/Book/IBookProduct';
-
+import React, { useState } from "react";
+import { IBook } from "./../../types/Book/IBook";
+import TransitionModal from "./../Modal/TransitionModal";
+import { BsSearch } from "react-icons/bs";
+import useDebounce from "./../../hooks/useDebounce";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
+import { BookService } from "./../../services/BookService";
+import Modal from "./../Modal/Modal";
+import Link from "next/link";
+import Image from "next/image";
+import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
+import { BookProductService } from "./../../services/BookProductService";
 
 
 type Props = {
@@ -27,30 +24,28 @@ type Props = {
 }
 
 const SelectBookSeriesModal = ({
-    isOpen,
-    onClose,
-    onItemSelect,
-    genreIds,
-    selectedBooks,
-    isSeries = false,
-    campaignId
-}: Props) => {
-    const {loginUser} = useAuth();
+                                   isOpen,
+                                   onClose,
+                                   onItemSelect,
+                                   genreIds,
+                                   selectedBooks,
+                                   isSeries = false,
+                                   campaignId,
+                               }: Props) => {
+    const { loginUser } = useAuth();
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search, 500);
     const bookService = new BookService(loginUser?.accessToken);
     const bookProductService = new BookProductService(loginUser?.accessToken);
 
-    const { data: books } = useQuery(["books", {debouncedSearch, campaignId, genreIds, isSeries}], () =>
-    bookService.getAddableBooksByIssuer({
+    const { data: books } = useQuery(["books", { debouncedSearch, campaignId, genreIds, isSeries }], () =>
+        bookService.getAddableBooksByIssuer({
             name: debouncedSearch,
             genreIds,
             isSeries: isSeries,
             CurrentCampaignId: campaignId,
-        })
+        }),
     );
-
-
 
 
     return (
@@ -75,7 +70,7 @@ const SelectBookSeriesModal = ({
                     {books?.data && books?.data.length > 0 ? (
                         books?.data.map((book, index) => {
                             const isSelected = selectedBooks?.find(
-                                (item) => item.id === book.id
+                                (item) => item.id === book.id,
                             );
                             return (
                                 <div
@@ -100,13 +95,14 @@ const SelectBookSeriesModal = ({
                                             alt=""
                                         />
                                         <div>
-                                            <div className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
+                                            <div
+                                                className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
                                                 {book?.code}
                                             </div>
                                             <div className="mb-1 text-sm font-medium text-gray-900">
                                                 {book?.name}
                                             </div>
-                                           
+
                                             <div className="text-sm font-medium text-gray-500">
                                                 Thể loại: {book?.genre?.name}
                                             </div>
@@ -147,7 +143,7 @@ const SelectBookSeriesModal = ({
                 </Modal.Footer>
             </div>
         </TransitionModal>
-    )
-}
+    );
+};
 
-export default SelectBookSeriesModal
+export default SelectBookSeriesModal;

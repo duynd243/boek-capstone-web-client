@@ -4,7 +4,7 @@ type Props = {
     size?: number;
 };
 
-const LoadingSpinner: React.FC<Props> = ({size = 4}) => {
+const LoadingSpinner: React.FC<Props> = ({ size = 4 }) => {
     return (
         <svg
             aria-hidden="true"

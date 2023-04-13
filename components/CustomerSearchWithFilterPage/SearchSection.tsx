@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type Props = {
     title: string;
@@ -9,6 +9,11 @@ type Props = {
 
 const SearchSection: React.FC<Props> = ({ title, initValue = "", onSearch, placeholder }) => {
     const [searchInput, setSearchInput] = useState(initValue);
+
+    useEffect(() => {
+        setSearchInput(initValue);
+    }, [initValue]);
+
     return (
         <div>
             <div

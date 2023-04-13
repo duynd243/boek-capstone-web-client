@@ -1,26 +1,23 @@
-import React from 'react'
-import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/router';
-import { IoChevronBack } from 'react-icons/io5';
-import Form from '../Form';
-import Image from 'next/image';
-import { IBookProduct } from '../../types/Book/IBookProduct';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { getBookProductsFormatOptions } from '../../utils/helper';
-import { BookFormats, getBookFormatById, IBookFormat } from './../../constants/BookFormats';
-import { Controller } from 'react-hook-form';
-import SelectBox from './../SelectBox/index';
-import ErrorMessage from './../Form/ErrorMessage';
-import { IBook } from '../../types/Book/IBook';
-import { toast } from 'react-hot-toast';
-import { BookProductService } from '../../services/BookProductService';
-import { useAuth } from '../../context/AuthContext';
-import { useMutation } from '@tanstack/react-query';
-import { useQueryClient } from '@tanstack/react-query';
-import { useContext } from 'react';
-import { CampaignContext } from './../../context/CampaignContext';
-import useEditBookProduct from './useEditBookProduct';
+import React, { useContext } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useRouter } from "next/router";
+import { IoChevronBack } from "react-icons/io5";
+import Form from "../Form";
+import Image from "next/image";
+import { IBookProduct } from "../../types/Book/IBookProduct";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { getBookProductsFormatOptions } from "../../utils/helper";
+import { BookFormats, getBookFormatById, IBookFormat } from "./../../constants/BookFormats";
+import SelectBox from "./../SelectBox/index";
+import ErrorMessage from "./../Form/ErrorMessage";
+import { IBook } from "../../types/Book/IBook";
+import { toast } from "react-hot-toast";
+import { BookProductService } from "../../services/BookProductService";
+import { useAuth } from "../../context/AuthContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CampaignContext } from "./../../context/CampaignContext";
+import useEditBookProduct from "./useEditBookProduct";
 
 type Props = {
     product: IBookProduct;
@@ -32,8 +29,8 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
     const router = useRouter();
 
     const { loginUser } = useAuth();
-    
-  const { editBasicInfoMutation } = useEditBookProduct();
+
+    const { editBasicInfoMutation } = useEditBookProduct();
 
 
     const campaign = useContext(CampaignContext);
@@ -53,9 +50,8 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
         displayPdfIndex: z.number(),
         withAudio: z.boolean(),
         displayAudioIndex: z.number(),
-        status: z.number()
-    })
-
+        status: z.number(),
+    });
 
 
     type FormType = Partial<z.infer<typeof UpdateBookProductSchema>>;
@@ -74,25 +70,32 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
     };
 
 
-    const { register, watch, control, setValue, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormType>({
+    const {
+        register,
+        watch,
+        control,
+        setValue,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<FormType>({
         resolver: zodResolver(UpdateBookProductSchema),
         defaultValues,
     });
     const bookProductService = new BookProductService(loginUser?.accessToken);
     const updateOddBookProductMutation = useMutation((data: any) => {
-        return bookProductService.updateOddBookProductByIssuer(data)
+        return bookProductService.updateOddBookProductByIssuer(data);
     }, {
         onSuccess: async () => {
-            await queryClient.invalidateQueries(['issuer_product']);
+            await queryClient.invalidateQueries(["issuer_product"]);
             await router.push(`/issuer/products`);
-        }
+        },
     });
 
     const availableFormats = getBookProductsFormatOptions({
         ...product?.book,
         fullPdfAndAudio: true,
     } as (IBook | undefined), product?.campaign?.format);
-    const selectedFormat = getBookFormatById(watch('format'));
+    const selectedFormat = getBookFormatById(watch("format"));
 
     const availableBonuses = availableFormats.filter((format) => format.id !== selectedFormat?.id && format.id !== BookFormats.PAPER.id);
 
@@ -102,58 +105,58 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
 
         //alert(JSON.stringify(data));
 
-        if(editBasicInfoOnly){
+        if (editBasicInfoOnly) {
             try {
                 const payload = {
-                  id: data.id,
-                  saleQuantity: data.saleQuantity,
-                  status: 3
+                    id: data.id,
+                    saleQuantity: data.saleQuantity,
+                    status: 3,
                 };
-        
+
                 // payload.commission = 10;
                 await toast.promise(editBasicInfoMutation.mutateAsync({
-                  ...payload,
+                    ...payload,
                 }), {
-                  loading: "Đang cập nhập sách",
-                  success: () => {
-                    return "Cập nhập sách thành công";
-                  },
-                  error: (err) => err?.message || "Cập nhập sách thất bại",
+                    loading: "Đang cập nhập sách",
+                    success: () => {
+                        return "Cập nhập sách thành công";
+                    },
+                    error: (err) => err?.message || "Cập nhập sách thất bại",
                 });
-                console.log(payload)
-              } catch (error) {
+                console.log(payload);
+            } catch (error) {
                 console.log(error);
                 return;
-              }
+            }
+        } else {
+            try {
+                const payload = UpdateBookProductSchema.parse(data);
+                // payload.commission = 10;
+
+                console.log(JSON.stringify(payload));
+                await toast.promise(updateOddBookProductMutation.mutateAsync(payload), {
+                    loading: "Đang cập nhập sách",
+                    success: () => {
+                        return "Chỉnh sửa sách thành công";
+                    },
+                    error: (err) => err?.message || "Chỉnh sửa sách thất bại",
+                });
+                console.log(payload);
+            } catch (error) {
+                console.log(error);
+                return;
+            }
         }
 
-        else{try {
-            const payload = UpdateBookProductSchema.parse(data);
-            // payload.commission = 10;
+    };
 
-            console.log(JSON.stringify(payload));
-            await toast.promise(updateOddBookProductMutation.mutateAsync(payload), {
-                loading: "Đang cập nhập sách",
-                success: () => {
-                    return "Chỉnh sửa sách thành công";
-                },
-                error: (err) => err?.message || "Chỉnh sửa sách thất bại",
-            });
-            console.log(payload)
-        } catch (error) {
-            console.log(error);
-            return;
-        }}
-        
-    }
-
-    console.log("errors", errors)
+    console.log("errors", errors);
     return (
         <div>
             <form className="p-6 sm:p-10" onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-6">
                     <button
-                        type='button'
+                        type="button"
                         className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
                         onClick={() => router.back()}
                     >
@@ -165,18 +168,18 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
                     label={"Thông tin chung"}
                     description={"Thông tin cơ bản về sách"}
                 />
-                <div className='mt-3 space-y-4 md:space-y-0 md:flex gap-6'>
+                <div className="mt-3 space-y-4 md:space-y-0 md:flex gap-6">
                     <Image
                         width={1200}
                         height={1200}
-                        className={'rounded-md w-64 h-72 object-cover max-w-full shadow-md'}
-                        src={product?.book?.imageUrl || ''} alt={product?.book?.name || ''} />
+                        className={"rounded-md w-64 h-72 object-cover max-w-full shadow-md"}
+                        src={product?.book?.imageUrl || ""} alt={product?.book?.name || ""} />
                     <div>
-                    <div
-                            className='inline mb-2 bg-blue-500 text-sm font-medium text-white py-2 px-3 w-fit rounded'>{product?.book?.code}
+                        <div
+                            className="inline mb-2 bg-blue-500 text-sm font-medium text-white py-2 px-3 w-fit rounded">{product?.book?.code}
                         </div>
                         <div
-                            className='inline ml-2 mb-2 bg-amber-500 text-sm font-medium text-white py-2 px-3 w-fit rounded'>{product?.book?.genre?.name}
+                            className="inline ml-2 mb-2 bg-amber-500 text-sm font-medium text-white py-2 px-3 w-fit rounded">{product?.book?.genre?.name}
                         </div>
                         <h1 className="mt-3 mb-2 text-2xl font-medium text-slate-800">{product?.title}</h1>
                         <div className="text-gray-500">NXB: {product?.book?.publisher?.name}</div>
@@ -199,7 +202,7 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
                     <div className="grid gap-y-4 gap-x-4 sm:grid-cols-3">
                         <Form.Input<FormType>
                             register={register}
-                            inputType={'number'}
+                            inputType={"number"}
                             disabled={editBasicInfoOnly}
                             placeholder={"Giảm giá"}
                             fieldName={"discount"}
@@ -208,7 +211,7 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
                         />
                         <Form.Input<FormType>
                             register={register}
-                            inputType={'number'}
+                            inputType={"number"}
                             disabled={editBasicInfoOnly}
                             placeholder={"Chiết khấu"}
                             fieldName={"commission"}
@@ -217,7 +220,7 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
                         />
                         <Form.Input<FormType>
                             register={register}
-                            inputType={'number'}
+                            inputType={"number"}
                             placeholder={"Nhập số lượng sách sẽ được bán"}
                             required={true}
                             fieldName={"saleQuantity"}
@@ -281,21 +284,26 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
                                                 Sách {format.displayName} -
                                                 {selectedFormat?.id === BookFormats.PAPER.id ? (
                                                     //If the format is a paper book, it will display 2 checkboxes that are audio books and pdf books, each checkbox has a different value
-                                                    <span className="text-gray-500">{format?.id === BookFormats.PDF.id ? (
-                                                        <span className="text-gray-500">{product?.book?.pdfExtraPrice} ₫</span>
+                                                    <span
+                                                        className="text-gray-500">{format?.id === BookFormats.PDF.id ? (
+                                                        <span
+                                                            className="text-gray-500">{product?.book?.pdfExtraPrice} ₫</span>
                                                     ) : (
-                                                        <span className="text-gray-500">{product?.book?.audioExtraPrice} ₫</span>
+                                                        <span
+                                                            className="text-gray-500">{product?.book?.audioExtraPrice} ₫</span>
                                                     )
                                                     }</span>
                                                 ) : selectedFormat?.id === BookFormats.PDF.id ? (
-                                                    <span className="text-gray-500">{product?.book?.audioExtraPrice} ₫</span>
+                                                    <span
+                                                        className="text-gray-500">{product?.book?.audioExtraPrice} ₫</span>
                                                 ) : (
-                                                    <span className="text-gray-500">{product?.book?.pdfExtraPrice} ₫</span>
+                                                    <span
+                                                        className="text-gray-500">{product?.book?.pdfExtraPrice} ₫</span>
                                                 )}
                                             </label>
                                         </div>
                                     </div>
-                                )
+                                );
                             }) : <div className="text-gray-500 text-sm">Không tìm thấy tặng kèm khả dụng.</div>) : (
                                 <div className="text-gray-500 text-sm">Bạn cần chọn định dạng để xem được các mục
                                     tặng kèm khả dụng.</div>
@@ -304,8 +312,8 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
                     </div>
                 </div>
                 <Form.Divider />
-                <div className='flex justify-end gap-4'>
-                    <button type='button' className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200">
+                <div className="flex justify-end gap-4">
+                    <button type="button" className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200">
                         Hủy
                     </button>
                     <button type="submit" className="m-btn text-white bg-indigo-600 hover:bg-indigo-700">
@@ -315,7 +323,7 @@ const SingleBookProductForm = ({ product, editBasicInfoOnly = false }: Props) =>
             </form>
             <pre>{JSON.stringify(watch(), null, 2)}</pre>
         </div>
-    )
-}
+    );
+};
 
-export default SingleBookProductForm
+export default SingleBookProductForm;

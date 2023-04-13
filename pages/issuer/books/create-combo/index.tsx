@@ -4,11 +4,11 @@ import AdminLayout from "../../../../components/Layout/AdminLayout";
 import ComboBookForm from "../../../../components/BookForm/ComboBookForm";
 
 const CreateComboPage: NextPageWithLayout = () => {
-  return <ComboBookForm formMode="create" />;
+    return <ComboBookForm formMode="create" />;
 };
 
 CreateComboPage.getLayout = function getLayout(page: ReactElement) {
-  return <AdminLayout>{page}</AdminLayout>;
+    return <AdminLayout>{page}</AdminLayout>;
 };
 
 export default CreateComboPage;

@@ -5,19 +5,11 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
 import { IPublisher } from "../../types/Publisher/IPublisher";
-import {
-    isImageFile,
-    isValidFileSize,
-    VIETNAMESE_PHONE_REGEX,
-} from "../../utils/helper";
+import { isImageFile, isValidFileSize, VIETNAMESE_PHONE_REGEX } from "../../utils/helper";
 import SelectProfilePicture from "../SelectProfilePicture";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
-import {
-    CreatePublisherParams,
-    PublisherService,
-    UpdatePublisherParams,
-} from "../../services/PublisherService";
+import { CreatePublisherParams, PublisherService, UpdatePublisherParams } from "../../services/PublisherService";
 import { useAuth } from "../../context/AuthContext";
 import { ImageUploadService } from "../../services/ImageUploadService";
 import ErrorMessage from "../Form/ErrorMessage";
@@ -37,13 +29,13 @@ type Props = {
 };
 
 const PublisherModal: React.FC<Props> = ({
-    maxWidth,
-    action,
-    isOpen,
-    onClose,
-    publisher,
-    afterLeave,
-}) => {
+                                             maxWidth,
+                                             action,
+                                             isOpen,
+                                             onClose,
+                                             publisher,
+                                             afterLeave,
+                                         }) => {
     const BasePublisherSchema = z.object({
         name: z
             .string()
@@ -91,7 +83,7 @@ const PublisherModal: React.FC<Props> = ({
         resolver: zodResolver(
             action === PublisherModalMode.CREATE
                 ? BasePublisherSchema
-                : UpdatePublisherSchema
+                : UpdatePublisherSchema,
         ),
         defaultValues,
     });
@@ -117,18 +109,18 @@ const PublisherModal: React.FC<Props> = ({
         (data: CreatePublisherParams) => {
             return publisherService.createPublisher(data);
         },
-        commonMutationOptions
+        commonMutationOptions,
     );
 
     const updatePublisherMutation = useMutation(
         (data: UpdatePublisherParams) => {
             return publisherService.updatePublisher(data);
         },
-        commonMutationOptions
+        commonMutationOptions,
     );
 
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
     const onSubmit = async (data: FormType) => {
         if (data.previewFile) {
@@ -144,7 +136,7 @@ const PublisherModal: React.FC<Props> = ({
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -172,7 +164,7 @@ const PublisherModal: React.FC<Props> = ({
                                     "Thêm nhà xuất bản thất bại"
                                 );
                             },
-                        }
+                        },
                     );
                 } catch (error) {
                     return;
@@ -194,7 +186,7 @@ const PublisherModal: React.FC<Props> = ({
                                     "Cập nhật nhà xuất bản thất bại"
                                 );
                             },
-                        }
+                        },
                     );
                 } catch (error) {
                     return;
@@ -232,13 +224,13 @@ const PublisherModal: React.FC<Props> = ({
                                 onChange={(file) => {
                                     if (!isImageFile(file)) {
                                         toast.error(
-                                            "Tệp tải lên phải có định dạng ảnh"
+                                            "Tệp tải lên phải có định dạng ảnh",
                                         );
                                         return false;
                                     }
                                     if (!isValidFileSize(file, 1)) {
                                         toast.error(
-                                            "Kích thước ảnh đại diện không được vượt quá 1MB"
+                                            "Kích thước ảnh đại diện không được vượt quá 1MB",
                                         );
                                         return false;
                                     }

@@ -21,7 +21,7 @@ export class LevelService extends BaseService {
             "/levels",
             {
                 params,
-            }
+            },
         );
         return response.data;
     };
@@ -29,7 +29,7 @@ export class LevelService extends BaseService {
     createLevel = async (data: CreateLevelParams) => {
         const response = await this.axiosClient.post<ILevel>(
             "/admin/levels",
-            data
+            data,
         );
         return response.data;
     };
@@ -37,7 +37,7 @@ export class LevelService extends BaseService {
     updateLevel = async (data: UpdateLevelParams) => {
         const response = await this.axiosClient.put<ILevel>(
             `/admin/levels`,
-            data
+            data,
         );
         return response.data;
     };

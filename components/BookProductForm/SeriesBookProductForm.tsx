@@ -1,31 +1,28 @@
-import React from 'react'
-import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/router';
-import { IoChevronBack } from 'react-icons/io5';
-import Form from '../Form';
-import Image from 'next/image';
-import { IBookProduct } from '../../types/Book/IBookProduct';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { getBookProductsFormatOptions } from '../../utils/helper';
-import { BookFormats, getBookFormatById, IBookFormat } from './../../constants/BookFormats';
-import { Controller } from 'react-hook-form';
-import SelectBox from './../SelectBox/index';
-import ErrorMessage from './../Form/ErrorMessage';
-import { IBook } from '../../types/Book/IBook';
-import { toast } from 'react-hot-toast';
-import { BookProductService } from '../../services/BookProductService';
-import { useAuth } from '../../context/AuthContext';
-import { useMutation } from '@tanstack/react-query';
-import { useQueryClient } from '@tanstack/react-query';
-import TableWrapper from './../Admin/Table/TableWrapper';
-import TableHeading from './../Admin/Table/TableHeading';
-import TableHeader from './../Admin/Table/TableHeader';
-import TableBody from './../Admin/Table/TableBody';
-import TableData from './../Admin/Table/TableData';
-import useEditBookProduct from './useEditBookProduct';
-import { useContext } from 'react';
-import { CampaignContext } from './../../context/CampaignContext';
+import React, { useContext } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useRouter } from "next/router";
+import { IoChevronBack } from "react-icons/io5";
+import Form from "../Form";
+import Image from "next/image";
+import { IBookProduct } from "../../types/Book/IBookProduct";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { getBookProductsFormatOptions } from "../../utils/helper";
+import { BookFormats, getBookFormatById, IBookFormat } from "./../../constants/BookFormats";
+import SelectBox from "./../SelectBox/index";
+import ErrorMessage from "./../Form/ErrorMessage";
+import { IBook } from "../../types/Book/IBook";
+import { toast } from "react-hot-toast";
+import { BookProductService } from "../../services/BookProductService";
+import { useAuth } from "../../context/AuthContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import TableWrapper from "./../Admin/Table/TableWrapper";
+import TableHeading from "./../Admin/Table/TableHeading";
+import TableHeader from "./../Admin/Table/TableHeader";
+import TableBody from "./../Admin/Table/TableBody";
+import TableData from "./../Admin/Table/TableData";
+import useEditBookProduct from "./useEditBookProduct";
+import { CampaignContext } from "./../../context/CampaignContext";
 
 
 type Props = {
@@ -33,14 +30,13 @@ type Props = {
     editBasicInfoOnly?: boolean;
 }
 
-const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) => {
-
+const SeriesBookProductForm = ({ product, editBasicInfoOnly = false }: Props) => {
 
 
     const { loginUser } = useAuth();
     const queryClient = useQueryClient();
-    
-  const { editBasicInfoMutation } = useEditBookProduct();
+
+    const { editBasicInfoMutation } = useEditBookProduct();
 
     const router = useRouter();
 
@@ -49,8 +45,8 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
     // const bookId = router.query.id as string;
     const campaign = useContext(CampaignContext);
     const minimalCommission = campaign
-    ?.campaignCommissions
-    ?.find((c) => c?.genreId === product?.genre?.parentId)?.minimalCommission || 0;
+        ?.campaignCommissions
+        ?.find((c) => c?.genreId === product?.genre?.parentId)?.minimalCommission || 0;
 
 
     const UpdateSeriesBookProductSchema = z.object({
@@ -70,10 +66,9 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                 withAudio: z.boolean(),
                 displayAudioIndex: z.number(),
                 book: z.any(),
-            })
-        )
-    })
-
+            }),
+        ),
+    });
 
 
     type FormType = Partial<z.infer<typeof UpdateSeriesBookProductSchema>>;
@@ -99,53 +94,60 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                     audioExtraPrice: i?.audioExtraPrice,
                     code: i?.book?.code,
                     imageUrl: i?.book?.imageUrl,
-                    coverPrice: i?.book?.coverPrice
-                }
-            }
-        }) || []
+                    coverPrice: i?.book?.coverPrice,
+                },
+            };
+        }) || [],
     };
 
-    const { register, reset, watch, control, setValue, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormType>({
+    const {
+        register,
+        reset,
+        watch,
+        control,
+        setValue,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<FormType>({
         resolver: zodResolver(UpdateSeriesBookProductSchema),
         defaultValues,
     });
 
 
-
     const updateSeriesBookProductMutation = useMutation((data: any) => {
-        return bookProductService.updateSeriesBookProductByIssuer(data)
+        return bookProductService.updateSeriesBookProductByIssuer(data);
     }, {
         onSuccess: async () => {
-            await queryClient.invalidateQueries(['issuer_product']);
+            await queryClient.invalidateQueries(["issuer_product"]);
             await router.push(`/issuer/products`);
-        }
+        },
     });
     const onSubmit = async (data: FormType) => {
 
         // alert(JSON.stringify(data));
-        if(editBasicInfoOnly){
+        if (editBasicInfoOnly) {
             try {
                 const payload = {
-                  id: data.id,
-                  saleQuantity: data.saleQuantity,
-                  status: 3
+                    id: data.id,
+                    saleQuantity: data.saleQuantity,
+                    status: 3,
                 };
-        
+
                 // payload.commission = 10;
                 await toast.promise(editBasicInfoMutation.mutateAsync({
-                  ...payload,
+                    ...payload,
                 }), {
-                  loading: "Đang cập nhập sách",
-                  success: () => {
-                    return "Cập nhập sách thành công";
-                  },
-                  error: (err) => err?.message || "Cập nhập sách thất bại",
+                    loading: "Đang cập nhập sách",
+                    success: () => {
+                        return "Cập nhập sách thành công";
+                    },
+                    error: (err) => err?.message || "Cập nhập sách thất bại",
                 });
-                console.log(payload)
-              } catch (error) {
+                console.log(payload);
+            } catch (error) {
                 console.log(error);
                 return;
-              }
+            }
         } else {
             try {
                 const payload = UpdateSeriesBookProductSchema.parse(data);
@@ -153,14 +155,14 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                 const bookProductItems = payload.bookProductItems?.map(i => {
                     return {
                         ...i,
-                        format: payload.format
-                    }
+                        format: payload.format,
+                    };
                 });
-    
+
                 console.log(JSON.stringify(payload));
                 await toast.promise(updateSeriesBookProductMutation.mutateAsync({
                     ...payload,
-                    bookProductItems
+                    bookProductItems,
                 }), {
                     loading: "Đang cập nhập series",
                     success: () => {
@@ -168,19 +170,19 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                     },
                     error: (err) => err?.message || "Cập nhập series thất bại",
                 });
-                console.log(payload)
+                console.log(payload);
             } catch (error) {
                 console.log(error);
                 return;
             }
         }
-        
-    }
+
+    };
     const availableFormats = getBookProductsFormatOptions({
         ...product?.book,
         fullPdfAndAudio: true,
     } as (IBook | undefined), product?.campaign?.format);
-    const selectedFormat = getBookFormatById(watch('format'));
+    const selectedFormat = getBookFormatById(watch("format"));
 
     const availableBonuses = availableFormats.filter((format) => format.id !== selectedFormat?.id && format.id !== BookFormats.PAPER.id);
     console.log(errors);
@@ -194,9 +196,9 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                 ...i,
                 withAudio: false,
                 withPdf: false,
-            }
+            };
         }));
-    }
+    };
 
 
     return (
@@ -216,18 +218,18 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                     label={"Thông tin chung"}
                     description={"Thông tin cơ bản về sách"}
                 />
-                <div className='mt-3 space-y-4 md:space-y-0 md:flex gap-6'>
+                <div className="mt-3 space-y-4 md:space-y-0 md:flex gap-6">
                     <Image
                         width={1000}
                         height={1000}
-                        className={'rounded-md w-64 h-72 object-cover max-w-full shadow-md'}
-                        src={product?.book?.imageUrl || ''} alt={product?.book?.name || ''} />
+                        className={"rounded-md w-64 h-72 object-cover max-w-full shadow-md"}
+                        src={product?.book?.imageUrl || ""} alt={product?.book?.name || ""} />
                     <div>
                         <div
-                            className='inline mb-2 bg-blue-500 text-sm font-medium text-white py-2 px-3 w-fit rounded'>{product?.book?.code}
+                            className="inline mb-2 bg-blue-500 text-sm font-medium text-white py-2 px-3 w-fit rounded">{product?.book?.code}
                         </div>
                         <div
-                            className='inline ml-2 mb-2 bg-amber-500 text-sm font-medium text-white py-2 px-3 w-fit rounded'>{product?.book?.genre?.name}
+                            className="inline ml-2 mb-2 bg-amber-500 text-sm font-medium text-white py-2 px-3 w-fit rounded">{product?.book?.genre?.name}
                         </div>
                         <h1 className="mt-3 mb-2 text-2xl font-medium text-slate-800">{product?.book?.name}</h1>
                         {/* <div className="text-gray-500">NXB: {product?.book?.publisher?.name}</div> */}
@@ -236,7 +238,8 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                         {/* Price */}
                         <div className="text-emerald-600 font-medium text-xl mt-3">{
                             product?.book?.coverPrice
-                        } ₫</div>
+                        } ₫
+                        </div>
 
                         {/* Description */}
                         <div className="mt-3 text-sm text-gray-500">
@@ -250,7 +253,7 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                         <Form.Input<FormType>
                             register={register}
                             disabled={editBasicInfoOnly}
-                            inputType={'number'}
+                            inputType={"number"}
                             placeholder={"Giảm giá"}
                             fieldName={"discount"}
                             label={"Giảm giá (%)"}
@@ -258,7 +261,7 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                         />
                         <Form.Input<FormType>
                             register={register}
-                            inputType={'number'}
+                            inputType={"number"}
                             disabled={editBasicInfoOnly}
                             placeholder={"Chiết khấu"}
                             fieldName={"commission"}
@@ -267,7 +270,7 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                         />
                         <Form.Input<FormType>
                             register={register}
-                            inputType={'number'}
+                            inputType={"number"}
                             placeholder={"Nhập số lượng sách sẽ được bán"}
                             required={true}
                             fieldName={"saleQuantity"}
@@ -295,7 +298,7 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                                     onValueChange={(value) => {
                                         if (value) {
                                             field.onChange(value.id);
-                                            clearAllBonuses()
+                                            clearAllBonuses();
                                         }
                                     }}
                                     dataSource={availableFormats}
@@ -360,8 +363,8 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                             <TableHeader>Tặng kèm</TableHeader>
                         </TableHeading>
                         <TableBody>
-                            {watch('bookProductItems') !== undefined && watch('bookProductItems')?.length > 0 ? (
-                                watch('bookProductItems')?.map((book, index) => {
+                            {watch("bookProductItems") !== undefined && watch("bookProductItems")?.length > 0 ? (
+                                watch("bookProductItems")?.map((book, index) => {
                                     return (
                                         <tr key={index}>
                                             <TableData className="text-sm font-medium uppercase text-gray-500">
@@ -412,43 +415,45 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
                                                     <>
 
                                                         {availableBonuses?.length > 0 ? availableBonuses?.map((format) => {
-                                                            const registerName = format.id === BookFormats.PDF.id ?
-                                                                `bookProductItems.${index}.withPdf` as const :
-                                                                `bookProductItems.${index}.withAudio` as const;
-                                                            const extraPrice = format.id === BookFormats.PDF.id ?
-                                                                book?.book?.pdfExtraPrice : book?.book?.audioExtraPrice
+                                                                const registerName = format.id === BookFormats.PDF.id ?
+                                                                    `bookProductItems.${index}.withPdf` as const :
+                                                                    `bookProductItems.${index}.withAudio` as const;
+                                                                const extraPrice = format.id === BookFormats.PDF.id ?
+                                                                    book?.book?.pdfExtraPrice : book?.book?.audioExtraPrice;
 
-                                                            return (
-                                                                <div
-                                                                    key={format.id}
-                                                                    className="relative flex items-center gap-2">
-                                                                    <input
-                                                                    disabled={editBasicInfoOnly}
-                                                                        id={`bonus-${format.id}-b${book.id}`}
-                                                                        type="checkbox"
-                                                                        {...register(registerName)}
-                                                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50"
-                                                                    />
-                                                                    <label
-                                                                        htmlFor={`bonus-${format.id}-b${book.id}`}
-                                                                        className="text-sm font-medium text-gray-600"
-                                                                    >
-                                                                        {format.displayName} - <span
+                                                                return (
+                                                                    <div
+                                                                        key={format.id}
+                                                                        className="relative flex items-center gap-2">
+                                                                        <input
+                                                                            disabled={editBasicInfoOnly}
+                                                                            id={`bonus-${format.id}-b${book.id}`}
+                                                                            type="checkbox"
+                                                                            {...register(registerName)}
+                                                                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50"
+                                                                        />
+                                                                        <label
+                                                                            htmlFor={`bonus-${format.id}-b${book.id}`}
+                                                                            className="text-sm font-medium text-gray-600"
+                                                                        >
+                                                                            {format.displayName} - <span
                                                                             className="text-emerald-600 font-medium">
                                                                             {new Intl.NumberFormat("vi-VN", {
                                                                                 style: "currency",
                                                                                 currency: "VND",
                                                                             }).format(extraPrice)}</span>
 
-                                                                    </label>
-                                                                </div>
-                                                            )
-                                                        })
+                                                                        </label>
+                                                                    </div>
+                                                                );
+                                                            })
                                                             : <div className="text-gray-500 text-sm">-</div>}
                                                     </>
                                                 }
 
-                                                {!watch("format") && <div>Bạn cần chọn định dạng để xem được các mục tặng kèm khả dụng.</div>}
+                                                {!watch("format") &&
+                                                    <div>Bạn cần chọn định dạng để xem được các mục tặng kèm khả
+                                                        dụng.</div>}
 
                                             </TableData>
                                         </tr>
@@ -470,8 +475,8 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
 
                 </div>
                 <Form.Divider />
-                <div className='flex justify-end gap-4'>
-                    <button type='button' className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200">
+                <div className="flex justify-end gap-4">
+                    <button type="button" className="m-btn bg-gray-100 text-slate-600 hover:bg-gray-200">
                         Hủy
                     </button>
                     <button type="submit" className="m-btn text-white bg-indigo-600 hover:bg-indigo-700">
@@ -483,7 +488,7 @@ const SeriesBookProductForm = ({ product,  editBasicInfoOnly = false }: Props) =
 
             </form>
         </div>
-    )
-}
+    );
+};
 
-export default SeriesBookProductForm
+export default SeriesBookProductForm;

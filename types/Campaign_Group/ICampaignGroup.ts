@@ -1,4 +1,5 @@
-import { IGroup } from './../Group/IGroup';
+import { IGroup } from "./../Group/IGroup";
+
 export interface ICampaignGroup {
     id: number;
     campaignId?: number;

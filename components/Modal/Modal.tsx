@@ -1,10 +1,10 @@
 import React from "react";
 
-import {Dialog} from "@headlessui/react";
+import { Dialog } from "@headlessui/react";
 import Form from "../Form";
 import Link from "next/link";
-import {BsEmojiFrownFill, BsEmojiSmileFill} from "react-icons/bs";
-import {CgSpinnerAlt} from "react-icons/cg";
+import { BsEmojiFrownFill, BsEmojiSmileFill } from "react-icons/bs";
+import { CgSpinnerAlt } from "react-icons/cg";
 
 type HeaderProps = {
     title: string;
@@ -16,7 +16,7 @@ type FooterProps = {
     children: React.ReactNode;
 };
 
-const Header: React.FC<HeaderProps> = ({title, showCloseButton, onClose}) => {
+const Header: React.FC<HeaderProps> = ({ title, showCloseButton, onClose }) => {
     return (
         <Dialog.Title className="border-b border-slate-200 px-5 py-3">
             <div className="flex items-center justify-between">
@@ -38,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({title, showCloseButton, onClose}) => {
         </Dialog.Title>
     );
 };
-const Footer: React.FC<FooterProps> = ({children}) => {
+const Footer: React.FC<FooterProps> = ({ children }) => {
     return (
         <div className="border-t border-slate-200 px-5 py-4">{children}</div>
     );
@@ -56,7 +56,7 @@ type ButtonProps = {
 } & React.ButtonHTMLAttributes<HTMLButtonElement> &
     React.AnchorHTMLAttributes<HTMLAnchorElement>;
 
-const PrimaryButton: React.FC<ButtonProps> = ({children, href, ...rest}) => {
+const PrimaryButton: React.FC<ButtonProps> = ({ children, href, ...rest }) => {
     const props = {
         ...rest,
         className:
@@ -113,11 +113,11 @@ const StatusSwitch = ({
             >
                 {enabled ? (
                     <>
-                        Hoạt động <BsEmojiSmileFill/>
+                        Hoạt động <BsEmojiSmileFill />
                     </>
                 ) : (
                     <>
-                        Không hoạt động <BsEmojiFrownFill/>
+                        Không hoạt động <BsEmojiFrownFill />
                     </>
                 )}
             </div>
@@ -138,7 +138,7 @@ const SubmitTextWithLoading = (props: {
             {props.isLoading ? (
                 <>
                     {props.loadingText}
-                    <CgSpinnerAlt className="animate-spin ml-2" size={18}/>
+                    <CgSpinnerAlt className="animate-spin ml-2" size={18} />
                 </>
             ) : (
                 props.text

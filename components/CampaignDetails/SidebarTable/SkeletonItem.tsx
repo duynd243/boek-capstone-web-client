@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 type Props = {}
 
@@ -11,7 +11,7 @@ const SkeletonItem: React.FC<Props> = ({}) => {
             </div>
             <div className="h-2.5 bg-gray-300 rounded-full w-12"></div>
         </div>
-    )
-}
+    );
+};
 
-export default SkeletonItem
+export default SkeletonItem;

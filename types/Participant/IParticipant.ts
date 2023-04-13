@@ -1,5 +1,5 @@
-import {IUser} from "../User/IUser";
-import {ICampaign} from "../Campaign/ICampaign";
+import { IUser } from "../User/IUser";
+import { ICampaign } from "../Campaign/ICampaign";
 
 export interface IParticipant {
     id: number;

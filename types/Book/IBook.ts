@@ -1,7 +1,7 @@
-import {IGenre} from "../Genre/IGenre";
-import {IPublisher} from "../Publisher/IPublisher";
-import {IBookAuthor} from "../Book_Author/IBookAuthor";
-import {IUser} from "../User/IUser";
+import { IGenre } from "../Genre/IGenre";
+import { IPublisher } from "../Publisher/IPublisher";
+import { IBookAuthor } from "../Book_Author/IBookAuthor";
+import { IUser } from "../User/IUser";
 
 export interface IBookItem {
     id: number;

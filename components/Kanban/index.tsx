@@ -5,6 +5,6 @@ import KanbanColumn from "./KanbanColumn";
 const Kanban = {
     Wrapper: KanbanWrapper,
     Column: KanbanColumn,
-}
+};
 
-export default Kanban
+export default Kanban;

@@ -105,9 +105,10 @@ const FollowOrganizationModal: React.FC<Props> = ({ isOpen, followedOrganization
                                             <div className="mb-1 text-sm font-medium text-gray-900">
                                                 {org?.name}
                                             </div>
-                                            <div className='flex items-center text-sm text-gray-600'>
-                                                <IoPeople/>
-                                                <span className="ml-1">{org?.customers?.length} người thuộc về tổ chức</span>
+                                            <div className="flex items-center text-sm text-gray-600">
+                                                <IoPeople />
+                                                <span
+                                                    className="ml-1">{org?.customers?.length} người thuộc về tổ chức</span>
                                             </div>
                                         </div>
                                     </div>

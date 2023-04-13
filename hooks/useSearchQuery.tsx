@@ -1,39 +1,29 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
+import { getStringArrayFromQueryKey } from "../utils/query-helper";
 
-function useSearchQuery(queryKey: string, onChange?: () => void) {
+function useSearchQuery(queryKey: string,
+                        onChange?: () => void) {
     const router = useRouter();
-    const searchFromUrl = router.query[queryKey] as string;
-    const [search, setSearch] = useState<string>(searchFromUrl || "");
-
-    useEffect(() => {
-        (async () => {
-            if (router.isReady && searchFromUrl !== search) {
-                await router.push(
-                    {
-                        pathname: router.pathname,
-                        query: {
-                            ...router.query,
-                            [queryKey]: search,
-                        },
-                    },
-                    undefined,
-                    { shallow: true },
-                );
+    const searchFromQuery = getStringArrayFromQueryKey(router.query[queryKey])[0] || "";
+    const onSearchChange = useCallback(
+        async (value: undefined | string | number | string[] | number[]) => {
+            await router.push({
+                pathname: router.pathname,
+                query: {
+                    ...router.query,
+                    [queryKey]: value,
+                },
+            });
+            if (onChange) {
+                onChange();
             }
-        })();
-    }, [queryKey, router, search, searchFromUrl]);
-
-
-    useEffect(() => {
-        if (onChange && searchFromUrl !== search) {
-            onChange();
-        }
-    }, [onChange, search, searchFromUrl]);
-
+        },
+        [onChange, queryKey, router],
+    );
     return {
-        search,
-        setSearch,
+        searchFromQuery,
+        onSearchChange,
     };
 }
 

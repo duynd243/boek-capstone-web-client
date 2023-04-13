@@ -1,23 +1,23 @@
 export const NotificationTypes = {
-    CheckingBookProduct : {
+    CheckingBookProduct: {
         id: 1,
     },
-    DoneCheckingBookProduct : {
+    DoneCheckingBookProduct: {
         id: 2,
     },
-    ParticipantInvitation : {
+    ParticipantInvitation: {
         id: 3,
     },
-    ParticipantRequest : {
+    ParticipantRequest: {
         id: 4,
     },
-    ParticipantStatus : {
+    ParticipantStatus: {
         id: 5,
     },
-    NewOrder : {
+    NewOrder: {
         id: 6,
     },
-    CancelledOrder : {
+    CancelledOrder: {
         id: 7,
-    }
-} as const
+    },
+} as const;

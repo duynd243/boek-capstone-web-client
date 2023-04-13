@@ -1,5 +1,5 @@
-import React from 'react'
-import {IoPerson} from "react-icons/io5";
+import React from "react";
+import { IoPerson } from "react-icons/io5";
 
 type Props = {}
 
@@ -15,7 +15,7 @@ const ParticipantCardSkeleton: React.FC<Props> = ({}) => {
                 {/*          clipRule="evenodd"></path>*/}
                 {/*</svg>*/}
 
-                <IoPerson className="text-white rounded bg-gray-200 w-10 h-10 p-2"/>
+                <IoPerson className="text-white rounded bg-gray-200 w-10 h-10 p-2" />
                 <div>
                     <div className="h-2.5 bg-gray-200 rounded-full w-32 mb-2"></div>
                     <div className="w-48 h-2 bg-gray-200 rounded-full"></div>
@@ -29,7 +29,7 @@ const ParticipantCardSkeleton: React.FC<Props> = ({}) => {
 
             <span className="sr-only">Loading...</span>
         </div>
-    )
-}
+    );
+};
 
-export default ParticipantCardSkeleton
+export default ParticipantCardSkeleton;

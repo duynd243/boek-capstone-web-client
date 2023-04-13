@@ -1,21 +1,21 @@
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {ReactElement} from "react";
-import {FormProvider, useForm} from "react-hook-form";
-import {toast} from "react-hot-toast";
-import AdminProfileForm, {UpdateProfileFormType, UpdateProfileSchema,} from "../../../components/AdminProfileForm";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ReactElement } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import AdminProfileForm, { UpdateProfileFormType, UpdateProfileSchema } from "../../../components/AdminProfileForm";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import AdminSettingsLayout from "../../../components/Layout/AdminSettingsLayout";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import LoadingTopPage from "../../../components/LoadingTopPage";
-import {Roles} from "../../../constants/Roles";
-import {useAuth} from "../../../context/AuthContext";
-import {ImageUploadService} from "../../../services/ImageUploadService";
-import {UpdateUserParams, UserService} from "../../../services/UserService";
-import {IUser} from "../../../types/User/IUser";
+import { Roles } from "../../../constants/Roles";
+import { useAuth } from "../../../context/AuthContext";
+import { ImageUploadService } from "../../../services/ImageUploadService";
+import { UpdateUserParams, UserService } from "../../../services/UserService";
+import { IUser } from "../../../types/User/IUser";
 
 const AdminProfilePage = () => {
-    const {loginUser, updateLoginUser} = useAuth();
+    const { loginUser, updateLoginUser } = useAuth();
 
     const userService = new UserService(loginUser?.accessToken);
     const imageService = new ImageUploadService(loginUser?.accessToken);
@@ -68,11 +68,11 @@ const AdminProfilePage = () => {
                 // reinitialize the form with the new data
                 //formMethods.reset(defaultValues);
             },
-        }
+        },
     );
 
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file)
+        imageService.uploadImage(file),
     );
 
     const onSubmit = async (data: UpdateProfileFormType) => {
@@ -90,7 +90,7 @@ const AdminProfilePage = () => {
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    }
+                    },
                 );
             } catch (error) {
                 return;
@@ -114,14 +114,14 @@ const AdminProfilePage = () => {
     };
 
     if (!loginUser || isLoading) {
-        return <LoadingSpinnerWithOverlay/>;
+        return <LoadingSpinnerWithOverlay />;
     }
 
     return (
         <AdminSettingsLayout>
-            {isFetching && <LoadingTopPage/>}
+            {isFetching && <LoadingTopPage />}
             <FormProvider {...formMethods}>
-                <AdminProfileForm onSubmit={onSubmit}/>
+                <AdminProfileForm onSubmit={onSubmit} />
             </FormProvider>
         </AdminSettingsLayout>
     );
