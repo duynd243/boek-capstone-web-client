@@ -12,6 +12,7 @@ import {useAuth} from "../../context/AuthContext";
 import {getAvatarFromName} from "../../utils/helper";
 import { IAuthor } from './../../types/Author/IAuthor';
 import { AuthorService } from './../../old-services/AuthorService';
+import Link from "next/link";
 
 type Props = {
     isOpen: boolean;
@@ -128,6 +129,12 @@ const SelectAuthorModal: React.FC<Props> = ({
                         >
                             Đóng
                         </button>
+                        <Link
+                            href="/issuer/authors"
+                            className="m-btn bg-indigo-600 text-white hover:bg-indigo-700"
+                        >
+                            Thêm tác giả mới
+                        </Link>
                     </div>
                 </Modal.Footer>
             </div>

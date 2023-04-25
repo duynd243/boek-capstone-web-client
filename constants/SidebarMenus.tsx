@@ -296,6 +296,11 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
                 path: "/issuer/books",
                 icon: <ImBook />,
             },
+            {
+                name: "Tác giả",
+                path: "/issuer/authors",
+                icon: <BsFillPenFill />,
+            },
             // {
             //     name: "Nhà xuất bản",
             //     path: "/admin/publishers",

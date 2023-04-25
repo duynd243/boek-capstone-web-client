@@ -240,14 +240,14 @@ const Page: NextPageWithLayout = () => {
         }),
     );
 
-    const testDataCustomers = newCustomers?.models?.map((i: any, index) => {
+    const testDataCustomers = newCustomers?.models?.map((i: any) => {
         return {
             "Số khách hàng mới": i?.total ?? 0,
             title: getFormattedTime(i?.timeLine?.startDate, "MM/yyyy"),
         };
     });
 
-    const testDataOrders = newOrders?.models?.map((i: any, index) => {
+    const testDataOrders = newOrders?.models?.map((i: any) => {
         return {
             "Số đơn hàng": i?.total ?? 0,
             title: getFormattedTime(i?.timeLine?.startDate, "MM/yyyy"),

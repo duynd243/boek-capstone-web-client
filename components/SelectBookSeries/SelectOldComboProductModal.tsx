@@ -136,7 +136,7 @@ const SelectOldComboProductModal = ({
                             Đóng
                         </button>
                         <Link
-                            href="/issuer/books/create-series"
+                            href={`/issuer/campaigns/${campaignId}/books/add-combo`}
                             className="m-btn bg-indigo-600 text-white hover:bg-indigo-700"
                         >
                             Tạo sách combo mới

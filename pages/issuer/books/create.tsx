@@ -184,22 +184,23 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
       authors: Yup.array(Yup.object().shape({
         id: Yup.number()
         , name: Yup.string()
+      .max(255, "Tên sách không được vượt quá 255 ký tự"),
       })).required("Tác giả không được để trống"),
       code: Yup.string().required("Mã sách không được để trống"),
-      // isbn10: Yup.string()
-      //   .required("ISBN10 không được để trống")
-      //   .length(10, "ISBN10 phải có 10 ký tự"),
-      // isbn13: Yup.string()
-      //   .required("ISBN13 không được để trống")
-      //   .length(13, "ISBN13 phải có 13 ký tự"),
+      isbn10: Yup.string()
+      .max(50, "ISBN10 không được vượt quá 50 ký tự"),
+      isbn13: Yup.string()
+      .max(50, "ISBN13 không được vượt quá 50 ký tự"),
       name: Yup.string().required("Tên sách không được để trống"),
       translator: Yup.string().required("Tên dịch giả không được để trống"),
       coverPrice: Yup.number()
         .required("Giá không được để trống")
         .min(0, "Giá không được nhỏ hơn 0"),
       description: Yup.string().required("Mô tả không được để trống"),
-      language: Yup.string().required("Ngôn ngữ không được để trống"),
-      size: Yup.string().required("Kích thước không được để trống"),
+      language: Yup.string().required("Ngôn ngữ không được để trống")
+      .max(255, "Ngôn ngữ không được vượt quá 255 ký tự"),
+      size: Yup.string().required("Kích thước không được để trống")
+      .max(255, "Kích thước không được vượt quá 255 ký tự"),
       // unitInStock: Yup.number()
       //   .required("Số lượng không được để trống")
       //   .integer("Số lượng phải là số nguyên")

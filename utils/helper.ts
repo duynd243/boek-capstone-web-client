@@ -7,6 +7,7 @@ import { hexColors } from "../constants/Colors";
 import { IBook } from "../types/Book/IBook";
 import { IBookProduct } from "../types/Book/IBookProduct";
 import { CampaignFormats } from "../constants/CampaignFormats";
+import resolveConfig from 'tailwindcss/resolveConfig';
 
 
 const fullBookFormats = Object.values(BookFormats);
@@ -104,11 +105,9 @@ export function getAvatarFromName(
     length?: number,
 ): string {
     const backgroundColor = randomColor(name);
-    return `https://ui-avatars.com/api/?name=${
-        name ? name : ""
-    }&color=FFFFFF&background=${backgroundColor}&length=${
-        length ? length : 2
-    }&format=svg`;
+    return `https://ui-avatars.com/api/?name=${name ? name : ""
+        }&color=FFFFFF&background=${backgroundColor}&length=${length ? length : 2
+        }&format=svg`;
 }
 
 export function isInViewPort(element: Element): boolean {
@@ -214,6 +213,7 @@ export function getIntersectedFormatOfBooks(books: IBook[]): IBookFormat[] {
         getIntersectedArray(prev, curr),
     );
 }
-
 export const VIETNAMESE_PHONE_REGEX =
     /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/;
+
+

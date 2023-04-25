@@ -22,11 +22,13 @@ export const UpdateProfileSchema = z.object({
     name: z
         .string()
         .min(2, "Họ và tên phải có ít nhất 2 ký tự")
-        .max(50, "Họ và tên không được vượt quá 50 ký tự"),
+        .max(255, "Họ và tên không được vượt quá 255 ký tự"),
     email: z.string().email("Email không hợp lệ"),
     phone: z
         .string()
-        .regex(VIETNAMESE_PHONE_REGEX, "Số điện thoại không hợp lệ"),
+        .min(8, "Số điện thoại phải có ít nhất 8 ký tự")
+        .max(50, "Số điện thoại không được vượt quá 50 ký tự"),
+        // .regex(VIETNAMESE_PHONE_REGEX, "Số điện thoại không hợp lệ"),
     addressRequest: z.object({
         detail: z.string().min(1, "Địa chỉ chi tiết không được để trống"),
         provinceCode: z.number({

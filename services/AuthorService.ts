@@ -64,4 +64,11 @@ export class AuthorService extends BaseService {
         );
         return response.data;
     };
+    createIssuerAuthor = async (data: CreateAuthorParams) => {
+        const response = await this.axiosClient.post<IAuthor>(
+            "/issuer/authors",
+            data,
+        );
+        return response.data;
+    };
 }

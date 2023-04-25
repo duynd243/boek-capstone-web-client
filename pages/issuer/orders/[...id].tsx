@@ -185,7 +185,7 @@ const AdminOrderDetailsPage: NextPageWithLayout = () => {
                                 </div>
                             </li>
                             <li className="flex items-center justify-between border-b border-slate-200 py-3">
-                                <div className="font-medium">Tổng tiền</div>
+                                <div className="font-medium">Tổng tiền (Đã bao gồm VAT nếu có)</div>
                                 <div className="ml-2 font-medium text-emerald-600">
                                     {new Intl.NumberFormat("vi-VN", {
                                         style: "currency",

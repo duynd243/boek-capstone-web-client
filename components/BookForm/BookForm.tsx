@@ -449,6 +449,7 @@ const BookForm = ({ book }: Props) => {
                                             />
                                         )}
                                     />
+                                    {/* <Form.Label  label={!book?.allowChangingGenre ?"Thể loại (Không thay đổi được vì có trong sách series, hội sách đang diễn ra, hay đơn hàng đang xử lý)" : ""} required={true} /> */}
                                 </div>
                             </div>
                         </div>

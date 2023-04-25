@@ -2,9 +2,9 @@ import { ReactElement } from "react";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { NextPageWithLayout } from "../../_app";
 import CampaignListPage from "../../../components/CampaignListPage";
+import useSearchQuery from "../../../hooks/useSearchQuery";
 
 const AdminCampaignsPage: NextPageWithLayout = () => {
-    const { search, setSearch } = useSearchQuery("search", () => setPage(1));
 
     return <CampaignListPage/>
     // const { search, setSearch } = useSearchQuery("search", () => setPage(1));
