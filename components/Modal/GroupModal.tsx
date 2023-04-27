@@ -37,11 +37,11 @@ const GroupModal: React.FC<Props> = ({
         name: z
             .string()
             .min(2, "Tên nhóm phải có ít nhất 2 ký tự")
-            .max(50, "Tên nhóm không được vượt quá 50 ký tự"),
+            .max(255, "Tên nhóm không được vượt quá 255 ký tự"),
         description: z
             .string()
             .min(2, "Mô tả phải có ít nhất 2 ký tự")
-            .max(50, "Mô tả không được vượt quá 50 ký tự"),
+            .max(255, "Mô tả không được vượt quá 255 ký tự"),
     });
 
     const UpdateGroupSchema = BaseGroupSchema.extend({

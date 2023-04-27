@@ -76,6 +76,7 @@ const DateTimePickerModal: React.FC<Props> = ({
                     selected={date}
                     onDayClick={setDate}
                     footer={showTime ? timePicker : undefined}
+                    {...rest}
                 />
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">

@@ -16,13 +16,16 @@ import AdminLayout from "../../../components/Layout/AdminLayout";
 import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 import LoadingTopPage from "../../../components/LoadingTopPage";
 import ConfirmModal from "../../../components/Modal/ConfirmModal";
-import OrganizationModal, { OrganizationModalMode } from "../../../components/Modal/OrganizationModal";
+import OrganizationModal, {
+    OrganizationModalMode,
+} from "../../../components/Modal/OrganizationModal";
 import { useAuth } from "../../../context/AuthContext";
 import useTableManagementPage from "../../../hooks/useTableManagementPage";
 import { OrganizationService } from "../../../services/OrganizationService";
 import { IOrganization } from "../../../types/Organization/IOrganization";
 import { getAvatarFromName } from "../../../utils/helper";
 import { NextPageWithLayout } from "../../_app";
+import { faker } from "@faker-js/faker/locale/vi";
 
 const AdminOrganizationsPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
@@ -55,7 +58,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
             onSettled: () => {
                 setShowDeleteModal(false);
             },
-        },
+        }
     );
 
     const {
@@ -69,10 +72,11 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                 name: search,
                 page,
                 size,
+                withMembers: true,
             }),
         {
             keepPreviousData: true,
-        },
+        }
     );
 
     const handleDeleteOrganization = useCallback(async () => {
@@ -83,7 +87,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                     loading: "Đang xoá tổ chức",
                     success: "Xoá tổ chức thành công",
                     error: (err) => err?.message || "Xoá tổ chức thất bại",
-                },
+                }
             );
         }
     }, [deleteOrganizationMutation, selectedOrg?.id]);
@@ -110,6 +114,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                     <TableHeading>
                         <TableHeader>Tên tổ chức</TableHeader>
                         <TableHeader>Địa chỉ & Điện thoại</TableHeader>
+                        <TableHeader>Tên miền</TableHeader>
                         <TableHeader>
                             <span className="sr-only">Actions</span>
                         </TableHeader>
@@ -128,7 +133,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                                                     src={
                                                         org?.imageUrl ||
                                                         getAvatarFromName(
-                                                            org?.name,
+                                                            org?.name
                                                         )
                                                     }
                                                     alt={org?.name || ""}
@@ -147,6 +152,31 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                                         </div>
                                         <div className="text-sm text-gray-500">
                                             {org?.phone}
+                                        </div>
+                                    </TableData>
+                                    <TableData>
+                                        <div className="text-sm text-gray-900">
+                                            <span className='space-x-2'>
+                                                {org?.members
+                                                    ?.slice(0, 3)
+                                                    .map(({ emailDomain }) => (
+                                                        <span
+                                                            key={emailDomain}
+                                                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800"
+                                                        >
+                                                            {emailDomain}
+                                                        </span>
+                                                    ))}
+                                            </span>
+                                            {org?.members &&
+                                                org?.members?.length > 3 && (
+                                                    <div className="text-sm text-gray-500 mt-2">
+                                                        và{" "}
+                                                        {org?.members?.length -
+                                                            3}{" "}
+                                                        tên miền khác
+                                                    </div>
+                                                )}
                                         </div>
                                     </TableData>
                                     <TableData className="space-x-4 text-right text-sm font-medium">
@@ -175,7 +205,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
                         })}
                     </TableBody>
                     <TableFooter
-                        colSpan={3}
+                        colSpan={4}
                         size={size}
                         onSizeChange={onSizeChange}
                         page={page}
@@ -198,6 +228,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
             )}
 
             <OrganizationModal
+                maxWidth={"max-w-xl"}
                 action={OrganizationModalMode.CREATE}
                 onClose={() => setShowCreateModal(false)}
                 afterLeave={() => setSelectedOrg(undefined)}
@@ -206,6 +237,7 @@ const AdminOrganizationsPage: NextPageWithLayout = () => {
 
             {selectedOrg && (
                 <OrganizationModal
+                    maxWidth={"max-w-xl"}
                     action={OrganizationModalMode.UPDATE}
                     organization={selectedOrg}
                     onClose={() => setShowUpdateModal(false)}

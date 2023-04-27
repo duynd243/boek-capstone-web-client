@@ -10,7 +10,6 @@ import TableBody from "../../../../../components/Admin/Table/TableBody";
 import TableRowSkeleton from "../../../../../components/Admin/Table/TableRowSkeleton";
 import TableData from "../../../../../components/Admin/Table/TableData";
 import StatusCard from "../../../../../components/StatusCard";
-import Link from "next/link";
 import EmptyState, { EMPTY_STATE_TYPE } from "../../../../../components/EmptyState";
 import TableFooter from "../../../../../components/Admin/Table/TableFooter";
 import TableWrapper from "../../../../../components/Admin/Table/TableWrapper";
@@ -21,6 +20,9 @@ import useTableManagementPage from "../../../../../hooks/useTableManagementPage"
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinnerWithOverlay from "../../../../../components/LoadingSpinnerWithOverlay";
 import { useRouter } from "next/router";
+import GenreModal, { GenreModalMode } from "../../../../../components/Modal/GenreModal";
+import Image from "next/image";
+import { getAvatarFromName } from "../../../../../utils/helper";
 
 const AdminGenresPage: NextPageWithLayout = () => {
     const router = useRouter();
@@ -79,13 +81,13 @@ const AdminGenresPage: NextPageWithLayout = () => {
     if (isLoading) return <LoadingSpinnerWithOverlay />;
     return (
         <Fragment>
-            <PageHeading label={`Chủ đề thuộc ${parentGenre?.name}`}>
+            <PageHeading label={`Thể loại thuộc ${parentGenre?.name}`}>
                 <SearchForm />
-                <CreateButton label={"Thêm chủ đề"} onClick={() => setShowCreateModal(true)} />
+                <CreateButton label={"Thêm thể loại"} onClick={() => setShowCreateModal(true)} />
             </PageHeading>
             <TableWrapper>
                 <TableHeading>
-                    <TableHeader>Tên chủ đề</TableHeader>
+                    <TableHeader>Tên thể loại</TableHeader>
                     <TableHeader textAlignment="text-center">
                         Trạng thái
                     </TableHeader>
@@ -103,8 +105,25 @@ const AdminGenresPage: NextPageWithLayout = () => {
 
                                 return (
                                     <tr key={genre?.id}>
-                                        <TableData className="text-sm font-medium">
-                                            {genre?.name}
+                                        <TableData>
+                                            <div className="flex items-center">
+                                                <div className="h-10 w-10 flex-shrink-0">
+                                                    <Image
+                                                        width={100}
+                                                        height={100}
+                                                        className="h-10 w-10 rounded-full object-cover"
+                                                        src={getAvatarFromName(
+                                                            genre?.name,
+                                                        )}
+                                                        alt=""
+                                                    />
+                                                </div>
+                                                <div className="ml-4">
+                                                    <div className="text-sm font-medium text-gray-900">
+                                                        {genre?.name}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </TableData>
                                         <TableData textAlignment="text-center">
                                             {genre?.status ? (
@@ -129,12 +148,6 @@ const AdminGenresPage: NextPageWithLayout = () => {
                                             >
                                                 Chỉnh sửa
                                             </button>
-                                            <Link
-                                                href={`/admin/genres/${genre.id}/child-genres`}
-                                                className="block"
-                                            >
-                                                Xem
-                                            </Link>
                                         </TableData>
                                     </tr>
                                 );
@@ -155,6 +168,27 @@ const AdminGenresPage: NextPageWithLayout = () => {
                     pageSizeOptions={pageSizeOptions}
                 />}
             </TableWrapper>
+
+            <GenreModal
+                title={`Thêm thể loại con cho ${parentGenre?.name}`}
+                action={GenreModalMode.CREATE}
+                onClose={() => setShowCreateModal(false)}
+                parentId={Number(parentId)}
+                isOpen={showCreateModal}
+            />
+
+            {selectedGenre && (
+                <GenreModal
+                    parentId={Number(parentId)}
+                    action={GenreModalMode.UPDATE}
+                    genre={selectedGenre}
+                    onClose={() => {
+                        setShowUpdateModal(false);
+                    }}
+                    afterLeave={() => setSelectedGenre(undefined)}
+                    isOpen={showUpdateModal}
+                />
+            )}
         </Fragment>
     );
 };

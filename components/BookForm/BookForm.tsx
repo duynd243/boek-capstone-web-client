@@ -72,7 +72,7 @@ const BookForm = ({ book }: Props) => {
     });
 
     const { data: books } = useQuery(["books"], () =>
-        bookService.getBooks$Issuer({
+        bookService.getBooksByIssuer({
             size: 1000,
         }),
     );
@@ -437,6 +437,12 @@ const BookForm = ({ book }: Props) => {
                                             />
                                         )}
                                     />
+                                    {!book?.allowChangingGenre ?
+                                        <div className="text-sm text-gray-500 mt-2">
+                                            Không thay đổi được vì có trong sách series, hội sách đang diễn ra, hay đơn
+                                            hàng đang xử lý
+                                        </div>
+                                        : null}
                                 </div>
                             </div>
                         </div>

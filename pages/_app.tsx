@@ -13,6 +13,7 @@ import { ProtectedRoutes } from "../constants/ProtectedRoutes";
 import "react-day-picker/dist/style.css";
 import "swiper/css";
 import "swiper/css/pagination";
+import useDebounce from "../hooks/useDebounce";
 
 const queryClient = new QueryClient();
 

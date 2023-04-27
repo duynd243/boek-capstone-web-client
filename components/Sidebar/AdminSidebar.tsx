@@ -38,7 +38,7 @@ const AdminSidebar: React.FC<Props> = ({ isSidebarOpen, setIsSidebarOpen }) => {
             activeMenu = allMenus.find(
                 (menu) =>
                     menu !== undefined &&
-                    menu?.path !== role?.defaultRoute &&
+                    menu?.path !== role?.baseUrl &&
                     router.pathname.startsWith(menu?.path),
             );
         }

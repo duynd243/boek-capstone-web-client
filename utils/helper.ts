@@ -7,7 +7,22 @@ import { hexColors } from "../constants/Colors";
 import { IBook } from "../types/Book/IBook";
 import { IBookProduct } from "../types/Book/IBookProduct";
 import { CampaignFormats } from "../constants/CampaignFormats";
+import { BookProductStatuses } from "../constants/BookProductStatuses";
+import { CampaignStatuses } from "../constants/CampaignStatuses";
 
+
+export function classNames(...classes: string[]) {
+    return classes.filter(Boolean).join(" ");
+}
+
+export const isAddToCartDisabled = (product: IBookProduct | undefined) => {
+    return product?.status !==
+        BookProductStatuses.Selling.id ||
+        (!product?.allowPurchasingByLevel &&
+            product?.withLevel)
+        ||
+        product?.campaign?.status !== CampaignStatuses.STARTING.id;
+};
 
 const fullBookFormats = Object.values(BookFormats);
 

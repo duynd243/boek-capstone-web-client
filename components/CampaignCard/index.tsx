@@ -80,7 +80,7 @@ const CampaignCard: React.FC<Props> = ({ campaign, horizontalOnly = false }) => 
             {/*</div>*/}
 
             <div
-                className="absolute top-2 left-2 z-10 bg-white text-gray-800 m-btn-xs !rounded-full">
+                className="absolute top-2 left-2 z-0 bg-white text-gray-800 m-btn-xs !rounded-full">
                 <span
                     className={`mr-2 inline-block h-2 w-2 rounded-full bg-${campaignStatus?.statusColor || "slate"}-500 ${campaign?.status === CampaignStatuses.STARTING.id ? "animate-bounce" : ""}`}
                 />

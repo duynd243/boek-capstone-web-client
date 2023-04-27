@@ -41,7 +41,7 @@ export class BookService extends BaseService {
         const response = await this.axiosClient.put<IBook>(`/issuer/books/series-books`, data);
         return response.data;
     };
-    getBooks$Issuer = async (params?: any) => {
+    getBooksByIssuer = async (params?: any) => {
         const response = await this.axiosClient.get<IBaseListResponse<IBook>>(`/issuer/books`, {
             params,
             // paramsSerializer: {
@@ -54,7 +54,7 @@ export class BookService extends BaseService {
     };
 
 
-    // getBooks$Issuer = async (params?: any) => {
+    // getBooksByIssuer = async (params?: any) => {
     //   const response = await this.axiosClient.get<
     //     IBaseListResponse<IBook>
     //   >(`/issuer/books`, {

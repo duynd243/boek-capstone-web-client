@@ -50,7 +50,7 @@ const AdminBooksPage: NextPageWithLayout = () => {
                 name: search,
                 page,
                 size,
-                sort: "id desc",
+                sort: "CreatedDate desc",
             }),
         {
             keepPreviousData: true,

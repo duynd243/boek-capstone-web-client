@@ -89,18 +89,18 @@ export class CampaignService extends BaseService {
         return response.data;
     };
 
-    getCampaignByIdByIssuer = async (
-        id: number,
-        params?: IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean },
-    ) => {
-        const response = await this.axiosClient.get<ICampaign>(
-            `/issuer/campaigns/${id}`,
-            {
-                params,
-            },
-        );
-        return response.data;
-    };
+    // getCampaignByIdByIssuer = async (
+    //     id: number,
+    //     params?: IBaseRequestParams<ICampaign> & { withAddressDetail?: boolean },
+    // ) => {
+    //     const response = await this.axiosClient.get<ICampaign>(
+    //         `/issuer/campaigns/${id}`,
+    //         {
+    //             params,
+    //         },
+    //     );
+    //     return response.data;
+    // };
 
     getCampaignsByAdmin = async (
         params?: GetCampaignsParams,

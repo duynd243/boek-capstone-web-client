@@ -31,8 +31,10 @@ type InputProps<T extends Record<string, any>> = {
     required?: boolean;
     placeholder?: string;
     isTextArea?: boolean;
+    extraInputClassName?: string;
     inputType?: React.HTMLInputTypeAttribute;
     errorMessage?: string;
+    renderTrail?: React.ReactNode;
 } & React.InputHTMLAttributes<HTMLInputElement> &
     React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
@@ -49,12 +51,14 @@ const Input = <T extends Record<string, any>>({
                                                   fieldName,
                                                   placeholder,
                                                   errorMessage,
+                                                  renderTrail,
+                                                  extraInputClassName = "",
                                                   ...rest
                                               }: InputProps<T>) => {
     const commonProps = {
         id: fieldName,
         placeholder: placeholder,
-        className: `${defaultInputClass}`,
+        className: `${defaultInputClass} ${extraInputClassName}`,
         ...register(fieldName),
         ...rest,
     };
@@ -62,11 +66,14 @@ const Input = <T extends Record<string, any>>({
     return (
         <div>
             <Label fieldName={fieldName} label={label} required={required} />
-            {isTextArea ? (
-                <textarea rows={7} {...commonProps} />
-            ) : (
-                <input {...commonProps} type={inputType} />
-            )}
+            <div className="relative">
+                {isTextArea ? (
+                    <textarea rows={7} {...commonProps} />
+                ) : (
+                    <input {...commonProps} type={inputType} />
+                )}
+                <div className="absolute inset-y-0 right-0 flex items-center">{renderTrail}</div>
+            </div>
             {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
         </div>
     );

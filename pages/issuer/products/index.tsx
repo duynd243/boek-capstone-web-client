@@ -21,7 +21,7 @@ import Link from "next/link";
 import { BookProductService } from "./../../../services/BookProductService";
 import { getBookTypeById } from "../../../constants/BookTypes";
 import { useRouter } from "next/router";
-import { CampaignStatuses } from "../../../constants/CampaignStatuses copy";
+import { CampaignStatuses } from "../../../constants/CampaignStatuses";
 import SelectBox from "../../../components/SelectBox";
 import { ICampaign } from "../../../types/Campaign/ICampaign";
 import { Roles } from "../../../constants/Roles";

@@ -5,11 +5,19 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
 import { IPublisher } from "../../types/Publisher/IPublisher";
-import { isImageFile, isValidFileSize, VIETNAMESE_PHONE_REGEX } from "../../utils/helper";
+import {
+    isImageFile,
+    isValidFileSize,
+    VIETNAMESE_PHONE_REGEX,
+} from "../../utils/helper";
 import SelectProfilePicture from "../SelectProfilePicture";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
-import { CreatePublisherParams, PublisherService, UpdatePublisherParams } from "../../services/PublisherService";
+import {
+    CreatePublisherParams,
+    PublisherService,
+    UpdatePublisherParams,
+} from "../../services/PublisherService";
 import { useAuth } from "../../context/AuthContext";
 import { ImageUploadService } from "../../services/ImageUploadService";
 import ErrorMessage from "../Form/ErrorMessage";
@@ -29,26 +37,30 @@ type Props = {
 };
 
 const PublisherModal: React.FC<Props> = ({
-                                             maxWidth,
-                                             action,
-                                             isOpen,
-                                             onClose,
-                                             publisher,
-                                             afterLeave,
-                                         }) => {
+    maxWidth,
+    action,
+    isOpen,
+    onClose,
+    publisher,
+    afterLeave,
+}) => {
     const BasePublisherSchema = z.object({
         name: z
             .string()
             .min(2, "Tên nhà xuất bản phải có ít nhất 2 ký tự")
             .max(50, "Tên nhà xuất bản không được vượt quá 50 ký tự"),
-        email: z.string().email("Email không hợp lệ"),
+        email: z
+            .string()
+            .email("Email không hợp lệ")
+            .max(255, "Email không được vượt quá 255 ký tự"),
         address: z
             .string()
             .min(2, "Địa chỉ phải có ít nhất 2 ký tự")
             .max(250, "Địa chỉ không được vượt quá 50 ký tự"),
         phone: z
             .string()
-            .regex(VIETNAMESE_PHONE_REGEX, "Số điện thoại không hợp lệ"),
+            .min(10, "Số điện thoại phải có ít nhất 10 ký tự")
+            .max(50, "Số điện thoại không được vượt quá 50 ký tự"),
         imageUrl: z.string().optional(),
         previewFile: z.instanceof(File),
     });
@@ -83,7 +95,7 @@ const PublisherModal: React.FC<Props> = ({
         resolver: zodResolver(
             action === PublisherModalMode.CREATE
                 ? BasePublisherSchema
-                : UpdatePublisherSchema,
+                : UpdatePublisherSchema
         ),
         defaultValues,
     });
@@ -109,18 +121,18 @@ const PublisherModal: React.FC<Props> = ({
         (data: CreatePublisherParams) => {
             return publisherService.createPublisher(data);
         },
-        commonMutationOptions,
+        commonMutationOptions
     );
 
     const updatePublisherMutation = useMutation(
         (data: UpdatePublisherParams) => {
             return publisherService.updatePublisher(data);
         },
-        commonMutationOptions,
+        commonMutationOptions
     );
 
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file),
+        imageService.uploadImage(file)
     );
     const onSubmit = async (data: FormType) => {
         if (data.previewFile) {
@@ -136,7 +148,7 @@ const PublisherModal: React.FC<Props> = ({
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    },
+                    }
                 );
             } catch (error) {
                 return;
@@ -164,7 +176,7 @@ const PublisherModal: React.FC<Props> = ({
                                     "Thêm nhà xuất bản thất bại"
                                 );
                             },
-                        },
+                        }
                     );
                 } catch (error) {
                     return;
@@ -186,7 +198,7 @@ const PublisherModal: React.FC<Props> = ({
                                     "Cập nhật nhà xuất bản thất bại"
                                 );
                             },
-                        },
+                        }
                     );
                 } catch (error) {
                     return;
@@ -224,13 +236,13 @@ const PublisherModal: React.FC<Props> = ({
                                 onChange={(file) => {
                                     if (!isImageFile(file)) {
                                         toast.error(
-                                            "Tệp tải lên phải có định dạng ảnh",
+                                            "Tệp tải lên phải có định dạng ảnh"
                                         );
                                         return false;
                                     }
                                     if (!isValidFileSize(file, 1)) {
                                         toast.error(
-                                            "Kích thước ảnh đại diện không được vượt quá 1MB",
+                                            "Kích thước ảnh đại diện không được vượt quá 1MB"
                                         );
                                         return false;
                                     }

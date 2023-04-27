@@ -12,7 +12,11 @@ import { IDistrict } from "../../types/Address/IDistrict";
 import { IProvince } from "../../types/Address/IProvince";
 import { IWard } from "../../types/Address/IWard";
 import { IUser } from "../../types/User/IUser";
-import { isImageFile, isValidFileSize, VIETNAMESE_PHONE_REGEX } from "../../utils/helper";
+import {
+    isImageFile,
+    isValidFileSize,
+    VIETNAMESE_PHONE_REGEX,
+} from "../../utils/helper";
 import ErrorMessage from "../Form/ErrorMessage";
 import SelectBox from "../SelectBox";
 import SelectProfilePicture from "../SelectProfilePicture";
@@ -29,12 +33,12 @@ type Props = {
 };
 
 const CustomerModal: React.FC<Props> = ({
-                                            afterLeave,
-                                            maxWidth,
-                                            isOpen,
-                                            onClose,
-                                            customer,
-                                        }) => {
+    afterLeave,
+    maxWidth,
+    isOpen,
+    onClose,
+    customer,
+}) => {
     const { loginUser } = useAuth();
     const userService = new UserService(loginUser?.accessToken);
     const imageService = new ImageUploadService(loginUser?.accessToken);
@@ -49,22 +53,26 @@ const CustomerModal: React.FC<Props> = ({
                 await queryClient.invalidateQueries(["customers"]);
                 onClose();
             },
-        },
+        }
     );
 
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file),
+        imageService.uploadImage(file)
     );
 
     const UpdateCustomerSchema = z.object({
         name: z
             .string()
             .min(2, "Tên khách hàng phải có ít nhất 2 ký tự")
-            .max(50, "Tên khách hàng không được vượt quá 50 ký tự"),
-        email: z.string().email("Email không hợp lệ"),
+            .max(255, "Tên khách hàng không được vượt quá 255 ký tự"),
+        email: z
+            .string()
+            .email("Email không hợp lệ")
+            .max(255, "Email không được vượt quá 255 ký tự"),
         phone: z
             .string()
-            .regex(VIETNAMESE_PHONE_REGEX, "Số điện thoại không hợp lệ"),
+            .min(10, "Số điện thoại phải có ít nhất 10 ký tự")
+            .max(50, "Số điện thoại không được vượt quá 50 ký tự"),
         imageUrl: z.string(),
         addressRequest: z.object({
             detail: z.string().min(1, "Địa chỉ chi tiết không được để trống"),
@@ -145,7 +153,7 @@ const CustomerModal: React.FC<Props> = ({
                         error: (error) => {
                             return "Tải ảnh lên thất bại";
                         },
-                    },
+                    }
                 );
             } catch (error) {
                 return;
@@ -169,7 +177,7 @@ const CustomerModal: React.FC<Props> = ({
                     error: (error) => {
                         return error?.message || "Cập nhật khách hàng thất bại";
                     },
-                },
+                }
             );
         } catch (error) {
             console.log(error);
@@ -201,13 +209,13 @@ const CustomerModal: React.FC<Props> = ({
                                 onChange={(file) => {
                                     if (!isImageFile(file)) {
                                         toast.error(
-                                            "Tệp tải lên phải có định dạng ảnh",
+                                            "Tệp tải lên phải có định dạng ảnh"
                                         );
                                         return false;
                                     }
                                     if (!isValidFileSize(file, 1)) {
                                         toast.error(
-                                            "Kích thước ảnh đại diện không được vượt quá 1MB",
+                                            "Kích thước ảnh đại diện không được vượt quá 1MB"
                                         );
                                         return false;
                                     }
@@ -276,11 +284,11 @@ const CustomerModal: React.FC<Props> = ({
                                         field.onChange(p.code);
                                         setValue(
                                             "addressRequest.districtCode" as any,
-                                            undefined,
+                                            undefined
                                         );
                                         setValue(
                                             "addressRequest.wardCode" as any,
-                                            undefined,
+                                            undefined
                                         );
                                         handleProvinceChange(p);
                                     }}
@@ -311,7 +319,7 @@ const CustomerModal: React.FC<Props> = ({
                                         field.onChange(d.code);
                                         setValue(
                                             "addressRequest.wardCode" as any,
-                                            undefined,
+                                            undefined
                                         );
                                         handleDistrictChange(d);
                                     }}

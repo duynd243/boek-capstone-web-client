@@ -20,8 +20,9 @@ import { HiBuildingStorefront } from "react-icons/hi2";
 import { HiStatusOnline } from "react-icons/hi";
 import { Roles } from "../../constants/Roles";
 import SelectBox from "../SelectBox";
+import Link from "next/link";
 
-type Props = {}
+type Props = {};
 
 const CampaignCreateButtons = [
     {
@@ -41,13 +42,13 @@ const IssuerCampaignOptions = [
     {
         id: 1,
         name: "Hội sách của bạn",
-    }, {
+    },
+    {
         id: 2,
         name: "Hội sách khác",
     },
 ];
 const CampaignListPage: React.FC<Props> = ({}) => {
-
     const { loginUser } = useAuth();
 
     const [size, setSize] = useState<number>(6);
@@ -57,9 +58,16 @@ const CampaignListPage: React.FC<Props> = ({}) => {
     const { searchFromQuery, onSearchChange } = useSearchQuery("search", () => {
         setPage(1);
     });
-    const [selectedFormatTab, setSelectedFormatTab] = useState<typeof CampaignFormatTabs[number]>(CampaignFormatTabs[0]);
-    const [selectedStatusTab, setSelectedStatusTab] = useState<typeof CampaignStatusTabs[number]>(CampaignStatusTabs[0]);
-    const [selectedIssuerCampaignOption, setSelectedIssuerCampaignOption] = useState<typeof IssuerCampaignOptions[number]>(IssuerCampaignOptions[0]);
+    const [selectedFormatTab, setSelectedFormatTab] = useState<
+        (typeof CampaignFormatTabs)[number]
+    >(CampaignFormatTabs[0]);
+    const [selectedStatusTab, setSelectedStatusTab] = useState<
+        (typeof CampaignStatusTabs)[number]
+    >(CampaignStatusTabs[0]);
+    const [selectedIssuerCampaignOption, setSelectedIssuerCampaignOption] =
+        useState<(typeof IssuerCampaignOptions)[number]>(
+            IssuerCampaignOptions[0]
+        );
     const campaignService = new CampaignService(loginUser?.accessToken);
 
     const queryParams = {
@@ -72,12 +80,11 @@ const CampaignListPage: React.FC<Props> = ({}) => {
         issuerCampaignOption: selectedIssuerCampaignOption.id,
         withAddressDetail: true,
     };
-    const {
-        data: campaignsData,
-        isInitialLoading,
-    } = useQuery(
+    const { data: campaignsData, isInitialLoading } = useQuery(
         [
-            loginUser?.role === Roles.SYSTEM.id ? "admin_campaigns" : "issuer_campaigns",
+            loginUser?.role === Roles.SYSTEM.id
+                ? "admin_campaigns"
+                : "issuer_campaigns",
             queryParams,
         ],
         () => {
@@ -90,15 +97,15 @@ const CampaignListPage: React.FC<Props> = ({}) => {
                 return campaignService.getOtherCampaignsByIssuer(queryParams);
             }
             return Promise.reject();
-        },
+        }
     );
 
     const onFormatTabChange = useCallback(
-        (tab: typeof CampaignFormatTabs[number]) => {
+        (tab: (typeof CampaignFormatTabs)[number]) => {
             setSelectedFormatTab(tab);
             setPage(1);
         },
-        [setSelectedFormatTab, setPage],
+        [setSelectedFormatTab, setPage]
     );
 
     function renderCampaigns() {
@@ -127,19 +134,23 @@ const CampaignListPage: React.FC<Props> = ({}) => {
                     </Fragment>
                 );
             } else {
-                return <div className="py-24">{searchFromQuery ?
-                    <EmptyState
-                        keyword={searchFromQuery}
-                        searchNotFoundMessage="Hãy thử tìm kiếm với từ khóa hoặc bộ lọc khác"
-                        status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
-                    />
-                    :
-                    <EmptyState
-                        keyword={searchFromQuery}
-                        customMessage={"Không có hội sách nào"}
-                        status={EMPTY_STATE_TYPE.NO_DATA}
-                    />
-                }</div>;
+                return (
+                    <div className="py-24">
+                        {searchFromQuery ? (
+                            <EmptyState
+                                keyword={searchFromQuery}
+                                searchNotFoundMessage="Hãy thử tìm kiếm với từ khóa hoặc bộ lọc khác"
+                                status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
+                            />
+                        ) : (
+                            <EmptyState
+                                keyword={searchFromQuery}
+                                customMessage={"Không có hội sách nào"}
+                                status={EMPTY_STATE_TYPE.NO_DATA}
+                            />
+                        )}
+                    </div>
+                );
             }
         }
         return (
@@ -152,11 +163,11 @@ const CampaignListPage: React.FC<Props> = ({}) => {
     }
 
     const onStatusTabChange = useCallback(
-        (tab: typeof CampaignStatusTabs[number]) => {
+        (tab: (typeof CampaignStatusTabs)[number]) => {
             setSelectedStatusTab(tab);
             setPage(1);
         },
-        [setSelectedStatusTab, setPage],
+        [setSelectedStatusTab, setPage]
     );
     return (
         <Fragment>
@@ -167,43 +178,51 @@ const CampaignListPage: React.FC<Props> = ({}) => {
                     value={searchFromQuery}
                     onSearchSubmit={onSearchChange}
                 />
-                {loginUser?.role === Roles.SYSTEM.id && <Menu as={"div"} className={"relative"}>
-                    <Menu.Button as={"div"}>
-                        <CreateButton label="Tạo hội sách" />
-                    </Menu.Button>
-                    <Transition
-                        as={Fragment}
-                        enter="transition ease-out duration-100"
-                        enterFrom="transform opacity-0 scale-95"
-                        enterTo="transform opacity-100 scale-100"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95"
-                    >
-                        <Menu.Items
-                            className="max-w-screen absolute right-0 z-10 mt-2 w-80 origin-top-right overflow-hidden rounded-lg bg-white p-2.5 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            <div className="relative flex flex-col gap-2 bg-white">
-                                {CampaignCreateButtons.map((button, index) => (
-                                    <Menu.Item as={"div"} key={index}>
-                                        <CreateCampaignButton
-                                            icon={button.icon}
-                                            href={button.href}
-                                            label={button.label}
-                                            description={button.description}
-                                        />
-                                    </Menu.Item>
-                                ))}
-                            </div>
-                        </Menu.Items>
-                    </Transition>
-                </Menu>}
+                {loginUser?.role === Roles.SYSTEM.id && (
+                    <Menu as={"div"} className={"relative"}>
+                        <Menu.Button as={"div"}>
+                            <CreateButton label="Tạo hội sách" />
+                        </Menu.Button>
+                        <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95"
+                        >
+                            <Menu.Items className="max-w-screen absolute right-0 z-10 mt-2 w-80 origin-top-right overflow-hidden rounded-lg bg-white p-2.5 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <div className="relative flex flex-col gap-2 bg-white">
+                                    {CampaignCreateButtons.map(
+                                        (button, index) => (
+                                            <Menu.Item as={"div"} key={index}>
+                                                <CreateCampaignButton
+                                                    icon={button.icon}
+                                                    href={button.href}
+                                                    label={button.label}
+                                                    description={
+                                                        button.description
+                                                    }
+                                                />
+                                            </Menu.Item>
+                                        )
+                                    )}
+                                </div>
+                            </Menu.Items>
+                        </Transition>
+                    </Menu>
+                )}
             </PageHeading>
 
             <div className="bg-white pb-6 px-4 md:px-6 rounded">
-                <div className={"border-b border-gray-200 flex items-center justify-between"}>
+                <div
+                    className={
+                        "border-b border-gray-200 flex items-center justify-between"
+                    }
+                >
                     <Tab.Group>
                         <ul className="flex flex-wrap gap-2">
-
                             {CampaignFormatTabs.map((tab) => (
                                 <Tab
                                     onClick={() => onFormatTabChange(tab)}
@@ -211,26 +230,28 @@ const CampaignListPage: React.FC<Props> = ({}) => {
                                     className={"focus:outline-none"}
                                     key={tab.name}
                                 >
-                                    <div
-                                        className="cursor-pointer ui-selected:border-indigo-500 ui-selected:text-indigo-600 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-4 border-b-2 font-medium text-sm">
+                                    <div className="cursor-pointer ui-selected:border-indigo-500 ui-selected:text-indigo-600 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-6 px-4 border-b-2 font-medium text-sm">
                                         {tab.name}
                                     </div>
                                 </Tab>
                             ))}
                         </ul>
                     </Tab.Group>
-                    {loginUser?.role === Roles.ISSUER.id && <div className={"w-56"}>
-                        <SelectBox<typeof IssuerCampaignOptions[number]>
-                            searchable={false}
-                            placeholder={""}
-                            value={selectedIssuerCampaignOption}
-                            dataSource={IssuerCampaignOptions}
-                            onValueChange={(o) => {
-                                setPage(1);
-                                setSelectedIssuerCampaignOption(o);
-                            }}
-                            displayKey={"name"} />
-                    </div>}
+                    {loginUser?.role === Roles.ISSUER.id && (
+                        <div className={"w-56"}>
+                            <SelectBox<(typeof IssuerCampaignOptions)[number]>
+                                searchable={false}
+                                placeholder={""}
+                                value={selectedIssuerCampaignOption}
+                                dataSource={IssuerCampaignOptions}
+                                onValueChange={(o) => {
+                                    setPage(1);
+                                    setSelectedIssuerCampaignOption(o);
+                                }}
+                                displayKey={"name"}
+                            />
+                        </div>
+                    )}
                 </div>
                 <Tab.Group>
                     <div className="py-6">
@@ -261,7 +282,6 @@ const CampaignListPage: React.FC<Props> = ({}) => {
                 </Tab.Group>
                 {renderCampaigns()}
             </div>
-
         </Fragment>
     );
 };

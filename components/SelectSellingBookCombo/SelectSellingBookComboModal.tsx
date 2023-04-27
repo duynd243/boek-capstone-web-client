@@ -32,7 +32,7 @@ const SelectSellingBookComboModal = ({
     const bookService = new BookService(loginUser?.accessToken);
 
     const { data: books } = useQuery(["issuer_books", debouncedSearch, genreId], () =>
-        bookService.getBooks$Issuer({
+        bookService.getBooksByIssuer({
             name: debouncedSearch,
             genreIds: [genreId],
             isSeries: false,

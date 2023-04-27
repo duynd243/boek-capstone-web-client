@@ -9,4 +9,11 @@ export interface IOrganization {
     imageUrl?: string;
     customers?: ICustomer[];
     campaigns?: ICampaign[];
+    members?: {
+        id: number
+        organizationId: number
+        emailDomain: string
+        status: boolean
+        statusName: string
+    }[];
 }

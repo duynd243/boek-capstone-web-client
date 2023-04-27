@@ -22,7 +22,7 @@ const IssuerCreatePostPage: NextPageWithLayout = () => {
     const [selectedBookId, setSelectedBookId] = React.useState<any>(null);
 
     const { data: books, isLoading } = useQuery(["issuer_books"], () =>
-        bookService.getBooks$Issuer({
+        bookService.getBooksByIssuer({
             size: 1000,
         }),
     );

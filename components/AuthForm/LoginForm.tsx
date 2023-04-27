@@ -2,7 +2,10 @@ import React from "react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { inputClass } from "../Layout/LoginSignUpLayout";
-import SocialLoginButton, { ActionTypes, AuthProviders } from "./SocialLoginButton";
+import SocialLoginButton, {
+    ActionTypes,
+    AuthProviders,
+} from "./SocialLoginButton";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 
@@ -10,32 +13,15 @@ type Props = {};
 
 const LoginForm: React.FC<Props> = () => {
     const { handleGoogleSignIn } = useAuth();
-    const form = useFormik({
-        initialValues: {
-            email: "",
-            password: "",
-        },
-        validationSchema: Yup.object().shape({
-            email: Yup.string()
-                .required("Email is required")
-                .email("Email is invalid"),
-            password: Yup.string()
-                .required("Password is required")
-                .min(6, "Password must be at least 6 characters"),
-        }),
-        onSubmit: (values) => {
-            console.log(values);
-            //handleEmailPasswordSignIn(values.email, values.password);
-        },
-    });
+
     return (
         <>
             <h1 className="mb-6 text-3xl font-bold text-slate-800">
-                Chào bạn trở lại! ✨
+                Chào bạn trở lại với Boek ✨
             </h1>
             {/* Form */}
-            <form onSubmit={form.handleSubmit} className="text-[#475569]">
-                <div>
+            <form className="text-[#475569]">
+                {/* <div>
                     <div>
                         <label className="mb-1 block text-sm font-medium" htmlFor="email">
                             Email
@@ -80,28 +66,33 @@ const LoginForm: React.FC<Props> = () => {
                 </div>
                 <div className="my-5 text-center text-xs font-medium uppercase text-gray-500">
                     Hoặc đăng nhập với
+                </div> */}
+
+                <div className="my-5 text-xs font-medium uppercase text-gray-500">
+                    Chọn hình thức đăng nhập
                 </div>
                 <SocialLoginButton
                     onClick={handleGoogleSignIn}
                     provider={AuthProviders.GOOGLE}
                     actionType={ActionTypes.LOGIN}
                 />
-                <SocialLoginButton
+                {/* <SocialLoginButton
                     wrapperClasses={"mt-4"}
                     provider={AuthProviders.FACEBOOK}
                     actionType={ActionTypes.LOGIN}
-                />
+                /> */}
             </form>
             {/* Footer */}
             <div className="mt-6 border-t-[1px] border-slate-200 pt-5">
-                <div className="text-sm">
-                    Bạn chưa có tài khoản?{" "}
-                    <Link
+                <div className="text-sm text-gray-500">
+                    Nếu tài khoản được đăng nhập lần đầu, bạn sẽ được chuyển
+                    hướng đến trang đăng ký để hoàn tất quá trình đăng ký.
+                    {/* <Link
                         className={"font-medium text-indigo-500 hover:text-indigo-600"}
                         href="/signup"
                     >
                         Đăng ký ngay
-                    </Link>
+                    </Link> */}
                 </div>
             </div>
         </>

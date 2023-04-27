@@ -1,13 +1,13 @@
 import React from "react";
-import SelectBox from "../SelectBox";
+import { Dropdown, DropdownItem } from "@tremor/react";
 
 type Props = {
     hideResult: boolean;
     showingListLength: number;
     totalListLength: number;
-    value: { name: string, value: string };
+    value: string;
     sortOptions: { name: string, value: string }[];
-    onSortChange: (value: { name: string, value: string }) => void;
+    onSortChange: (value: string) => void;
     itemName?: string;
 }
 
@@ -24,17 +24,22 @@ const SortPanel: React.FC<Props> = ({
         <div
             className="flex flex-wrap gap-3 items-center justify-between border p-4 bg-white rounded shadow-sm">
             <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-700">
+                                <span className="text-sm shrink-0 text-gray-700">
                                     Sắp xếp theo
                                 </span>
-                <SelectBox<typeof sortOptions[number]>
-                    searchable={false}
-                    placeholder={"Chọn"}
+
+                <Dropdown
                     value={value}
                     onValueChange={onSortChange}
-                    dataSource={sortOptions}
-                    displayKey={"name"}
-                />
+                >
+                    {sortOptions?.map((option) => (
+                        <DropdownItem
+
+                            value={option.value} key={option.value}
+                            text={option.name}
+                        />
+                    ))}
+                </Dropdown>
             </div>
 
             {!hideResult &&

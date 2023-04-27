@@ -2,12 +2,17 @@ import { ICampaign } from "./ICampaign";
 
 export interface ICampaignHomepage {
     hierarchicalCustomerCampaigns: IHierarchicalCustomerCampaign[];
-    unhierarchicalCustomerCampaigns: any[];
+    unhierarchicalCustomerCampaigns: IUnhierarchicalCustomerCampaign[];
 }
 
 export interface IHierarchicalCustomerCampaign {
     title: string;
     subHierarchicalCustomerCampaigns: ISubHierarchicalCustomerCampaign[];
+}
+
+export interface IUnhierarchicalCustomerCampaign {
+    title: string;
+    campaigns: ICampaign[];
 }
 
 export interface ISubHierarchicalCustomerCampaign {
@@ -18,7 +23,6 @@ export interface ISubHierarchicalCustomerCampaign {
     format: number;
     campaigns: ICampaign[];
 }
-
 
 export interface CampaignCommission {
     id: number;

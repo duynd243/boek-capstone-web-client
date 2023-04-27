@@ -5,7 +5,7 @@ import { IOrder } from "../types/Order/IOrder";
 export class OrderService extends BaseService {
 
     // For customer (access token required)
-    getOrders = async (params?: any) => {
+    getOrdersByCustomer = async (params?: any) => {
         const response = await this.axiosClient.get<IBaseListResponse<IOrder>>(
             "/orders",
             {
@@ -15,7 +15,7 @@ export class OrderService extends BaseService {
         return response.data;
     };
     // For customer (access token required)
-    getOrderById = async (id: string) => {
+    getOrderByIdByCustomer = async (id: string) => {
         const response = await this.axiosClient.get<IOrder>(`/orders/${id}`);
         return response.data;
     };
@@ -87,4 +87,43 @@ export class OrderService extends BaseService {
         const response = await this.axiosClient.get<string[]>(`/issuer/orders/campaigns/addresses/${id}`);
         return response.data;
     };
+
+
+    createDeliveryOrderByCustomer = async (param?: any) => {
+        const response = await this.axiosClient.post<any>(
+            "/orders/customer/shipping", param,
+        );
+        return response.data;
+    }
+
+    createPickupOrderByCustomer = async (param?: any) => {
+        const response = await this.axiosClient.post<any>(
+            "/orders/customer/pick-up", param,
+        );
+        return response.data;
+    }
+
+    createZaloPayOrder = async (param?: any) => {
+        const response = await this.axiosClient.post<any>(
+            "/orders/zalopay", param,
+        );
+        return response.data;
+    }
+
+
+    createDeliveryOrderByGuest = async (param?: any) => {
+        const response = await this.axiosClient.post<any>(
+            "/orders/guest/shipping", param,
+        );
+        return response.data;
+    }
+
+    createPickupOrderByGuest = async (param?: any) => {
+        const response = await this.axiosClient.post<any>(
+            "/orders/guest/pick-up", param,
+        );
+        return response.data;
+    }
+
+
 }

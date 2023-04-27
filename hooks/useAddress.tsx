@@ -9,9 +9,13 @@ type Props = {
     defaultProvinceCode?: number;
     defaultDistrictCode?: number;
     defaultWardCode?: number;
+    isDisabled?: boolean;
 };
 
-function useAddress(props: Props) {
+function useAddress({
+                        defaultProvinceCode, defaultDistrictCode, defaultWardCode, isDisabled = false,
+                    }:
+                        Props) {
 
     const addressService = new AddressService();
 
@@ -31,11 +35,12 @@ function useAddress(props: Props) {
         ["provinces"],
         () => addressService.getProvinces(),
         {
+            enabled: !isDisabled,
             onSuccess: (data) => {
-                if (props?.defaultProvinceCode && !selectedProvince && !edited) {
+                if (defaultProvinceCode && !selectedProvince && !edited) {
                     const defaultProvince = data.find(
                         (province) =>
-                            province.code === props.defaultProvinceCode,
+                            province.code === defaultProvinceCode,
                     );
                     setSelectedProvince(defaultProvince || null);
                 }
@@ -54,12 +59,12 @@ function useAddress(props: Props) {
             return [];
         },
         {
-            enabled: !!selectedProvince,
+            enabled: !isDisabled && !!selectedProvince,
             onSuccess: (data) => {
-                if (props?.defaultDistrictCode && !selectedDistrict && !edited) {
+                if (defaultDistrictCode && !selectedDistrict && !edited) {
                     const defaultDistrict = data.find(
                         (district) =>
-                            district.code === props.defaultDistrictCode,
+                            district.code === defaultDistrictCode,
                     );
                     setSelectedDistrict(defaultDistrict || null);
                 }
@@ -78,11 +83,11 @@ function useAddress(props: Props) {
             return [];
         },
         {
-            enabled: !!selectedDistrict,
+            enabled: !isDisabled && !!selectedDistrict,
             onSuccess: (data) => {
-                if (props?.defaultWardCode && !selectedWard && !edited) {
+                if (defaultWardCode && !selectedWard && !edited) {
                     const defaultWard = data.find(
-                        (ward) => ward.code === props.defaultWardCode,
+                        (ward) => ward.code === defaultWardCode,
                     );
                     setSelectedWard(defaultWard || null);
                 }

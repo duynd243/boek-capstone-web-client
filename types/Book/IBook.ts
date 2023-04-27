@@ -44,11 +44,6 @@ export interface IBook {
         description?: string;
         user?: IUser;
     };
-    issuer?: {
-        id: string;
-        description?: string;
-        user?: IUser;
-    };
     publisher?: IPublisher;
     bookAuthors?: IBookAuthor[];
     bookItems?: IBookItem[];

@@ -14,8 +14,18 @@ const useOrdersPage = ({
 }) => {
     const { loginUser } = useAuth();
     const orderService = new OrderService(loginUser?.accessToken);
-
+    const searchByOptions = [
+        {
+            value: "orderCode",
+            label: "Tìm với Mã đơn hàng",
+        },
+        {
+            value: "campaign",
+            label: "Tìm với Tên hội sách",
+        },
+    ];
     const [selectedStatusId, setSelectedStatusId] = useState<number | undefined>(initStatusId);
+    const [searchBy, setSearchBy] = useState(searchByOptions[0].value);
     const {
         search,
         setSearch,
@@ -32,10 +42,11 @@ const useOrdersPage = ({
             size,
             type: orderType,
             status: selectedStatusId,
-            "Campaign.Name": search,
-
+            sort: "orderDate desc",
+            "Campaign.Name": searchBy === "campaign" ? search : undefined,
+            code: searchBy === "orderCode" ? search : undefined,
         };
-    }, [page, size, orderType, selectedStatusId, search]);
+    }, [page, size, orderType, selectedStatusId, searchBy, search]);
 
 
     const queryFn = function() {
@@ -55,6 +66,9 @@ const useOrdersPage = ({
     return {
         search,
         setSearch,
+        searchBy,
+        searchByOptions,
+        setSearchBy,
         orderQuery,
         selectedStatusId,
         setSelectedStatusId,

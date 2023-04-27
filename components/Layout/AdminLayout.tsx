@@ -11,6 +11,7 @@ import { NotificationTypes } from "../../constants/NotificationTypes";
 import { useAuth } from "../../context/AuthContext";
 import { findRole } from "../../constants/Roles";
 import { useQueryClient } from "@tanstack/react-query";
+import BoekLogo from "../../assets/images/logo/boek-logo.png";
 
 type Props = {
     children: React.ReactElement;
@@ -82,7 +83,7 @@ const AdminLayout: React.FC<Props> = ({ children, containerClassName, bgClassNam
                     </div>
                     <div className="flex border-l border-gray-200">
                         <Link
-                            href={viewUrl ? findRole(loginUser?.role)?.defaultRoute + viewUrl : "#"}
+                            href={viewUrl ? findRole(loginUser?.role)?.baseUrl + viewUrl : "#"}
                             className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
                             Xem

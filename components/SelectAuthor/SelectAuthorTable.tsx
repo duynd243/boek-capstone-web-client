@@ -21,7 +21,7 @@ const SelectGroupsTable: React.FC<Props> = ({
         <TableWrapper>
             <TableHeading>
                 <TableHeader>Tên tác giả</TableHeader>
-                <TableHeader>Mô tả</TableHeader>
+                {/*<TableHeader>Mô tả</TableHeader>*/}
                 <TableHeader>
                     <span className="sr-only">Actions</span>
                 </TableHeader>
@@ -49,11 +49,11 @@ const SelectGroupsTable: React.FC<Props> = ({
                                         </div>
                                     </div>
                                 </TableData>
-                                <TableData>
-                                    <div className="text-sm text-gray-900">
-                                        {author?.description}
-                                    </div>
-                                </TableData>
+                                {/*<TableData>*/}
+                                {/*    <div className="text-sm text-gray-900">*/}
+                                {/*        {author?.description}*/}
+                                {/*    </div>*/}
+                                {/*</TableData>*/}
 
                                 <TableData className="text-right text-sm font-medium">
                                     <button
