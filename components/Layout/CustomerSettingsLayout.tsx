@@ -24,7 +24,7 @@ const CustomerSettingsLayout: React.FC<Props> = ({ children }) => {
                             key={menu?.path}
                             href={menu?.path}
                             className={`${
-                                menu?.path === router.pathname
+                                router.pathname.startsWith(menu?.path)
                                     ? "border-indigo-500 bg-indigo-50 text-indigo-700 hover:bg-indigo-50 hover:text-indigo-700"
                                     : "border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900"
                             }  group flex items-center border-l-4 px-3 py-2 text-sm font-medium py-3`}

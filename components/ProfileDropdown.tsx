@@ -96,7 +96,7 @@ const ProfileDropdown: React.FC<Props> = ({ align }) => {
                             <Link
                                 className="flex items-center py-1 px-3 text-sm font-medium text-indigo-500 hover:text-indigo-600"
                                 href={`${
-                                    findRole(loginUser?.role)?.defaultRoute
+                                    findRole(loginUser?.role)?.baseUrl
                                 }/settings/profile`}
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
                             >

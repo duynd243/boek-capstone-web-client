@@ -2,7 +2,7 @@ import { IBaseRequestParams } from "../types/Request/IBaseRequestParams";
 import { ILoginData } from "../types/User/ILoginData";
 import { IBaseStatusResponse } from "../types/Commons/IBaseStatusResponse";
 import { BaseService } from "./BaseService";
-import { ICustomer, IUser } from "../types/User/IUser";
+import { ICustomer, IIssuer, IUser } from "../types/User/IUser";
 import { IBaseListResponse } from "../types/Commons/IBaseListResponse";
 
 export type UpdateUserParams = Required<Pick<IUser, "id" | "role">> &
@@ -28,6 +28,7 @@ export class UserService extends BaseService {
         const response = await this.axiosClient.get<IUser>("/users/me");
         return response.data;
     };
+
 
     // admin
     getUsersByAdmin = async (
@@ -77,6 +78,20 @@ export class UserService extends BaseService {
         return response.data;
     };
 
+    getProfileByAdmin = async () => {
+        const response = await this.axiosClient.get<IUser>(
+            `/users/me`,
+        );
+        return response.data;
+    };
+
+    getProfileByIssuer = async () => {
+        const response = await this.axiosClient.get<IIssuer>(
+            `/users/me`,
+        );
+        return response.data;
+    };
+
     updateProfileByCustomer = async (payload: any) => {
         const response = await this.axiosClient.put<any>(
             `/users/customer`,
@@ -117,4 +132,13 @@ export class UserService extends BaseService {
         }
         return data;
     };
+
+
+    createUser = async (user?: any) => {
+        const response = await this.axiosClient.post<IUser>(
+            `/users`,
+            user,
+        );
+        return response.data;
+    }
 }

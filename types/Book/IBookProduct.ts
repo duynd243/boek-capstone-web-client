@@ -40,7 +40,6 @@ export interface IBookProduct {
     withPdf?: boolean;
     pdfExtraPrice?: number;
     displayPdfIndex?: number;
-
     withAudio?: boolean;
     displayAudioIndex?: number;
     audioExtraPrice?: number;
@@ -56,6 +55,8 @@ export interface IBookProduct {
     book?: IBook;
     issuer?: IIssuer;
     bookProductItems?: IBookProductItem[];
+    withLevel?: boolean;
+    allowPurchasingByLevel?: boolean;
 }
 
 export interface ICustomerBookProduct extends IBookProduct {

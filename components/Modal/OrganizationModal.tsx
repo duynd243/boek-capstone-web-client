@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
 import { useAuth } from "../../context/AuthContext";
@@ -16,6 +16,10 @@ import { isImageFile, isValidFileSize, VIETNAMESE_PHONE_REGEX } from "../../util
 import SelectProfilePicture from "../SelectProfilePicture";
 import Modal from "./Modal";
 import TransitionModal from "./TransitionModal";
+import { defaultInputClass } from "../Form";
+import { MdOutlineAdd, MdRemoveCircle } from "react-icons/md";
+import ErrorMessage from "../Form/ErrorMessage";
+import ToggleButton from "../ToggleButton";
 
 export enum OrganizationModalMode {
     CREATE,
@@ -44,6 +48,8 @@ const OrganizationModal: React.FC<Props> = ({
     const orgService = new OrganizationService(loginUser?.accessToken);
     const imageService = new ImageUploadService(loginUser?.accessToken);
 
+    const [emails, setEmails] = React.useState<string[]>([]);
+
     const commonMutationOptions = {
         onSuccess: async () => {
             await queryClient.invalidateQueries(["organizations"]);
@@ -67,16 +73,27 @@ const OrganizationModal: React.FC<Props> = ({
         name: z
             .string()
             .min(2, "Tên tổ chức phải có ít nhất 2 ký tự")
-            .max(50, "Tên tổ chức không được vượt quá 50 ký tự"),
+            .max(255, "Tên tổ chức không được vượt quá 255 ký tự"),
         address: z
             .string()
             .min(2, "Địa chỉ phải có ít nhất 2 ký tự")
             .max(250, "Địa chỉ không được vượt quá 50 ký tự"),
         phone: z
-            .string()
-            .regex(VIETNAMESE_PHONE_REGEX, "Số điện thoại không hợp lệ"),
+        .string()
+        .min(10, "Số điện thoại phải có ít nhất 10 ký tự")
+        .max(50, "Số điện thoại không được vượt quá 50 ký tự"),
         imageUrl: z.string().optional(),
         previewFile: z.instanceof(File).optional(),
+        organizationMembers: z.array(
+            z.object(
+                {
+                    emailDomain: z.string().min(3, "Tên miền phải có ít nhất 3 ký tự"),
+                    status: z.boolean().default(true),
+                    isNewItem: z.boolean().default(true),
+                },
+            )).refine((value) => {
+            return value.length === Array.from(new Set(value.map((v) => v.emailDomain.trim()))).length;
+        }, "Các tên miền không được trùng nhau"),
     });
 
     const UpdateOrganizationSchema = BaseOrganizationSchema.extend({
@@ -92,6 +109,13 @@ const OrganizationModal: React.FC<Props> = ({
         phone: organization?.phone,
         imageUrl: organization?.imageUrl || undefined,
         previewFile: undefined,
+        organizationMembers: organization?.members?.map(m => {
+            return {
+                emailDomain: m.emailDomain,
+                status: m.status,
+                isNewItem: false,
+            };
+        }) || [],
     };
 
     const {
@@ -99,6 +123,7 @@ const OrganizationModal: React.FC<Props> = ({
         control,
         setValue,
         reset,
+        watch,
         handleSubmit,
         formState: { errors, isSubmitting, isDirty },
     } = useForm<FormType>({
@@ -108,6 +133,11 @@ const OrganizationModal: React.FC<Props> = ({
                 : BaseOrganizationSchema,
         ),
         defaultValues,
+    });
+
+    const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+        control,
+        name: "organizationMembers",
     });
 
     const handleOnClose = () => {
@@ -275,6 +305,68 @@ const OrganizationModal: React.FC<Props> = ({
                         register={register}
                         errorMessage={errors.address?.message}
                     />
+
+                    <div>
+                        <Modal.FormLabel label="Tên miền của tổ chức" />
+                        <p className={"text-sm text-gray-500 mb-3"}>
+                            Các tên miền đã tồn tại trước đó chỉ có thể thay đổi trạng thái và không thể xóa.
+                        </p>
+                        <div className="space-y-2">
+                            {fields.map((field, index) => (
+                                <div key={field.id}>
+                                    <div
+                                        className="flex items-center space-x-2"
+                                    >
+                                        <input
+                                            className={defaultInputClass}
+                                            type="text"
+                                            disabled={!field.isNewItem}
+                                            placeholder="Nhập tên miền"
+                                            {...register(`organizationMembers.${index}.emailDomain` as const)}
+                                        />
+                                        <button
+                                            type={"button"}
+                                            className="disabled:opacity-50"
+                                            disabled={!field.isNewItem}
+                                            onClick={() => {
+                                                remove(index);
+                                            }}
+                                        >
+                                            <MdRemoveCircle className="text-red-500 w-6 h-6" />
+                                        </button>
+
+                                        <Controller
+                                            name={`organizationMembers.${index}.status` as const}
+                                            control={control}
+                                            render={({ field: statusField }) => (
+                                                <ToggleButton isCheck={statusField.value}
+                                                              onChange={(value) => {
+                                                                  statusField.onChange(value);
+                                                              }} disabled={field.isNewItem} />
+                                            )}
+                                        />
+
+                                    </div>
+                                    <ErrorMessage>
+                                        {errors.organizationMembers?.[index]?.emailDomain?.message}
+                                    </ErrorMessage>
+                                </div>
+                            ))}
+                        </div>
+                        <ErrorMessage>
+                            {errors.organizationMembers?.message}
+                        </ErrorMessage>
+                        <button
+                            className="mt-3 flex gap-2 justify-center items-center text-sm font-medium rounded py-2 bg-indigo-100 text-indigo-500 w-full border border-dashed border-indigo-200"
+                            type={"button"}
+                            onClick={() => {
+                                append({ emailDomain: "", status: true, isNewItem: true });
+                            }}
+                        >
+                            <MdOutlineAdd />
+                            Thêm tên miền
+                        </button>
+                    </div>
                 </div>
                 <Modal.Footer>
                     <div className="flex flex-wrap justify-end space-x-2">
@@ -310,6 +402,10 @@ const OrganizationModal: React.FC<Props> = ({
                         </Modal.PrimaryButton>
                     </div>
                 </Modal.Footer>
+
+                <pre>
+                    {JSON.stringify(watch(), null, 2)}
+                </pre>
             </form>
         </TransitionModal>
     );

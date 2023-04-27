@@ -41,7 +41,7 @@ const LevelModal: React.FC<Props> = ({
         name: z
             .string()
             .min(2, { message: "Tên cấp độ phải có ít nhất 2 ký tự" })
-            .max(50, { message: "Tên cấp độ không được vượt quá 50 ký tự" }),
+            .max(255, { message: "Tên cấp độ không được vượt quá 255 ký tự" }),
         conditionalPoint: z.coerce
             .number()
             .int("Điểm yêu cầu phải là số nguyên")

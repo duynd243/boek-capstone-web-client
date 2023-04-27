@@ -13,6 +13,7 @@ export interface IOrderDetail {
     withPdf?: boolean;
     withAudio?: boolean;
     subTotal?: number;
+    total?: number;
     bookProduct?: IBookProduct;
 }
 

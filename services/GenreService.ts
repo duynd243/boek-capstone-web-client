@@ -1,7 +1,6 @@
 import { BaseService } from "./BaseService";
 import { IBaseListResponse } from "../types/Commons/IBaseListResponse";
 import { IGenre } from "../types/Genre/IGenre";
-import { IBaseRequestParams } from "../types/Request/IBaseRequestParams";
 
 export class GenreService extends BaseService {
     getGenres = async (
@@ -12,18 +11,6 @@ export class GenreService extends BaseService {
             {
                 params,
             });
-        return response.data;
-    };
-
-    getChilrenGenres = async (
-        params?: IBaseRequestParams<IGenre> & { withBooks?: boolean },
-    ) => {
-        const response = await this.axiosClient.get<IGenre[]>(
-            "/genres/child-genres",
-            {
-                params,
-            },
-        );
         return response.data;
     };
     getChildGenres = async (params?: any) => {
@@ -38,6 +25,16 @@ export class GenreService extends BaseService {
 
     getGenreById = async (id: number) => {
         const response = await this.axiosClient.get<IGenre>(`/genres/${id}`);
+        return response.data;
+    };
+
+    createGenre = async (data: any) => {
+        const response = await this.axiosClient.post<IGenre>("/admin/genres", data);
+        return response.data;
+    };
+
+    updateGenre = async (data: any) => {
+        const response = await this.axiosClient.put<IGenre>(`admin/genres`, data);
         return response.data;
     };
 }

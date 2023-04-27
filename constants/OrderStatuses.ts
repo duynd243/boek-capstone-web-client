@@ -4,6 +4,7 @@ export interface IOrderStatus {
     id: number;
     displayName: string;
     labelColor?: string;
+    dotColor?: string;
 }
 
 export const OrderStatuses = {
@@ -11,38 +12,45 @@ export const OrderStatuses = {
         id: 1,
         displayName: "Chờ thanh toán",
         labelColor: "bg-amber-100 text-amber-800",
+        dotColor: "bg-amber-400",
     },
     PROCESSING: {
         id: 2,
         displayName: "Đang xử lý",
         labelColor: "bg-amber-100 text-amber-800",
+        dotColor: "bg-amber-400",
     },
     // Chờ nhận hàng tại campaign (đơn dạng pickup)
     WAITING_RECEIVE: {
         id: 3,
         displayName: "Đợi nhận hàng",
         labelColor: "bg-green-100 text-green-800",
+        dotColor: "bg-green-400",
     },
     SHIPPING: {
         id: 4,
         displayName: "Đang vận chuyển",
         labelColor: "bg-green-100 text-green-800",
+        dotColor: "bg-green-400",
     },
     SHIPPED: {
         id: 5,
         displayName: "Đã giao",
         labelColor: "bg-green-100 text-green-800",
+        dotColor: "bg-green-400",
     },
     // Đã nhận hàng tại campaign (đơn dạng pickup)
     RECEIVED: {
         id: 6,
         displayName: "Đã nhận",
         labelColor: "bg-green-100 text-green-800",
+        dotColor: "bg-green-400",
     },
     CANCELLED: {
         id: 7,
         displayName: "Đã bị hủy",
         labelColor: "bg-rose-100 text-rose-800",
+        dotColor: "bg-rose-400",
     },
 } satisfies Record<
     string,

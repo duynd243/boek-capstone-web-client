@@ -7,6 +7,6 @@ const Login: NextPageWithLayout = () => {
     return <LoginForm />;
 };
 
-Login.getLayout = (page) => <LoginSignUpLayout>{page}</LoginSignUpLayout>;
+Login.getLayout = (page) => <LoginSignUpLayout childrenWrapperClass="mx-auto my-auto w-full max-w-md px-4 py-8">{page}</LoginSignUpLayout>;
 
 export default Login;

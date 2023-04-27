@@ -147,7 +147,7 @@ const AdminCampaignCard: React.FC<Props> = ({ campaign, organization }) => {
             <div className="mt-3.5 grow">
                 <Link
                     href={
-                        findRole(loginUser?.role)?.defaultRoute +
+                        findRole(loginUser?.role)?.baseUrl +
                         `/campaigns/${campaign?.id}`
                     }
                     className="mb-1 inline-flex text-slate-800 hover:text-slate-900"

@@ -4,16 +4,18 @@ import { Switch } from "@headlessui/react";
 type Props = {
     isCheck: boolean;
     onChange: (value: boolean) => void;
+    disabled?: boolean;
 };
 
-const ToggleButton: React.FC<Props> = ({ isCheck, onChange }) => {
+const ToggleButton: React.FC<Props> = ({ isCheck, onChange, disabled = false }) => {
     return (
         <Switch
+            disabled={disabled}
             checked={isCheck}
             onChange={onChange}
             className={`${
                 isCheck ? "bg-green-500" : "bg-gray-200"
-            } relative ml-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
+            } relative ml-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50`}
         >
             <span
                 aria-hidden="true"

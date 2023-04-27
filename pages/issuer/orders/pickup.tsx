@@ -8,14 +8,17 @@ import { PickupOrderTabs } from "../../../constants/OrderStatuses";
 import { OrderTypes } from "../../../constants/OrderTypes";
 import OrderTable from "../../../components/OrderPage/OrderTable";
 import OrderTabs from "../../../components/OrderPage/OrderTabs";
+import { Dropdown, DropdownItem } from "@tremor/react";
 
 
 const AdminPickupOrdersPage: NextPageWithLayout = () => {
     const {
-        search,
+       search,
         setSearch,
         orderQuery,
-        selectedStatusId,
+        searchBy,
+        setSearchBy,
+        searchByOptions,
         setSelectedStatusId,
         size,
         onSizeChange,
@@ -33,6 +36,15 @@ const AdminPickupOrdersPage: NextPageWithLayout = () => {
     return (
         <Fragment>
             <PageHeading label="Đơn tại quầy">
+                <Dropdown
+                    onValueChange={(value) => {
+                        setSearchBy(value);
+                    }}
+                    value={searchBy} placeholder={"Tìm kiếm theo"}>
+                    {searchByOptions.map((option, index) => (
+                        <DropdownItem key={index} value={option.value} text={option.label}/>
+                    ))}
+                </Dropdown>
                 <SearchForm
                     value={search}
                     onSearchSubmit={(value) => setSearch(value)}

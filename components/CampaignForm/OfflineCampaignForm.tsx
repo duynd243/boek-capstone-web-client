@@ -696,6 +696,7 @@ const OfflineCampaignForm: React.FC<Props> = ({ action }) => {
 
                     <Form.Divider />
                     <Form.GroupLabel
+                        required={true}
                         label={"Các tổ chức và chuỗi hội sách"}
                         description={
                             "Thông tin về các tổ chức và chuỗi hội sách"

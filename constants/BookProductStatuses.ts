@@ -48,7 +48,7 @@ export const BookProductStatuses = {
             classNames: "border border-green-500 text-green-600 bg-green-50",
         },
         campaignCardTag: {
-            bgClassNames: "bg-green-500",
+            bgClassNames: "bg-gray-500",
         },
     },
     NotSaleDueEndDate: {
@@ -59,7 +59,7 @@ export const BookProductStatuses = {
             classNames: "border border-green-500 text-green-600 bg-green-50",
         },
         campaignCardTag: {
-            bgClassNames: "bg-green-500",
+           bgClassNames: "bg-gray-500",
         },
     },
     NotSaleDueCancelledCampaign: {
@@ -70,7 +70,7 @@ export const BookProductStatuses = {
             classNames: "border border-green-500 text-green-600 bg-green-50",
         },
         campaignCardTag: {
-            bgClassNames: "bg-green-500",
+            bgClassNames: "bg-gray-500",
         },
     },
     NotSaleDuePostponedCampaign: {
@@ -81,7 +81,7 @@ export const BookProductStatuses = {
             classNames: "border border-green-500 text-green-600 bg-green-50",
         },
         campaignCardTag: {
-            bgClassNames: "bg-green-500",
+           bgClassNames: "bg-gray-500",
         },
     },
     OutOfStock: {
@@ -91,7 +91,7 @@ export const BookProductStatuses = {
             classNames: "border border-green-500 text-green-600 bg-green-50",
         },
         campaignCardTag: {
-            bgClassNames: "bg-green-500",
+            bgClassNames: "bg-gray-500",
         },
     },
     Unreleased: {
@@ -101,7 +101,7 @@ export const BookProductStatuses = {
             classNames: "border border-green-500 text-green-600 bg-green-50",
         },
         campaignCardTag: {
-            bgClassNames: "bg-green-500",
+           bgClassNames: "bg-gray-500",
         },
     },
 } satisfies Record<string, IBookProductStatus>;

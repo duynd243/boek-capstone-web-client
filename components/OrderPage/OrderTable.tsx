@@ -73,10 +73,10 @@ const OrderTable: React.FC<Props> = ({
                                         </div>
                                         <div className="ml-4">
                                             <div className="text-sm font-medium text-gray-900">
-                                                {order?.customerName}
+                                                {order?.customerName || 'Vô danh'}
                                             </div>
                                             <div className="text-sm text-gray-500">
-                                                {order?.customerEmail}
+                                                {order?.customerEmail || '-'}
                                             </div>
                                         </div>
                                     </div>

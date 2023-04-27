@@ -64,7 +64,7 @@ const AuthorModal: React.FC<Props> = ({
         name: z
             .string()
             .min(2, { message: "Tên tác giả phải có ít nhất 2 ký tự" })
-            .max(50, { message: "Tên tác giả không được vượt quá 50 ký tự" }),
+            .max(255, { message: "Tên tác giả không được vượt quá 255 ký tự" }),
         description: z
             .string()
             .max(500, "Mô tả không được vượt quá 500 ký tự")

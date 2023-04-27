@@ -24,6 +24,9 @@ import { getAvatarFromName } from "../../utils/helper";
 import { CampaignFormats } from "../../constants/CampaignFormats";
 import { HiLocationMarker, HiOutlineStatusOnline } from "react-icons/hi";
 import { getNumberArrayFromQueryKey, getStringArrayFromQueryKey } from "../../utils/query-helper";
+import { DateRangePicker, DateRangePickerValue } from "@tremor/react";
+import { vi } from "date-fns/locale";
+import { CampaignStatuses } from "../../constants/CampaignStatuses";
 
 const sortOptions = [
     { name: "Mới nhất", value: "CreatedDate desc" },
@@ -33,15 +36,22 @@ const sortOptions = [
 const CustomerCampaignsPage: NextPageWithLayout = () => {
     const router = useRouter();
     const [page, setPage] = useState(1);
-    const [selectedSortOption, setSelectedSortOption] = useState(sortOptions[0]);
-    const searchFromQuery = getStringArrayFromQueryKey(router.query.name)[0] || "";
-    const [startDate, setStartDate] = useState(getStringArrayFromQueryKey(router.query.startdate)[0] || "");
-    const [endDate, setEndDate] = useState(getStringArrayFromQueryKey(router.query.enddate)[0] || "");
+    const [selectedSortOption, setSelectedSortOption] = useState(
+        sortOptions[0],
+    );
+    const searchFromQuery =
+        getStringArrayFromQueryKey(router.query.name)[0] || "";
+    const startDate =
+        getStringArrayFromQueryKey(router.query.range)[0] || "";
+    const endDate = getStringArrayFromQueryKey(router.query.range)?.[1] || "";
 
-    const {
-        onParamsChange,
-        issuers,
-    } = useCustomerSearchWithFilterPage(setPage);
+    const [dateRange, setDateRange] = useState<DateRangePickerValue>([
+        startDate !== "" ? new Date(startDate) : null,
+        endDate !== "" ? new Date(endDate) : null,
+    ]);
+
+    const { onParamsChange, issuers } =
+        useCustomerSearchWithFilterPage(setPage);
 
     const [formatIds, setFormatIds] = useState<number[]>(
         getNumberArrayFromQueryKey(router.query.format),
@@ -52,7 +62,7 @@ const CustomerCampaignsPage: NextPageWithLayout = () => {
     );
 
     const [statusIds, setStatusIds] = useState<number[]>(
-        getNumberArrayFromQueryKey(router.query.genre),
+        getNumberArrayFromQueryKey(router.query.status),
     );
 
     const [issuerIds, setIssuerIds] = useState<string[]>(
@@ -68,10 +78,11 @@ const CustomerCampaignsPage: NextPageWithLayout = () => {
     const organizationService = new OrganizationService();
     const queryParams = {
         name: searchFromQuery,
-        startDate: startDate,
-        endDate: endDate,
+        startDate: dateRange[0] ? dateRange[0].toISOString() : "",
+        endDate: dateRange[1] ? dateRange[1].toISOString() : "",
         formats: formatIds,
         address: addresses,
+        status: statusIds,
         "CampaignOrganizations.OrganizationIds": orgIds,
         "Participants.IssuerIds": issuerIds,
         size: 6,
@@ -79,44 +90,59 @@ const CustomerCampaignsPage: NextPageWithLayout = () => {
         sort: selectedSortOption.value,
     };
 
-    const {
-        data,
-        isInitialLoading: campaignsLoading,
-    } = useQuery(["customer_campaigns", queryParams],
+    const { data, isInitialLoading: campaignsLoading } = useQuery(
+        ["customer_campaigns", queryParams],
         () => campaignService.getCampaignsByCustomer(queryParams),
         {
             onError: (error: any) => {
-                toast.error(error?.message || "Xảy ra lỗi!\nVui lòng thử lại sau hoặc chọn các bộ lọc khác.", {
-                    duration: 5000,
-                });
+                toast.error(
+                    error?.message ||
+                    "Xảy ra lỗi!\nVui lòng thử lại sau hoặc chọn các bộ lọc khác.",
+                    {
+                        duration: 5000,
+                    },
+                );
             },
         },
     );
 
-    const {
-        data: provinces,
-    } = useQuery(
-        ["provinces"],
-        () => addressService.getProvinces(),
+    const { data: provinces } = useQuery(["provinces"], () =>
+        addressService.getProvinces(),
     );
 
-    const {
-        data: organizations,
-    } = useQuery(
-        ["organizations"],
-        () => organizationService.getAllOrganizations(),
+    const { data: organizations } = useQuery(["organizations"], () =>
+        organizationService.getAllOrganizations(),
     );
 
-    const sortedIssuers = getSortedArray((issuers || []), "id", issuerIds);
-    const sortedOrganizations = getSortedArray((organizations || []), "id", orgIds);
+    const sortedIssuers = getSortedArray(issuers || [], "id", issuerIds);
+    const sortedOrganizations = getSortedArray(
+        organizations || [],
+        "id",
+        orgIds,
+    );
 
     const haveFilters = useMemo(() => {
-        return startDate !== "" || endDate !== "" || formatIds.length > 0 || addresses.length > 0 || statusIds.length > 0 || issuerIds.length > 0 || orgIds.length > 0;
-    }, [startDate, endDate, formatIds, addresses, statusIds, issuerIds, orgIds]);
+        return (
+            startDate !== "" ||
+            endDate !== "" ||
+            formatIds.length > 0 ||
+            addresses.length > 0 ||
+            statusIds.length > 0 ||
+            issuerIds.length > 0 ||
+            orgIds.length > 0
+        );
+    }, [
+        startDate,
+        endDate,
+        formatIds,
+        addresses,
+        statusIds,
+        issuerIds,
+        orgIds,
+    ]);
 
     const clearFilters = async () => {
-        setStartDate("");
-        setEndDate("");
+        setDateRange([null, null]);
         setFormatIds([]);
         setAddresses([]);
         setStatusIds([]);
@@ -133,250 +159,509 @@ const CustomerCampaignsPage: NextPageWithLayout = () => {
 
     return (
         <Fragment>
-            <SearchSection title={"Hội sách"}
-                           initValue={searchFromQuery}
-                           onSearch={async (value) => await onParamsChange("name", value)} />
+            <SearchSection
+                title={"Hội sách"}
+                initValue={searchFromQuery}
+                onSearch={async (value) => await onParamsChange("name", value)}
+            />
 
-            <div className={"max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8"}>
+            <div
+                className={"max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8"}
+            >
                 <div className={"flex flex-col md:flex-row gap-6 relative"}>
-                    <FilterSidebar onClearFilters={clearFilters}
-                                   clearFiltersDisabled={!haveFilters}
+                    <FilterSidebar
+                        onClearFilters={clearFilters}
+                        clearFiltersDisabled={!haveFilters}
                     >
-                        <FilterSection label={"Thời gian"}>
-                            <></>
+                        <FilterSection
+                            defaultOpen={true}
+                            label={"Thời gian"}>
+                            <DateRangePicker
+                                value={dateRange}
+                                onValueChange={async (range) => {
+                                    setDateRange(range);
+                                    if (range[0] && range[1]) {
+                                        await onParamsChange(
+                                            "range",
+                                            [range?.[0]?.toISOString(), range?.[1]?.toISOString()],
+                                        );
+                                    }
+                                }}
+                                locale={vi}
+                                placeholder="Chọn khoảng thời gian"
+                                className="mx-auto bg-white max-w-full"
+                                enableDropdown={false}
+                            />
                         </FilterSection>
 
                         <FilterSection
                             defaultOpen={addresses.length > 0}
                             count={addresses.length}
-                            label={"Địa điểm"}>
-                            <div className={"space-y-3"}>
-                                <ExpandableList items={provinces || []} renderItem={
-                                    (province) => <div
-                                        className={"flex items-center justify-between gap-2 text-sm outline-none"}>
-
-                                        <label htmlFor={`province-${province?.code}`}>
-                                                    <span>
-                                                        {province?.nameWithType}
-                                                    </span>
-                                        </label>
-
-                                        <input
-                                            type="checkbox"
-                                            id={`province-${province?.code}`}
-                                            className={"rounded-sm bg-gray-100 border-gray-200 shrink-0"}
-                                            checked={addresses.includes(province?.nameWithType)}
-                                            onChange={async (e) => {
-                                                if (e.target.checked) {
-                                                    const newAddresses = [...addresses, province?.nameWithType];
-                                                    setAddresses(newAddresses);
-                                                    await onParamsChange("address", newAddresses);
-                                                } else {
-                                                    const newAddresses = addresses.filter(x => x !== province?.nameWithType);
-                                                    setAddresses(newAddresses);
-                                                    await onParamsChange("address", newAddresses);
-                                                }
-                                            }
-                                            }
-                                        />
-                                    </div>
-                                } />
-
-                            </div>
-                        </FilterSection>
-
-                        <FilterSection label={"Hình thức tổ chức"}>
-                            <div className={"flex flex-wrap gap-2 text-sm text-gray-500"}>
-                                {Object.values(CampaignFormats).map((format) => {
-                                    const checked = formatIds.includes(format.id);
-                                    return <Fragment key={format.id}>
-                                        <input
-                                            type="checkbox"
-                                            id={`format-${format.id}`}
-                                            className={"hidden"}
-                                            checked={checked}
-                                            onChange={async (e) => {
-                                                if (e.target.checked) {
-                                                    const newFormatIds = [...formatIds, format.id];
-                                                    setFormatIds(newFormatIds);
-                                                    await onParamsChange("format", newFormatIds);
-                                                } else {
-                                                    const newFormatIds = formatIds.filter((x) => x !== format.id);
-                                                    setFormatIds(newFormatIds);
-                                                    await onParamsChange("format", newFormatIds);
-                                                }
-                                            }
-                                            }
-                                        />
-                                        <label htmlFor={`format-${format.id}`}>
-                                            <div
-                                                className={`flex gap-1 border py-2 px-3 rounded-md cursor-pointer ${checked ? "bg-blue-50 text-blue-500 border-blue-400" : ""}`}>
-                                                {format.id === CampaignFormats.OFFLINE.id && <HiLocationMarker
-                                                    className="flex-shrink-0 h-5 w-5 text-rose-600" />}
-                                                {format.id === CampaignFormats.ONLINE.id && <HiOutlineStatusOnline
-                                                    className="flex-shrink-0 h-5 w-5 text-green-600" />}
-                                                <span className="font-medium">
-                                                                {format.name}
-                                                            </span>
-                                            </div>
-                                        </label>
-                                    </Fragment>;
-                                })}
-                            </div>
-                        </FilterSection>
-                        <FilterSection label={"Trạng thái"}>
-                            <></>
-                        </FilterSection>
-
-                        <FilterSection label={"Nhà phát hành"}
-                                       count={issuerIds?.length}
-                                       defaultOpen={issuerIds.length > 0}
+                            label={"Địa điểm"}
                         >
                             <div className={"space-y-3"}>
-                                <ExpandableList items={sortedIssuers} renderItem={
-                                    (issuer) => <motion.div
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.9 }}
-                                        className={"h-full flex flex-col"}
-                                        transition={{ duration: 0.4, ease: "easeInOut" }}
-                                        layout key={issuer.id}>
-                                        <input
-                                            type="checkbox"
-                                            id={`issuer-${issuer.id}`}
-                                            className={"hidden"}
-                                            checked={issuerIds.includes(issuer.id)}
-                                            onChange={async (e) => {
-                                                if (e.target.checked) {
-                                                    const newIssuerIds = [...issuerIds, issuer.id];
-                                                    setIssuerIds(newIssuerIds);
-                                                    await onParamsChange("issuer", newIssuerIds);
-                                                } else {
-                                                    const newIssuerIds = issuerIds.filter((x) => x !== issuer.id);
-                                                    setIssuerIds(newIssuerIds);
-                                                    await onParamsChange("issuer", newIssuerIds);
-                                                }
+                                <ExpandableList
+                                    items={provinces || []}
+                                    renderItem={(province) => (
+                                        <div
+                                            className={
+                                                "flex items-center justify-between gap-2 text-sm outline-none"
                                             }
-                                            }
-                                        />
-                                        <label htmlFor={`issuer-${issuer.id}`}>
-                                            <div
-                                                className={`flex items-center gap-2 border py-2 px-3 text-sm rounded-md cursor-pointer ${issuerIds.includes(issuer.id) ? "bg-blue-50 text-blue-500 border-blue-400" : ""}`}>
-                                                <Image src={issuer?.imageUrl ||
-                                                    getAvatarFromName(issuer.name)
-                                                } alt={""}
-                                                       width={40}
-                                                       height={40}
-                                                       className={"rounded-full object-cover h-6 w-6"} />
-                                                <span className="font-medium">
-                                                                    {issuer.name}
-                                                                </span>
-                                            </div>
-                                        </label>
-                                    </motion.div>
-                                } />
+                                        >
+                                            <label
+                                                htmlFor={`province-${province?.code}`}
+                                            >
+                                                <span>
+                                                    {province?.nameWithType}
+                                                </span>
+                                            </label>
 
+                                            <input
+                                                type="checkbox"
+                                                id={`province-${province?.code}`}
+                                                className={
+                                                    "rounded-sm bg-gray-100 border-gray-200 shrink-0"
+                                                }
+                                                checked={addresses.includes(
+                                                    province?.nameWithType,
+                                                )}
+                                                onChange={async (e) => {
+                                                    if (e.target.checked) {
+                                                        const newAddresses = [
+                                                            ...addresses,
+                                                            province?.nameWithType,
+                                                        ];
+                                                        setAddresses(
+                                                            newAddresses,
+                                                        );
+                                                        await onParamsChange(
+                                                            "address",
+                                                            newAddresses,
+                                                        );
+                                                    } else {
+                                                        const newAddresses =
+                                                            addresses.filter(
+                                                                (x) =>
+                                                                    x !==
+                                                                    province?.nameWithType,
+                                                            );
+                                                        setAddresses(
+                                                            newAddresses,
+                                                        );
+                                                        await onParamsChange(
+                                                            "address",
+                                                            newAddresses,
+                                                        );
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    )}
+                                />
+                            </div>
+                        </FilterSection>
+
+                        <FilterSection
+                            count={formatIds.length}
+                            defaultOpen={formatIds.length > 0}
+                            label={"Hình thức tổ chức"}>
+                            <div
+                                className={
+                                    "flex flex-wrap gap-2 text-sm text-gray-500"
+                                }
+                            >
+                                {Object.values(CampaignFormats).map(
+                                    (format) => {
+                                        const checked = formatIds.includes(
+                                            format.id,
+                                        );
+                                        return (
+                                            <Fragment key={format.id}>
+                                                <input
+                                                    type="checkbox"
+                                                    id={`format-${format.id}`}
+                                                    className={"hidden"}
+                                                    checked={checked}
+                                                    onChange={async (e) => {
+                                                        if (e.target.checked) {
+                                                            const newFormatIds =
+                                                                [
+                                                                    ...formatIds,
+                                                                    format.id,
+                                                                ];
+                                                            setFormatIds(
+                                                                newFormatIds,
+                                                            );
+                                                            await onParamsChange(
+                                                                "format",
+                                                                newFormatIds,
+                                                            );
+                                                        } else {
+                                                            const newFormatIds =
+                                                                formatIds.filter(
+                                                                    (x) =>
+                                                                        x !==
+                                                                        format.id,
+                                                                );
+                                                            setFormatIds(
+                                                                newFormatIds,
+                                                            );
+                                                            await onParamsChange(
+                                                                "format",
+                                                                newFormatIds,
+                                                            );
+                                                        }
+                                                    }}
+                                                />
+                                                <label
+                                                    htmlFor={`format-${format.id}`}
+                                                >
+                                                    <div
+                                                        className={`flex gap-1 border py-2 px-3 rounded-md cursor-pointer ${
+                                                            checked
+                                                                ? "bg-blue-50 text-blue-500 border-blue-400"
+                                                                : ""
+                                                        }`}
+                                                    >
+                                                        {format.id ===
+                                                            CampaignFormats
+                                                                .OFFLINE.id && (
+                                                                <HiLocationMarker
+                                                                    className="flex-shrink-0 h-5 w-5 text-rose-600" />
+                                                            )}
+                                                        {format.id ===
+                                                            CampaignFormats
+                                                                .ONLINE.id && (
+                                                                <HiOutlineStatusOnline
+                                                                    className="flex-shrink-0 h-5 w-5 text-green-600" />
+                                                            )}
+                                                        <span className="font-medium">
+                                                            {format.name}
+                                                        </span>
+                                                    </div>
+                                                </label>
+                                            </Fragment>
+                                        );
+                                    },
+                                )}
+                            </div>
+                        </FilterSection>
+                        <FilterSection
+                            count={statusIds.length}
+                            defaultOpen={statusIds.length > 0}
+                            label={"Trạng thái"}>
+                            <div
+                                className={
+                                    "space-y-2 text-sm text-gray-500"
+                                }
+                            >
+                                {Object.values(CampaignStatuses).map(
+                                    (status) => {
+                                        const checked = statusIds.includes(
+                                            status.id,
+                                        );
+                                        return (
+                                            <div key={status.id}>
+                                                <input
+                                                    type="checkbox"
+                                                    id={`status-${status.id}`}
+                                                    className={"hidden"}
+                                                    checked={checked}
+                                                    onChange={async (e) => {
+                                                        if (e.target.checked) {
+                                                            const newStatusIds =
+                                                                [
+                                                                    ...statusIds,
+                                                                    status.id,
+                                                                ];
+                                                            setStatusIds(
+                                                                newStatusIds,
+                                                            );
+                                                            await onParamsChange(
+                                                                "status",
+                                                                newStatusIds,
+                                                            );
+                                                        } else {
+                                                            const newStatusIds =
+                                                                statusIds.filter(
+                                                                    (x) =>
+                                                                        x !==
+                                                                        status.id,
+                                                                );
+                                                            setStatusIds(
+                                                                newStatusIds,
+                                                            );
+                                                            await onParamsChange(
+                                                                "status",
+                                                                newStatusIds,
+                                                            );
+                                                        }
+                                                    }}
+                                                />
+                                                <label
+                                                    htmlFor={`status-${status.id}`}
+                                                >
+                                                    <div
+                                                        className={`flex items-center bg-white gap-2 border py-2 px-3 rounded-md cursor-pointer ${
+                                                            checked
+                                                                ? "bg-blue-50 text-blue-500 border-blue-400"
+                                                                : ""
+                                                        }`}
+                                                    >
+                                                        <div
+                                                            className={`flex-shrink-0  h-3 w-3 rounded-full bg-${status?.statusColor}-500`}></div>
+                                                        <span className="font-medium">
+                                                            {status.displayName}
+                                                        </span>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        );
+                                    },
+                                )}
+                            </div>
+                        </FilterSection>
+
+                        <FilterSection
+                            label={"Nhà phát hành"}
+                            count={issuerIds?.length}
+                            defaultOpen={issuerIds.length > 0}
+                        >
+                            <div className={"space-y-3"}>
+                                <ExpandableList
+                                    items={sortedIssuers}
+                                    renderItem={(issuer) => (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.9 }}
+                                            className={"h-full flex flex-col"}
+                                            transition={{
+                                                duration: 0.4,
+                                                ease: "easeInOut",
+                                            }}
+                                            layout
+                                            key={issuer.id}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                id={`issuer-${issuer.id}`}
+                                                className={"hidden"}
+                                                checked={issuerIds.includes(
+                                                    issuer.id,
+                                                )}
+                                                onChange={async (e) => {
+                                                    if (e.target.checked) {
+                                                        const newIssuerIds = [
+                                                            ...issuerIds,
+                                                            issuer.id,
+                                                        ];
+                                                        setIssuerIds(
+                                                            newIssuerIds,
+                                                        );
+                                                        await onParamsChange(
+                                                            "issuer",
+                                                            newIssuerIds,
+                                                        );
+                                                    } else {
+                                                        const newIssuerIds =
+                                                            issuerIds.filter(
+                                                                (x) =>
+                                                                    x !==
+                                                                    issuer.id,
+                                                            );
+                                                        setIssuerIds(
+                                                            newIssuerIds,
+                                                        );
+                                                        await onParamsChange(
+                                                            "issuer",
+                                                            newIssuerIds,
+                                                        );
+                                                    }
+                                                }}
+                                            />
+                                            <label
+                                                htmlFor={`issuer-${issuer.id}`}
+                                            >
+                                                <div
+                                                    className={`flex items-center gap-2 border py-2 px-3 text-sm rounded-md cursor-pointer ${
+                                                        issuerIds.includes(
+                                                            issuer.id,
+                                                        )
+                                                            ? "bg-blue-50 text-blue-500 border-blue-400"
+                                                            : ""
+                                                    }`}
+                                                >
+                                                    <Image
+                                                        src={
+                                                            issuer?.imageUrl ||
+                                                            getAvatarFromName(
+                                                                issuer.name,
+                                                            )
+                                                        }
+                                                        alt={""}
+                                                        width={40}
+                                                        height={40}
+                                                        className={
+                                                            "rounded-full object-cover h-6 w-6"
+                                                        }
+                                                    />
+                                                    <span className="font-medium">
+                                                        {issuer.name}
+                                                    </span>
+                                                </div>
+                                            </label>
+                                        </motion.div>
+                                    )}
+                                />
                             </div>
                         </FilterSection>
 
                         <FilterSection label={"Tổ chức"}>
                             <div className={"space-y-3"}>
-                                <ExpandableList items={sortedOrganizations} renderItem={
-                                    (org) => <motion.div
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.9 }}
-                                        className={"h-full flex flex-col"}
-                                        transition={{ duration: 0.4, ease: "easeInOut" }}
-                                        layout key={org.id}>
-                                        <input
-                                            type="checkbox"
-                                            id={`org-${org.id}`}
-                                            className={"hidden"}
-                                            checked={orgIds.includes(org.id)}
-                                            onChange={async (e) => {
-                                                if (e.target.checked) {
-                                                    const newOrgIds = [...orgIds, org.id];
-                                                    setOrgIds(newOrgIds);
-                                                    await onParamsChange("organization", newOrgIds);
-                                                } else {
-                                                    const newOrgIds = orgIds.filter((x) => x !== org.id);
-                                                    setOrgIds(newOrgIds);
-                                                    await onParamsChange("organization", newOrgIds);
-                                                }
-                                            }
-                                            }
-                                        />
-                                        <label htmlFor={`org-${org.id}`}>
-                                            <div
-                                                className={`flex items-center gap-2 border py-2 px-3 text-sm rounded-md cursor-pointer ${orgIds.includes(org.id) ? "bg-blue-50 text-blue-500 border-blue-400" : ""}`}>
-                                                <Image src={org?.imageUrl ||
-                                                    getAvatarFromName(org.name)
-                                                } alt={""}
-                                                       width={40}
-                                                       height={40}
-                                                       className={"rounded-full object-cover h-6 w-6"} />
-                                                <span className="font-medium">
-                                                                    {org.name}
-                                                                </span>
-                                            </div>
-                                        </label>
-                                    </motion.div>
-                                } />
-
+                                <ExpandableList
+                                    items={sortedOrganizations}
+                                    renderItem={(org) => (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.9 }}
+                                            className={"h-full flex flex-col"}
+                                            transition={{
+                                                duration: 0.4,
+                                                ease: "easeInOut",
+                                            }}
+                                            layout
+                                            key={org.id}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                id={`org-${org.id}`}
+                                                className={"hidden"}
+                                                checked={orgIds.includes(
+                                                    org.id,
+                                                )}
+                                                onChange={async (e) => {
+                                                    if (e.target.checked) {
+                                                        const newOrgIds = [
+                                                            ...orgIds,
+                                                            org.id,
+                                                        ];
+                                                        setOrgIds(newOrgIds);
+                                                        await onParamsChange(
+                                                            "organization",
+                                                            newOrgIds,
+                                                        );
+                                                    } else {
+                                                        const newOrgIds =
+                                                            orgIds.filter(
+                                                                (x) =>
+                                                                    x !== org.id,
+                                                            );
+                                                        setOrgIds(newOrgIds);
+                                                        await onParamsChange(
+                                                            "organization",
+                                                            newOrgIds,
+                                                        );
+                                                    }
+                                                }}
+                                            />
+                                            <label htmlFor={`org-${org.id}`}>
+                                                <div
+                                                    className={`flex items-center gap-2 border py-2 px-3 text-sm rounded-md cursor-pointer ${
+                                                        orgIds.includes(org.id)
+                                                            ? "bg-blue-50 text-blue-500 border-blue-400"
+                                                            : ""
+                                                    }`}
+                                                >
+                                                    <Image
+                                                        src={
+                                                            org?.imageUrl ||
+                                                            getAvatarFromName(
+                                                                org.name,
+                                                            )
+                                                        }
+                                                        alt={""}
+                                                        width={40}
+                                                        height={40}
+                                                        className={
+                                                            "rounded-full object-cover h-6 w-6"
+                                                        }
+                                                    />
+                                                    <span className="font-medium">
+                                                        {org.name}
+                                                    </span>
+                                                </div>
+                                            </label>
+                                        </motion.div>
+                                    )}
+                                />
                             </div>
                         </FilterSection>
                     </FilterSidebar>
                     <div className="md:self-start md:grow">
                         <SortPanel
                             hideResult={campaignsLoading}
-                            showingListLength={(data?.data.length || 0)}
-                            totalListLength={(data?.metadata?.total || 0)}
-                            value={selectedSortOption}
+                            showingListLength={data?.data.length || 0}
+                            totalListLength={data?.metadata?.total || 0}
+                            value={selectedSortOption.value}
                             sortOptions={sortOptions}
-                            onSortChange={value => {
-                                setSelectedSortOption(value);
-                                setPage(1);
+                            onSortChange={(value) => {
+                                const option = sortOptions.find((x) => x.value === value);
+                                if (option) {
+                                    setSelectedSortOption(option);
+                                    setPage(1);
+                                }
                             }}
                             itemName={"hội sách"}
                         />
 
                         {!campaignsLoading && data?.data.length === 0 && (
                             <div className={"my-24"}>
-                                <EmptyState status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
-                                            searchNotFoundMessage={"Hãy thử tìm kiếm với từ khoá hoặc bộ lọc khác."}
+                                <EmptyState
+                                    status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
+                                    searchNotFoundMessage={
+                                        "Hãy thử tìm kiếm với từ khoá hoặc bộ lọc khác."
+                                    }
                                 />
                             </div>
                         )}
-                        {!campaignsLoading && data?.data && data?.data.length > 0 && (
+                        {!campaignsLoading &&
+                            data?.data &&
+                            data?.data.length > 0 && (
+                                <div className="mt-6 md:self-start grid md:grid-cols-2 gap-6">
+                                    {data?.data.map((campaign) => (
+                                        <CampaignCard
+                                            key={campaign.id}
+                                            campaign={campaign}
+                                            horizontalOnly={true}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        {campaignsLoading && (
                             <div className="mt-6 md:self-start grid md:grid-cols-2 gap-6">
-                                {data?.data.map((campaign) => (
-                                    <CampaignCard
-                                        key={campaign.id}
-                                        campaign={campaign}
+                                {[...Array(6)].map((_, index) => (
+                                    <CampaignCardSkeleton
                                         horizontalOnly={true}
+                                        key={index}
                                     />
                                 ))}
                             </div>
                         )}
-                        {campaignsLoading && (
-                            <div className="mt-6 md:self-start grid md:grid-cols-2 gap-6">
-                                {[...Array(6)].map((_, index) =>
-                                    <CampaignCardSkeleton horizontalOnly={true} key={index} />,
-                                )}
-                            </div>
-                        )}
-                        {!campaignsLoading && data?.data && data?.data.length > 0 &&
-                            <div className="mt-6 flex justify-end">
-                                <Pagination
-                                    currentPage={page}
-                                    pageSize={6}
-                                    totalItems={data?.metadata?.total || 0}
-                                    onPageChange={p => setPage(p)}
-                                    visiblePageButtonLimit={4}
-                                />
-                            </div>
-                        }
+                        {!campaignsLoading &&
+                            data?.data &&
+                            data?.data.length > 0 && (
+                                <div className="mt-6 flex justify-end">
+                                    <Pagination
+                                        currentPage={page}
+                                        pageSize={6}
+                                        totalItems={data?.metadata?.total || 0}
+                                        onPageChange={(p) => setPage(p)}
+                                        visiblePageButtonLimit={4}
+                                    />
+                                </div>
+                            )}
                     </div>
                 </div>
             </div>
@@ -386,9 +671,9 @@ const CustomerCampaignsPage: NextPageWithLayout = () => {
 
 CustomerCampaignsPage.getLayout = (page) => {
     return (
-        <CustomerLayout
-            childrenWrapperClassName={"relative"}
-        >{page}</CustomerLayout>
+        <CustomerLayout childrenWrapperClassName={"relative"}>
+            {page}
+        </CustomerLayout>
     );
 };
 

@@ -13,6 +13,7 @@ export interface IRole {
     name: string;
     displayName: string;
     defaultRoute: string;
+    baseUrl: string;
     sidebarMenuGroups?: ISidebarMenuGroup[];
     settingsMenus?: ISidebarMenu[];
 }
@@ -22,7 +23,8 @@ export const Roles = {
         id: 1,
         name: "admin",
         displayName: "Quản trị viên",
-        defaultRoute: "/admin",
+        defaultRoute: "/admin/dashboard",
+        baseUrl: "/admin",
         sidebarMenuGroups: ADMIN_SIDEBAR_MENUS,
         settingsMenus: ADMIN_SETTINGS_MENUS,
     },
@@ -30,7 +32,8 @@ export const Roles = {
         id: 2,
         name: "issuer",
         displayName: "Nhà phát hành",
-        defaultRoute: "/issuer",
+        defaultRoute: "/issuer/dashboard",
+        baseUrl: "/issuer",
         sidebarMenuGroups: ISSUER_SIDEBAR_MENUS,
         settingsMenus: ISSUER_SETTINGS_MENUS,
     },
@@ -39,12 +42,14 @@ export const Roles = {
         name: "staff",
         displayName: "Nhân viên",
         defaultRoute: "/",
+        baseUrl: "/",
     },
     CUSTOMER: {
         id: 4,
         name: "customer",
         displayName: "Khách hàng",
         defaultRoute: "/",
+        baseUrl: "/",
         settingsMenus: CUSTOMER_SETTINGS_MENUS,
     },
 } satisfies Record<string, IRole>;

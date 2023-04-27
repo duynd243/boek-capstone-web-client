@@ -81,7 +81,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
 
     const { data: book, isLoading } = useQuery(
         ["issuer_book"],
-        () => bookService.getBooks$Issuer({ withCampaigns: true }),
+        () => bookService.getBooksByIssuer({ withCampaigns: true }),
         {
             refetchOnWindowFocus: false,
         },
@@ -125,7 +125,8 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
         campaignId: z.literal(Number(campaignId)),
         format: z.number(),
         genreId: z.number(),
-        title: z.string(),
+        title: z.string()
+        .max(255, "Tên Combo không được vượt quá 255 ký tự"),
         description: z.string(),
         imageUrl: z.string().optional(),
         salePrice: z.coerce.number().min(1),

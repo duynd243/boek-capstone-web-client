@@ -11,7 +11,7 @@ import EmptySection from "../../../../components/CampaignDetails/EmptySection";
 import Image from "next/image";
 import { AiFillBook, AiFillFilePdf } from "react-icons/ai";
 import { FaFileAudio } from "react-icons/fa";
-import { getAvatarFromName, getSlug } from "../../../../utils/helper";
+import { getAvatarFromName, getSlug, isAddToCartDisabled } from "../../../../utils/helper";
 import { BookTypes } from "../../../../constants/BookTypes";
 import Link from "next/link";
 import NoImagePlaceholder from "../../../../assets/images/no-image.png";
@@ -19,6 +19,9 @@ import { BsBagPlusFill } from "react-icons/bs";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper";
 import { motion } from "framer-motion";
+import Breadcrumbs from "../../../../components/Breadcrumbs";
+import { useCartStore } from "../../../../stores/CartStore";
+import { useAuth } from "../../../../context/AuthContext";
 
 const BonusFormatCard = (
     {
@@ -61,9 +64,14 @@ const BonusFormatCard = (
 
 const ProductDetailsPage: NextPageWithLayout = () => {
     const router = useRouter();
+    const { loginUser } = useAuth();
     const id = router.query.id as string;
-    const bookProductService = new BookProductService();
+    const bookProductService = new BookProductService(loginUser?.accessToken);
 
+    const {
+        cart,
+        addToCart,
+    } = useCartStore(state => state);
     const {
         data: product,
         isInitialLoading: productLoading,
@@ -107,6 +115,29 @@ const ProductDetailsPage: NextPageWithLayout = () => {
     if (productLoading) return <LoadingSpinnerWithOverlay label={"Đang tải thông tin sản phẩm"} />;
     return (
         <div>
+            <div className={"mb-4"}>
+                <Breadcrumbs items={
+                    [
+                        {
+                            label: "Trang chủ",
+                            href: "/",
+                        },
+                        {
+                            label: "Sách",
+                            href: "/products",
+                        },
+                        {
+                            label: `${product?.title}`,
+                            href: `/products/${getSlug(product?.title)}/${product?.id}`,
+                            current: true,
+                        },
+                    ]
+                } renderItem={i => {
+                    return <Link
+                        className={`${i.current ? "text-gray-600" : "text-gray-500 hover:text-gray-600"} hover:underline`}
+                        href={i.href}>{i.label}</Link>;
+                }} />
+            </div>
             {/*Product overview section*/}
             <div className="grid grid-cols-1 md:gap-x-8 md:grid-cols-3 gap-y-4 md:gap-y-0 bg-white px-8 py-6">
                 <div className={"max-h-[512px] relative"}>
@@ -154,7 +185,7 @@ const ProductDetailsPage: NextPageWithLayout = () => {
                                         </div>
                                         <div className="text-sm font-medium text-gray-500 line-through">
                                             {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" })
-                                                .format((product?.salePrice || 0) + (product?.salePrice || 0) * (product?.discount || 0) / 100)}
+                                                .format(((product?.salePrice || 0) * 100) / (100 - product?.discount))}
                                         </div>
                                     </div>
                                     :
@@ -234,10 +265,13 @@ const ProductDetailsPage: NextPageWithLayout = () => {
                                 {/*    </div>*/}
                                 {/*</div>*/}
                                 <button
+                                    disabled={isAddToCartDisabled(product)}
                                     onClick={() => {
-
+                                        if (product) {
+                                            addToCart(product);
+                                        }
                                     }}
-                                    className={"bg-indigo-600 text-sm text-white font-medium py-3 px-6 flex items-center rounded hover:bg-indigo-700"}>
+                                    className={"bg-indigo-600 text-sm text-white font-medium py-3 px-6 flex items-center rounded hover:bg-indigo-700 disabled:opacity-50"}>
                                     <BsBagPlusFill className={"inline-block mr-2"} />
                                     {/*<IoBagAdd className={"inline-block mr-2"} />*/}
                                     Thêm vào giỏ hàng

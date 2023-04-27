@@ -49,7 +49,7 @@ const CampaignDetails: NextPageWithLayout = () => {
                             customMessage={"Không tìm thấy thông tin hội sách"}
                 />
                 <Link
-                    href={`${findRole(loginUser?.role)?.defaultRoute}/campaigns`}
+                    href={`${findRole(loginUser?.role)?.baseUrl}/campaigns`}
                     className="m-btn bg-blue-600 hover:bg-blue-700 text-white">
                     Xem danh sách hội sách
                 </Link>

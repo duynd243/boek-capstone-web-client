@@ -1,34 +1,35 @@
-import React, { Fragment, useMemo, useState } from "react";
-import { NextPageWithLayout } from "../_app";
-import CustomerLayout from "../../components/Layout/CustomerLayout";
 import { useQuery } from "@tanstack/react-query";
-import { BookProductService } from "../../services/BookProductService";
+import { motion } from "framer-motion";
+import Image from "next/image";
 import { useRouter } from "next/router";
-import { BookFormats } from "../../constants/BookFormats";
+import { Fragment, useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
 import { AiFillBook, AiFillFilePdf } from "react-icons/ai";
 import { FaFileAudio } from "react-icons/fa";
-import { AuthorService } from "../../services/AuthorService";
-import Image from "next/image";
-import { getAvatarFromName } from "../../utils/helper";
-import { motion } from "framer-motion";
-import { PublisherService } from "../../services/PublisherService";
-import { LanguageService } from "../../services/LanguageService";
-import SelectBox from "../../components/SelectBox";
-import Pagination from "../../components/Pagination";
-import EmptyState, { EMPTY_STATE_TYPE } from "../../components/EmptyState";
 import CustomerProductCard from "../../components/CustomerProductCard";
 import CustomerProductCardSkeleton from "../../components/CustomerProductCard/CustomerProductCardSkeleton";
-import { toast } from "react-hot-toast";
-import { CampaignService } from "../../services/CampaignService";
-import SearchSection from "../../components/CustomerSearchWithFilterPage/SearchSection";
-import ExpandableList from "../../components/ExpandableList";
 import FilterSection from "../../components/CustomerSearchWithFilterPage/FilterSection";
-import useCustomerSearchWithFilterPage from "../../components/CustomerSearchWithFilterPage/hook";
 import FilterSidebar from "../../components/CustomerSearchWithFilterPage/FilterSidebar";
-import { getSortedArray } from "../../components/CustomerSearchWithFilterPage/utils";
+import SearchSection from "../../components/CustomerSearchWithFilterPage/SearchSection";
 import SortPanel from "../../components/CustomerSearchWithFilterPage/SortPanel";
+import useCustomerSearchWithFilterPage from "../../components/CustomerSearchWithFilterPage/hook";
+import { getSortedArray } from "../../components/CustomerSearchWithFilterPage/utils";
+import EmptyState, { EMPTY_STATE_TYPE } from "../../components/EmptyState";
+import ExpandableList from "../../components/ExpandableList";
+import CustomerLayout from "../../components/Layout/CustomerLayout";
+import Pagination from "../../components/Pagination";
+import { BookFormats } from "../../constants/BookFormats";
+import { AuthorService } from "../../services/AuthorService";
+import { BookProductService } from "../../services/BookProductService";
+import { CampaignService } from "../../services/CampaignService";
 import { GenreService } from "../../services/GenreService";
+import { LanguageService } from "../../services/LanguageService";
+import { PublisherService } from "../../services/PublisherService";
+import { getAvatarFromName } from "../../utils/helper";
 import { getNumberArrayFromQueryKey, getStringArrayFromQueryKey } from "../../utils/query-helper";
+import { NextPageWithLayout } from "../_app";
+import { useAuth } from "../../context/AuthContext";
+import { SelectBox as TremorSelectBox, SelectBoxItem as TremorSelectBoxItem } from "@tremor/react";
 
 const sortOptions = [
     { name: "Mới nhất", value: "CreatedDate desc" },
@@ -39,6 +40,9 @@ const sortOptions = [
 
 const CustomerProductsPage: NextPageWithLayout = () => {
     const router = useRouter();
+
+    const { loginUser } = useAuth();
+
     const [page, setPage] = useState(1);
     const pageSize = 9;
     const {
@@ -72,7 +76,7 @@ const CustomerProductsPage: NextPageWithLayout = () => {
         getNumberArrayFromQueryKey(router.query.author),
     );
 
-    const bookProductService = new BookProductService();
+    const bookProductService = new BookProductService(loginUser?.accessToken);
     const authorService = new AuthorService();
     const publisherService = new PublisherService();
     const languageService = new LanguageService();
@@ -123,7 +127,7 @@ const CustomerProductsPage: NextPageWithLayout = () => {
     const {
         data: genres,
     } = useQuery(["genres"],
-        () => genreService.getChilrenGenres({
+        () => genreService.getChildGenres({
             status: true,
         }),
     );
@@ -178,6 +182,28 @@ const CustomerProductsPage: NextPageWithLayout = () => {
                     <FilterSidebar onClearFilters={clearFilters}
                                    clearFiltersDisabled={!haveFilters}
                     >
+                        <FilterSection label={"Hội sách"}
+                                       count={campaignId ? 1 : 0}
+                                       defaultOpen={!!campaignId}
+                        >
+
+                            <TremorSelectBox
+                                value={campaignId ? campaignId.toString() : "all"}
+                                placeholder={"Chọn hội sách"}
+                                onValueChange={async (value) => {
+                                    setCampaignId(value === "all" ? undefined : parseInt(value));
+                                    await onParamsChange("campaign", value === "all" ? undefined : parseInt(value));
+                                }}>
+
+                                {([
+                                    { id: "all", name: "Tất cả hội sách" },
+                                    ...campaigns || [],
+                                ])?.map((campaign) => <TremorSelectBoxItem key={campaign?.id}
+                                                                           value={campaign?.id?.toString()}
+                                                                           text={campaign?.name} />)
+                                }
+                            </TremorSelectBox>
+                        </FilterSection>
                         <FilterSection
                             count={formatIds?.length}
                             label={"Định dạng sách"}
@@ -413,6 +439,23 @@ const CustomerProductsPage: NextPageWithLayout = () => {
                                 } />
 
                             </div>
+                            {/*<div>*/}
+                            {/*    <TremorMultiSelectBox*/}
+                            {/*        placeholder={"Chọn ngôn ngữ"}*/}
+                            {/*        title={"Ngôn ngữ"}*/}
+                            {/*        value={languages}*/}
+                            {/*        onValueChange={async (newLanguages) => {*/}
+                            {/*            setLanguages(newLanguages);*/}
+                            {/*            await onParamsChange("language", newLanguages);*/}
+                            {/*        }}>*/}
+                            {/*        {(languagesList || [])?.map((language, index) => <TremorMultiSelectBoxItem*/}
+                            {/*                key={index}*/}
+                            {/*                value={language}*/}
+                            {/*                text={language}*/}
+                            {/*            />,*/}
+                            {/*        )}*/}
+                            {/*    </TremorMultiSelectBox>*/}
+                            {/*</div>*/}
                         </FilterSection>
 
                         <FilterSection label={"Thể loại"}
@@ -454,37 +497,21 @@ const CustomerProductsPage: NextPageWithLayout = () => {
                             </div>
                         </FilterSection>
 
-                        <FilterSection label={"Hội sách"}
-                                       count={campaignId ? 1 : 0}
-                                       defaultOpen={!!campaignId}
-                        >
-                            <SelectBox
-                                placeholder={"Tất cả hội sách"}
-                                value={campaigns?.find((x) => x.id === campaignId) || null}
-                                onValueChange={async (v) => {
-                                    if (v) {
-                                        setCampaignId(v.id);
-                                        await onParamsChange("campaign", v.id);
-                                    }
-                                }}
-                                dataSource={[{
-                                    id: undefined,
-                                    name: "Tất cả hội sách",
-                                }, ...campaigns || []]}
-                                displayKey={"name"}
-                            />
-                        </FilterSection>
+
                     </FilterSidebar>
                     <div className="md:self-start md:grow">
                         <SortPanel
                             hideResult={productsLoading}
                             showingListLength={(data?.data.length || 0)}
                             totalListLength={(data?.metadata?.total || 0)}
-                            value={selectedSortOption}
+                            value={selectedSortOption.value}
                             sortOptions={sortOptions}
                             onSortChange={value => {
-                                setSelectedSortOption(value);
-                                setPage(1);
+                                const option = sortOptions.find((x) => x.value === value);
+                                if (option) {
+                                    setSelectedSortOption(option);
+                                    setPage(1);
+                                }
                             }}
                             itemName={"sản phẩm"}
                         />

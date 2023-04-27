@@ -48,18 +48,21 @@ const IssuerBooksPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
     const pageSizeOptions = [5, 10, 20, 50];
     const [size, setSize] = useState<number>(pageSizeOptions[0]);
-    const { search, setSearch } = useSearchQuery("search", () => setPage(1));
+    const {
+        searchFromQuery,
+        onSearchChange,
+    } = useSearchQuery("search", () => setPage(1));
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(5);
     const issuerBookService = new IssuerBookService(loginUser?.accessToken);
     const bookService = new BookService(loginUser?.accessToken);
 
-    const { data: issuerData } = useQuery(["issuer_books", { search, page, size }], () =>
-        bookService.getBooks$Issuer({
+    const { data: issuerData } = useQuery(["issuer_books", { searchFromQuery, page, size }], () =>
+        bookService.getBooksByIssuer({
             page: page,
             size: size,
-            sort: "id desc",
-            name: search || undefined,
+            sort: "CreatedDate desc",
+            name: searchFromQuery || undefined,
         }),
     );
     const onSizeChange = useCallback((newSize: number) => {
@@ -71,8 +74,8 @@ const IssuerBooksPage: NextPageWithLayout = () => {
             <PageHeading label="Kho sách">
                 <SearchForm
                     placeholder="Tìm kiếm sách"
-                    value={search}
-                    onSearchSubmit={(value) => setSearch(value)} />
+                    value={searchFromQuery}
+                    onSearchSubmit={onSearchChange} />
                 <Menu as={"div"} className={"relative"}>
                     <Menu.Button
                         as={"button"}
@@ -224,9 +227,9 @@ const IssuerBooksPage: NextPageWithLayout = () => {
                 </TableWrapper>
             ) : (
                 <div className="pt-8">
-                    {search ? (
+                    { searchFromQuery ? (
                         <EmptyState
-                            keyword={search}
+                            keyword={searchFromQuery}
                             status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
                         />
                     ) : (

@@ -5,12 +5,15 @@ import { Roles } from "../../constants/Roles";
 import { UserService } from "../../services/UserService";
 
 export default function useCustomerSearchWithFilterPage(
-    setPage: (page: number) => void,
+    setPage: (page: number) => void
 ) {
     const userService = new UserService();
     const router = useRouter();
     const onParamsChange = useCallback(
-        async (queryKey: string, value: undefined | string | number | string[] | number[]) => {
+        async (
+            queryKey: string,
+            value: undefined | string | number | string[] | number[]
+        ) => {
             await router.push({
                 pathname: router.pathname,
                 query: {
@@ -20,15 +23,13 @@ export default function useCustomerSearchWithFilterPage(
             });
             setPage(1);
         },
-        [router, setPage],
+        [router, setPage]
     );
 
-    const {
-        data: issuers,
-    } = useQuery(["issuers"],
-        () => userService.getAllUsers({
+    const { data: issuers } = useQuery(["issuers"], () =>
+        userService.getAllUsers({
             role: Roles.ISSUER.id,
-        }),
+        })
     );
     return {
         onParamsChange,

@@ -18,7 +18,7 @@ export class IssuerBookService {
         }>("/issuer/books", params);
         return response.data;
     };
-    getBooks$Issuer = async (params?: any) => {
+    getBooksByIssuer = async (params?: any) => {
         const response = await this.axiosClient.get<
             IBaseListResponse<IBookResponse>
         >("/issuer/books", {

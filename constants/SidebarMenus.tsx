@@ -9,6 +9,7 @@ import {
     BsFillGearFill,
     BsFillPenFill,
     BsFillPeopleFill,
+    BsFillPersonVcardFill,
     BsFillPieChartFill,
     BsFillTagsFill,
     BsPrinterFill,
@@ -59,7 +60,7 @@ export const ADMIN_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
         menus: [
             {
                 name: "Thống kê",
-                path: "/admin",
+                path: "/admin/dashboard",
                 icon: <BsFillPieChartFill />,
             },
             {
@@ -174,7 +175,7 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
         menus: [
             {
                 name: "Thống kê",
-                path: "/issuer",
+                path: "/issuer/dashboard",
                 icon: <BsFillPieChartFill />,
             },
 
@@ -233,3 +234,21 @@ export const ISSUER_SIDEBAR_MENUS: ISidebarMenuGroup[] = [
         ],
     },
 ];
+
+export const CUSTOMER_SETTINGS_MENUS: ISidebarMenu[] = [
+    {
+        icon: <BsFillPersonVcardFill />,
+        name: "Hồ sơ",
+        path: "/profile",
+    },
+    {
+        icon: <BsFillFileEarmarkMedicalFill />,
+        name: "Đơn hàng",
+        path: "/orders",
+    },
+    // {
+    //     name: "Cài đặt khác",
+    //     path: "/other",
+    // },
+];
+

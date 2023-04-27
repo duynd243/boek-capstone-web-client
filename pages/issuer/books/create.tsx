@@ -9,9 +9,15 @@ import { NextPageWithLayout } from "../../_app";
 import { useAuth } from "../../../context/AuthContext";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AuthorService } from "../../../old-services/AuthorService";
+import { CategoryService } from "../../../old-services/System/CategoryService";
+import { IssuerBookService } from "../../../old-services/Issuer/Issuer_BookService";
 import { PublisherService } from "../../../old-services/System/PublisherService";
+import Multiselect from "multiselect-react-dropdown";
+import DynamicForm from "./../../../components/DynamicForm";
 import CreateButton from "../../../components/Admin/CreateButton";
-import AuthorModal, { AuthorModalMode } from "../../../components/Modal/AuthorModal";
+import AuthorModal, {
+    AuthorModalMode,
+} from "../../../components/Modal/AuthorModal";
 import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
 
@@ -24,17 +30,16 @@ import SelectAuthorTable from "./../../../components/SelectAuthor/SelectAuthorTa
 import { IAuthor } from "./../../../types/Author/IAuthor";
 import ErrorMessage from "./../../../components/Form/ErrorMessage";
 
-
 const IssuerCreateBookPage: NextPageWithLayout = () => {
-
     const { loginUser } = useAuth();
     const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
-    const [selectedAuthorId, setSelectedAuthorId] = useState<string | null>(null);
-
-    const [selectedBookId, setSelectedBookId] = useState<string | null>(
-        null,
+    const [selectedAuthorId, setSelectedAuthorId] = useState<string | null>(
+        null
     );
-    const [showauthorselectModal, setShowAuthorSelectModal] = useState<boolean>(false);
+
+    const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+    const [showauthorselectModal, setShowAuthorSelectModal] =
+        useState<boolean>(false);
 
     const languageService = new LanguageService();
     const genreService = new GenreService();
@@ -45,25 +50,25 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
     const bookService = new BookService(loginUser?.accessToken);
 
     const { data: books } = useQuery(["books"], () =>
-        bookService.getBooks$Issuer({
+        bookService.getBooksByIssuer({
             size: 1000,
-        }),
+        })
     );
     const { data: publishers } = useQuery(["publisher"], () =>
         publisherService.getPublishers({
             size: 1000,
-        }),
+        })
     );
     const { data: authors } = useQuery(["authors"], () =>
         authorService.getAuthors({
             size: 1000,
-        }),
+        })
     );
     const { data: languages } = useQuery(["languages"], () =>
-        languageService.getLanguages(),
+        languageService.getLanguages()
     );
     const { data: genres } = useQuery(["genres"], () =>
-        genreService.getChildGenres({}),
+        genreService.getChildGenres({})
     );
 
     const [selectedAuthor, setSelectedAuthor] = useState<{
@@ -105,7 +110,6 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
     //   });
     // };
 
-
     const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -133,20 +137,18 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
     const handleRemoveAuthor = (org: IAuthor) => {
         form.setFieldValue(
             "authors",
-            form.values.authors.filter((o: IAuthor) => o?.id !== org?.id),
+            form.values.authors.filter((o: IAuthor) => o?.id !== org?.id)
         );
     };
 
-
     const imageService = new ImageUploadService(loginUser?.accessToken);
     const uploadImageMutation = useMutation((file: File) =>
-        imageService.uploadImage(file),
+        imageService.uploadImage(file)
     );
 
-    const createBookMutation = useMutation(
-        (values: any) => bookService.createBookByIssuer(values),
+    const createBookMutation = useMutation((values: any) =>
+        bookService.createBookByIssuer(values)
     );
-
 
     const form = useFormik({
         initialValues: {
@@ -172,25 +174,32 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
             genreId: undefined,
         },
         validationSchema: Yup.object().shape({
-            authors: Yup.array(Yup.object().shape({
-                id: Yup.number()
-                , name: Yup.string(),
-            })).required("Tác giả không được để trống"),
+            authors: Yup.array(
+                Yup.object().shape({
+                    id: Yup.number(),
+                    name: Yup.string().max(
+                        255,
+                        "Tên sách không được vượt quá 255 ký tự"
+                    ),
+                })
+            ).required("Tác giả không được để trống"),
             code: Yup.string().required("Mã sách không được để trống"),
-            // isbn10: Yup.string()
-            //   .required("ISBN10 không được để trống")
-            //   .length(10, "ISBN10 phải có 10 ký tự"),
-            // isbn13: Yup.string()
-            //   .required("ISBN13 không được để trống")
-            //   .length(13, "ISBN13 phải có 13 ký tự"),
+            isbn10: Yup.string().max(50, "ISBN10 không được vượt quá 50 ký tự"),
+            isbn13: Yup.string().max(50, "ISBN13 không được vượt quá 50 ký tự"),
             name: Yup.string().required("Tên sách không được để trống"),
-            translator: Yup.string().required("Tên dịch giả không được để trống"),
+            translator: Yup.string().required(
+                "Tên dịch giả không được để trống"
+            ),
             coverPrice: Yup.number()
                 .required("Giá không được để trống")
                 .min(0, "Giá không được nhỏ hơn 0"),
             description: Yup.string().required("Mô tả không được để trống"),
-            language: Yup.string().required("Ngôn ngữ không được để trống"),
-            size: Yup.string().required("Kích thước không được để trống"),
+            language: Yup.string()
+                .required("Ngôn ngữ không được để trống")
+                .max(255, "Ngôn ngữ không được vượt quá 255 ký tự"),
+            size: Yup.string()
+                .required("Kích thước không được để trống")
+                .max(255, "Kích thước không được vượt quá 255 ký tự"),
             // unitInStock: Yup.number()
             //   .required("Số lượng không được để trống")
             //   .integer("Số lượng phải là số nguyên")
@@ -201,12 +210,14 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 .min(2010, "Năm xuất bản không được nhỏ hơn 2010")
                 .max(
                     new Date().getFullYear(),
-                    "Năm xuất bản không được lớn hơn năm hiện tại",
+                    "Năm xuất bản không được lớn hơn năm hiện tại"
                 ),
             page: Yup.number()
                 .required("Số trang không được để trống")
                 .min(1, "Số trang không được nhỏ hơn 1"),
-            publisherId: Yup.number().required("Nhà xuất bản không được để trống"),
+            publisherId: Yup.number().required(
+                "Nhà xuất bản không được để trống"
+            ),
             genreId: Yup.number().required("Thể loại không được để trống"),
         }),
         onSubmit: async (values) => {
@@ -227,7 +238,6 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
             //   toast.error("Vui lòng chọn thể loại");
             //   return;
             // }
-
 
             // // upload cover photo to firebase
             //
@@ -253,32 +263,34 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
             //   }
             // )
 
-
             let payload = {
                 ...values,
                 authors: values.authors.map((a: IAuthor) => a.id),
                 audioTrialUrl: values.audioTrialUrl || null,
                 pdfTrialUrl: values.pdfTrialUrl || null,
-                pdfExtraPrice: values.pdfExtraPrice <= 0 ? null : values.pdfExtraPrice,
-                audioExtraPrice: values.audioExtraPrice <= 0 ? null : values.audioExtraPrice,
+                pdfExtraPrice:
+                    values.pdfExtraPrice <= 0 ? null : values.pdfExtraPrice,
+                audioExtraPrice:
+                    values.audioExtraPrice <= 0 ? null : values.audioExtraPrice,
                 imageUrl: "",
             };
-
 
             if (!coverPhoto) {
                 toast.error("Vui lòng chọn ảnh bìa");
                 return;
             }
             try {
-                await toast.promise(uploadImageMutation.mutateAsync(coverPhoto), {
-                    loading: "Đang tải ảnh lên",
-                    success: (data) => {
-                        payload.imageUrl = data?.url || "";
-                        return "Tải ảnh lên thành công";
+                await toast.promise(
+                    uploadImageMutation.mutateAsync(coverPhoto),
+                    {
+                        loading: "Đang tải ảnh lên",
+                        success: (data) => {
+                            payload.imageUrl = data?.url || "";
+                            return "Tải ảnh lên thành công";
+                        },
+                        error: (err) => err?.message || "Tải ảnh lên thất bại",
                     }
-                    ,
-                    error: (err) => err?.message || "Tải ảnh lên thất bại",
-                });
+                );
             } catch (err) {
                 console.log(err);
                 return;
@@ -290,7 +302,6 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                     success: (data) => {
                         if (data?.id) {
                             router.push(`/issuer/books`);
-
                         }
                         return "Tạo sách lẻ thành công";
                     },
@@ -300,15 +311,15 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 });
             }
 
-
             console.log(payload);
 
             try {
-                await createBookWithToast(createBookMutation.mutateAsync(payload));
+                await createBookWithToast(
+                    createBookMutation.mutateAsync(payload)
+                );
             } catch (error) {
                 console.log(error);
             }
-
 
             // createBookWithToast(createBookMutation.mutateAsync(payload));
         },
@@ -321,7 +332,6 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                 onSubmit={form.handleSubmit}
                 className="mx-auto max-w-6xl space-y-8 bg-white p-10"
             >
-
                 <div className="mb-4 sm:mb-0">
                     <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
                         Thêm sách lẻ ✨
@@ -353,10 +363,10 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                     htmlFor="cover-photo"
                                     className="block text-sm font-medium text-gray-700"
                                 >
-                                    Ảnh bìa<span className="text-rose-500">*</span>
+                                    Ảnh bìa
+                                    <span className="text-rose-500">*</span>
                                 </label>
-                                <div
-                                    className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
+                                <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
                                     <div className="space-y-1 text-center">
                                         {coverPhoto ? (
                                             <Image
@@ -365,7 +375,9 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 }
                                                 width={500}
                                                 height={500}
-                                                src={URL.createObjectURL(coverPhoto)}
+                                                src={URL.createObjectURL(
+                                                    coverPhoto
+                                                )}
                                                 alt={""}
                                             />
                                         ) : (
@@ -389,11 +401,17 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 htmlFor="file-upload"
                                                 className="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
                                             >
-                        <span>
-                          {coverPhoto ? "Chọn ảnh khác" : "Tải ảnh lên"}
-                        </span>
+                                                <span>
+                                                    {coverPhoto
+                                                        ? "Chọn ảnh khác"
+                                                        : "Tải ảnh lên"}
+                                                </span>
                                                 <input
-                                                    onChange={(e) => handleCoverPhotoChange(e)}
+                                                    onChange={(e) =>
+                                                        handleCoverPhotoChange(
+                                                            e
+                                                        )
+                                                    }
                                                     id="file-upload"
                                                     name="file-upload"
                                                     type="file"
@@ -412,7 +430,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                     htmlFor="name"
                                     className="block text-sm font-medium text-gray-700"
                                 >
-                                    Tên sách<span className="text-rose-500">*</span>
+                                    Tên sách
+                                    <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="mt-1">
                                     <input
@@ -425,7 +444,9 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                     />
                                 </div>
                                 {form.errors.name && form.touched.name && (
-                                    <div className={"input-error"}>{form.errors.name}</div>
+                                    <div className={"input-error"}>
+                                        {form.errors.name}
+                                    </div>
                                 )}
                                 <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                                     <div className="sm:col-span-2">
@@ -433,7 +454,10 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                             htmlFor="code"
                                             className="block text-sm font-medium text-gray-700"
                                         >
-                                            Mã sách<span className="text-rose-500">*</span>
+                                            Mã sách
+                                            <span className="text-rose-500">
+                                                *
+                                            </span>
                                         </label>
                                         <div className="mt-1">
                                             <input
@@ -446,9 +470,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                             />
                                         </div>
-                                        {form.errors.code && form.touched.code && (
-                                            <div className={"input-error"}>{form.errors.code}</div>
-                                        )}
+                                        {form.errors.code &&
+                                            form.touched.code && (
+                                                <div className={"input-error"}>
+                                                    {form.errors.code}
+                                                </div>
+                                            )}
                                     </div>
                                     <div className="sm:col-span-2">
                                         <label
@@ -468,9 +495,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                             />
                                         </div>
-                                        {form.errors.isbn10 && form.touched.isbn10 && (
-                                            <div className={"input-error"}>{form.errors.isbn10}</div>
-                                        )}
+                                        {form.errors.isbn10 &&
+                                            form.touched.isbn10 && (
+                                                <div className={"input-error"}>
+                                                    {form.errors.isbn10}
+                                                </div>
+                                            )}
                                     </div>
 
                                     <div className="sm:col-span-2">
@@ -491,16 +521,22 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                             />
                                         </div>
-                                        {form.errors.isbn13 && form.touched.isbn13 && (
-                                            <div className={"input-error"}>{form.errors.isbn13}</div>
-                                        )}
+                                        {form.errors.isbn13 &&
+                                            form.touched.isbn13 && (
+                                                <div className={"input-error"}>
+                                                    {form.errors.isbn13}
+                                                </div>
+                                            )}
                                     </div>
                                     <div className="sm:col-span-3">
                                         <label
                                             htmlFor="coverPrice"
                                             className="block text-sm font-medium text-gray-700"
                                         >
-                                            Giá bìa (đ)<span className="text-rose-500">*</span>
+                                            Giá bìa (đ)
+                                            <span className="text-rose-500">
+                                                *
+                                            </span>
                                         </label>
 
                                         <div className="mt-1">
@@ -518,9 +554,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                             />
                                         </div>
-                                        {form.errors.coverPrice && form.touched.coverPrice && (
-                                            <div className={"input-error"}>{form.errors.coverPrice}</div>
-                                        )}
+                                        {form.errors.coverPrice &&
+                                            form.touched.coverPrice && (
+                                                <div className={"input-error"}>
+                                                    {form.errors.coverPrice}
+                                                </div>
+                                            )}
                                     </div>
 
                                     <div className="sm:col-span-3">
@@ -528,7 +567,10 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                             htmlFor="size"
                                             className="block text-sm font-medium text-gray-700"
                                         >
-                                            Kích thước<span className="text-rose-500">*</span>
+                                            Kích thước
+                                            <span className="text-rose-500">
+                                                *
+                                            </span>
                                         </label>
                                         <div className="mt-1">
                                             <input
@@ -541,16 +583,22 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                             />
                                         </div>
-                                        {form.errors.size && form.touched.size && (
-                                            <div className={"input-error"}>{form.errors.size}</div>
-                                        )}
+                                        {form.errors.size &&
+                                            form.touched.size && (
+                                                <div className={"input-error"}>
+                                                    {form.errors.size}
+                                                </div>
+                                            )}
                                     </div>
                                     <div className="sm:col-span-3">
                                         <label
                                             htmlFor="language"
                                             className="block text-sm font-medium text-gray-700"
                                         >
-                                            Ngôn ngữ<span className="text-rose-500">*</span>
+                                            Ngôn ngữ
+                                            <span className="text-rose-500">
+                                                *
+                                            </span>
                                         </label>
                                         <div className="mt-1">
                                             <select
@@ -560,11 +608,16 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 name="language"
                                                 id="language"
                                             >
-                                                {languages?.map((language, index) => (
-                                                    <option value={language} key={index}>
-                                                        {language}
-                                                    </option>
-                                                ))}
+                                                {languages?.map(
+                                                    (language, index) => (
+                                                        <option
+                                                            value={language}
+                                                            key={index}
+                                                        >
+                                                            {language}
+                                                        </option>
+                                                    )
+                                                )}
                                             </select>
                                         </div>
                                     </div>
@@ -573,7 +626,10 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                             htmlFor="releasedYear"
                                             className="block text-sm font-medium text-gray-700"
                                         >
-                                            Năm xuất bản<span className="text-rose-500">*</span>
+                                            Năm xuất bản
+                                            <span className="text-rose-500">
+                                                *
+                                            </span>
                                         </label>
                                         <div className="mt-1">
                                             <input
@@ -585,11 +641,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                             />
                                         </div>
-                                        {form.errors.releasedYear && form.touched.releasedYear && (
-                                            <div className={"input-error"}>
-                                                {form.errors.releasedYear}
-                                            </div>
-                                        )}
+                                        {form.errors.releasedYear &&
+                                            form.touched.releasedYear && (
+                                                <div className={"input-error"}>
+                                                    {form.errors.releasedYear}
+                                                </div>
+                                            )}
                                     </div>
 
                                     <div className="sm:col-span-3">
@@ -597,7 +654,10 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                             htmlFor="page"
                                             className="block text-sm font-medium text-gray-700"
                                         >
-                                            Số trang<span className="text-rose-500">*</span>
+                                            Số trang
+                                            <span className="text-rose-500">
+                                                *
+                                            </span>
                                         </label>
                                         <div className="mt-1">
                                             <input
@@ -609,9 +669,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                             />
                                         </div>
-                                        {form.errors.page && form.touched.page && (
-                                            <div className={"input-error"}>{form.errors.page}</div>
-                                        )}
+                                        {form.errors.page &&
+                                            form.touched.page && (
+                                                <div className={"input-error"}>
+                                                    {form.errors.page}
+                                                </div>
+                                            )}
                                     </div>
 
                                     <div className="sm:col-span-3">
@@ -619,7 +682,10 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                             htmlFor="publisher"
                                             className="block text-sm font-medium text-gray-700"
                                         >
-                                            Nhà xuất bản<span className="text-rose-500">*</span>
+                                            Nhà xuất bản
+                                            <span className="text-rose-500">
+                                                *
+                                            </span>
                                         </label>
                                         <div className="mt-1">
                                             <select
@@ -629,11 +695,18 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 name="publisherId"
                                                 id="publisherId"
                                             >
-                                                {publishers?.data?.map((publisher) => (
-                                                    <option value={Number(publisher?.id)} key={publisher?.id}>
-                                                        {publisher?.name}
-                                                    </option>
-                                                ))}
+                                                {publishers?.data?.map(
+                                                    (publisher) => (
+                                                        <option
+                                                            value={Number(
+                                                                publisher?.id
+                                                            )}
+                                                            key={publisher?.id}
+                                                        >
+                                                            {publisher?.name}
+                                                        </option>
+                                                    )
+                                                )}
                                             </select>
                                         </div>
                                     </div>
@@ -642,7 +715,10 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                             htmlFor="genreId"
                                             className="block text-sm font-medium text-gray-700"
                                         >
-                                            Thể loại<span className="text-rose-500">*</span>
+                                            Thể loại
+                                            <span className="text-rose-500">
+                                                *
+                                            </span>
                                         </label>
                                         <div className="mt-1">
                                             <select
@@ -653,7 +729,10 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                                 id="genreId"
                                             >
                                                 {genres?.map((genre) => (
-                                                    <option value={genre?.id} key={genre?.id}>
+                                                    <option
+                                                        value={genre?.id}
+                                                        key={genre?.id}
+                                                    >
                                                         {genre?.name}
                                                     </option>
                                                 ))}
@@ -674,7 +753,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                     htmlFor="translator"
                                     className="block text-sm font-medium text-gray-700"
                                 >
-                                    Dịch giả<span className="text-rose-500">*</span>
+                                    Dịch giả
+                                    <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="mt-1">
                                     <input
@@ -687,9 +767,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                         className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     />
                                 </div>
-                                {form.errors.translator && form.touched.translator && (
-                                    <div className={"input-error"}>{form.errors.translator}</div>
-                                )}
+                                {form.errors.translator &&
+                                    form.touched.translator && (
+                                        <div className={"input-error"}>
+                                            {form.errors.translator}
+                                        </div>
+                                    )}
                             </div>
                         </div>
                         <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
@@ -698,13 +781,16 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                     htmlFor="author"
                                     className="block text-sm font-medium text-gray-700"
                                 >
-                                    Tác giả<span className="text-rose-500">*</span>
+                                    Tác giả
+                                    <span className="text-rose-500">*</span>
                                 </label>
                                 <div>
                                     <div className="flex justify-end mb-4 gap-4">
                                         <CreateButton
                                             className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                            onClick={() => setShowAuthorSelectModal(true)}
+                                            onClick={() =>
+                                                setShowAuthorSelectModal(true)
+                                            }
                                             label="Thêm tác giả"
                                         />
                                     </div>
@@ -712,9 +798,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                         selectedAuthors={form.values.authors}
                                         handleRemoveAuthor={handleRemoveAuthor}
                                     />
-                                    {form.errors.authors && form.touched.authors && (
-                                        <ErrorMessage>{form.errors.authors}</ErrorMessage>
-                                    )}
+                                    {form.errors.authors &&
+                                        form.touched.authors && (
+                                            <ErrorMessage>
+                                                {form.errors.authors}
+                                            </ErrorMessage>
+                                        )}
                                 </div>
                             </div>
                         </div>
@@ -769,9 +858,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                         className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     />
                                 </div>
-                                {form.errors.pdfExtraPrice && form.touched.pdfExtraPrice && (
-                                    <div className={"input-error"}>{form.errors.pdfExtraPrice}</div>
-                                )}
+                                {form.errors.pdfExtraPrice &&
+                                    form.touched.pdfExtraPrice && (
+                                        <div className={"input-error"}>
+                                            {form.errors.pdfExtraPrice}
+                                        </div>
+                                    )}
                             </div>
                             <div className="sm:col-span-3">
                                 <label
@@ -813,9 +905,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                         className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     />
                                 </div>
-                                {form.errors.audioExtraPrice && form.touched.audioExtraPrice && (
-                                    <div className={"input-error"}>{form.errors.audioExtraPrice}</div>
-                                )}
+                                {form.errors.audioExtraPrice &&
+                                    form.touched.audioExtraPrice && (
+                                        <div className={"input-error"}>
+                                            {form.errors.audioExtraPrice}
+                                        </div>
+                                    )}
                             </div>
                         </div>
                     </div>
@@ -831,18 +926,21 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                 Mô tả<span className="text-rose-500">*</span>
                             </label>
                             <div className="mt-1">
-                <textarea
-                    value={form.values.description}
-                    onChange={form.handleChange}
-                    id="description"
-                    name="description"
-                    rows={7}
-                    className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                />
+                                <textarea
+                                    value={form.values.description}
+                                    onChange={form.handleChange}
+                                    id="description"
+                                    name="description"
+                                    rows={7}
+                                    className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                />
                             </div>
-                            {form.errors.description && form.touched.description && (
-                                <div className={"input-error"}>{form.errors.description}</div>
-                            )}
+                            {form.errors.description &&
+                                form.touched.description && (
+                                    <div className={"input-error"}>
+                                        {form.errors.description}
+                                    </div>
+                                )}
                         </div>
                     </div>
                 </div>
@@ -851,8 +949,8 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                     {/* <div className="flex justify-end"> */}
                     <button
                         type="submit"
-                        className="bg-slate-200 hover:bg-slate-300 text-gray-800 text-sm font-medium py-2 px-4 rounded inline-flex gap-2 items-center mt-5">
-
+                        className="bg-slate-200 hover:bg-slate-300 text-gray-800 text-sm font-medium py-2 px-4 rounded inline-flex gap-2 items-center mt-5"
+                    >
                         Tạo sách
                     </button>
                     {/* </div> */}
@@ -879,8 +977,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
 
                     handleAddAuthor(author);
                     setShowAuthorSelectModal(false);
-                }
-                }
+                }}
                 selectedAuthors={form.values.authors}
             />
         </Fragment>

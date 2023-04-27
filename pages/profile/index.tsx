@@ -34,6 +34,7 @@ import { GroupService } from "../../services/GroupService";
 import FollowGroupModal from "../../components/Modal/FollowGroupModal";
 import { BiUser } from "react-icons/bi";
 import { Roles } from "../../constants/Roles";
+import Chip from "../../components/Admin/Chip";
 
 const genderOptions = {
     MALE: {
@@ -44,7 +45,7 @@ const genderOptions = {
         label: "Nữ",
         value: false,
     },
-} satisfies Record<string, { label: string, value: boolean }>;
+} satisfies Record<string, { label: string; value: boolean }>;
 const CustomerProfilePage: NextPageWithLayout = () => {
     const { loginUser, user, logOut } = useAuth();
 
@@ -60,12 +61,15 @@ const CustomerProfilePage: NextPageWithLayout = () => {
     const groupService = new GroupService(loginUser?.accessToken);
 
     const unfollowOrganizationMutation = useMutation(
-        (organizationId: number) => organizationService.unfollowOrganization(organizationId),
+        (organizationId: number) =>
+            organizationService.unfollowOrganization(organizationId),
         {
             onSuccess: async (data) => {
-                await queryClient.invalidateQueries(["following_organizations"]);
+                await queryClient.invalidateQueries([
+                    "following_organizations",
+                ]);
             },
-        },
+        }
     );
 
     const unfollowGroupMutation = useMutation(
@@ -74,15 +78,40 @@ const CustomerProfilePage: NextPageWithLayout = () => {
             onSuccess: async (data) => {
                 await queryClient.invalidateQueries(["following_groups"]);
             },
-        },
+        }
+    );
+
+    const { data: otherOrganizations } = useQuery(
+        ["other_organizations"],
+        () =>
+            organizationService.getOrganizations({
+                size: 1000,
+                status: true,
+                withCustomers: true,
+                withCampaigns: true,
+            }),
+        {
+            select: (data) =>
+                data?.data?.filter(
+                    (org) =>
+                        !(
+                            followingOrganizations?.organizations?.map(
+                                (o) => o?.organization?.id
+                            ) || []
+                        ).includes(org?.id)
+                ),
+        }
     );
 
     const onUnfollowOrganization = async (organization: IOrganization) => {
-        await toast.promise(unfollowOrganizationMutation.mutateAsync(organization?.id), {
-            loading: `Đang bỏ theo dõi ${organization?.name}`,
-            success: `Đã bỏ theo dõi ${organization?.name}`,
-            error: (err) => err?.message || "Có lỗi xảy ra",
-        });
+        await toast.promise(
+            unfollowOrganizationMutation.mutateAsync(organization?.id),
+            {
+                loading: `Đang bỏ theo dõi ${organization?.name}`,
+                success: `Đã bỏ theo dõi ${organization?.name}`,
+                error: (err) => err?.message || "Có lỗi xảy ra",
+            }
+        );
     };
 
     const onUnfollowGroup = async (group: IOrganization) => {
@@ -93,31 +122,25 @@ const CustomerProfilePage: NextPageWithLayout = () => {
         });
     };
 
-
     const {
         data: followingOrganizations,
         isInitialLoading: isFollowingOrganizationsLoading,
-
-    } = useQuery(
-        ["following_organizations", loginUser?.id],
-        () => organizationService.getFollowingOrganizationsByCustomer({
+    } = useQuery(["following_organizations", loginUser?.id], () =>
+        organizationService.getFollowingOrganizationsByCustomer({
             withCustomers: true,
             withCampaigns: true,
-        }),
+        })
     );
 
     const {
         data: followingGroups,
         isInitialLoading: isFollowingGroupsLoading,
-
-    } = useQuery(
-        ["following_groups", loginUser?.id],
-        () => groupService.getFollowingGroupsByCustomer({
+    } = useQuery(["following_groups", loginUser?.id], () =>
+        groupService.getFollowingGroupsByCustomer({
             withCustomers: true,
             withCampaigns: true,
-        }),
+        })
     );
-
 
     const {
         data: levelData,
@@ -134,18 +157,21 @@ const CustomerProfilePage: NextPageWithLayout = () => {
             }),
         {
             keepPreviousData: true,
-        },
+        }
     );
-
 
     const UpdateProfileSchema = z.object({
         dob: z.date().optional(),
         gender: z.boolean(),
         user: z.object({
             id: z.string(),
-            name: z.string(),
-            email: z.string(),
-            phone: z.string(),
+            name: z.string().min(1, "Tên không được để trống")
+                .max(255, "Tên không được vượt quá 255 ký tự"),
+            email: z.string().email("Email không hợp lệ"),
+            phone: z
+                .string()
+                .min(10, "Số điện thoại phải có ít nhất 10 ký tự")
+                .max(50, "Số điện thoại không được vượt quá 50 ký tự"),
             addressRequest: z.object({
                 detail: z.string(),
                 provinceCode: z.number(),
@@ -157,7 +183,6 @@ const CustomerProfilePage: NextPageWithLayout = () => {
     });
 
     type UpdateProfileSchemaType = Partial<z.infer<typeof UpdateProfileSchema>>;
-
 
     const {
         register,
@@ -171,10 +196,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
         resolver: zodResolver(UpdateProfileSchema),
     });
 
-    const {
-        data: profile,
-        isInitialLoading: profileLoading,
-    } = useQuery(
+    const { data: profile, isInitialLoading: profileLoading } = useQuery(
         ["profile", loginUser?.id],
         () => userService.getProfileByCustomer(),
         {
@@ -190,16 +212,17 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                         email: profile?.user?.email,
                         addressRequest: {
                             detail: profile?.user?.addressViewModel?.detail,
-                            provinceCode: profile?.user?.addressViewModel?.provinceCode,
-                            districtCode: profile?.user?.addressViewModel?.districtCode,
+                            provinceCode:
+                                profile?.user?.addressViewModel?.provinceCode,
+                            districtCode:
+                                profile?.user?.addressViewModel?.districtCode,
                             wardCode: profile?.user?.addressViewModel?.wardCode,
                         },
                     },
                 });
             },
-        },
+        }
     );
-
 
     const {
         selectedProvince,
@@ -220,14 +243,13 @@ const CustomerProfilePage: NextPageWithLayout = () => {
         defaultWardCode: profile?.user?.addressViewModel?.wardCode,
     });
 
-
     const updateProfileMutation = useMutation(
         (data: any) => userService.updateProfileByCustomer(data),
         {
             onSuccess: async () => {
                 await queryClient.invalidateQueries(["profile", loginUser?.id]);
             },
-        },
+        }
     );
 
     const onSubmit = async (data: UpdateProfileSchemaType) => {
@@ -246,7 +268,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                     loading: "Đang cập nhật thông tin",
                     success: "Cập nhật thông tin thành công",
                     error: (e) => e?.message || "Có lỗi xảy ra",
-                },
+                }
             );
         } catch (e) {
             console.log(e);
@@ -255,25 +277,29 @@ const CustomerProfilePage: NextPageWithLayout = () => {
 
     console.log(errors);
     return (
-        <div
-            className={`grow flex flex-col`}
-        >
+        <div className={`grow flex flex-col`}>
             {/* Profile background */}
             <div className="relative h-44 bg-slate-200">
-                <Image className="object-cover h-full w-full shadow-inner"
-                       src={CoverImage.src}
-                       width="979" height="220"
-                       alt="" />
+                <Image
+                    className="object-cover h-full w-full shadow-inner"
+                    src={CoverImage.src}
+                    width="979"
+                    height="220"
+                    alt=""
+                />
                 {/* Close button */}
                 <button
                     className="md:hidden absolute top-4 left-4 sm:left-6 text-white opacity-80 hover:opacity-100"
-                    onClick={() => {
-                    }}
+                    onClick={() => {}}
                     aria-controls="profile-sidebar"
                     aria-expanded={true}
                 >
                     <span className="sr-only">Close sidebar</span>
-                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg
+                        className="w-6 h-6 fill-current"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
                         <path d="M10.7 18.7l1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3-1.4-1.4L4 12z" />
                     </svg>
                 </button>
@@ -286,37 +312,38 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                     <div className="flex flex-col items-center sm:flex-row sm:justify-between sm:items-end">
                         {/* Avatar */}
                         <div className="inline-flex -ml-1 -mt-1 mb-4 sm:mb-0 relative group">
-                            <img className="rounded-full border-4 border-white"
-                                 src={loginUser?.imageUrl || user?.photoURL} width="128"
-                                 height="128" alt="Avatar" />
+                            <img
+                                className="rounded-full border-4 border-white"
+                                src={loginUser?.imageUrl || user?.photoURL}
+                                width="128"
+                                height="128"
+                                alt="Avatar"
+                            />
 
-                            <div
-                                className="cursor-pointer absolute flex flex-col items-center justify-center bg-black/0 group-hover:bg-black/30 inset-0 rounded-full border-4 border-white  transition duration-150 ease-in-out">
+                            <div className="cursor-pointer absolute flex flex-col items-center justify-center bg-black/0 group-hover:bg-black/30 inset-0 rounded-full border-4 border-white  transition duration-150 ease-in-out">
                                 <AiOutlineCamera className="hidden group-hover:block text-white text-2xl" />
                                 <span className="hidden group-hover:block text-xs text-white">
                                     Thay đổi
                                 </span>
-
                             </div>
-
                         </div>
 
                         {/* Actions */}
                         <div className="flex space-x-2 sm:mb-2">
                             <div className="flex items-center space-x-2">
-                                <div
-                                    className="text-sm text-green-600 font-medium bg-green-100 rounded-sm px-3 py-1 border border-green-200">
+                                <div className="text-sm text-green-600 font-medium bg-green-100 rounded-sm px-3 py-1 border border-green-200">
                                     {profile?.level?.name}
                                 </div>
-                                <div
-                                    className="text-sm text-amber-600 font-medium bg-amber-100 rounded-sm px-3 py-1 border border-amber-200">
+                                <div className="text-sm text-amber-600 font-medium bg-amber-100 rounded-sm px-3 py-1 border border-amber-200">
                                     <span className={"font-normal"}>
-                                        Điểm: </span>
+                                        Điểm:{" "}
+                                    </span>
                                     {profile?.point}
                                 </div>
-                                <button onClick={
-                                    () => setShowLevelModal(true)
-                                } className="border bg-white rounded shadow-sm items-center justify-center">
+                                <button
+                                    onClick={() => setShowLevelModal(true)}
+                                    className="border bg-white rounded shadow-sm items-center justify-center"
+                                >
                                     <AiOutlineInfo className="text-slate-600 text-lg m-1" />
                                 </button>
                             </div>
@@ -331,9 +358,11 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                         <h1 className="text-2xl text-slate-800 font-bold">
                             {loginUser?.name}
                         </h1>
-                        <svg className="w-4 h-4 fill-current shrink-0 text-amber-500 ml-2" viewBox="0 0 16 16">
-                            <path
-                                d="M13 6a.75.75 0 0 1-.75-.75 1.5 1.5 0 0 0-1.5-1.5.75.75 0 1 1 0-1.5 1.5 1.5 0 0 0 1.5-1.5.75.75 0 1 1 1.5 0 1.5 1.5 0 0 0 1.5 1.5.75.75 0 1 1 0 1.5 1.5 1.5 0 0 0-1.5 1.5A.75.75 0 0 1 13 6ZM6 16a1 1 0 0 1-1-1 4 4 0 0 0-4-4 1 1 0 0 1 0-2 4 4 0 0 0 4-4 1 1 0 1 1 2 0 4 4 0 0 0 4 4 1 1 0 0 1 0 2 4 4 0 0 0-4 4 1 1 0 0 1-1 1Z" />
+                        <svg
+                            className="w-4 h-4 fill-current shrink-0 text-amber-500 ml-2"
+                            viewBox="0 0 16 16"
+                        >
+                            <path d="M13 6a.75.75 0 0 1-.75-.75 1.5 1.5 0 0 0-1.5-1.5.75.75 0 1 1 0-1.5 1.5 1.5 0 0 0 1.5-1.5.75.75 0 1 1 1.5 0 1.5 1.5 0 0 0 1.5 1.5.75.75 0 1 1 0 1.5 1.5 1.5 0 0 0-1.5 1.5A.75.75 0 0 1 13 6ZM6 16a1 1 0 0 1-1-1 4 4 0 0 0-4-4 1 1 0 0 1 0-2 4 4 0 0 0 4-4 1 1 0 1 1 2 0 4 4 0 0 0 4 4 1 1 0 0 1 0 2 4 4 0 0 0-4 4 1 1 0 0 1-1 1Z" />
                         </svg>
                     </div>
                     <BioSection profile={profile} isLoading={profileLoading} />
@@ -342,53 +371,63 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                 <Tab.Group>
                     {/* Tabs */}
                     <Tab.List as={"div"} className="relative mb-6">
-                        <div className="absolute bottom-0 w-full h-px bg-slate-200" aria-hidden="true"></div>
+                        <div
+                            className="absolute bottom-0 w-full h-px bg-slate-200"
+                            aria-hidden="true"
+                        ></div>
                         <ul className="relative text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8 overflow-x-scroll no-scrollbar">
-                            <Tab as={"div"}
-                                 className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer">
-                                <span
-                                    className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
+                            <Tab
+                                as={"div"}
+                                className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer"
+                            >
+                                <span className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
                                     Thông tin cá nhân
                                 </span>
                             </Tab>
 
-                            <Tab as={"div"}
-                                 className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer">
-                                <span
-                                    className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
+                            <Tab
+                                as={"div"}
+                                className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer"
+                            >
+                                <span className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
                                     Tổ chức
                                 </span>
                             </Tab>
 
-                            <Tab as={"div"}
-                                 className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer">
-                                <span
-                                    className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
+                            <Tab
+                                as={"div"}
+                                className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer"
+                            >
+                                <span className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
                                     Nhóm tham gia
                                 </span>
                             </Tab>
-
                         </ul>
                     </Tab.List>
                     <Tab.Panels>
                         <Tab.Panel>
-                            <form className="space-y-4"
-                                  onSubmit={handleSubmit(onSubmit)}>
-
+                            <form
+                                className="space-y-4"
+                                onSubmit={handleSubmit(onSubmit)}
+                            >
                                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                     <Form.Input<UpdateProfileSchemaType>
                                         register={register}
                                         fieldName={"user.name"}
                                         label="Họ và tên"
                                         placeholder={"Nhập họ và tên"}
-                                        errorMessage={errors?.user?.name?.message}
+                                        errorMessage={
+                                            errors?.user?.name?.message
+                                        }
                                     />
                                     <Form.Input<UpdateProfileSchemaType>
                                         register={register}
                                         fieldName={"user.phone"}
                                         label="Số điện thoại"
                                         placeholder={"Nhập số điện thoại"}
-                                        errorMessage={errors?.user?.phone?.message}
+                                        errorMessage={
+                                            errors?.user?.phone?.message
+                                        }
                                     />
                                 </div>
 
@@ -403,13 +442,19 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                     label: string;
                                                     value: boolean;
                                                 }>
-                                                    value={watch("gender") ? genderOptions.MALE : genderOptions.FEMALE}
+                                                    value={
+                                                        watch("gender")
+                                                            ? genderOptions.MALE
+                                                            : genderOptions.FEMALE
+                                                    }
                                                     placeholder="Giới tính"
                                                     onValueChange={(g) => {
                                                         field.onChange(g.value);
                                                     }}
                                                     displayKey="label"
-                                                    dataSource={Object.values(genderOptions)}
+                                                    dataSource={Object.values(
+                                                        genderOptions
+                                                    )}
                                                     searchable={false}
                                                 />
                                             )}
@@ -426,42 +471,45 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                         <DateTimePickerModal
                                                             showTime={false}
                                                             value={field.value}
-                                                            title={
-                                                                "Ngày sinh"
+                                                            title={"Ngày sinh"}
+                                                            isOpen={
+                                                                showDatePicker
                                                             }
-                                                            isOpen={showDatePicker}
                                                             onDismiss={() =>
                                                                 setShowDatePicker(
-                                                                    false,
+                                                                    false
                                                                 )
                                                             }
                                                             onClose={(date) => {
                                                                 if (date) {
                                                                     field.onChange(
-                                                                        date,
+                                                                        date
                                                                     );
                                                                 }
                                                                 setShowDatePicker(
-                                                                    false,
+                                                                    false
                                                                 );
                                                             }}
                                                         />
                                                         <ErrorMessage>
-                                                            {errors?.dob?.message}
+                                                            {
+                                                                errors?.dob
+                                                                    ?.message
+                                                            }
                                                         </ErrorMessage>
 
                                                         <Form.DateTimeInputField
                                                             value={
                                                                 field.value
                                                                     ? format(
-                                                                        field.value,
-                                                                        "dd/MM/yyyy",
-                                                                    )
+                                                                          field.value,
+                                                                          "dd/MM/yyyy"
+                                                                      )
                                                                     : ""
                                                             }
                                                             onClick={() =>
                                                                 setShowDatePicker(
-                                                                    true,
+                                                                    true
                                                                 )
                                                             }
                                                         />
@@ -487,22 +535,28 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                             render={({ field }) => (
                                                 <SelectBox<IProvince>
                                                     value={selectedProvince}
-                                                    placeholder={provincesLoading ? "Đang tải..." : "Chọn tỉnh / thành phố"}
+                                                    placeholder={
+                                                        provincesLoading
+                                                            ? "Đang tải..."
+                                                            : "Chọn tỉnh / thành phố"
+                                                    }
                                                     onValueChange={(p) => {
                                                         if (
                                                             p.code ===
-                                                            watch("user.addressRequest.provinceCode")
+                                                            watch(
+                                                                "user.addressRequest.provinceCode"
+                                                            )
                                                         )
                                                             return;
 
                                                         field.onChange(p.code);
                                                         setValue(
                                                             "user.addressRequest.districtCode" as any,
-                                                            undefined,
+                                                            undefined
                                                         );
                                                         setValue(
                                                             "user.addressRequest.wardCode" as any,
-                                                            undefined,
+                                                            undefined
                                                         );
                                                         handleProvinceChange(p);
                                                     }}
@@ -521,17 +575,23 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                             render={({ field }) => (
                                                 <SelectBox<IDistrict>
                                                     value={selectedDistrict}
-                                                    placeholder={districtsLoading ? "Đang tải..." : "Chọn quận / huyện"}
+                                                    placeholder={
+                                                        districtsLoading
+                                                            ? "Đang tải..."
+                                                            : "Chọn quận / huyện"
+                                                    }
                                                     onValueChange={(d) => {
                                                         if (
                                                             d.code ===
-                                                            watch("user.addressRequest.districtCode")
+                                                            watch(
+                                                                "user.addressRequest.districtCode"
+                                                            )
                                                         )
                                                             return;
                                                         field.onChange(d.code);
                                                         setValue(
                                                             "user.addressRequest.wardCode" as any,
-                                                            undefined,
+                                                            undefined
                                                         );
                                                         handleDistrictChange(d);
                                                     }}
@@ -550,11 +610,17 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                             render={({ field }) => (
                                                 <SelectBox<IWard>
                                                     value={selectedWard}
-                                                    placeholder={wardsLoading ? "Đang tải..." : "Chọn phường / xã"}
+                                                    placeholder={
+                                                        wardsLoading
+                                                            ? "Đang tải..."
+                                                            : "Chọn phường / xã"
+                                                    }
                                                     onValueChange={(w) => {
                                                         if (
                                                             w.code ===
-                                                            watch("user.addressRequest.wardCode")
+                                                            watch(
+                                                                "user.addressRequest.wardCode"
+                                                            )
                                                         )
                                                             return;
                                                         field.onChange(w.code);
@@ -567,7 +633,6 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                             )}
                                         />
                                     </div>
-
                                 </div>
                                 <div className="flex justify-end">
                                     <button
@@ -577,141 +642,350 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                     transition duration-150
                     disabled:opacity-50"
                                     >
-                                        {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
+                                        {isSubmitting
+                                            ? "Đang lưu..."
+                                            : "Lưu thay đổi"}
                                     </button>
                                 </div>
                             </form>
-
                         </Tab.Panel>
 
                         <Tab.Panel>
-                            <div className={"flex justify-end"}>
-                                <button
-                                    onClick={() => setShowOrgModal(true)}
-                                    className="m-btn bg-indigo-500 text-white">
-
-                                    Chọn tổ chức
-                                </button>
-                            </div>
-                            {isFollowingOrganizationsLoading && <div>Loading...</div>}
-                            {!isFollowingOrganizationsLoading && followingOrganizations?.organizations && followingOrganizations.organizations.length > 0 &&
-                                <div className={"grid grid-cols-1 gap-6 sm:grid-cols-3 mt-4"}>
-                                    {followingOrganizations.organizations.map((o) => (
-                                        <div key={o?.organization?.id}
-                                             className={"flex flex-col items-center justify-center rounded border p-4"}>
-                                            <Image src={o?.organization?.imageUrl
-                                                || getAvatarFromName(o?.organization?.name)
-                                            } alt={""} width={100} height={100}
-                                                   className={"rounded-full w-20 h-20 object-cover"}
-                                            />
-                                            <span
-                                                className={"mt-4 text-center font-medium"}>{o?.organization?.name}</span>
-                                            <div
-                                                className={"flex items-center text-gray-500 gap-2 justify-center mt-4"}>
-                                                <BiUser />
-                                                <span className={"text-gray-500 text-sm text-center"}>{o?.total} người thuộc tổ chức</span>
-                                            </div>
-
-                                            {/*Unfollow button*/}
-                                            <button
-                                                onClick={async () => {
-                                                    if (o?.organization) {
-                                                        await onUnfollowOrganization(o?.organization);
-                                                    }
+                            <Tab.Group>
+                                <Tab.List>
+                                    <div className="py-3">
+                                        <ul className="flex flex-wrap gap-2">
+                                            <Tab
+                                                as={"div"}
+                                                className={"focus:outline-none"}
+                                            >
+                                                {({ selected }) => {
+                                                    return (
+                                                        <Chip active={selected}>
+                                                            Tổ chức của bạn
+                                                        </Chip>
+                                                    );
                                                 }}
-                                                className="m-btn bg-red-50 text-red-500 mt-4">
-                                                Bỏ theo dõi
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>}
+                                            </Tab>
+                                            <Tab
+                                                as={"div"}
+                                                className={"focus:outline-none"}
+                                            >
+                                                {({ selected }) => {
+                                                    return (
+                                                        <Chip active={selected}>
+                                                            Các tổ chức khác
+                                                        </Chip>
+                                                    );
+                                                }}
+                                            </Tab>
+                                        </ul>
+                                    </div>
+                                </Tab.List>
+                                <Tab.Panels>
+                                    <Tab.Panel>
+                                        {isFollowingOrganizationsLoading && (
+                                            <div>Loading...</div>
+                                        )}
+                                        {!isFollowingOrganizationsLoading &&
+                                            followingOrganizations?.organizations &&
+                                            followingOrganizations.organizations
+                                                .length > 0 && (
+                                                <div
+                                                    className={
+                                                        "grid grid-cols-1 gap-6 sm:grid-cols-3 mt-4"
+                                                    }
+                                                >
+                                                    {followingOrganizations.organizations.map(
+                                                        (o) => (
+                                                            <div
+                                                                key={
+                                                                    o
+                                                                        ?.organization
+                                                                        ?.id
+                                                                }
+                                                                className={
+                                                                    "flex flex-col items-center justify-center rounded border p-4"
+                                                                }
+                                                            >
+                                                                <Image
+                                                                    src={
+                                                                        o
+                                                                            ?.organization
+                                                                            ?.imageUrl ||
+                                                                        getAvatarFromName(
+                                                                            o
+                                                                                ?.organization
+                                                                                ?.name
+                                                                        )
+                                                                    }
+                                                                    alt={""}
+                                                                    width={100}
+                                                                    height={100}
+                                                                    className={
+                                                                        "rounded-full w-20 h-20 object-cover"
+                                                                    }
+                                                                />
+                                                                <span
+                                                                    className={
+                                                                        "mt-4 text-center font-medium"
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        o
+                                                                            ?.organization
+                                                                            ?.name
+                                                                    }
+                                                                </span>
+                                                                <div
+                                                                    className={
+                                                                        "flex items-center text-gray-500 gap-2 justify-center mt-4"
+                                                                    }
+                                                                >
+                                                                    <BiUser />
+                                                                    <span
+                                                                        className={
+                                                                            "text-gray-500 text-sm text-center"
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            o?.total
+                                                                        }{" "}
+                                                                        người
+                                                                        thuộc tổ
+                                                                        chức
+                                                                    </span>
+                                                                </div>
 
-                            {!isFollowingOrganizationsLoading && (followingOrganizations === null) && (
-                                <div className="flex flex-col items-center justify-center w-full h-full">
-                                    <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}
-                                                customMessage={"Bạn chưa theo dõi tổ chức nào"}
-                                    />
-                                </div>
-                            )}
+                                                                {/*Unfollow button*/}
+                                                                {/*<button*/}
+                                                                {/*    onClick={async () => {*/}
+                                                                {/*        if (o?.organization) {*/}
+                                                                {/*            await onUnfollowOrganization(o?.organization);*/}
+                                                                {/*        }*/}
+                                                                {/*    }}*/}
+                                                                {/*    className="m-btn bg-red-50 text-red-500 mt-4">*/}
+                                                                {/*    Bỏ theo dõi*/}
+                                                                {/*</button>*/}
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </div>
+                                            )}
+                                        {!isFollowingOrganizationsLoading &&
+                                            followingOrganizations === null && (
+                                                <div className="flex flex-col items-center justify-center w-full h-full">
+                                                    <EmptyState
+                                                        status={
+                                                            EMPTY_STATE_TYPE.NO_DATA
+                                                        }
+                                                        customMessage={
+                                                            "Bạn chưa theo dõi tổ chức nào"
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
+                                    </Tab.Panel>
+                                    <Tab.Panel>
+                                        <div
+                                            className={
+                                                "grid grid-cols-1 gap-6 sm:grid-cols-3 mt-4"
+                                            }
+                                        >
+                                            {otherOrganizations?.map((o) => (
+                                                <div
+                                                    key={o?.id}
+                                                    className={
+                                                        "flex flex-col items-center justify-center rounded border p-4"
+                                                    }
+                                                >
+                                                    <Image
+                                                        src={
+                                                            o?.imageUrl ||
+                                                            getAvatarFromName(
+                                                                o?.name
+                                                            )
+                                                        }
+                                                        alt={""}
+                                                        width={100}
+                                                        height={100}
+                                                        className={
+                                                            "rounded-full w-20 h-20 object-cover"
+                                                        }
+                                                    />
+                                                    <span
+                                                        className={
+                                                            "mt-4 text-center font-medium"
+                                                        }
+                                                    >
+                                                        {o?.name}
+                                                    </span>
+                                                    <div
+                                                        className={
+                                                            "flex items-center text-gray-500 gap-2 justify-center mt-4"
+                                                        }
+                                                    >
+                                                        <BiUser />
+                                                        <span
+                                                            className={
+                                                                "text-gray-500 text-sm text-center"
+                                                            }
+                                                        >
+                                                            {o?.customers
+                                                                ?.length ||
+                                                                0}{" "}
+                                                            người thuộc tổ chức
+                                                        </span>
+                                                    </div>
+
+                                                    {/*Unfollow button*/}
+                                                    {/*<button*/}
+                                                    {/*    onClick={async () => {*/}
+                                                    {/*        if (o?.organization) {*/}
+                                                    {/*            await onUnfollowOrganization(o?.organization);*/}
+                                                    {/*        }*/}
+                                                    {/*    }}*/}
+                                                    {/*    className="m-btn bg-red-50 text-red-500 mt-4">*/}
+                                                    {/*    Bỏ theo dõi*/}
+                                                    {/*</button>*/}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Tab.Panel>
+                                </Tab.Panels>
+                            </Tab.Group>
+
+                            {/*<div className={"flex justify-end"}>*/}
+                            {/*    <button*/}
+                            {/*        onClick={() => setShowOrgModal(true)}*/}
+                            {/*        className="m-btn bg-indigo-500 text-white">*/}
+
+                            {/*        Chọn tổ chức*/}
+                            {/*    </button>*/}
+                            {/*</div>*/}
                         </Tab.Panel>
                         <Tab.Panel>
                             <div className={"flex justify-end"}>
                                 <button
                                     onClick={() => setShowGroupModal(true)}
-                                    className="m-btn bg-indigo-500 text-white">
+                                    className="m-btn bg-indigo-500 text-white"
+                                >
                                     Thêm mới
                                 </button>
                             </div>
                             {isFollowingGroupsLoading && <div>Loading...</div>}
-                            {!isFollowingGroupsLoading && followingGroups?.groups && followingGroups.groups.length > 0 &&
-                                <div className={"grid grid-cols-1 gap-6 sm:grid-cols-3"}>
-                                    {followingGroups.groups.map((group) => (
-                                        <div key={group?.group?.id}
-                                             className={"flex flex-col items-center justify-center rounded border p-4"}>
-                                            <Image src={getAvatarFromName(group?.group?.name)
-                                            } alt={""} width={100} height={100}
-                                                   className={"rounded-full w-20 h-20 object-cover"}
-                                            />
-                                            <span className={"mt-4 text-center font-medium"}>{group?.group?.name}</span>
-
+                            {!isFollowingGroupsLoading &&
+                                followingGroups?.groups &&
+                                followingGroups.groups.length > 0 && (
+                                    <div
+                                        className={
+                                            "grid grid-cols-1 gap-6 sm:grid-cols-3"
+                                        }
+                                    >
+                                        {followingGroups.groups.map((group) => (
                                             <div
-                                                className={"flex items-center text-gray-500 gap-2 justify-center mt-4"}>
-                                                <BiUser />
-                                                <span
-                                                    className={"text-gray-500 text-sm text-center"}>{group?.total} người tham gia nhóm</span>
-                                            </div>
-
-                                            {/*Unfollow button*/}
-                                            <button
-                                                onClick={async () => {
-                                                    if (group) {
-                                                        await onUnfollowGroup(group?.group);
+                                                key={group?.group?.id}
+                                                className={
+                                                    "flex flex-col items-center justify-center rounded border p-4"
+                                                }
+                                            >
+                                                <Image
+                                                    src={getAvatarFromName(
+                                                        group?.group?.name
+                                                    )}
+                                                    alt={""}
+                                                    width={100}
+                                                    height={100}
+                                                    className={
+                                                        "rounded-full w-20 h-20 object-cover"
                                                     }
-                                                }
-                                                }
-                                                className="m-btn bg-red-50 text-red-500 mt-4">
-                                                Bỏ theo dõi
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>}
+                                                />
+                                                <span
+                                                    className={
+                                                        "mt-4 text-center font-medium"
+                                                    }
+                                                >
+                                                    {group?.group?.name}
+                                                </span>
 
-                            {!isFollowingGroupsLoading && (followingGroups === null) && (
-                                <div className="flex flex-col items-center justify-center w-full h-full">
-                                    <EmptyState status={EMPTY_STATE_TYPE.NO_DATA}
-                                                customMessage={"Bạn chưa theo dõi nhóm nào"}
-                                    />
-                                </div>
-                            )}
+                                                <div
+                                                    className={
+                                                        "flex items-center text-gray-500 gap-2 justify-center mt-4"
+                                                    }
+                                                >
+                                                    <BiUser />
+                                                    <span
+                                                        className={
+                                                            "text-gray-500 text-sm text-center"
+                                                        }
+                                                    >
+                                                        {group?.total} người
+                                                        tham gia nhóm
+                                                    </span>
+                                                </div>
+
+                                                {/*Unfollow button*/}
+                                                <button
+                                                    onClick={async () => {
+                                                        if (group) {
+                                                            await onUnfollowGroup(
+                                                                group?.group
+                                                            );
+                                                        }
+                                                    }}
+                                                    className="m-btn bg-red-50 text-red-500 mt-4"
+                                                >
+                                                    Bỏ theo dõi
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                            {!isFollowingGroupsLoading &&
+                                followingGroups === null && (
+                                    <div className="flex flex-col items-center justify-center w-full h-full">
+                                        <EmptyState
+                                            status={EMPTY_STATE_TYPE.NO_DATA}
+                                            customMessage={
+                                                "Bạn chưa theo dõi nhóm nào"
+                                            }
+                                        />
+                                    </div>
+                                )}
                         </Tab.Panel>
-
                     </Tab.Panels>
-
                 </Tab.Group>
 
-                <TransitionModal isOpen={showLevelModal}
-                                 onClose={() => setShowLevelModal(false)}
+                <TransitionModal
+                    isOpen={showLevelModal}
+                    onClose={() => setShowLevelModal(false)}
                 >
                     <div className="flex flex-col items-center justify-center w-full h-full">
                         123
                     </div>
                 </TransitionModal>
 
-                <FollowOrganizationModal isOpen={showOrgModal}
-                                         onClose={() => setShowOrgModal(false)}
-                                         followedOrganizationIds={followingOrganizations?.organizations?.map(o => o?.organization?.id) || []}
+                <FollowOrganizationModal
+                    isOpen={showOrgModal}
+                    onClose={() => setShowOrgModal(false)}
+                    followedOrganizationIds={
+                        followingOrganizations?.organizations?.map(
+                            (o) => o?.organization?.id
+                        ) || []
+                    }
                 />
-
             </div>
 
-            <FollowGroupModal isOpen={showGroupModal}
-                              onClose={() => setShowGroupModal(false)}
-                              followedGroupIds={followingGroups?.groups?.map(g => g?.group?.id) || []}
+            <FollowGroupModal
+                isOpen={showGroupModal}
+                onClose={() => setShowGroupModal(false)}
+                followedGroupIds={
+                    followingGroups?.groups?.map((g) => g?.group?.id) || []
+                }
             />
 
-            <pre>
-                {JSON.stringify(watch(), null, 2)}
-            </pre>
+            <pre>{JSON.stringify(watch(), null, 2)}</pre>
         </div>
     );
 };
@@ -719,9 +993,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
 CustomerProfilePage.getLayout = function getLayout(page: ReactElement) {
     return (
         <CustomerLayout>
-            <CustomerSettingsLayout>
-                {page}
-            </CustomerSettingsLayout>
+            <CustomerSettingsLayout>{page}</CustomerSettingsLayout>
         </CustomerLayout>
     );
 };

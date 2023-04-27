@@ -78,7 +78,7 @@ const PersonnelModal: React.FC<Props> = ({
         name: z
             .string()
             .min(2, "Tên nhân sự phải có ít nhất 2 ký tự")
-            .max(50, "Tên nhân sự không được vượt quá 50 ký tự"),
+            .max(255, "Tên nhân sự không được vượt quá 255 ký tự"),
         email: z.string().email("Email không hợp lệ"),
         role: z
             .number({
@@ -91,7 +91,8 @@ const PersonnelModal: React.FC<Props> = ({
         id: z.string(),
         phone: z
             .string()
-            .regex(VIETNAMESE_PHONE_REGEX, "Số điện thoại không hợp lệ"),
+            .min(10, "Số điện thoại phải có ít nhất 10 ký tự")
+            .max(50, "Số điện thoại không được vượt quá 50 ký tự"),
         imageUrl: z.string(),
         addressRequest: z.object({
             detail: z.string().min(1, "Địa chỉ chi tiết không được để trống"),
@@ -454,8 +455,8 @@ const PersonnelModal: React.FC<Props> = ({
                             <div className="flex items-center justify-between">
                                 <Modal.StatusSwitch
                                     enabled={watch("status") || false}
-                                    enabledText="nhân sự đang hoạt động"
-                                    disabledText="nhân sự sẽ bị vô hiệu hóa"
+                                    enabledText="Nhân sự đang hoạt động"
+                                    disabledText="Nhân sự sẽ bị vô hiệu hóa"
                                 />
                                 <Controller
                                     name="status"

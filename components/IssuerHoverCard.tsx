@@ -14,7 +14,7 @@ type Props = {
 
 const IssuerHoverCard: React.FC<Props> = ({ issuer }) => {
     return (
-        <div className={"bg-slate-50 z-0 overflow-hidden relative min-w-md select-none shadow-lg rounded-lg p-4"}>
+        <div className={"bg-slate-50 z-20 overflow-hidden relative min-w-md select-none shadow-lg rounded-lg p-4"}>
             <Image
                 src={DefaultCover.src}
                 width={300}
@@ -31,7 +31,7 @@ const IssuerHoverCard: React.FC<Props> = ({ issuer }) => {
             <div className={"text-sm font-semibold text-slate-700 mt-2"}>
                 {issuer?.name}
             </div>
-            <div className={"mt-2 space-y-1"}>
+            <div className={"mt-2 space-y-1 z-20"}>
                 <div className={"flex items-center gap-1 text-sm text-gray-500"}>
                     <HiMail />
                     {issuer?.email}
