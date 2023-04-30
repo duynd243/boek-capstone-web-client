@@ -22,10 +22,6 @@ import { motion } from "framer-motion";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
 import { useCartStore } from "../../../../stores/CartStore";
 import { useAuth } from "../../../../context/AuthContext";
-import { Document, Page, pdfjs } from 'react-pdf';
-
-
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 
 const BonusFormatCard = (
@@ -347,15 +343,6 @@ const ProductDetailsPage: NextPageWithLayout = () => {
 
             {product?.otherMobileBookProducts && product?.otherMobileBookProducts.length > 0 &&
                 <>
-
-                    {product?.book?.pdfTrialUrl && <div>
-                        <Document file={'https://24p8vj-my.sharepoint.com/:b:/g/personal/admin_duynd_cf/EceRwAEYwpFBgPYo0TpZVGwBhlo_8HiPUCig0CAKbFB2yw?download=1'}
-                                  onLoadSuccess={(pdf) => {
-                                      setNumPages(pdf.numPages);
-                                  }}>
-                            <Page pageNumber={pageNumber} />
-                        </Document>
-                    </div>}
                     <h2 className={"text-gray-900 text-2xl font-semibold mt-8"}>
                         Sản phẩm này tại các hội sách khác
                     </h2>
