@@ -14,7 +14,7 @@ import { toast } from "react-hot-toast";
 import SelectOrderPlacementTypeModal from "../../components/Modal/SelectOrderPlacementTypeModal";
 import { getOrderParams, useOrderStore } from "../../stores/OrderStore";
 import Link from "next/link";
-import { GiShoppingBag } from "react-icons/all";
+import { GiShoppingBag } from "react-icons/gi";
 
 
 const chartdata2 = [
