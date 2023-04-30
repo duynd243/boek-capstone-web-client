@@ -1,10 +1,6 @@
 import Image from "next/image";
 import React, { Fragment, useContext } from "react";
-import {
-    IoArrowForward,
-    IoChevronBack,
-    IoLocationSharp,
-} from "react-icons/io5";
+import { IoArrowForward, IoChevronBack, IoLocationSharp } from "react-icons/io5";
 import { useAuth } from "../../context/AuthContext";
 import { getAvatarFromName, getFormattedDate } from "../../utils/helper";
 import ContentHeader from "./ContentHeader";
@@ -14,10 +10,7 @@ import StatusLabel from "./StatusLabel";
 import { useRouter } from "next/router";
 import { HiStatusOnline } from "react-icons/hi";
 import { CampaignFormats } from "../../constants/CampaignFormats";
-import {
-    CampaignContext,
-    CustomerCampaignContext,
-} from "../../context/CampaignContext";
+import { CampaignContext, CustomerCampaignContext } from "../../context/CampaignContext";
 import EmptySection from "./EmptySection";
 import { useQuery } from "@tanstack/react-query";
 import { BookProductService } from "../../services/BookProductService";
@@ -44,14 +37,14 @@ const MainContent: React.FC = () => {
         isAdmin || isIssuer
             ? campaign?.campaignOrganizations || []
             : customerCampaign?.organizations?.map((o, idx) => {
-                  return {
-                      id: idx,
-                      organizationId: o?.id,
-                      campaignId: customerCampaign?.id,
-                      organization: o as IOrganization,
-                      schedules: o?.schedules as ISchedule[],
-                  };
-              }) || [];
+            return {
+                id: idx,
+                organizationId: o?.id,
+                campaignId: customerCampaign?.id,
+                organization: o as IOrganization,
+                schedules: o?.schedules as ISchedule[],
+            };
+        }) || [];
 
     const campaignLevels =
         isAdmin || isIssuer
@@ -74,14 +67,14 @@ const MainContent: React.FC = () => {
                 return bookProductService.getBookProducts(getProductsParams);
             } else if (isIssuer) {
                 return bookProductService.getBookProductsByIssuer(
-                    getProductsParams
+                    getProductsParams,
                 );
             }
             return Promise.reject();
         },
         {
             enabled: !!campaign?.id && (isAdmin || isIssuer),
-        }
+        },
     );
 
     return (
@@ -119,34 +112,34 @@ const MainContent: React.FC = () => {
                 <div className="flex items-center gap-1 sm:mr-4">
                     {(campaign || customerCampaign)?.format ===
                         CampaignFormats.OFFLINE.id && (
-                        <>
-                            <IoLocationSharp
-                                size={20}
-                                className={"fill-red-700"}
-                            />
-                            <div className="whitespace-nowrap text-sm">
-                                Diễn ra tại{" "}
-                                <span className="font-semibold text-slate-800">
+                            <>
+                                <IoLocationSharp
+                                    size={20}
+                                    className={"fill-red-700"}
+                                />
+                                <div className="whitespace-nowrap text-sm">
+                                    Diễn ra tại{" "}
+                                    <span className="font-semibold text-slate-800">
                                     {(campaign || customerCampaign)?.address}
                                 </span>
-                            </div>
-                        </>
-                    )}
+                                </div>
+                            </>
+                        )}
 
                     {(campaign || customerCampaign)?.format ===
                         CampaignFormats.ONLINE.id && (
-                        <>
-                            <HiStatusOnline
-                                size={20}
-                                className={"fill-green-700"}
-                            />
-                            <div className="whitespace-nowrap text-sm">
+                            <>
+                                <HiStatusOnline
+                                    size={20}
+                                    className={"fill-green-700"}
+                                />
+                                <div className="whitespace-nowrap text-sm">
                                 <span className="font-semibold text-slate-800">
                                     Hội sách tổ chức trực tuyến
                                 </span>
-                            </div>
-                        </>
-                    )}
+                                </div>
+                            </>
+                        )}
                 </div>
                 {/* Right side */}
                 <StatusLabel
@@ -179,30 +172,30 @@ const MainContent: React.FC = () => {
             {/*Organizations*/}
             {(campaign || customerCampaign)?.format ===
                 CampaignFormats.OFFLINE.id && (
-                <Fragment>
-                    <Separator />
-                    <div>
-                        <ContentHeader
-                            text={`${
-                                (campaign || customerCampaign)?.isRecurring
-                                    ? "Tổ chức và lịch trình"
-                                    : "Tổ chức"
-                            } (${campaignOrganizations?.length || 0})`}
-                        />
-                        {campaignOrganizations &&
-                            campaignOrganizations?.length > 0 && (
-                                <div className="my-6 space-y-4">
-                                    {campaignOrganizations.map((org) => (
-                                        <OrganizationCard
-                                            campaignOrganization={org}
-                                            key={org.id}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                    </div>
-                </Fragment>
-            )}
+                    <Fragment>
+                        <Separator />
+                        <div>
+                            <ContentHeader
+                                text={`${
+                                    (campaign || customerCampaign)?.isRecurring
+                                        ? "Tổ chức và lịch trình"
+                                        : "Tổ chức"
+                                } (${campaignOrganizations?.length || 0})`}
+                            />
+                            {campaignOrganizations &&
+                                campaignOrganizations?.length > 0 && (
+                                    <div className="my-6 space-y-4">
+                                        {campaignOrganizations.map((org) => (
+                                            <OrganizationCard
+                                                campaignOrganization={org}
+                                                key={org.id}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                        </div>
+                    </Fragment>
+                )}
 
             {/*Commissions*/}
             {(isAdmin || isIssuer) && (
@@ -225,7 +218,7 @@ const MainContent: React.FC = () => {
                                         >
                                             <Image
                                                 src={getAvatarFromName(
-                                                    commission?.genre?.name
+                                                    commission?.genre?.name,
                                                 )}
                                                 width={500}
                                                 height={500}
@@ -260,7 +253,7 @@ const MainContent: React.FC = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                    )
+                                    ),
                                 )}
                             </div>
                         ) : (
@@ -291,7 +284,7 @@ const MainContent: React.FC = () => {
                                         >
                                             <Image
                                                 src={getAvatarFromName(
-                                                    cg?.group?.name
+                                                    cg?.group?.name,
                                                 )}
                                                 width={500}
                                                 height={500}
@@ -332,65 +325,65 @@ const MainContent: React.FC = () => {
             {/*Levels*/}
             {(campaign || customerCampaign)?.format ===
                 CampaignFormats.ONLINE.id && (
-                <Fragment>
-                    <Separator />
-                    <div>
-                        <ContentHeader
-                            text={`Cấp độ khách hàng yêu cầu (${
-                                campaignLevels?.length || 0
-                            })`}
-                        />
-                        {campaignLevels?.length > 0 ? (
-                            <div className="my-6 space-y-4">
-                                {campaignLevels.map((l) => (
-                                    <div
-                                        key={l?.id}
-                                        className="relative flex h-full w-full space-x-4 rounded border border-slate-200 bg-white px-4 py-6 shadow-sm transition duration-300 hover:shadow"
-                                    >
-                                        <Image
-                                            src={getAvatarFromName(l?.name, 1)}
-                                            width={500}
-                                            height={500}
-                                            alt=""
-                                            className="rounded-full object-cover h-12 w-12"
-                                        />
-                                        <div className={`grow min-w-0`}>
-                                            <div
-                                                className={
-                                                    "mb-1 text-base font-bold text-slate-700"
-                                                }
-                                            >
-                                                <span>{l?.name}</span>
-                                                {/*<span className={"ml-2 bg-indigo-500 text-white font-medium p-2 rounded text-xs uppercase"}>*/}
-                                                {/*   Cấp độ của bạn*/}
-                                                {/*</span>*/}
-                                            </div>
-                                            <div
-                                                className={
-                                                    "text-sm text-slate-500"
-                                                }
-                                            >
-                                                Điểm:{" "}
-                                                <span
-                                                    className={"font-semibold"}
+                    <Fragment>
+                        <Separator />
+                        <div>
+                            <ContentHeader
+                                text={`Cấp độ khách hàng yêu cầu (${
+                                    campaignLevels?.length || 0
+                                })`}
+                            />
+                            {campaignLevels?.length > 0 ? (
+                                <div className="my-6 space-y-4">
+                                    {campaignLevels.map((l) => (
+                                        <div
+                                            key={l?.id}
+                                            className="relative flex h-full w-full space-x-4 rounded border border-slate-200 bg-white px-4 py-6 shadow-sm transition duration-300 hover:shadow"
+                                        >
+                                            <Image
+                                                src={getAvatarFromName(l?.name, 1)}
+                                                width={500}
+                                                height={500}
+                                                alt=""
+                                                className="rounded-full object-cover h-12 w-12"
+                                            />
+                                            <div className={`grow min-w-0`}>
+                                                <div
+                                                    className={
+                                                        "mb-1 text-base font-bold text-slate-700"
+                                                    }
                                                 >
+                                                    <span>{l?.name}</span>
+                                                    {/*<span className={"ml-2 bg-indigo-500 text-white font-medium p-2 rounded text-xs uppercase"}>*/}
+                                                    {/*   Cấp độ của bạn*/}
+                                                    {/*</span>*/}
+                                                </div>
+                                                <div
+                                                    className={
+                                                        "text-sm text-slate-500"
+                                                    }
+                                                >
+                                                    Điểm:{" "}
+                                                    <span
+                                                        className={"font-semibold"}
+                                                    >
                                                     {l?.conditionalPoint}
                                                 </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <EmptySection
-                                text={
-                                    "Hội sách này chưa có cấp độ khách hàng yêu cầu."
-                                }
-                            />
-                        )}
-                    </div>
-                </Fragment>
-            )}
+                                    ))}
+                                </div>
+                            ) : (
+                                <EmptySection
+                                    text={
+                                        "Hội sách này chưa có cấp độ khách hàng yêu cầu."
+                                    }
+                                />
+                            )}
+                        </div>
+                    </Fragment>
+                )}
 
             {/*Products*/}
             {(isAdmin || isIssuer) && (
@@ -424,7 +417,7 @@ const MainContent: React.FC = () => {
                         {isProductsLoading ? (
                             <div>Loading...</div>
                         ) : productData?.data &&
-                          productData?.data?.length > 0 ? (
+                        productData?.data?.length > 0 ? (
                             <div className="my-6">
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                     {productData?.data?.map((product) => {
@@ -468,7 +461,7 @@ const MainContent: React.FC = () => {
                                                 hierarchicalBookProduct?.subHierarchicalBookProducts.map(
                                                     (
                                                         subHierarchicalBookProduct,
-                                                        index
+                                                        index,
                                                     ) => {
                                                         return (
                                                             <Tab
@@ -478,14 +471,15 @@ const MainContent: React.FC = () => {
                                                                 }
                                                                 key={index}
                                                             >
-                                                                <div className="cursor-pointer ui-selected:border-indigo-500 ui-selected:text-indigo-600 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
+                                                                <div
+                                                                    className="cursor-pointer ui-selected:border-indigo-500 ui-selected:text-indigo-600 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
                                                                     {
                                                                         subHierarchicalBookProduct?.subTitle
                                                                     }
                                                                 </div>
                                                             </Tab>
                                                         );
-                                                    }
+                                                    },
                                                 )}
                                         </Tab.List>
                                         <Tab.Panels className={"mt-4"}>
@@ -493,7 +487,7 @@ const MainContent: React.FC = () => {
                                                 hierarchicalBookProduct?.subHierarchicalBookProducts.map(
                                                     (
                                                         subHierarchicalBookProduct,
-                                                        index
+                                                        index,
                                                     ) => {
                                                         return (
                                                             <Tab.Panel
@@ -508,13 +502,10 @@ const MainContent: React.FC = () => {
                                                                         subHierarchicalBookProduct?.bookProducts.map(
                                                                             (
                                                                                 bookProduct,
-                                                                                index
+                                                                                index,
                                                                             ) => {
                                                                                 return (
                                                                                     <CustomerProductCard
-                                                                                        showAddToCart={
-                                                                                            false
-                                                                                        }
                                                                                         product={
                                                                                             bookProduct
                                                                                         }
@@ -523,7 +514,7 @@ const MainContent: React.FC = () => {
                                                                                         }
                                                                                     />
                                                                                 );
-                                                                            }
+                                                                            },
                                                                         )}
                                                                 </div>
                                                                 <div
@@ -537,7 +528,7 @@ const MainContent: React.FC = () => {
                                                                                 "/products",
                                                                             query: {
                                                                                 campaign:
-                                                                                    customerCampaign?.id,
+                                                                                customerCampaign?.id,
                                                                                 issuer:
                                                                                     subHierarchicalBookProduct?.issuerId ||
                                                                                     null,
@@ -551,12 +542,12 @@ const MainContent: React.FC = () => {
                                                                         Xem thêm
                                                                         sách{" "}
                                                                         {(subHierarchicalBookProduct
-                                                                            ?.issuer
-                                                                            ?.name &&
-                                                                            `từ ${subHierarchicalBookProduct?.issuer?.name}`) ||
+                                                                                    ?.issuer
+                                                                                    ?.name &&
+                                                                                `từ ${subHierarchicalBookProduct?.issuer?.name}`) ||
                                                                             (subHierarchicalBookProduct
-                                                                                ?.genre
-                                                                                ?.name &&
+                                                                                    ?.genre
+                                                                                    ?.name &&
                                                                                 `thuộc ${subHierarchicalBookProduct?.genre?.name}`)}
                                                                         <span aria-hidden="true">
                                                                             {" "}
@@ -566,14 +557,14 @@ const MainContent: React.FC = () => {
                                                                 </div>
                                                             </Tab.Panel>
                                                         );
-                                                    }
+                                                    },
                                                 )}
                                         </Tab.Panels>
                                     </Tab.Group>
                                 </div>
                             </Fragment>
                         );
-                    }
+                    },
                 )}
 
             {customerCampaign?.unhierarchicalBookProducts &&
@@ -594,9 +585,6 @@ const MainContent: React.FC = () => {
                                                 (bookProduct, index) => {
                                                     return (
                                                         <CustomerProductCard
-                                                            showAddToCart={
-                                                                false
-                                                            }
                                                             key={
                                                                 bookProduct?.id
                                                             }
@@ -605,13 +593,13 @@ const MainContent: React.FC = () => {
                                                             }
                                                         />
                                                     );
-                                                }
+                                                },
                                             )}
                                     </div>
                                 </div>
                             </Fragment>
                         );
-                    }
+                    },
                 )}
 
             {(customerCampaign?.hierarchicalBookProducts &&

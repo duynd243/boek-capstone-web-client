@@ -15,6 +15,7 @@ import { useCartStore } from "../../stores/CartStore";
 import { CampaignStatuses } from "../../constants/CampaignStatuses";
 
 const StatusBadge: React.FC<{ bgColor: string, label: string, title?: string }> = ({ bgColor, label, title }) => {
+
     return (
         <div
             title={title || ""}
@@ -37,6 +38,7 @@ const CustomerProductCard: React.FC<Props> = ({
                                                   product,
                                               }) => {
     const bookProductStatus = getBookProductStatusById(product?.status);
+    console.log(product?.id, product?.campaign?.status !== CampaignStatuses.STARTING.id)
 
     const { addToCart } = useCartStore((state) => state);
 

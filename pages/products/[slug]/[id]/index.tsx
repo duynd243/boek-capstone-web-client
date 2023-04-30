@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NextPageWithLayout } from "../../../_app";
 import CustomerLayout from "../../../../components/Layout/CustomerLayout";
 import { useRouter } from "next/router";
@@ -23,13 +23,16 @@ import Breadcrumbs from "../../../../components/Breadcrumbs";
 import { useCartStore } from "../../../../stores/CartStore";
 import { useAuth } from "../../../../context/AuthContext";
 
+
 const BonusFormatCard = (
     {
         type,
         price,
+        url,
     }: {
         type: "PDF" | "AUDIO";
         price: number;
+        url?: string;
     },
 ) => {
     return (
@@ -52,7 +55,7 @@ const BonusFormatCard = (
                 }).format(price)}
                 </div>
                 <Link
-                    href={"#"}
+                    href={url || "#"}
                     target={"_blank"}
                     className={"text-indigo-600 text-sm"}>
                     {type === "PDF" ? "Xem thử" : "Nghe thử"}
@@ -67,6 +70,9 @@ const ProductDetailsPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
     const id = router.query.id as string;
     const bookProductService = new BookProductService(loginUser?.accessToken);
+
+    const [numPages, setNumPages] = useState<number | null>(null);
+    const [pageNumber, setPageNumber] = useState(1);
 
     const {
         cart,
@@ -113,6 +119,8 @@ const ProductDetailsPage: NextPageWithLayout = () => {
     ];
 
     if (productLoading) return <LoadingSpinnerWithOverlay label={"Đang tải thông tin sản phẩm"} />;
+
+
     return (
         <div>
             <div className={"mb-4"}>
@@ -205,12 +213,16 @@ const ProductDetailsPage: NextPageWithLayout = () => {
                                     <div className={"flex gap-4 mt-2"}>
                                         {product?.withPdf ?
                                             <BonusFormatCard
+                                                url={product?.book?.pdfTrialUrl}
                                                 type={"PDF"}
                                                 price={product?.pdfExtraPrice || 0}
                                             />
                                             : null}
+
+
                                         {product?.withAudio ?
                                             <BonusFormatCard
+                                                url={product?.book?.audioTrialUrl}
                                                 type={"AUDIO"}
                                                 price={product?.audioExtraPrice || 0}
                                             />
