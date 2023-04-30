@@ -69,7 +69,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                     "following_organizations",
                 ]);
             },
-        }
+        },
     );
 
     const unfollowGroupMutation = useMutation(
@@ -78,7 +78,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
             onSuccess: async (data) => {
                 await queryClient.invalidateQueries(["following_groups"]);
             },
-        }
+        },
     );
 
     const { data: otherOrganizations } = useQuery(
@@ -96,11 +96,11 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                     (org) =>
                         !(
                             followingOrganizations?.organizations?.map(
-                                (o) => o?.organization?.id
+                                (o) => o?.organization?.id,
                             ) || []
-                        ).includes(org?.id)
+                        ).includes(org?.id),
                 ),
-        }
+        },
     );
 
     const onUnfollowOrganization = async (organization: IOrganization) => {
@@ -110,7 +110,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                 loading: `Đang bỏ theo dõi ${organization?.name}`,
                 success: `Đã bỏ theo dõi ${organization?.name}`,
                 error: (err) => err?.message || "Có lỗi xảy ra",
-            }
+            },
         );
     };
 
@@ -129,7 +129,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
         organizationService.getFollowingOrganizationsByCustomer({
             withCustomers: true,
             withCampaigns: true,
-        })
+        }),
     );
 
     const {
@@ -139,26 +139,64 @@ const CustomerProfilePage: NextPageWithLayout = () => {
         groupService.getFollowingGroupsByCustomer({
             withCustomers: true,
             withCampaigns: true,
-        })
+        }),
     );
 
+    const { data: profile, isInitialLoading: profileLoading } = useQuery(
+        ["profile", loginUser?.id],
+        () => userService.getProfileByCustomer(),
+        {
+            onSuccess: (profile) => {
+                reset({
+                    dob: profile?.dob ? new Date(profile?.dob) : undefined,
+                    gender: profile?.gender,
+                    user: {
+                        id: profile?.user?.id,
+                        name: profile?.user?.name,
+                        phone: profile?.user?.phone,
+                        imageUrl: profile?.user?.imageUrl,
+                        email: profile?.user?.email,
+                        addressRequest: {
+                            detail: profile?.user?.addressViewModel?.detail,
+                            provinceCode:
+                            profile?.user?.addressViewModel?.provinceCode,
+                            districtCode:
+                            profile?.user?.addressViewModel?.districtCode,
+                            wardCode: profile?.user?.addressViewModel?.wardCode,
+                        },
+                    },
+                });
+            },
+        },
+    );
+
+    const levelService = new LevelService();
+
     const {
-        data: levelData,
+        data: allLevels,
         isLoading,
         isFetching,
     } = useQuery(
         ["levels"],
         () =>
-            new LevelService().getLevels({
-                page: 1,
-                size: 1000,
+            levelService.getAllLevels({
                 withCustomers: false,
                 status: true,
             }),
-        {
-            keepPreviousData: true,
-        }
     );
+
+    const otherLevels = allLevels?.filter((level) => level?.id !== profile?.level?.id)?.sort((a, b) => {
+        if (a?.conditionalPoint && b?.conditionalPoint) {
+            return a?.conditionalPoint - b?.conditionalPoint;
+        }
+        return 0;
+    });
+
+    const nextLevel = otherLevels?.find((level) => {
+        if (level?.conditionalPoint !== undefined && profile?.point !== undefined) {
+            return level?.conditionalPoint > profile?.point;
+        }
+    });
 
     const UpdateProfileSchema = z.object({
         dob: z.date().optional(),
@@ -196,33 +234,6 @@ const CustomerProfilePage: NextPageWithLayout = () => {
         resolver: zodResolver(UpdateProfileSchema),
     });
 
-    const { data: profile, isInitialLoading: profileLoading } = useQuery(
-        ["profile", loginUser?.id],
-        () => userService.getProfileByCustomer(),
-        {
-            onSuccess: (profile) => {
-                reset({
-                    dob: profile?.dob ? new Date(profile?.dob) : undefined,
-                    gender: profile?.gender,
-                    user: {
-                        id: profile?.user?.id,
-                        name: profile?.user?.name,
-                        phone: profile?.user?.phone,
-                        imageUrl: profile?.user?.imageUrl,
-                        email: profile?.user?.email,
-                        addressRequest: {
-                            detail: profile?.user?.addressViewModel?.detail,
-                            provinceCode:
-                                profile?.user?.addressViewModel?.provinceCode,
-                            districtCode:
-                                profile?.user?.addressViewModel?.districtCode,
-                            wardCode: profile?.user?.addressViewModel?.wardCode,
-                        },
-                    },
-                });
-            },
-        }
-    );
 
     const {
         selectedProvince,
@@ -249,7 +260,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
             onSuccess: async () => {
                 await queryClient.invalidateQueries(["profile", loginUser?.id]);
             },
-        }
+        },
     );
 
     const onSubmit = async (data: UpdateProfileSchemaType) => {
@@ -268,7 +279,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                     loading: "Đang cập nhật thông tin",
                     success: "Cập nhật thông tin thành công",
                     error: (e) => e?.message || "Có lỗi xảy ra",
-                }
+                },
             );
         } catch (e) {
             console.log(e);
@@ -290,7 +301,8 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                 {/* Close button */}
                 <button
                     className="md:hidden absolute top-4 left-4 sm:left-6 text-white opacity-80 hover:opacity-100"
-                    onClick={() => {}}
+                    onClick={() => {
+                    }}
                     aria-controls="profile-sidebar"
                     aria-expanded={true}
                 >
@@ -320,7 +332,8 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                 alt="Avatar"
                             />
 
-                            <div className="cursor-pointer absolute flex flex-col items-center justify-center bg-black/0 group-hover:bg-black/30 inset-0 rounded-full border-4 border-white  transition duration-150 ease-in-out">
+                            <div
+                                className="cursor-pointer absolute flex flex-col items-center justify-center bg-black/0 group-hover:bg-black/30 inset-0 rounded-full border-4 border-white  transition duration-150 ease-in-out">
                                 <AiOutlineCamera className="hidden group-hover:block text-white text-2xl" />
                                 <span className="hidden group-hover:block text-xs text-white">
                                     Thay đổi
@@ -331,10 +344,12 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                         {/* Actions */}
                         <div className="flex space-x-2 sm:mb-2">
                             <div className="flex items-center space-x-2">
-                                <div className="text-sm text-green-600 font-medium bg-green-100 rounded-sm px-3 py-1 border border-green-200">
+                                <div
+                                    className="text-sm text-green-600 font-medium bg-green-100 rounded-sm px-3 py-1 border border-green-200">
                                     {profile?.level?.name}
                                 </div>
-                                <div className="text-sm text-amber-600 font-medium bg-amber-100 rounded-sm px-3 py-1 border border-amber-200">
+                                <div
+                                    className="text-sm text-amber-600 font-medium bg-amber-100 rounded-sm px-3 py-1 border border-amber-200">
                                     <span className={"font-normal"}>
                                         Điểm:{" "}
                                     </span>
@@ -362,7 +377,8 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                             className="w-4 h-4 fill-current shrink-0 text-amber-500 ml-2"
                             viewBox="0 0 16 16"
                         >
-                            <path d="M13 6a.75.75 0 0 1-.75-.75 1.5 1.5 0 0 0-1.5-1.5.75.75 0 1 1 0-1.5 1.5 1.5 0 0 0 1.5-1.5.75.75 0 1 1 1.5 0 1.5 1.5 0 0 0 1.5 1.5.75.75 0 1 1 0 1.5 1.5 1.5 0 0 0-1.5 1.5A.75.75 0 0 1 13 6ZM6 16a1 1 0 0 1-1-1 4 4 0 0 0-4-4 1 1 0 0 1 0-2 4 4 0 0 0 4-4 1 1 0 1 1 2 0 4 4 0 0 0 4 4 1 1 0 0 1 0 2 4 4 0 0 0-4 4 1 1 0 0 1-1 1Z" />
+                            <path
+                                d="M13 6a.75.75 0 0 1-.75-.75 1.5 1.5 0 0 0-1.5-1.5.75.75 0 1 1 0-1.5 1.5 1.5 0 0 0 1.5-1.5.75.75 0 1 1 1.5 0 1.5 1.5 0 0 0 1.5 1.5.75.75 0 1 1 0 1.5 1.5 1.5 0 0 0-1.5 1.5A.75.75 0 0 1 13 6ZM6 16a1 1 0 0 1-1-1 4 4 0 0 0-4-4 1 1 0 0 1 0-2 4 4 0 0 0 4-4 1 1 0 1 1 2 0 4 4 0 0 0 4 4 1 1 0 0 1 0 2 4 4 0 0 0-4 4 1 1 0 0 1-1 1Z" />
                         </svg>
                     </div>
                     <BioSection profile={profile} isLoading={profileLoading} />
@@ -380,7 +396,8 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                 as={"div"}
                                 className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer"
                             >
-                                <span className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
+                                <span
+                                    className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
                                     Thông tin cá nhân
                                 </span>
                             </Tab>
@@ -389,7 +406,8 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                 as={"div"}
                                 className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer"
                             >
-                                <span className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
+                                <span
+                                    className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
                                     Tổ chức
                                 </span>
                             </Tab>
@@ -398,7 +416,8 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                 as={"div"}
                                 className="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8 focus:outline-none cursor-pointer"
                             >
-                                <span className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
+                                <span
+                                    className="block pb-3 ui-selected:text-indigo-500 text-slate-500 ui-selected:hover:text-slate-600 whitespace-nowrap ui-selected:border-b-2 ui-selected:border-indigo-500">
                                     Nhóm tham gia
                                 </span>
                             </Tab>
@@ -453,7 +472,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                     }}
                                                     displayKey="label"
                                                     dataSource={Object.values(
-                                                        genderOptions
+                                                        genderOptions,
                                                     )}
                                                     searchable={false}
                                                 />
@@ -477,17 +496,17 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                             }
                                                             onDismiss={() =>
                                                                 setShowDatePicker(
-                                                                    false
+                                                                    false,
                                                                 )
                                                             }
                                                             onClose={(date) => {
                                                                 if (date) {
                                                                     field.onChange(
-                                                                        date
+                                                                        date,
                                                                     );
                                                                 }
                                                                 setShowDatePicker(
-                                                                    false
+                                                                    false,
                                                                 );
                                                             }}
                                                         />
@@ -502,14 +521,14 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                             value={
                                                                 field.value
                                                                     ? format(
-                                                                          field.value,
-                                                                          "dd/MM/yyyy"
-                                                                      )
+                                                                        field.value,
+                                                                        "dd/MM/yyyy",
+                                                                    )
                                                                     : ""
                                                             }
                                                             onClick={() =>
                                                                 setShowDatePicker(
-                                                                    true
+                                                                    true,
                                                                 )
                                                             }
                                                         />
@@ -544,7 +563,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                         if (
                                                             p.code ===
                                                             watch(
-                                                                "user.addressRequest.provinceCode"
+                                                                "user.addressRequest.provinceCode",
                                                             )
                                                         )
                                                             return;
@@ -552,11 +571,11 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                         field.onChange(p.code);
                                                         setValue(
                                                             "user.addressRequest.districtCode" as any,
-                                                            undefined
+                                                            undefined,
                                                         );
                                                         setValue(
                                                             "user.addressRequest.wardCode" as any,
-                                                            undefined
+                                                            undefined,
                                                         );
                                                         handleProvinceChange(p);
                                                     }}
@@ -584,14 +603,14 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                         if (
                                                             d.code ===
                                                             watch(
-                                                                "user.addressRequest.districtCode"
+                                                                "user.addressRequest.districtCode",
                                                             )
                                                         )
                                                             return;
                                                         field.onChange(d.code);
                                                         setValue(
                                                             "user.addressRequest.wardCode" as any,
-                                                            undefined
+                                                            undefined,
                                                         );
                                                         handleDistrictChange(d);
                                                     }}
@@ -619,7 +638,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                         if (
                                                             w.code ===
                                                             watch(
-                                                                "user.addressRequest.wardCode"
+                                                                "user.addressRequest.wardCode",
                                                             )
                                                         )
                                                             return;
@@ -716,7 +735,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                                         getAvatarFromName(
                                                                             o
                                                                                 ?.organization
-                                                                                ?.name
+                                                                                ?.name,
                                                                         )
                                                                     }
                                                                     alt={""}
@@ -768,13 +787,14 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                                 {/*    Bỏ theo dõi*/}
                                                                 {/*</button>*/}
                                                             </div>
-                                                        )
+                                                        ),
                                                     )}
                                                 </div>
                                             )}
                                         {!isFollowingOrganizationsLoading &&
                                             followingOrganizations === null && (
-                                                <div className="flex flex-col items-center justify-center w-full h-full">
+                                                <div
+                                                    className="flex flex-col items-center justify-center w-full h-full">
                                                     <EmptyState
                                                         status={
                                                             EMPTY_STATE_TYPE.NO_DATA
@@ -803,7 +823,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                         src={
                                                             o?.imageUrl ||
                                                             getAvatarFromName(
-                                                                o?.name
+                                                                o?.name,
                                                             )
                                                         }
                                                         alt={""}
@@ -832,7 +852,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                             }
                                                         >
                                                             {o?.customers
-                                                                ?.length ||
+                                                                    ?.length ||
                                                                 0}{" "}
                                                             người thuộc tổ chức
                                                         </span>
@@ -891,7 +911,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                             >
                                                 <Image
                                                     src={getAvatarFromName(
-                                                        group?.group?.name
+                                                        group?.group?.name,
                                                     )}
                                                     alt={""}
                                                     width={100}
@@ -929,7 +949,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                                     onClick={async () => {
                                                         if (group) {
                                                             await onUnfollowGroup(
-                                                                group?.group
+                                                                group?.group,
                                                             );
                                                         }
                                                     }}
@@ -961,8 +981,59 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                     isOpen={showLevelModal}
                     onClose={() => setShowLevelModal(false)}
                 >
-                    <div className="flex flex-col items-center justify-center w-full h-full">
-                        123
+                    <div className="">
+                        <div className={"flex flex-col items-center p-4"}>
+                            <Image
+                                src={getAvatarFromName(profile?.level?.name, 1)}
+                                alt={""}
+                                width={200}
+                                height={200}
+                                className={"rounded-full w-32 h-32 object-cover"}
+                            />
+                            <h3 className={"text-center text-2xl font-medium mt-4"}>
+                                {profile?.level?.name}
+                            </h3>
+                            <div className={"text-center text-xl text-gray-500 mt-2"}>
+                                Điểm: <span className={"font-medium"}>{profile?.point}</span>
+                            </div>
+                        </div>
+                        <div className={"space-y-3 p-4"}>
+                            {otherLevels?.map((level) => {
+                                const isEarnedLevel = level?.conditionalPoint !== undefined && profile?.point !== undefined && profile?.point > level?.conditionalPoint;
+                                const isNextLevel = level?.id === nextLevel?.id;
+                                return (
+                                    <div key={level?.id}
+                                         className={"relative border p-4 rounded shadow-sm"}
+                                    >
+                                        <div className={"flex items-center gap-3"}>
+                                            <Image src={getAvatarFromName(level?.name, 1)}
+                                                   width={200}
+                                                   height={200}
+                                                   className={`rounded-full w-12 h-12 object-cover`}
+                                                   alt={""} />
+                                            <div>
+                                                <h2 className={"text-lg font-medium"}>{level?.name}</h2>
+                                                <div className={"text-sm text-gray-500"}>
+                                                    Điểm: <span className={"font-medium"}>{level?.conditionalPoint}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {isEarnedLevel && (
+                                            <div className={"absolute top-0 right-0 bg-green-500 text-white px-2 py-1 rounded"}>
+                                                Đã đạt
+                                            </div>
+                                        )}
+
+                                        {isNextLevel && (
+                                            <div className={"absolute top-0 right-0 bg-indigo-500 text-white px-2 py-1 rounded"}>
+                                                Cần thêm {level?.conditionalPoint - profile?.point} điểm
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </TransitionModal>
 
@@ -971,7 +1042,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                     onClose={() => setShowOrgModal(false)}
                     followedOrganizationIds={
                         followingOrganizations?.organizations?.map(
-                            (o) => o?.organization?.id
+                            (o) => o?.organization?.id,
                         ) || []
                     }
                 />

@@ -26,6 +26,19 @@ export class LevelService extends BaseService {
         return response.data;
     };
 
+    getAllLevels = async (params?: LevelRequestParams) => {
+        const response = await this.getLevels(params);
+        const { data, metadata: { total } } = response;
+        if (data.length < total) {
+            const newResponse = await this.getLevels({
+                ...params,
+                size: total,
+            });
+            return newResponse.data;
+        }
+        return response.data;
+    };
+
     createLevel = async (data: CreateLevelParams) => {
         const response = await this.axiosClient.post<ILevel>(
             "/admin/levels",

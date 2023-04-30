@@ -94,7 +94,7 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
         "dashboardRequestModel": {
             "timeLine": [
                 {
-                    "type": 0,
+                    "type": TimelineTypes.Day.id,
                     "startDate": revenueDateRange?.[0]?.toISOString(),
                     "endDate": revenueDateRange?.[1]?.toISOString(),
                     "timeLength": 0,
@@ -108,7 +108,7 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
             "isDescendingTimeLine": false,
             "separateDay": false,
         },
-        "isAllTheTime": true,
+        "isAllTheTime": false,
     };
     const {
         data: dashboardData,

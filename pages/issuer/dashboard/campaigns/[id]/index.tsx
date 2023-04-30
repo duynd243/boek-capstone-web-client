@@ -1,4 +1,3 @@
-
 import React, { Fragment, useState } from "react";
 import { NextPageWithLayout } from "../../../../_app";
 import AdminLayout from "../../../../../components/Layout/AdminLayout";
@@ -89,7 +88,7 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
         "dashboardRequestModel": {
             "timeLine": [
                 {
-                    "type": 0,
+                    "type": TimelineTypes.Day.id,
                     "startDate": revenueDateRange?.[0]?.toISOString(),
                     "endDate": revenueDateRange?.[1]?.toISOString(),
                     "timeLength": 0,
@@ -103,7 +102,7 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
             "isDescendingTimeLine": false,
             "separateDay": false,
         },
-        "isAllTheTime": true,
+        "isAllTheTime": false,
     };
     const {
         data: dashboardData,
@@ -124,15 +123,15 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
     return (
 
         <Fragment>
-<div className="mb-6">
-                    <Link
-                        className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
-                        href="/issuer"
-                    >
-                        <IoChevronBack size={"17"} />
-                        <span>Quay lại</span>
-                    </Link>
-                </div>
+            <div className="mb-6">
+                <Link
+                    className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
+                    href="/issuer"
+                >
+                    <IoChevronBack size={"17"} />
+                    <span>Quay lại</span>
+                </Link>
+            </div>
 
             <Card>
                 <div>

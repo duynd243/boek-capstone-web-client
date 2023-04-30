@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NextPageWithLayout } from "../../../_app";
 import CustomerLayout from "../../../../components/Layout/CustomerLayout";
 import { useRouter } from "next/router";
@@ -22,14 +22,21 @@ import { motion } from "framer-motion";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
 import { useCartStore } from "../../../../stores/CartStore";
 import { useAuth } from "../../../../context/AuthContext";
+import { Document, Page, pdfjs } from 'react-pdf';
+
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+
 
 const BonusFormatCard = (
     {
         type,
         price,
+        url,
     }: {
         type: "PDF" | "AUDIO";
         price: number;
+        url?: string;
     },
 ) => {
     return (
@@ -52,7 +59,7 @@ const BonusFormatCard = (
                 }).format(price)}
                 </div>
                 <Link
-                    href={"#"}
+                    href={url || "#"}
                     target={"_blank"}
                     className={"text-indigo-600 text-sm"}>
                     {type === "PDF" ? "Xem thử" : "Nghe thử"}
@@ -67,6 +74,9 @@ const ProductDetailsPage: NextPageWithLayout = () => {
     const { loginUser } = useAuth();
     const id = router.query.id as string;
     const bookProductService = new BookProductService(loginUser?.accessToken);
+
+    const [numPages, setNumPages] = useState<number | null>(null);
+    const [pageNumber, setPageNumber] = useState(1);
 
     const {
         cart,
@@ -113,6 +123,8 @@ const ProductDetailsPage: NextPageWithLayout = () => {
     ];
 
     if (productLoading) return <LoadingSpinnerWithOverlay label={"Đang tải thông tin sản phẩm"} />;
+
+
     return (
         <div>
             <div className={"mb-4"}>
@@ -205,12 +217,16 @@ const ProductDetailsPage: NextPageWithLayout = () => {
                                     <div className={"flex gap-4 mt-2"}>
                                         {product?.withPdf ?
                                             <BonusFormatCard
+                                                url={product?.book?.pdfTrialUrl}
                                                 type={"PDF"}
                                                 price={product?.pdfExtraPrice || 0}
                                             />
                                             : null}
+
+
                                         {product?.withAudio ?
                                             <BonusFormatCard
+                                                url={product?.book?.audioTrialUrl}
                                                 type={"AUDIO"}
                                                 price={product?.audioExtraPrice || 0}
                                             />
@@ -331,6 +347,15 @@ const ProductDetailsPage: NextPageWithLayout = () => {
 
             {product?.otherMobileBookProducts && product?.otherMobileBookProducts.length > 0 &&
                 <>
+
+                    {product?.book?.pdfTrialUrl && <div>
+                        <Document file={'https://24p8vj-my.sharepoint.com/:b:/g/personal/admin_duynd_cf/EceRwAEYwpFBgPYo0TpZVGwBhlo_8HiPUCig0CAKbFB2yw?download=1'}
+                                  onLoadSuccess={(pdf) => {
+                                      setNumPages(pdf.numPages);
+                                  }}>
+                            <Page pageNumber={pageNumber} />
+                        </Document>
+                    </div>}
                     <h2 className={"text-gray-900 text-2xl font-semibold mt-8"}>
                         Sản phẩm này tại các hội sách khác
                     </h2>
