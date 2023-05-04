@@ -140,6 +140,22 @@ export class CampaignService extends BaseService {
     };
 
 
+    getAllCampaignsByAdmin = async (
+        params?: GetCampaignsParams,
+    ) => {
+        const response = await this.getCampaignsByAdmin(params);
+        const { data, metadata: { total } } = response;
+        if (data.length < total) {
+            const newResponse = await this.getCampaignsByAdmin({
+                ...params,
+                size: total,
+            });
+            return newResponse.data;
+        }
+        return data;
+    };
+
+
     getCampaignsByIssuer = async (
         params?: GetCampaignsParams,
     ) => {
@@ -150,6 +166,22 @@ export class CampaignService extends BaseService {
         });
         return response.data;
     };
+
+
+    getAllCampaignsByIssuer = async (
+        params?: GetCampaignsParams,
+    ) => {
+        const response = await this.getCampaignsByIssuer(params);
+        const { data, metadata: { total } } = response;
+        if (data.length < total) {
+            const newResponse = await this.getCampaignsByIssuer({
+                ...params,
+                size: total,
+            });
+            return newResponse.data;
+        }
+        return data;
+    }
 
     getOtherCampaignsByIssuer = async (
         params?: GetCampaignsParams,

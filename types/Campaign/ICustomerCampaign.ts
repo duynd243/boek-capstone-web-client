@@ -4,6 +4,7 @@ import { ILevel } from "../Level/ILevel";
 import { IHierarchicalBookProduct } from "../Book/IHierarchicalBookProduct";
 import { IUnhierarchicalBookProduct } from "../Book/IUnhierarchicalBookProduct";
 import { ICustomerCampaignOrganization } from "../Campaign_Organization/ICampaignOrganization";
+import { IGroup } from "../Group/IGroup";
 
 export interface ICustomerCampaign extends Omit<ICampaign,
     "campaignCommissions"
@@ -16,6 +17,7 @@ export interface ICustomerCampaign extends Omit<ICampaign,
     organizations?: ICustomerCampaignOrganization[];
     issuers?: IIssuer[];
     levels?: ILevel[];
+    groups?: IGroup[];
     hierarchicalBookProducts?: IHierarchicalBookProduct[];
     unhierarchicalBookProducts?: IUnhierarchicalBookProduct[];
 }

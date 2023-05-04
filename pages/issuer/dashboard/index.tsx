@@ -236,7 +236,7 @@ const Page: NextPageWithLayout = () => {
                                 ))}
                             </Dropdown>
                             <Dropdown
-                                placeholder="Hội sách tham gia"
+                                placeholder="Tất cả hội sách"
                                 onValueChange={(value) =>
                                     router.push(
                                         `/issuer/dashboard/campaigns/${campaignId}`

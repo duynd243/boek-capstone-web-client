@@ -10,6 +10,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../../context/AuthContext";
 import { OrderService } from "../../../services/OrderService";
 import { getOrderPaymentMethodById } from "../../../constants/OrderPaymentMethods";
+import { HiXMark } from "react-icons/hi2";
+import { BsCheck } from "react-icons/bs";
+import { getFormattedTime } from "../../../utils/helper";
+import useOrderTimeline from "../../../hooks/useOrderTimeline";
+import Link from "next/link";
+import { IoChevronBack } from "react-icons/io5";
 
 const AdminOrderDetailsPage: NextPageWithLayout = () => {
     const router = useRouter();
@@ -24,10 +30,20 @@ const AdminOrderDetailsPage: NextPageWithLayout = () => {
             enabled: !!id,
         },
     );
+    const { orderTimeline } = useOrderTimeline(order);
 
     const orderPaymentMethod = getOrderPaymentMethodById(order?.payment);
     return (
         <div className="max-w-5xl mx-auto rounded py-8 px-4 lg:px-8 2xl:px-12 bg-white">
+           <div className={"w-fit py-1 my-6 font-medium !text-xs"}>
+                <Link
+                    className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
+                    href={order?.type === 1 ? "delivery" : "pickup"}
+                >
+                    <IoChevronBack size={"17"} />
+                    <span>Quay lại</span>
+                </Link>
+            </div>
             <div className="mx-auto">
                 <h1 className="mb-6 text-2xl font-bold text-slate-800">
                     Chi tiết đơn hàng
@@ -36,6 +52,44 @@ const AdminOrderDetailsPage: NextPageWithLayout = () => {
                     </span>
                 </h1>
                 <div className="space-y-6">
+                    {/* Order Timeline */}
+                    <ol className="items-center sm:flex justify-between mt-8">
+                        {orderTimeline.filter(timeline => timeline.date)
+                            .map((timeline, index) =>
+                                <li key={index} className="relative mb-6 sm:mb-0 w-full">
+                                    <div className="flex items-center">
+                                        <div
+                                            className={`z-10 flex items-center justify-center w-6 h-6 ${timeline?.cancelled ? "bg-red-100" : "bg-green-100"} rounded-full ring-0 ring-white 0 sm:ring-8 shrink-0`}>
+                                            {timeline?.cancelled ? <HiXMark className="w-4 h-4 text-red-500" /> :
+                                                <BsCheck className="w-4 h-4 text-green-500" />}
+                                        </div>
+                                        <div className="hidden sm:flex w-full bg-gray-200 h-0.5 0"></div>
+                                    </div>
+                                    <div className="mt-3 sm:pr-8">
+                                        <h3 className="font-medium text-gray-700">
+                                            {timeline.title}
+                                        </h3>
+                                        <time className="block mb-2 text-sm font-normal leading-none text-gray-400">
+                                            {getFormattedTime(timeline.date || undefined, "HH:mm, dd/MM/yyyy")}
+                                        </time>
+                                    </div>
+                                </li>,
+                            )}
+                    </ol>
+                    <div className="bg-gray-50 mt-8 p-4 sm:p-6 rounded-lg">
+                    <h3 className="text-lg font-medium text-gray-700">Ghi chú</h3>
+                    <p className="text-sm text-gray-500 mt-2">
+                        {order?.note ?
+                            order?.note?.split(";")?.map((note, index) => {
+                                return (
+                                    <span key={index} className="block">
+                                        {note}
+                                    </span>
+                                );
+                            })
+                            : "Không có ghi chú"}
+                    </p>
+                </div>
                     {/* Order Info */}
                     <OrderGeneralInfo order={order} />
 

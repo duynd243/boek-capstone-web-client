@@ -31,6 +31,7 @@ const CustomerOrdersPage: NextPageWithLayout = () => {
             Status: orderStatus,
             Page: currentPage,
             Size: 5,
+            Sort: "OrderDate desc",
         };
     }, [orderType, orderStatus, currentPage]);
 

@@ -12,20 +12,18 @@ import { getFormattedTime } from "./../../../utils/helper";
 import Form from "../../Form";
 import SidebarButton from "./../../CampaignDetails/SidebarButton";
 import ConfirmModal from "./../ConfirmModal";
-import { OrderService } from "./../../../services/OrderService";
+import { OrderService } from "../../../services/OrderService";
 import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
 import { useRouter } from "next/router";
-import { ICampaignOrganization } from "../../../types/Campaign_Organization/ICampaignOrganization";
 import SelectBox from "./../../SelectBox/index";
-
+import DefaultAvatar from "../../../assets/images/default-avatar.png";
 
 type Props = {
     order: IOrder | undefined;
-    campaignOrganization: ICampaignOrganization;
 }
 
-const StatusCard: React.FC<Props> = ({ order, campaignOrganization }) => {
+const StatusCard: React.FC<Props> = ({ order }) => {
     const { loginUser } = useAuth();
     const queryClient = useQueryClient();
     const orderService = new OrderService(loginUser?.accessToken);
@@ -130,21 +128,13 @@ const StatusCard: React.FC<Props> = ({ order, campaignOrganization }) => {
                     <span>Quay lại</span>
                 </button>
             </div> */}
-            <div className={"w-fit px-3 py-1 my-6 font-medium !text-xs"}>
-                <Link
-                    className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
-                    href={order?.type === 1 ? "/issuer/orders/delivery" : "/issuer/orders/pickup"}
-                >
-                    <IoChevronBack size={"17"} />
-                    <span>Quay lại</span>
-                </Link>
-            </div>
+
             <div className="px-6">
                 <div className={`${orderStatus?.labelColor} w-fit px-3 py-1 my-6 font-medium !text-xs`}>
                     {orderStatus?.displayName}
                 </div>
                 <div className="flex items-center">
-                    <Image src={order?.customer?.user?.imageUrl || ""}
+                    <Image src={order?.customer?.user?.imageUrl || DefaultAvatar.src}
                            alt={""}
                            className={"rounded-full w-12 h-12 object-cover flex-shrink-0"}
                            width={500}
@@ -161,7 +151,11 @@ const StatusCard: React.FC<Props> = ({ order, campaignOrganization }) => {
 
 
                 <div className="bg-slate-50 rounded text-sm text-slate-600 mb-6 px-3 py-2 border border-slate-200">
-                    📝 {order?.note || "Không có ghi chú"}
+                    📝 {order?.note ?
+                    order?.note?.split(";")?.map((item, index) => {
+                        return <div key={index}>{item}</div>;
+                    })
+                    : "Không có ghi chú"}
                 </div>
                 {order?.type === 2 &&
                     <div className="bg-slate-50 rounded text-sm text-slate-600 mb-6 px-3 py-2 border border-slate-200">
