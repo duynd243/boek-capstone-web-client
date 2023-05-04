@@ -30,6 +30,8 @@ import { IDistrict } from "../../types/Address/IDistrict";
 import { IProvince } from "../../types/Address/IProvince";
 import { IWard } from "../../types/Address/IWard";
 import { NextPageWithLayout } from "../_app";
+import { IoIosArrowRoundBack } from "react-icons/io";
+import Link from "next/link";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
@@ -710,6 +712,11 @@ const CheckoutPage: NextPageWithLayout = () => {
                 <section
                     className="flex-auto overflow-y-auto px-4 pt-12 pb-16 sm:px-6 sm:pt-16 lg:px-8 lg:pt-0 lg:pb-0">
                     <div className="max-w-lg mx-auto">
+                        <Link href="/cart"
+                              className="underline mb-4 underline-offset-2 flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700">
+                            <IoIosArrowRoundBack />
+                            Giỏ hàng
+                        </Link>
                         <h1 className="text-3xl font-bold tracking-tight text-slate-700 sm:text-4xl">
                             Xác nhận đơn hàng
                         </h1>

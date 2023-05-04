@@ -101,7 +101,7 @@ const BookForm = ({ book }: Props) => {
         isbn10: z.coerce.string().optional(),
         isbn13: z.coerce.string().optional(),
         name: z.string().min(1),
-        translator: z.string().min(1, "Vui lòng chọn ít nhất 1 dịch giả"),
+        translator: z.string(),
         imageUrl: z.string(),
         coverPrice: z.coerce.number(),
         description: z.string().min(1),
@@ -453,7 +453,6 @@ const BookForm = ({ book }: Props) => {
                 <Form.GroupLabel label="Tác giả và dịch giả" />
                 <div className="mt-3 space-y-4">
                     <Form.Input<FormType>
-                        required={true}
                         label={"Dịch giả"}
                         register={register}
                         fieldName="translator"

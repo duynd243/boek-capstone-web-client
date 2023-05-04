@@ -296,7 +296,9 @@ const SidebarActions: React.FC<Props> = ({}) => {
                 </>
             }
 
-            {issuerJoined &&
+            {(issuerJoined
+                && campaign?.status === CampaignStatuses.NOT_STARTED.id
+                ) &&
                 <Menu as={"div"} className={"relative"}>
                     <Menu.Button as={"div"} className="w-full">
                         <SidebarButton>
