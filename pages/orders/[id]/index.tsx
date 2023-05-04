@@ -17,6 +17,7 @@ import { OrderTypes } from "../../../constants/OrderTypes";
 import { getFormattedTime } from "../../../utils/helper";
 import { BsCheck } from "react-icons/bs";
 import { HiXMark } from "react-icons/hi2";
+import useOrderTimeline from "../../../hooks/useOrderTimeline";
 
 const mockOrder = {
     "id": "6df2cf81-ec57-454d-a823-0e69681894b1",
@@ -187,51 +188,17 @@ const CustomerOrderDetailsPage: NextPageWithLayout = () => {
     const orderService = new OrderService(loginUser?.accessToken);
     const {
         query: { id },
-    } = useRouter()
-     const {
+    } = useRouter();
+    const {
         data: order,
-         isInitialLoading,
+        isInitialLoading,
     } = useQuery(["order", id],
         () => orderService.getOrderByIdByCustomer(id as string), {
             enabled: !!id,
         });
 
 
-    const deliveryOrderTimeline = [
-        {
-            title: "Đặt hàng",
-            date: order?.orderDate,
-        },
-        {
-            title: "Đang giao hàng",
-            date: order?.shippingDate,
-        }, {
-            title: "Đã giao hàng",
-            date: order?.shippedDate,
-        }, {
-            title: "Đã huỷ",
-            date: order?.cancelledDate,
-            cancelled: true,
-        },
-    ];
-    const pickupOrderTimeline = [
-        {
-            title: "Đặt hàng",
-            date: order?.orderDate,
-        },
-        {
-            title: "Chờ nhận hàng",
-            date: order?.availableDate,
-        }, {
-            title: "Đã nhận hàng",
-            date: order?.receivedDate,
-        }, {
-            title: "Đã huỷ",
-            date: order?.cancelledDate,
-            cancelled: true,
-        },
-    ];
-    const orderTimeline = order?.type === OrderTypes.DELIVERY.id ? deliveryOrderTimeline : pickupOrderTimeline;
+    const { orderTimeline } = useOrderTimeline(order);
 
 
     const orderStatus = getOrderStatusById(order?.status);
@@ -274,135 +241,145 @@ const CustomerOrderDetailsPage: NextPageWithLayout = () => {
             {/*</ol>*/}
 
 
-            {isInitialLoading ? <div>Đang tải...</div> : <Fragment><ol className="items-center sm:flex justify-between px-4 mt-8">
-                {orderTimeline.filter(timeline => timeline.date)
-                    .map((timeline, index) =>
-                        <li key={index} className="relative mb-6 sm:mb-0 w-full">
-                            <div className="flex items-center">
-                                <div
-                                    className={`z-10 flex items-center justify-center w-6 h-6 ${timeline?.cancelled ? "bg-red-100" : "bg-green-100"} rounded-full ring-0 ring-white 0 sm:ring-8 shrink-0`}>
-                                    {timeline?.cancelled ? <HiXMark className="w-4 h-4 text-red-500" /> :
-                                        <BsCheck className="w-4 h-4 text-green-500" />}
+            {isInitialLoading ? <div>Đang tải...</div> : <Fragment>
+                <ol className="items-center sm:flex justify-between px-4 mt-8">
+                    {orderTimeline.filter(timeline => timeline.date)
+                        .map((timeline, index) =>
+                            <li key={index} className="relative mb-6 sm:mb-0 w-full">
+                                <div className="flex items-center">
+                                    <div
+                                        className={`z-10 flex items-center justify-center w-6 h-6 ${timeline?.cancelled ? "bg-red-100" : "bg-green-100"} rounded-full ring-0 ring-white 0 sm:ring-8 shrink-0`}>
+                                        {timeline?.cancelled ? <HiXMark className="w-4 h-4 text-red-500" /> :
+                                            <BsCheck className="w-4 h-4 text-green-500" />}
+                                    </div>
+                                    <div className="hidden sm:flex w-full bg-gray-200 h-0.5 0"></div>
                                 </div>
-                                <div className="hidden sm:flex w-full bg-gray-200 h-0.5 0"></div>
-                            </div>
-                            <div className="mt-3 sm:pr-8">
-                                <h3 className="font-medium text-gray-700">
-                                    {timeline.title}
-                                </h3>
-                                <time className="block mb-2 text-sm font-normal leading-none text-gray-400">
-                                    {getFormattedTime(timeline.date || undefined, "HH:mm, dd/MM/yyyy")}
-                                </time>
-                            </div>
-                        </li>,
-                    )}
-            </ol>
+                                <div className="mt-3 sm:pr-8">
+                                    <h3 className="font-medium text-gray-700">
+                                        {timeline.title}
+                                    </h3>
+                                    <time className="block mb-2 text-sm font-normal leading-none text-gray-400">
+                                        {getFormattedTime(timeline.date || undefined, "HH:mm, dd/MM/yyyy")}
+                                    </time>
+                                </div>
+                            </li>,
+                        )}
+                </ol>
 
 
-            <div className="bg-gray-50 mt-8 p-4 sm:p-6 rounded-lg">
-                <h3 className="text-lg font-medium text-gray-700">Ghi chú</h3>
-                <p className="text-sm text-gray-500 mt-2">
-                    {order?.note || "Không có ghi chú"}
-                </p>
-            </div>
+                <div className="bg-gray-50 mt-8 p-4 sm:p-6 rounded-lg">
+                    <h3 className="text-lg font-medium text-gray-700">Ghi chú</h3>
+                    <p className="text-sm text-gray-500 mt-2">
+                        {order?.note ?
+                            order?.note?.split(";")?.map((note, index) => {
+                                return (
+                                    <span key={index} className="block">
+                                        {note}
+                                    </span>
+                                );
+                            })
+                            : "Không có ghi chú"}
+                    </p>
+                </div>
 
 
-            <div className={"divide-y divide-gray-200 mt-8"}>
-                {order?.orderDetails?.map((orderDetail) => {
-                    return (
-                        <OrderDetailCard
-                            key={orderDetail?.id}
-                            orderDetail={orderDetail as IOrderDetail} />
-                    );
-                })}
-            </div>
-            <div className="mt-8">
-                <h2 className="sr-only">Billing Summary</h2>
+                <div className={"divide-y divide-gray-200 mt-8"}>
+                    {order?.orderDetails?.map((orderDetail) => {
+                        return (
+                            <OrderDetailCard
+                                key={orderDetail?.id}
+                                orderDetail={orderDetail as IOrderDetail} />
+                        );
+                    })}
+                </div>
+                <div className="mt-8">
+                    <h2 className="sr-only">Billing Summary</h2>
 
-                <div
-                    className="bg-gray-50 py-6 px-4 sm:px-6 sm:rounded-lg lg:px-8 lg:py-8 lg:grid lg:grid-cols-12 lg:gap-x-8">
-                    <dl className="grid grid-cols-2 gap-6 text-sm sm:grid-cols-2 md:gap-x-8 lg:col-span-7">
-                        <div>
-                            <dt className="font-medium text-gray-900">Thông tin nhận hàng</dt>
-                            <dd className="mt-3 text-gray-500">
-                                <span className="block font-medium uppercase">{order?.customerName}</span>
-                                <span className="block mt-2">{order?.customerPhone}</span>
-                                <span
-                                    className="block mt-2">{order?.address || "Địa chỉ nhận hàng chưa được cập nhật"}</span>
-                            </dd>
-                        </div>
-                        <div>
-                            <dt className="font-medium text-gray-900">Phương thức thanh toán</dt>
-                            <div className="mt-3">
-                                <dd className="-ml-4 -mt-4 flex flex-wrap items-center">
-                                    <div className="ml-4 mt-4 flex-shrink-0">
-                                        <Image
-                                            width={500}
-                                            height={500}
-                                            className="h-6 w-6"
-                                            src={orderPaymentMethod?.logo?.src || ""}
-                                            alt=""
-                                        />
-                                    </div>
-                                    <div className="ml-2 mt-4">
-                                        <p className="text-gray-600 font-medium">
-                                            {order?.paymentName}
-                                        </p>
-                                    </div>
+                    <div
+                        className="bg-gray-50 py-6 px-4 sm:px-6 sm:rounded-lg lg:px-8 lg:py-8 lg:grid lg:grid-cols-12 lg:gap-x-8">
+                        <dl className="grid grid-cols-2 gap-6 text-sm sm:grid-cols-2 md:gap-x-8 lg:col-span-7">
+                            <div>
+                                <dt className="font-medium text-gray-900">Thông tin nhận hàng</dt>
+                                <dd className="mt-3 text-gray-500">
+                                    <span className="block font-medium uppercase">{order?.customerName}</span>
+                                    <span className="block mt-2">{order?.customerPhone}</span>
+                                    <span
+                                        className="block mt-2">{order?.address || "Địa chỉ nhận hàng chưa được cập nhật"}</span>
                                 </dd>
                             </div>
-                        </div>
-                    </dl>
+                            <div>
+                                <dt className="font-medium text-gray-900">Phương thức thanh toán</dt>
+                                <div className="mt-3">
+                                    <dd className="-ml-4 -mt-4 flex flex-wrap items-center">
+                                        <div className="ml-4 mt-4 flex-shrink-0">
+                                            <Image
+                                                width={500}
+                                                height={500}
+                                                className="h-6 w-6"
+                                                src={orderPaymentMethod?.logo?.src || ""}
+                                                alt=""
+                                            />
+                                        </div>
+                                        <div className="ml-2 mt-4">
+                                            <p className="text-gray-600 font-medium">
+                                                {order?.paymentName}
+                                            </p>
+                                        </div>
+                                    </dd>
+                                </div>
+                            </div>
+                        </dl>
 
-                    <dl className="mt-8 divide-y divide-gray-200 text-sm lg:mt-0 lg:col-span-5">
-                        <div className="pb-4 flex items-center justify-between">
-                            <dt className="text-gray-600">Tạm tính</dt>
-                            <dd className="font-medium text-gray-900">{new Intl.NumberFormat("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                            }).format(
-                                order?.subTotal || 0,
-                            )}</dd>
-                        </div>
-                        <div className="py-4 flex items-center justify-between">
-                            <dt className="text-gray-600">Phí vận chuyển</dt>
-                            <dd className="font-medium text-gray-900">
-                                {new Intl.NumberFormat("vi-VN", {
+                        <dl className="mt-8 divide-y divide-gray-200 text-sm lg:mt-0 lg:col-span-5">
+                            <div className="pb-4 flex items-center justify-between">
+                                <dt className="text-gray-600">Tạm tính</dt>
+                                <dd className="font-medium text-gray-900">{new Intl.NumberFormat("vi-VN", {
                                     style: "currency",
                                     currency: "VND",
-                                }).format(order?.freight || 0)}
-                            </dd>
-                        </div>
-                        <div className="py-4 flex items-center justify-between">
-                            <dt className="text-gray-600">Giảm giá</dt>
-                            <dd className="font-medium text-gray-900">
-                                {new Intl.NumberFormat("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                }).format(order?.discountTotal || 0)}
-                            </dd>
-                        </div>
-                        <div className="pt-4 flex text-base items-center justify-between">
-                            <dt className="font-medium text-gray-900">Tổng tiền
-                                <div className="text-gray-500 text-sm font-normal">(Đã bao gồm VAT nếu có)</div>
-                            </dt>
-                            <dd className="font-medium text-indigo-600">
-                                {new Intl.NumberFormat("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                }).format(order?.total || 0)}
-                            </dd>
-                        </div>
+                                }).format(
+                                    order?.subTotal || 0,
+                                )}</dd>
+                            </div>
+                            <div className="py-4 flex items-center justify-between">
+                                <dt className="text-gray-600">Phí vận chuyển</dt>
+                                <dd className="font-medium text-gray-900">
+                                    {new Intl.NumberFormat("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                    }).format(order?.freight || 0)}
+                                </dd>
+                            </div>
+                            <div className="py-4 flex items-center justify-between">
+                                <dt className="text-gray-600">Giảm giá</dt>
+                                <dd className="font-medium text-gray-900">
+                                    {new Intl.NumberFormat("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                    }).format(order?.discountTotal || 0)}
+                                </dd>
+                            </div>
+                            <div className="pt-4 flex text-base items-center justify-between">
+                                <dt className="font-medium text-gray-900">Tổng tiền
+                                    <div className="text-gray-500 text-sm font-normal">(Đã bao gồm VAT nếu có)</div>
+                                </dt>
+                                <dd className="font-medium text-indigo-600">
+                                    {new Intl.NumberFormat("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                    }).format(order?.total || 0)}
+                                </dd>
+                            </div>
 
-                        {/*<div className="py-4 border-none bg-indigo-100 mt-2 rounded px-3 flex items-center justify-between">*/}
-                        {/*    <dt className="text-indigo-600">Điểm thưởng</dt>*/}
-                        {/*    <dd className="font-medium text-indigo-900">*/}
-                        {/*        123*/}
-                        {/*    </dd>*/}
-                        {/*</div>*/}
-                    </dl>
+                            {/*<div className="py-4 border-none bg-indigo-100 mt-2 rounded px-3 flex items-center justify-between">*/}
+                            {/*    <dt className="text-indigo-600">Điểm thưởng</dt>*/}
+                            {/*    <dd className="font-medium text-indigo-900">*/}
+                            {/*        123*/}
+                            {/*    </dd>*/}
+                            {/*</div>*/}
+                        </dl>
+                    </div>
                 </div>
-            </div></Fragment>}
+            </Fragment>}
         </div>
     );
 };

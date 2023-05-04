@@ -15,7 +15,7 @@ import {
     DateRangePickerValue,
     Dropdown,
     DropdownItem,
-    Flex,
+    Flex, SelectBox as TremorSelectBox, SelectBoxItem as TremorSelectBoxItem,
     Text,
     Title,
 } from "@tremor/react";
@@ -31,7 +31,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { getOrderStatusById } from "../../../../constants/OrderStatuses";
 import { IoChevronBack } from "react-icons/io5";
-import CustomBarChart from "../../../../components/Dashboard/CustomBarChart";
 
 const dateRanges = [{
     text: "7 ngày qua",
@@ -60,13 +59,6 @@ const dataSizes = [5, 10, 15, 20, 25];
 const CampaignDashboardDetails: NextPageWithLayout = () => {
 
     const { loginUser } = useAuth();
-    const [revenueDateRange, setRevenueDateRange] = useState<DateRangePickerValue>([
-        new Date(new Date().setMonth(0, 1)),
-        new Date(),
-    ]);
-
-    const [revenueDataDescending, setRevenueDataDescending] = useState(true);
-    const [revenueDataSize, setRevenueDataSize] = useState<number>(dataSizes[0]);
 
     const dashboardService = new DashboardService(loginUser?.accessToken);
 
@@ -83,20 +75,49 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
         () => campaignService.getCampaignByIdByAdmin(Number(campaignId)), {
             enabled: !!campaignId,
             onSuccess: (data) => {
-                if(data?.startDate && data?.endDate) {
+                if ((!revenueDateRange?.[0] || !revenueDateRange?.[1])
+                    && data?.startDate && data?.endDate
+                ) {
                     setRevenueDateRange([new Date(data?.startDate), new Date(data?.endDate)]);
                 }
-            }
+            },
         },
     );
+
+    const {
+        data: allCampaigns,
+    } = useQuery(["admin_campaigns"],
+        () => campaignService.getAllCampaignsByAdmin({
+            sort: "CreatedDate desc",
+        }),
+        {
+            enabled: !!campaignId,
+            select: (data) => {
+                // put current campaign to the first
+                const currentCampaign = data?.find((item) => item?.id === Number(campaignId));
+                const otherCampaigns = data?.filter((item) => item?.id !== Number(campaignId));
+                return [currentCampaign, ...otherCampaigns];
+            },
+        },
+    );
+
+    const [revenueDateRange, setRevenueDateRange] = useState<DateRangePickerValue>(() => {
+        if (campaign?.startDate && campaign?.endDate) {
+            return [new Date(campaign?.startDate), new Date(campaign?.endDate)];
+        }
+        return [null, null];
+    });
+
+    const [revenueDataDescending, setRevenueDataDescending] = useState(true);
+    const [revenueDataSize, setRevenueDataSize] = useState<number>(dataSizes[0]);
     const params = {
         "campaignId": Number(campaignId),
         "dashboardRequestModel": {
             "timeLine": [
                 {
                     "type": TimelineTypes.Day.id,
-                    "startDate": revenueDateRange?.[0]?.toISOString(),
-                    "endDate": revenueDateRange?.[1]?.toISOString(),
+                    "startDate": revenueDateRange?.[0]?.toISOString()?.split("T")[0],
+                    "endDate": revenueDateRange?.[1]?.toISOString()?.split("T")[0]?.concat("T23:59:59.999Z"),
                     "timeLength": 0,
                     "seasonType": 0,
                     "year": 0,
@@ -114,13 +135,13 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
         data: dashboardData,
     } = useQuery(["dashboard", params],
         () => dashboardService.getDashboardCampaignDetails(Number(campaignId), params), {
-            enabled: !!campaignId,
+            enabled: !!campaignId && !!revenueDateRange?.[0] && !!revenueDateRange?.[1],
         },
     );
 
     const campaignRevenueChartData = dashboardData?.revenues?.map((item) => {
         return {
-            timeLine: item?.timeLine?.type === TimelineTypes.Month.id ? getFormattedTime(item?.timeLine?.startDate, "MM/yyyy") : getFormattedTime(item?.timeLine?.startDate, "dd/MM/yyyy"),
+            timeLine: item?.timeLine?.type === TimelineTypes.Month.id ? getFormattedTime(item?.timeLine?.startDate, "MM/yyyy") : getFormattedTime(item?.timeLine?.startDate, "dd/MM"),
             "Doanh thu": item?.revenue || 0,
         };
     }) || [];
@@ -129,8 +150,7 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
     return (
 
         <Fragment>
-
-            <div className="mb-6">
+            <div className="flex justify-between mb-6">
                 <button
                     className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-200 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
                     onClick={() => router.back()}
@@ -138,6 +158,25 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
                     <IoChevronBack size={"17"} />
                     <span>Quay lại</span>
                 </button>
+
+                <TremorSelectBox
+                    className={"w-56"}
+                    value={campaignId?.toString()}
+                    placeholder={"Chọn hội sách"}
+                    onValueChange={async (value) => {
+                        if (value) {
+                            // clear data
+                            setRevenueDateRange([null, null]);
+                            setRevenueDataSize(dataSizes[0]);
+                            await router.push(`/admin/dashboard/campaigns/${value}`)
+                        }
+                    }}>
+
+                    {(allCampaigns || [])?.map((campaign) => <TremorSelectBoxItem key={campaign?.id}
+                                                                                  value={campaign?.id?.toString() || ""}
+                                                                                  text={campaign?.name} />)
+                    }
+                </TremorSelectBox>
             </div>
             <Card>
                 <div>
@@ -156,7 +195,9 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
                     <DateRangePicker
                         className={"w-fit"}
                         value={revenueDateRange}
-                        onValueChange={setRevenueDateRange}
+                        onValueChange={(value) => {
+                            setRevenueDateRange(value);
+                        }}
                         locale={vi}
                         dropdownPlaceholder="Chọn"
                         enableDropdown={false}

@@ -15,7 +15,7 @@ import {
     DateRangePickerValue,
     Dropdown,
     DropdownItem,
-    Flex,
+    Flex, SelectBox as TremorSelectBox, SelectBoxItem as TremorSelectBoxItem,
     Text,
     Title,
 } from "@tremor/react";
@@ -57,15 +57,8 @@ const dateRanges = [{
 
 const dataSizes = [5, 10, 15, 20, 25];
 const CampaignDashboardDetails: NextPageWithLayout = () => {
-
+    const router = useRouter();
     const { loginUser } = useAuth();
-    const [revenueDateRange, setRevenueDateRange] = useState<DateRangePickerValue>([
-        new Date(new Date().setMonth(0, 1)),
-        new Date(),
-    ]);
-
-    const [revenueDataDescending, setRevenueDataDescending] = useState(true);
-    const [revenueDataSize, setRevenueDataSize] = useState<number>(dataSizes[0]);
 
     const dashboardService = new DashboardService(loginUser?.accessToken);
 
@@ -81,16 +74,50 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
     } = useQuery(["issuer_campaign", campaignId],
         () => campaignService.getCampaignByIdByIssuer(Number(campaignId)), {
             enabled: !!campaignId,
+            onSuccess: (data) => {
+                if ((!revenueDateRange?.[0] || !revenueDateRange?.[1])
+                    && data?.startDate && data?.endDate
+                ) {
+                    setRevenueDateRange([new Date(data?.startDate), new Date(data?.endDate)]);
+                }
+            },
         },
     );
+
+    const {
+        data: allCampaigns,
+    } = useQuery(["issuer_campaigns"],
+        () => campaignService.getAllCampaignsByIssuer({
+            sort: "CreatedDate desc",
+        }),
+        {
+            enabled: !!campaignId,
+            select: (data) => {
+                // put current campaign to the first
+                const currentCampaign = data?.find((item) => item?.id === Number(campaignId));
+                const otherCampaigns = data?.filter((item) => item?.id !== Number(campaignId));
+                return [currentCampaign, ...otherCampaigns];
+            },
+        },
+    );
+    const [revenueDateRange, setRevenueDateRange] = useState<DateRangePickerValue>(() => {
+        if (campaign?.startDate && campaign?.endDate) {
+            return [new Date(campaign?.startDate), new Date(campaign?.endDate)];
+        }
+        return [null, null];
+    });
+
+    const [revenueDataDescending, setRevenueDataDescending] = useState(true);
+    const [revenueDataSize, setRevenueDataSize] = useState<number>(dataSizes[0]);
+
     const params = {
         "campaignId": Number(campaignId),
         "dashboardRequestModel": {
             "timeLine": [
                 {
                     "type": TimelineTypes.Day.id,
-                    "startDate": revenueDateRange?.[0]?.toISOString(),
-                    "endDate": revenueDateRange?.[1]?.toISOString(),
+                    "startDate": revenueDateRange?.[0]?.toISOString()?.split("T")[0],
+                    "endDate": revenueDateRange?.[1]?.toISOString()?.split("T")[0]?.concat("T23:59:59.999Z"),
                     "timeLength": 0,
                     "seasonType": 0,
                     "year": 0,
@@ -114,7 +141,7 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
 
     const campaignRevenueChartData = dashboardData?.revenues?.map((item) => {
         return {
-            timeLine: item?.timeLine?.type === TimelineTypes.Month.id ? getFormattedTime(item?.timeLine?.startDate, "MM/yyyy") : getFormattedTime(item?.timeLine?.startDate, "dd/MM/yyyy"),
+            timeLine: item?.timeLine?.type === TimelineTypes.Month.id ? getFormattedTime(item?.timeLine?.startDate, "MM/yyyy") : getFormattedTime(item?.timeLine?.startDate, "dd/MM"),
             "Doanh thu": item?.revenue || 0,
         };
     }) || [];
@@ -123,14 +150,33 @@ const CampaignDashboardDetails: NextPageWithLayout = () => {
     return (
 
         <Fragment>
-            <div className="mb-6">
-                <Link
-                    className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-100 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
-                    href="/issuer"
+            <div className="flex justify-between mb-6">
+                <button
+                    className="flex w-fit items-center justify-between rounded border-slate-200 bg-slate-200 px-3.5 py-1.5 text-base font-medium text-slate-600 transition duration-150 ease-in-out hover:border-slate-300 hover:bg-slate-200"
+                    onClick={() => router.back()}
                 >
                     <IoChevronBack size={"17"} />
                     <span>Quay lại</span>
-                </Link>
+                </button>
+
+                <TremorSelectBox
+                    className={"w-56"}
+                    value={campaignId?.toString()}
+                    placeholder={"Chọn hội sách"}
+                    onValueChange={async (value) => {
+                        if (value) {
+                            // clear data
+                            setRevenueDateRange([null, null]);
+                            setRevenueDataSize(dataSizes[0]);
+                            await router.push(`/issuer/dashboard/campaigns/${value}`)
+                        }
+                    }}>
+
+                    {(allCampaigns || [])?.map((campaign) => <TremorSelectBoxItem key={campaign?.id}
+                                                                                  value={campaign?.id?.toString() || ""}
+                                                                                  text={campaign?.name} />)
+                    }
+                </TremorSelectBox>
             </div>
 
             <Card>

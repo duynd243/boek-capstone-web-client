@@ -51,6 +51,11 @@ const MainContent: React.FC = () => {
             ? campaign?.campaignLevels?.map(({ level }) => level) || []
             : customerCampaign?.levels || [];
 
+    const campaignGroups =
+        isAdmin || isIssuer
+            ? campaign?.campaignGroups?.map(({ group }) => group) || []
+            : customerCampaign?.groups || [];
+
     const bookProductService = new BookProductService(loginUser?.accessToken);
 
     const getProductsParams = {
@@ -264,63 +269,61 @@ const MainContent: React.FC = () => {
             )}
 
             {/*Groups*/}
-            {campaign?.format === CampaignFormats.ONLINE.id &&
-                (isAdmin || isIssuer) && (
-                    <Fragment>
-                        <Separator />
-                        <div>
-                            <ContentHeader
-                                text={`Nhóm đề tài (${
-                                    campaign?.campaignGroups?.length || 0
-                                })`}
-                            />
-                            {campaign?.campaignGroups &&
-                            campaign?.campaignGroups?.length > 0 ? (
-                                <div className="my-6 space-y-4">
-                                    {campaign?.campaignGroups.map((cg) => (
-                                        <div
-                                            key={cg?.id}
-                                            className="relative flex h-full w-full space-x-4 rounded border border-slate-200 bg-white px-4 py-6 shadow-sm transition duration-300 hover:shadow"
-                                        >
-                                            <Image
-                                                src={getAvatarFromName(
-                                                    cg?.group?.name,
-                                                )}
-                                                width={500}
-                                                height={500}
-                                                alt=""
-                                                className="rounded-full object-cover h-12 w-12"
-                                            />
-                                            {/*Org Info*/}
-                                            <div className={`grow min-w-0`}>
-                                                <div
-                                                    className={
-                                                        "mb-1 text-base font-bold text-slate-700"
-                                                    }
-                                                >
-                                                    {cg?.group?.name}
-                                                </div>
-                                                <div
-                                                    className={
-                                                        "text-sm text-slate-500"
-                                                    }
-                                                >
-                                                    {cg?.group?.description}
-                                                </div>
+            {(campaign || customerCampaign)?.format === CampaignFormats.ONLINE.id &&
+                <Fragment>
+                    <Separator />
+                    <div>
+                        <ContentHeader
+                            text={`Nhóm đề tài (${
+                                campaignGroups?.length || 0
+                            })`}
+                        />
+                        {campaignGroups &&
+                        campaignGroups?.length > 0 ? (
+                            <div className="my-6 space-y-4">
+                                {campaignGroups?.map((group) => (
+                                    <div
+                                        key={group?.id}
+                                        className="relative flex h-full w-full space-x-4 rounded border border-slate-200 bg-white px-4 py-6 shadow-sm transition duration-300 hover:shadow"
+                                    >
+                                        <Image
+                                            src={getAvatarFromName(
+                                                group?.name,
+                                            )}
+                                            width={500}
+                                            height={500}
+                                            alt=""
+                                            className="rounded-full object-cover h-12 w-12"
+                                        />
+                                        {/*Org Info*/}
+                                        <div className={`grow min-w-0`}>
+                                            <div
+                                                className={
+                                                    "mb-1 text-base font-bold text-slate-700"
+                                                }
+                                            >
+                                                {group?.name}
+                                            </div>
+                                            <div
+                                                className={
+                                                    "text-sm text-slate-500"
+                                                }
+                                            >
+                                                {group?.description}
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <EmptySection
-                                    text={
-                                        "Hội sách này chưa có nhóm đề tài được thêm."
-                                    }
-                                />
-                            )}
-                        </div>
-                    </Fragment>
-                )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <EmptySection
+                                text={
+                                    "Hội sách này chưa có nhóm đề tài được thêm."
+                                }
+                            />
+                        )}
+                    </div>
+                </Fragment>}
 
             {/*Levels*/}
             {(campaign || customerCampaign)?.format ===
