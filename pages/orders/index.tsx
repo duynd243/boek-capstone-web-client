@@ -15,6 +15,7 @@ import Image from "next/image";
 import Link from "next/link";
 import OrderDetailCard from "../../components/CustomerOrder/OrderDetailCard";
 import Pagination from "../../components/Pagination";
+import SearchForm from "../../components/Admin/SearchForm";
 
 const CustomerOrdersPage: NextPageWithLayout = () => {
 
@@ -24,6 +25,7 @@ const CustomerOrdersPage: NextPageWithLayout = () => {
     const [orderType, setOrderType] = useState(Object.values(OrderTypes)[0].id);
     const [orderStatus, setOrderStatus] = useState(DeliveryOrderTabs[0].id);
     const [currentPage, setCurrentPage] = useState(1);
+    const [searchValue, setSearchValue] = useState("");
 
     const requestParams = useMemo(() => {
         return {
@@ -32,8 +34,9 @@ const CustomerOrdersPage: NextPageWithLayout = () => {
             Page: currentPage,
             Size: 5,
             Sort: "OrderDate desc",
+            Code: searchValue,
         };
-    }, [orderType, orderStatus, currentPage]);
+    }, [orderType, orderStatus, currentPage, searchValue]);
 
     const {
         data: orderData,
@@ -43,11 +46,22 @@ const CustomerOrdersPage: NextPageWithLayout = () => {
     );
 
 
+
+
     return (
         <div className="p-4 sm:p-6">
             <h1 className="text-2xl font-bold">
                 Lịch sử đơn hàng
             </h1>
+
+            <div className={"flex justify-end"}>
+                <SearchForm
+                    value={searchValue}
+                    onSearchSubmit={setSearchValue}
+                    placeholder={"Tìm kiếm đơn hàng..."}
+                />
+            </div>
+
 
             <Tab.Group
                 onChange={(index) => setOrderType(Object.values(OrderTypes)[index].id)}
