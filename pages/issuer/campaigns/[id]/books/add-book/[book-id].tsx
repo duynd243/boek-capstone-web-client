@@ -276,7 +276,7 @@ const AddSellingBookPage: NextPageWithLayout = () => {
                                                     htmlFor={`bonus-${format.id}`}
                                                     className="text-sm font-medium text-gray-600"
                                                 >
-                                                    Sách {format.displayName} -
+                                                    {format.displayName} -
                                                     {selectedFormat?.id === BookFormats.PAPER.id ? (
                                                         //If the format is a paper book, it will display 2 checkboxes that are audio books and pdf books, each checkbox has a different value
                                                         <span
