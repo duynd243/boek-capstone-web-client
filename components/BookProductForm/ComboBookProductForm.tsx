@@ -792,7 +792,7 @@ const ComboBookProductForm = ({ product, action, editBasicInfoOnly = false }: Pr
                             {action === "update" ? "Cập nhập combo" : "Thêm vào hội sách"}
                         </button>
                     </div>
-                    <pre>{JSON.stringify(watch(), null, 2)}</pre>
+                    {/*<pre>{JSON.stringify(watch(), null, 2)}</pre>*/}
                 </form>
             </div>
             <SelectSellingBookComboModal

@@ -12,7 +12,7 @@ type Props = {
     cartItem: ICartItem,
     isSelected: boolean,
     onSelectedChange: (item: ICartItem, value: boolean) => void,
-    notifySelectedItemQuantityChange: (item: ICartItem, value: number) => void,
+    notifyChange: (item: ICartItem) => void,
     onRemove: (item: ICartItem) => void,
 }
 const CartItem: React.FC<Props> = ({
@@ -20,7 +20,7 @@ const CartItem: React.FC<Props> = ({
                                        isSelected = false,
                                        onSelectedChange,
                                        onRemove,
-                                       notifySelectedItemQuantityChange,
+                                       notifyChange,
                                    }) => {
     const {
         removeItem,
@@ -44,11 +44,17 @@ const CartItem: React.FC<Props> = ({
             }
             setQuantityInput(quantity);
             updateQuantity(product?.id, quantity);
-            notifySelectedItemQuantityChange(cartItem, quantity);
+            notifyChange({
+                ...cartItem,
+                quantity: quantity,
+            });
         } else {
             setQuantityInput(1);
             updateQuantity(product?.id, 1);
-            notifySelectedItemQuantityChange(cartItem, 1);
+            notifyChange({
+                ...cartItem,
+                quantity: 1,
+            });
         }
     };
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -147,6 +153,10 @@ const CartItem: React.FC<Props> = ({
                                     disabled={!isSelected}
                                     onChange={(e) => {
                                         updateWithPdf(product?.id, e.target.checked);
+                                        notifyChange({
+                                            ...cartItem,
+                                            withPdf: e.target.checked,
+                                        });
                                     }}
                                     type="checkbox"
                                     className="form-checkbox rounded border border-gray-200 bg-gray-100 h-4 w-4 text-blue-600 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
@@ -173,6 +183,10 @@ const CartItem: React.FC<Props> = ({
                                     disabled={!isSelected}
                                     onChange={(e) => {
                                         updateWithAudio(product?.id, e.target.checked);
+                                        notifyChange({
+                                            ...cartItem,
+                                            withAudio: e.target.checked,
+                                        });
                                     }}
                                     type="checkbox"
                                     className="form-checkbox rounded border border-gray-200 bg-gray-100 h-4 w-4 text-blue-600 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"

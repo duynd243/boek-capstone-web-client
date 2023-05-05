@@ -102,6 +102,9 @@ const OfflineCampaignForm: React.FC<Props> = ({ action }) => {
         handleDistrictChange,
         handleWardChange,
         selectedProvince,
+        provincesLoading,
+        districtsLoading,
+        wardsLoading,
         selectedDistrict,
         selectedWard,
     } = useAddress({
@@ -572,8 +575,9 @@ const OfflineCampaignForm: React.FC<Props> = ({ action }) => {
                                     render={({ field }) => {
                                         return (
                                             <SelectBox<IProvince>
+                                                disabled={provincesLoading}
                                                 value={selectedProvince}
-                                                placeholder="Chọn tỉnh / thành phố"
+                                                placeholder={provincesLoading ? "Đang tải..." : "Chọn tỉnh / thành phố"}
                                                 onValueChange={(p) => {
                                                     if (
                                                         p.code ===
@@ -620,8 +624,9 @@ const OfflineCampaignForm: React.FC<Props> = ({ action }) => {
                                     render={({ field }) => {
                                         return (
                                             <SelectBox<IDistrict>
+                                                disabled={districtsLoading}
                                                 value={selectedDistrict}
-                                                placeholder="Chọn quận / huyện"
+                                                placeholder={districtsLoading ? "Đang tải..." : "Chọn quận / huyện"}
                                                 onValueChange={(d) => {
                                                     if (
                                                         d.code ===
@@ -664,7 +669,8 @@ const OfflineCampaignForm: React.FC<Props> = ({ action }) => {
                                         return (
                                             <SelectBox<IWard>
                                                 value={selectedWard}
-                                                placeholder="Chọn phường / xã"
+                                                disabled={wardsLoading}
+                                                placeholder={wardsLoading ? "Đang tải..." : "Chọn phường / xã"}
                                                 onValueChange={(w) => {
                                                     if (
                                                         w.code ===

@@ -235,7 +235,7 @@ const GenreModal: React.FC<Props> = ({
                         </Modal.PrimaryButton>
                     </div>
                 </Modal.Footer>
-                <pre>{JSON.stringify(watch(), null, 2)}</pre>
+                {/*<pre>{JSON.stringify(watch(), null, 2)}</pre>*/}
             </form>
         </TransitionModal>
     );

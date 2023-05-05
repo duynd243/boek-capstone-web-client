@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useRef, useState } from "react";
 import { NextPageWithLayout } from "../_app";
 import { useAuth } from "../../context/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -28,13 +28,15 @@ import { format } from "date-fns";
 import { toast } from "react-hot-toast";
 import ErrorMessage from "../../components/Form/ErrorMessage";
 import FollowOrganizationModal from "../../components/Modal/FollowOrganizationModal";
-import { getAvatarFromName } from "../../utils/helper";
+import { getAvatarFromName, isImageFile, isValidFileSize, isValidImageSrc } from "../../utils/helper";
 import { IOrganization } from "../../types/Organization/IOrganization";
 import { GroupService } from "../../services/GroupService";
 import FollowGroupModal from "../../components/Modal/FollowGroupModal";
 import { BiUser } from "react-icons/bi";
 import { Roles } from "../../constants/Roles";
 import Chip from "../../components/Admin/Chip";
+import DefaultAvatar from "../../assets/images/default-avatar.png";
+import { ImageUploadService } from "../../services/ImageUploadService";
 
 const genderOptions = {
     MALE: {
@@ -263,7 +265,46 @@ const CustomerProfilePage: NextPageWithLayout = () => {
         },
     );
 
+    const [previewImage, setPreviewImage] = useState<File | null>(null);
+    const objectURL = previewImage && URL.createObjectURL(previewImage);
+    const imgSrc = objectURL ? objectURL : (profile?.user?.imageUrl || DefaultAvatar.src);
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e?.target?.files?.[0];
+        if (file) {
+            if (!isValidFileSize(file, 1)) {
+                toast.error("Ảnh không được quá 1MB");
+                return;
+            }
+            if (!isImageFile(file)) {
+                toast.error("Vui lòng chọn file ảnh");
+                return;
+            }
+            setPreviewImage(file);
+        }
+    };
+
+    const imageService = new ImageUploadService(loginUser?.accessToken);
+    const uploadImageMutation = useMutation((file: File) =>
+        imageService.uploadImage(file),
+    );
+
     const onSubmit = async (data: UpdateProfileSchemaType) => {
+        if (previewImage) {
+            try {
+                await toast.promise(uploadImageMutation.mutateAsync(previewImage), {
+                    loading: "Đang tải ảnh lên",
+                    success: (res) => {
+                        if (data?.user?.imageUrl)
+                            data.user.imageUrl = res?.url;
+                        return "Tải ảnh lên thành công";
+                    },
+                    error: "Tải ảnh lên thất bại",
+                });
+            } catch (error) {
+                console.log(error);
+                return;
+            }
+        }
         try {
             const payload = UpdateProfileSchema.parse(data);
             await toast.promise(
@@ -324,21 +365,28 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                     <div className="flex flex-col items-center sm:flex-row sm:justify-between sm:items-end">
                         {/* Avatar */}
                         <div className="inline-flex -ml-1 -mt-1 mb-4 sm:mb-0 relative group">
-                            <img
-                                className="rounded-full border-4 border-white"
-                                src={loginUser?.imageUrl || user?.photoURL}
+                            <input
+                                id={`avatar-${loginUser?.id}`}
+                                type="file"
+                                className="hidden"
+                                accept={"image/*"}
+                                onChange={handleAvatarChange}
+                            />
+                            <Image
+                                className="rounded-full w-32 h-32 border-4 border-white object-cover"
                                 width="128"
                                 height="128"
+                                src={imgSrc}
                                 alt="Avatar"
                             />
 
-                            <div
-                                className="cursor-pointer absolute flex flex-col items-center justify-center bg-black/0 group-hover:bg-black/30 inset-0 rounded-full border-4 border-white  transition duration-150 ease-in-out">
+                            <label htmlFor={`avatar-${loginUser?.id}`}
+                                   className="cursor-pointer absolute flex flex-col items-center justify-center bg-black/0 group-hover:bg-black/30 inset-0 rounded-full border-4 border-white  transition duration-150 ease-in-out">
                                 <AiOutlineCamera className="hidden group-hover:block text-white text-2xl" />
                                 <span className="hidden group-hover:block text-xs text-white">
                                     Thay đổi
                                 </span>
-                            </div>
+                            </label>
                         </div>
 
                         {/* Actions */}
@@ -1014,19 +1062,22 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                                             <div>
                                                 <h2 className={"text-lg font-medium"}>{level?.name}</h2>
                                                 <div className={"text-sm text-gray-500"}>
-                                                    Điểm: <span className={"font-medium"}>{level?.conditionalPoint}</span>
+                                                    Điểm: <span
+                                                    className={"font-medium"}>{level?.conditionalPoint}</span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {isEarnedLevel && (
-                                            <div className={"absolute top-0 right-0 bg-green-500 text-white px-2 py-1 rounded"}>
+                                            <div
+                                                className={"absolute top-0 right-0 bg-green-500 text-white px-2 py-1 rounded"}>
                                                 Đã đạt
                                             </div>
                                         )}
 
                                         {isNextLevel && (
-                                            <div className={"absolute top-0 right-0 bg-indigo-500 text-white px-2 py-1 rounded"}>
+                                            <div
+                                                className={"absolute top-0 right-0 bg-indigo-500 text-white px-2 py-1 rounded"}>
                                                 Cần thêm {level?.conditionalPoint - profile?.point} điểm
                                             </div>
                                         )}
@@ -1056,7 +1107,7 @@ const CustomerProfilePage: NextPageWithLayout = () => {
                 }
             />
 
-            <pre>{JSON.stringify(watch(), null, 2)}</pre>
+            {/*<pre>{JSON.stringify(watch(), null, 2)}</pre>*/}
         </div>
     );
 };

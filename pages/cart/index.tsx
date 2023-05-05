@@ -69,14 +69,11 @@ const CartPage: NextPageWithLayout = () => {
         }
     };
 
-    const notifySelectedItemQuantityChange = (item: ICartItem, quantity: number) => {
+    const notifyItemChange = (item: ICartItem) => {
         if (selectedItems.some((selectedItem) => selectedItem?.product?.id === item?.product?.id)) {
             setSelectedItems(selectedItems.map((selectedItem) => {
                 if (selectedItem?.product?.id === item?.product?.id) {
-                    return {
-                        ...selectedItem,
-                        quantity,
-                    };
+                    return item;
                 }
                 return selectedItem;
             }));
@@ -172,7 +169,7 @@ const CartPage: NextPageWithLayout = () => {
                                         const isSelected = selectedItems?.findIndex((item) => item?.product?.id === cartItem?.product?.id) !== -1;
                                         return <CartItem
                                             isSelected={isSelected}
-                                            notifySelectedItemQuantityChange={notifySelectedItemQuantityChange}
+                                            notifyChange={notifyItemChange}
                                             onSelectedChange={onSelectedChange}
                                             key={cartItem?.product?.id}
                                             cartItem={cartItem}
@@ -204,41 +201,61 @@ const CartPage: NextPageWithLayout = () => {
                                 <dt className="text-sm font-medium text-gray-700">
                                     Tạm tính
                                 </dt>
-                                <dd className="text-sm font-medium text-gray-900">
-                                    {new Intl.NumberFormat("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                    }).format(
-                                        cartCalculation?.subTotal || 0,
-                                    )}
-                                </dd>
+
+                                {/*Skeleton*/}
+
+                                {isCartCalculationLoading ?
+                                    <dd className={"animate-pulse"}>
+                                        <div className="h-4 bg-gray-200 rounded w-20"></div>
+                                    </dd>
+                                    :
+                                    <dd className="text-sm font-medium text-gray-900">
+                                        {new Intl.NumberFormat("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
+                                        }).format(
+                                            cartCalculation?.subTotal || 0,
+                                        )}
+                                    </dd>
+                                }
                             </div>
                             <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                                 <dt className="flex text-sm font-medium text-gray-700">
                                     <span>Phí tạm tính</span>
-                                    <a
-                                        href="#"
-                                        className="ml-2 flex-shrink-0 text-gray-400 hover:text-gray-500"
-                                    >
-                                        <HiQuestionMarkCircle
-                                            className="h-5 w-5"
-                                            aria-hidden="true"
-                                        />
-                                    </a>
+                                    {/*<a*/}
+                                    {/*    href="#"*/}
+                                    {/*    className="ml-2 flex-shrink-0 text-gray-400 hover:text-gray-500"*/}
+                                    {/*>*/}
+                                    {/*    <HiQuestionMarkCircle*/}
+                                    {/*        className="h-5 w-5"*/}
+                                    {/*        aria-hidden="true"*/}
+                                    {/*    />*/}
+                                    {/*</a>*/}
                                 </dt>
-                                <dd className="text-sm font-medium text-gray-900">
-                                    {new Intl.NumberFormat("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                    }).format(
-                                        cartCalculation?.freight || 0,
-                                    )}
-                                </dd>
+                                {isCartCalculationLoading ?
+                                    <dd className={"animate-pulse"}>
+                                        <div className="h-4 bg-gray-200 rounded w-20"></div>
+                                    </dd>
+                                    :
+                                    <dd className="text-sm font-medium text-gray-900">
+                                        {new Intl.NumberFormat("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
+                                        }).format(
+                                            cartCalculation?.freight || 0,
+                                        )}
+                                    </dd>
+                                }
                             </div>
                             <div className="flex items-center justify-between ">
                                 <dt className="text-sm font-medium text-gray-700">
                                     Giảm giá
                                 </dt>
+                                {isCartCalculationLoading ?
+                                    <dd className={"animate-pulse"}>
+                                        <div className="h-4 bg-gray-200 rounded w-20"></div>
+                                    </dd>
+                                    :
                                 <dd className="text-sm font-medium text-gray-900">
                                     {new Intl.NumberFormat("vi-VN", {
                                         style: "currency",
@@ -247,6 +264,7 @@ const CartPage: NextPageWithLayout = () => {
                                         cartCalculation?.discountTotal || 0,
                                     )}
                                 </dd>
+                                }
                             </div>
                             {/*<div className="border-t border-gray-200 pt-4">*/}
                             {/*    <dt className=" text-base font-medium text-gray-700">*/}
@@ -288,6 +306,11 @@ const CartPage: NextPageWithLayout = () => {
                                 <dt className="text-base font-medium text-gray-900">
                                     Tổng cộng
                                 </dt>
+                                {isCartCalculationLoading ?
+                                    <dd className={"animate-pulse"}>
+                                        <div className="h-6 bg-gray-200 rounded w-24"></div>
+                                    </dd>
+                                    :
                                 <dd className="text-lg font-semibold text-gray-900">
                                     {new Intl.NumberFormat("vi-VN", {
                                         style: "currency",
@@ -296,6 +319,7 @@ const CartPage: NextPageWithLayout = () => {
                                         cartCalculation?.total || 0,
                                     )}
                                 </dd>
+                                }
                             </div>
                         </dl>
 

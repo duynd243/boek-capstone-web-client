@@ -187,9 +187,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
             isbn10: Yup.string().max(50, "ISBN10 không được vượt quá 50 ký tự"),
             isbn13: Yup.string().max(50, "ISBN13 không được vượt quá 50 ký tự"),
             name: Yup.string().required("Tên sách không được để trống"),
-            translator: Yup.string().required(
-                "Tên dịch giả không được để trống"
-            ),
+            translator: Yup.string(),
             coverPrice: Yup.number()
                 .required("Giá không được để trống")
                 .min(0, "Giá không được nhỏ hơn 0"),
@@ -205,12 +203,12 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
             //   .integer("Số lượng phải là số nguyên")
             //   .min(0, "Số lượng không được nhỏ hơn 0"),
             releasedYear: Yup.number()
-                .required("Năm xuất bản không được để trống")
-                .integer("Năm xuất bản phải là số nguyên")
-                .min(2010, "Năm xuất bản không được nhỏ hơn 2010")
+                .required("Năm phát hành không được để trống")
+                .integer("Năm phát hành phải là số nguyên")
+                .min(2010, "Năm phát hành không được nhỏ hơn 2010")
                 .max(
                     new Date().getFullYear(),
-                    "Năm xuất bản không được lớn hơn năm hiện tại"
+                    "Năm phát hành không được lớn hơn năm hiện tại"
                 ),
             page: Yup.number()
                 .required("Số trang không được để trống")
@@ -626,7 +624,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                             htmlFor="releasedYear"
                                             className="block text-sm font-medium text-gray-700"
                                         >
-                                            Năm xuất bản
+                                            Năm phát hành
                                             <span className="text-rose-500">
                                                 *
                                             </span>
@@ -754,7 +752,7 @@ const IssuerCreateBookPage: NextPageWithLayout = () => {
                                     className="block text-sm font-medium text-gray-700"
                                 >
                                     Dịch giả
-                                    <span className="text-rose-500">*</span>
+                                    {/*<span className="text-rose-500">*</span>*/}
                                 </label>
                                 <div className="mt-1">
                                     <input

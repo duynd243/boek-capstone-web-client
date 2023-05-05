@@ -414,7 +414,7 @@ const BookDetails: NextPageWithLayout = () => {
         //                                     htmlFor="releasedYear"
         //                                     className="block text-sm font-medium text-gray-700"
         //                                 >
-        //                                     Năm xuất bản<span className="text-rose-500">*</span>
+        //                                     Năm phát hành<span className="text-rose-500">*</span>
         //                                 </label>
         //                                 <div className="mt-1">
         //                                     <input

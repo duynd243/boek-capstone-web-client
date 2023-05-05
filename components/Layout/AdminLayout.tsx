@@ -46,50 +46,44 @@ const AdminLayout: React.FC<Props> = ({ children, containerClassName, bgClassNam
 
 
             toast.custom((t) => (
-                <div
-                    className={`${
-                        t.visible ? "animate-enter" : "animate-leave"
-                    } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
-                >
-                    <div className="flex-1 w-0 p-4">
-                        <div className="flex items-start">
-                            <div className="flex-shrink-0 pt-0.5">
-                                <Image
-                                    className="h-10 w-10 object-cover"
-                                    width={40}
-                                    height={40}
-                                    src="https://i.upanh.org/2023/04/03/boek-logoa702ffa1a5d22adf.png"
-                                    alt=""
-                                />
-                            </div>
-                            <div className="ml-3 flex-1">
-                                <p className="text-sm font-medium text-gray-900">
-                                    Bạn có thông báo mới!
-                                </p>
-                                <p className="mt-1 text-sm font-medium text-gray-600">
-                                    {Message}
-                                </p>
-                                {/*Timestamp*/}
-                                <div className="mt-4 flex-shrink-0 flex">
-                                    <p className="text-sm font-medium text-gray-500">
-                                        {formatDistance(new Date(), new Date(), {
-                                            addSuffix: true,
-                                            locale: vi,
-                                        })}
-                                    </p>
+                <div aria-live="assertive"
+                     className={`${
+                         t.visible ? "animate-enter" : "animate-leave"
+                     } max-w-md w-full bg-white rounded-lg pointer-events-auto flex`}>
+                    <div className="w-full flex flex-col items-center space-y-4 sm:items-end">
+                        <div
+                            className="max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5">
+                            <div className="w-0 flex-1 p-4 my-auto">
+                                <div className="flex items-start">
+                                    <div className="flex-shrink-0 pt-0.5">
+                                        <Image
+                                            className="h-10 w-10 object-cover"
+                                            width={40}
+                                            height={40}
+                                            src={BoekLogo.src}
+                                            alt=""
+                                        />
+                                    </div>
+                                    <div className="ml-3 w-0 flex-1">
+                                        <p className="text-sm font-medium text-gray-900">Bạn có thông báo mới!</p>
+                                        <p className="mt-1 text-sm text-gray-500">{Message}</p>
+                                    </div>
                                 </div>
+                            </div>
+                            <div className="flex flex-col border-l border-gray-200">
+                                <Link
+                                    href={viewUrl ? findRole(loginUser?.role)?.baseUrl + viewUrl : "#"}
+                                    className="w-full border border-transparent rounded-none rounded-tr-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">Xem
+                                </Link>
+                                <button
+                                    onClick={() => toast.dismiss(t.id)}
+                                    className="w-full border border-transparent rounded-none rounded-br-lg p-4 flex items-center justify-center text-sm font-medium text-red-600 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500">Ẩn
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div className="flex border-l border-gray-200">
-                        <Link
-                            href={viewUrl ? findRole(loginUser?.role)?.baseUrl + viewUrl : "#"}
-                            className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        >
-                            Xem
-                        </Link>
-                    </div>
                 </div>
+
             ), {
 
                 duration: 10000,
@@ -123,6 +117,55 @@ const AdminLayout: React.FC<Props> = ({ children, containerClassName, bgClassNam
                             "max-w-9xl mx-auto w-full px-4 py-8 sm:px-6 lg:px-8"
                         }
                     >
+                        {/*<button*/}
+                        {/*    onClick={() => {*/}
+                        {/*        toast.custom((t) => (*/}
+                        {/*            <div aria-live="assertive"*/}
+                        {/*                 className={`${*/}
+                        {/*                     t.visible ? "animate-enter" : "animate-leave"*/}
+                        {/*                 } max-w-md w-full bg-white rounded-lg pointer-events-auto flex`}>*/}
+                        {/*                <div className="w-full flex flex-col items-center space-y-4 sm:items-end">*/}
+                        {/*                    <div*/}
+                        {/*                        className="max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5">*/}
+                        {/*                        <div className="w-0 flex-1 p-4 my-auto">*/}
+                        {/*                            <div className="flex items-start">*/}
+                        {/*                                <div className="flex-shrink-0 pt-0.5">*/}
+                        {/*                                    <Image*/}
+                        {/*                                        className="h-10 w-10 object-cover"*/}
+                        {/*                                        width={40}*/}
+                        {/*                                        height={40}*/}
+                        {/*                                        src={BoekLogo.src}*/}
+                        {/*                                        alt=""*/}
+                        {/*                                    />*/}
+                        {/*                                </div>*/}
+                        {/*                                <div className="ml-3 w-0 flex-1">*/}
+                        {/*                                    <p className="text-sm font-medium text-gray-900">Emilia*/}
+                        {/*                                        Gates</p>*/}
+                        {/*                                    <p className="mt-1 text-sm text-gray-500">Sure! 8:30pm works*/}
+                        {/*                                        great!</p>*/}
+                        {/*                                </div>*/}
+                        {/*                            </div>*/}
+                        {/*                        </div>*/}
+                        {/*                        <div className="flex flex-col border-l border-gray-200">*/}
+                        {/*                            <button*/}
+                        {/*                                className="w-full border border-transparent rounded-none rounded-tr-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">Xem*/}
+                        {/*                            </button>*/}
+                        {/*                            <button*/}
+                        {/*                                onClick={() => toast.dismiss(t.id)}*/}
+                        {/*                                className="w-full border border-transparent rounded-none rounded-br-lg p-4 flex items-center justify-center text-sm font-medium text-red-600 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500">Ẩn*/}
+                        {/*                            </button>*/}
+                        {/*                        </div>*/}
+                        {/*                    </div>*/}
+                        {/*                </div>*/}
+                        {/*            </div>*/}
+                        {/*        ), {*/}
+
+                        {/*            duration: 10000,*/}
+                        {/*        });*/}
+                        {/*    }}*/}
+                        {/*    className={"bg-blue-500 p-3 text-white"}>*/}
+                        {/*    Test thông báo*/}
+                        {/*</button>*/}
                         {children}
                     </div>
                 </main>

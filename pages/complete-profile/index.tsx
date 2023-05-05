@@ -518,7 +518,7 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                     Huỷ bỏ đăng ký và quay lại
                 </button>
             </div>
-            <pre>{JSON.stringify(watch(), null, 2)}</pre>
+            {/*<pre>{JSON.stringify(watch(), null, 2)}</pre>*/}
 
             <DateTimePickerModal
 

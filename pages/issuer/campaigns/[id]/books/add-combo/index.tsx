@@ -786,7 +786,7 @@ const AddSellingBookComboPage: NextPageWithLayout = () => {
                                 Thêm vào hội sách
                             </button>
                         </div>
-                        <pre>{JSON.stringify(watch(), null, 2)}</pre>
+                        {/*<pre>{JSON.stringify(watch(), null, 2)}</pre>*/}
                     </form>
                 </div>
             </FormPageLayout>

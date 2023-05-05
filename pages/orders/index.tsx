@@ -142,7 +142,7 @@ const CustomerOrdersPage: NextPageWithLayout = () => {
             </Tab.Group>
 
             <div className="mt-4">
-                {isInitialLoading ? <div>Loading...</div> :
+                {isInitialLoading ? <div>Đang tải...</div> :
                     orderData?.data && orderData?.data?.length > 0 ?
                         <Fragment>
                             <div className="space-y-8">
