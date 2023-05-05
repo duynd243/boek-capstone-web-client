@@ -380,7 +380,7 @@ const BookForm = ({ book }: Props) => {
                                     <Form.Input<FormType>
                                         inputType="number"
                                         required={true}
-                                        label={"Năm xuất bản"}
+                                        label={"Năm phát hành"}
                                         register={register}
                                         fieldName="releasedYear"
                                         errorMessage={errors.releasedYear?.message}

@@ -500,7 +500,7 @@ const AddSellingBookSeriesPage: NextPageWithLayout = () => {
                         </button>
                     </div>
 
-                    <pre>{JSON.stringify(watch(), null, 2)}</pre>
+                    {/*<pre>{JSON.stringify(watch(), null, 2)}</pre>*/}
 
                 </form>
             </div>

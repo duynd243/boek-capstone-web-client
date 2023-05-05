@@ -32,6 +32,7 @@ import { IWard } from "../../types/Address/IWard";
 import { NextPageWithLayout } from "../_app";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import Link from "next/link";
+import { useCartStore } from "../../stores/CartStore";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
@@ -82,6 +83,7 @@ const CheckoutPage: NextPageWithLayout = () => {
     const { customerProfile } = useUserProfile();
     const orderCalculationService = new OrderCalculationService();
     const verificationService = new VerificationService();
+    const {removeItem} = useCartStore((state) => state);
     const { orderItems, orderType, setOrderItems } = useOrderStore(
         (state) => state,
     );
@@ -126,6 +128,9 @@ const CheckoutPage: NextPageWithLayout = () => {
         },
         {
             onSuccess: async (data) => {
+                orderItems.forEach((item) => {
+                    removeItem(item.product.id);
+                });
                 await router.push(`/order-success/`);
             },
         },
@@ -141,6 +146,9 @@ const CheckoutPage: NextPageWithLayout = () => {
         },
         {
             onSuccess: async (data) => {
+                orderItems.forEach((item) => {
+                    removeItem(item.product.id);
+                });
                 await router.push(`/order-success/`);
             },
         },
@@ -997,7 +1005,7 @@ const CheckoutPage: NextPageWithLayout = () => {
             </main>
             <div className={"grid grid-cols-2 gap-3"}>
                 <div>
-                    <pre>{JSON.stringify(watch(), null, 2)}</pre>
+                    {/*<pre>{JSON.stringify(watch(), null, 2)}</pre>*/}
                 </div>
                 <div>
                     <div>

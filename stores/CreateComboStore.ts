@@ -5,7 +5,7 @@ const initialFormValues = {
     name: "",
     isbn10: "",
     isbn13: "",
-    releasedYear: "",
+    releasedYear: new Date().getFullYear(),
     coverPrice: "",
     genreId: "",
     description: "",
