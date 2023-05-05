@@ -121,9 +121,9 @@ const CompleteProfilePage: NextPageWithLayout = () => {
         gender: z.boolean(),
         address: z.object({
             detail: z.string().min(1).max(100),
-            provinceCode: z.number(),
-            districtCode: z.number(),
-            wardCode: z.number(),
+            provinceCode: z.number({required_error: "Vui lòng chọn Tỉnh/Thành phố"}),
+            districtCode: z.number({required_error: "Vui lòng chọn Quận/Huyện"}),
+            wardCode: z.number({required_error: "Vui lòng chọn Phường/Xã"}),
         }),
         dob: z.string(),
         phone: z.string(),
