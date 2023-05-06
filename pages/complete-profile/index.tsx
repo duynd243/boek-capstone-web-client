@@ -121,9 +121,9 @@ const CompleteProfilePage: NextPageWithLayout = () => {
         gender: z.boolean(),
         address: z.object({
             detail: z.string().min(1).max(100),
-            provinceCode: z.number({required_error: "Vui lòng chọn Tỉnh/Thành phố"}),
-            districtCode: z.number({required_error: "Vui lòng chọn Quận/Huyện"}),
-            wardCode: z.number({required_error: "Vui lòng chọn Phường/Xã"}),
+            provinceCode: z.number({ required_error: "Vui lòng chọn Tỉnh/Thành phố" }),
+            districtCode: z.number({ required_error: "Vui lòng chọn Quận/Huyện" }),
+            wardCode: z.number({ required_error: "Vui lòng chọn Phường/Xã" }),
         }),
         dob: z.string(),
         phone: z.string(),
@@ -146,7 +146,6 @@ const CompleteProfilePage: NextPageWithLayout = () => {
             gender: true,
         },
         resolver: zodResolver(FormSchema),
-        mode: "all",
     });
 
     useEffect(() => {
@@ -156,7 +155,7 @@ const CompleteProfilePage: NextPageWithLayout = () => {
 
     const onSubmit = async (data: FormType) => {
         const idToken = await user?.getIdToken();
-        if(!idToken) return;
+        if (!idToken) return;
         await toast.promise(createUserMutation.mutateAsync({
             ...data,
             idToken,
@@ -166,10 +165,6 @@ const CompleteProfilePage: NextPageWithLayout = () => {
             error: (err) => err?.message || "Tạo tài khoản thất bại!",
         });
     };
-
-    console.log(errors);
-
-    console.log(Object.keys(errors).length);
 
     return (
         <Fragment>
@@ -328,12 +323,13 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                             />
                             <Controller
                                 control={control}
-                                disabled={districtsLoading}
+
                                 name="address.districtCode"
                                 render={({ field }) => {
                                     return (
                                         <SelectBox<IDistrict>
                                             value={selectedDistrict}
+                                            disabled={districtsLoading}
                                             placeholder={
                                                 districtsLoading
                                                     ? "Đang tải..."
@@ -487,29 +483,33 @@ const CompleteProfilePage: NextPageWithLayout = () => {
                     >
                         &lt;- Quay lại
                     </button>
-                    {stepIndex < Object.keys(FormSteps).length - 1 ? (
+                    {currentStep.id !== FormSteps.GROUP.id ? (
                         <button
                             type={"button"}
                             onClick={() => {
-                                setStepIndex((current) => current + 1);
+                                setStepIndex(stepIndex + 1);
                             }}
                             className="m-btn bg-indigo-500 hover:bg-indigo-600 text-white ml-auto disabled:opacity-50"
                         >
                             {"Tiếp theo ->"}
                         </button>
-                    ) : (
-                        <button
+                    ) : null}
+
+
+                    {currentStep.id === FormSteps.GROUP.id ? <button
+                            disabled={isSubmitting}
                             type={"submit"}
                             className="m-btn bg-indigo-500 hover:bg-indigo-600 text-white ml-auto disabled:opacity-50"
                         >
                             {"Đăng ký"}
                         </button>
-                    )}
+                        : null}
                 </div>
             </form>
 
             <div className="mt-6 border-t-[1px] border-slate-200 pt-5">
                 <button
+                    type="button"
                     className={
                         "text-sm font-medium text-slate-500 hover:text-slate-600"
                     }

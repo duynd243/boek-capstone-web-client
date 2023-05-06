@@ -83,7 +83,7 @@ const AddStaffModal: React.FC<Props> = ({ isOpen, onClose }) => {
     function renderStaffs() {
         if (isLoading) {
             return (
-                <div>Loading...</div>
+                <div>Đang tải...</div>
             );
         } else {
             if (staffs && staffs?.length > 0) {

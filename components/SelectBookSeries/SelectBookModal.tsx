@@ -31,7 +31,10 @@ const SelectBookModal = ({
     const debouncedSearch = useDebounce(search, 500);
     const bookService = new BookService(loginUser?.accessToken);
 
-    const { data: books } = useQuery(["books", debouncedSearch], () =>
+    const {
+        data: books,
+        isLoading,
+    } = useQuery(["books", debouncedSearch], () =>
         bookService.getBooksByIssuer({
             name: debouncedSearch,
             genreId: genreId,
@@ -59,64 +62,71 @@ const SelectBookModal = ({
                     />
                 </div>
                 <div className="h-96 overflow-y-auto">
-                    {books?.data && books?.data.length > 0 ? (
-                        books?.data.map((book, index) => {
-                            const isSelected = selectedBooks?.find(
-                                (item) => item.id === book.id,
-                            );
-                            return (
-                                <div
-                                    onClick={() => {
-                                        if (!isSelected) {
-                                            onItemSelect(book);
-                                        }
-                                    }}
-                                    key={index}
-                                    className={`relative flex justify-between border-b border-gray-300 p-4 pr-12 ${
-                                        isSelected
-                                            ? "cursor-not-allowed bg-slate-100"
-                                            : "cursor-pointer"
-                                    }`}
-                                >
-                                    <div className="flex gap-4">
-                                        <Image
-                                            width={500}
-                                            height={500}
-                                            className="h-20 w-16 object-cover"
-                                            src={book.imageUrl || ""}
-                                            alt=""
-                                        />
-                                        <div>
-                                            <div
-                                                className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
-                                                {book?.code}
-                                            </div>
-                                            <div className="mb-1 text-sm font-medium text-gray-900">
-                                                {book?.name}
-                                            </div>
-                                            <div className="text-sm font-medium text-gray-500">
-                                                NXB: {book?.publisher?.name}
-                                            </div>
-                                            <div className="text-sm font-medium text-gray-500">
-                                                Thể loại: {book?.genre?.name}
+
+                    {isLoading ?
+                        <div className={"animate-pulse flex text-lg text-gray-600 justify-center items-center h-full"}>
+                            Đang tải dữ liệu...
+                        </div> :
+
+                        books?.data && books?.data.length > 0 ? (
+                            books?.data.map((book, index) => {
+                                const isSelected = selectedBooks?.find(
+                                    (item) => item.id === book.id,
+                                );
+                                return (
+                                    <div
+                                        onClick={() => {
+                                            if (!isSelected) {
+                                                onItemSelect(book);
+                                            }
+                                        }}
+                                        key={index}
+                                        className={`relative flex justify-between border-b border-gray-300 p-4 pr-12 ${
+                                            isSelected
+                                                ? "cursor-not-allowed bg-slate-100"
+                                                : "cursor-pointer"
+                                        }`}
+                                    >
+                                        <div className="flex gap-4">
+                                            <Image
+                                                width={500}
+                                                height={500}
+                                                className="h-20 w-16 object-cover"
+                                                src={book.imageUrl || ""}
+                                                alt=""
+                                            />
+                                            <div>
+                                                <div
+                                                    className="mb-1 w-fit rounded bg-blue-500 py-1 px-2 text-xs text-white">
+                                                    {book?.code}
+                                                </div>
+                                                <div className="mb-1 text-sm font-medium text-gray-900">
+                                                    {book?.name}
+                                                </div>
+                                                <div className="text-sm font-medium text-gray-500">
+                                                    NXB: {book?.publisher?.name}
+                                                </div>
+                                                <div className="text-sm font-medium text-gray-500">
+                                                    Thể loại: {book?.genre?.name}
+                                                </div>
                                             </div>
                                         </div>
+                                        <div className="text-sm font-semibold text-emerald-600">
+                                            {new Intl.NumberFormat("vi-VN", {
+                                                style: "currency",
+                                                currency: "VND",
+                                            }).format(book?.coverPrice || 0)}
+                                        </div>
                                     </div>
-                                    <div className="text-sm font-semibold text-emerald-600">
-                                        {new Intl.NumberFormat("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND",
-                                        }).format(book?.coverPrice || 0)}
-                                    </div>
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <EmptyState
-                            status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
-                            keyword={search}
-                        />
-                    )}
+                                );
+                            })
+                        ) : (
+                            <EmptyState
+                                status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}
+                                keyword={search}
+                            />
+                        )
+                    }
                 </div>
 
                 <Modal.Footer>
