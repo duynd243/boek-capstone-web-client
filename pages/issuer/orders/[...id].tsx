@@ -17,6 +17,7 @@ import { getFormattedTime } from "../../../utils/helper";
 import useOrderTimeline from "../../../hooks/useOrderTimeline";
 import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
+import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 
 
 const AdminOrderDetailsPage: NextPageWithLayout = () => {
@@ -28,7 +29,7 @@ const AdminOrderDetailsPage: NextPageWithLayout = () => {
     console.log(router.query);
     console.log(id);
 
-    const { data: order } = useQuery(["order", id],
+    const { data: order, isLoading } = useQuery(["order", id],
         () => orderService.getOrderByIdByIssuer(id),
         {
             enabled: !!id,
@@ -37,6 +38,9 @@ const AdminOrderDetailsPage: NextPageWithLayout = () => {
     const { orderTimeline } = useOrderTimeline(order);
 
     const orderPaymentMethod = getOrderPaymentMethodById(order?.payment);
+    if (isLoading) return <LoadingSpinnerWithOverlay
+        label={"Đang tải thông tin đơn hàng..."}
+    />;
     return (
         <div className="max-w-5xl mx-auto rounded py-8 px-4 lg:px-8 2xl:px-12 bg-white">
             <div className={"w-fit py-1 my-6 font-medium !text-xs"}>

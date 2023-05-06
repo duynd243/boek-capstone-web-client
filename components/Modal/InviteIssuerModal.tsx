@@ -12,6 +12,7 @@ import { getAvatarFromName } from "../../utils/helper";
 import Image from "next/image";
 import Modal from "./Modal";
 import EmptyState, { EMPTY_STATE_TYPE } from "../EmptyState";
+import LoadingSpinner from "../LoadingSpinner";
 
 type Props = {
     isOpen: boolean;
@@ -182,7 +183,16 @@ const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
                     )}
 
                     <div className="overflow-y-auto h-96 max-w-full">
-                        {searchedIssuers && searchedIssuers?.length > 0 ? (
+                        {isLoading ? (
+                            <div className={'animate-pulse flex flex-col gap-4 items-center justify-center'}>
+                                {Array.from(Array(5).keys()).map((i, idx) => (
+                                <div
+                                    key={idx}
+                                    className={'h-10 w-full bg-gray-200 rounded'} />
+                                ))}
+                            </div>
+                        ) : (
+                        searchedIssuers && searchedIssuers?.length > 0 ? (
                                 searchedIssuers.map((issuer) => {
                                     const isSelected = selectedIssuers?.find(i => i?.id === issuer?.id) !== undefined;
                                     return <div
@@ -237,7 +247,8 @@ const InviteIssuerModal: React.FC<Props> = ({ isOpen, onClose }) => {
                                     status={EMPTY_STATE_TYPE.NO_DATA}
                                     customMessage={"Không có nhà phát hành nào để mời"}
                                 />
-                            )}
+                            )
+                        )}
                     </div>
                 </div>
                 <Modal.Footer>

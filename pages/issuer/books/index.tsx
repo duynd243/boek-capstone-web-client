@@ -22,6 +22,8 @@ import useSearchQuery from "../../../hooks/useSearchQuery";
 import { BookService } from "./../../../services/BookService";
 import Link from "next/link";
 import TableFooter from "../../../components/Admin/Table/TableFooter";
+import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
+import LoadingTopPage from "../../../components/LoadingTopPage";
 
 
 const CREATE_BOOK_BUTTONS = [
@@ -57,7 +59,10 @@ const IssuerBooksPage: NextPageWithLayout = () => {
     const issuerBookService = new IssuerBookService(loginUser?.accessToken);
     const bookService = new BookService(loginUser?.accessToken);
 
-    const { data: issuerData } = useQuery(["issuer_books", { searchFromQuery, page, size }], () =>
+    const {
+        data: issuerData, isLoading
+        , isFetching,
+    } = useQuery(["issuer_books", { searchFromQuery, page, size }], () =>
         bookService.getBooksByIssuer({
             page: page,
             size: size,
@@ -69,8 +74,11 @@ const IssuerBooksPage: NextPageWithLayout = () => {
         setSize(newSize);
         setPage(1);
     }, []);
+
+    if (isLoading) return <LoadingSpinnerWithOverlay />;
     return (
         <Fragment>
+             {isFetching && <LoadingTopPage />}
             <PageHeading label="Kho sách">
                 <SearchForm
                     placeholder="Tìm kiếm sách"
@@ -227,7 +235,7 @@ const IssuerBooksPage: NextPageWithLayout = () => {
                 </TableWrapper>
             ) : (
                 <div className="pt-8">
-                    { searchFromQuery ? (
+                    {searchFromQuery ? (
                         <EmptyState
                             keyword={searchFromQuery}
                             status={EMPTY_STATE_TYPE.SEARCH_NOT_FOUND}

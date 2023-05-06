@@ -3,7 +3,7 @@ import useSearchQuery from "./useSearchQuery";
 
 export default function useTableManagementPage() {
     const [page, setPage] = useState(1);
-    const pageSizeOptions = [5, 10, 20, 50];
+    const pageSizeOptions = [10, 20, 50];
     const [size, setSize] = useState(pageSizeOptions[0]);
     const { searchFromQuery, onSearchChange } = useSearchQuery("search", () => setPage(1));
     const [showCreateModal, setShowCreateModal] = useState(false);

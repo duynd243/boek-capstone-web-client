@@ -21,6 +21,7 @@ import { NextPageWithLayout } from "../../../../../_app";
 import { getBookFormatById } from "./../../../../../../constants/BookFormats";
 import { CampaignService } from "./../../../../../../services/CampaignService";
 import { getBookProductsFormatOptions } from "./../../../../../../utils/helper";
+import LoadingSpinnerWithOverlay from "../../../../../../components/LoadingSpinnerWithOverlay";
 
 
 const AddSellingBookPage: NextPageWithLayout = () => {
@@ -145,7 +146,7 @@ const AddSellingBookPage: NextPageWithLayout = () => {
         }
     };
 
-
+    if(isLoading) return <LoadingSpinnerWithOverlay label={'Đang tải thông tin sách...'} />
     return (
         <FormPageLayout>
             <WelcomeBanner label={`Thêm sách bán lẻ cho hội sách✨${campaigns?.name} 📚`} className="p-6 sm:p-10" />

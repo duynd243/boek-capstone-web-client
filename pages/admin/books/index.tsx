@@ -20,6 +20,8 @@ import EmptyState, { EMPTY_STATE_TYPE } from "../../../components/EmptyState";
 import TableFooter from "../../../components/Admin/Table/TableFooter";
 import DefaultAvatar from "../../../assets/images/default-avatar.png";
 import Link from "next/link";
+import LoadingTopPage from "../../../components/LoadingTopPage";
+import LoadingSpinnerWithOverlay from "../../../components/LoadingSpinnerWithOverlay";
 
 const AdminBooksPage: NextPageWithLayout = () => {
 
@@ -56,9 +58,10 @@ const AdminBooksPage: NextPageWithLayout = () => {
             keepPreviousData: true,
         },
     );
-
+    if (isLoading) return <LoadingSpinnerWithOverlay />;
     return (
         <Fragment>
+            {isFetching && <LoadingTopPage />}
             <PageHeading label="Kho sách">
                 <SearchForm
                     placeholder="Tìm kiếm theo tên sách"
