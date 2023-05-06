@@ -1003,18 +1003,18 @@ const CheckoutPage: NextPageWithLayout = () => {
                     </div>
                 </section>
             </main>
-            <div className={"grid grid-cols-2 gap-3"}>
-                <div>
-                    {/*<pre>{JSON.stringify(watch(), null, 2)}</pre>*/}
-                </div>
-                <div>
-                    <div>
-                        isOrderCalculationLoading:{" "}
-                        {isOrderCalculationLoading.toString()}
-                    </div>
-                    <pre>{JSON.stringify(orderCalculation, null, 2)}</pre>
-                </div>
-            </div>
+            {/*<div className={"grid grid-cols-2 gap-3"}>*/}
+            {/*    <div>*/}
+            {/*        /!*<pre>{JSON.stringify(watch(), null, 2)}</pre>*!/*/}
+            {/*    </div>*/}
+            {/*    <div>*/}
+            {/*        <div>*/}
+            {/*            isOrderCalculationLoading:{" "}*/}
+            {/*            {isOrderCalculationLoading.toString()}*/}
+            {/*        </div>*/}
+            {/*        <pre>{JSON.stringify(orderCalculation, null, 2)}</pre>*/}
+            {/*    </div>*/}
+            {/*</div>*/}
 
             {!loginUser?.accessToken && (
                 <ConfirmModal
